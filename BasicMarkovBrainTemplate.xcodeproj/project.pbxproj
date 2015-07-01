@@ -8,10 +8,54 @@
 
 /* Begin PBXBuildFile section */
 		C0CE1DDC1B447E4800F0002E /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DDB1B447E4800F0002E /* main.cpp */; };
+		C0CE1DF01B447E6B00F0002E /* Agent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DE21B447E6B00F0002E /* Agent.cpp */; };
+		C0CE1DF11B447E6B00F0002E /* Analyse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DE41B447E6B00F0002E /* Analyse.cpp */; };
+		C0CE1DF21B447E6B00F0002E /* Data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DE61B447E6B00F0002E /* Data.cpp */; };
+		C0CE1DF31B447E6B00F0002E /* Gate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DE81B447E6B00F0002E /* Gate.cpp */; };
+		C0CE1DF41B447E6B00F0002E /* Genome.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DEA1B447E6B00F0002E /* Genome.cpp */; };
+		C0CE1DF51B447E6B00F0002E /* Optimizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DEC1B447E6B00F0002E /* Optimizer.cpp */; };
+		C0CE1DF61B447E6B00F0002E /* World.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DEE1B447E6B00F0002E /* World.cpp */; };
+		C0CE1DFE1B447EAC00F0002E /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DFD1B447EAC00F0002E /* main.cpp */; };
+		C0CE1E041B447EC900F0002E /* RedBlueBerryWorld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1E021B447EC900F0002E /* RedBlueBerryWorld.cpp */; };
+		C0CE1E051B447EE900F0002E /* Agent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DE21B447E6B00F0002E /* Agent.cpp */; };
+		C0CE1E071B447EE900F0002E /* Analyse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DE41B447E6B00F0002E /* Analyse.cpp */; };
+		C0CE1E091B447EE900F0002E /* Data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DE61B447E6B00F0002E /* Data.cpp */; };
+		C0CE1E0B1B447EE900F0002E /* Gate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DE81B447E6B00F0002E /* Gate.cpp */; };
+		C0CE1E0D1B447EE900F0002E /* Genome.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DEA1B447E6B00F0002E /* Genome.cpp */; };
+		C0CE1E0F1B447EE900F0002E /* Optimizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DEC1B447E6B00F0002E /* Optimizer.cpp */; };
+		C0CE1E111B447EE900F0002E /* World.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DEE1B447E6B00F0002E /* World.cpp */; };
+		C0CE1E1A1B447F1200F0002E /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1E191B447F1200F0002E /* main.cpp */; };
+		C0CE1E201B447F3100F0002E /* MadBotAI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1E1E1B447F3100F0002E /* MadBotAI.cpp */; };
+		C0CE1E211B447F3D00F0002E /* Agent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DE21B447E6B00F0002E /* Agent.cpp */; };
+		C0CE1E221B447F3E00F0002E /* Analyse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DE41B447E6B00F0002E /* Analyse.cpp */; };
+		C0CE1E231B447F3E00F0002E /* Data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DE61B447E6B00F0002E /* Data.cpp */; };
+		C0CE1E241B447F3E00F0002E /* Gate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DE81B447E6B00F0002E /* Gate.cpp */; };
+		C0CE1E251B447F3E00F0002E /* Genome.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DEA1B447E6B00F0002E /* Genome.cpp */; };
+		C0CE1E261B447F3E00F0002E /* Optimizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DEC1B447E6B00F0002E /* Optimizer.cpp */; };
+		C0CE1E271B447F3E00F0002E /* World.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DEE1B447E6B00F0002E /* World.cpp */; };
+		C0CE1E281B447F3E00F0002E /* RedBlueBerryWorld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1E021B447EC900F0002E /* RedBlueBerryWorld.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		C0CE1DD61B447E4700F0002E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		C0CE1DF91B447EAC00F0002E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		C0CE1E151B447F1200F0002E /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -25,10 +69,46 @@
 /* Begin PBXFileReference section */
 		C0CE1DD81B447E4700F0002E /* BasicMarkovBrainTemplate */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BasicMarkovBrainTemplate; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0CE1DDB1B447E4800F0002E /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		C0CE1DE21B447E6B00F0002E /* Agent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Agent.cpp; sourceTree = "<group>"; };
+		C0CE1DE31B447E6B00F0002E /* Agent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Agent.h; sourceTree = "<group>"; };
+		C0CE1DE41B447E6B00F0002E /* Analyse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Analyse.cpp; sourceTree = "<group>"; };
+		C0CE1DE51B447E6B00F0002E /* Analyse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Analyse.h; sourceTree = "<group>"; };
+		C0CE1DE61B447E6B00F0002E /* Data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Data.cpp; sourceTree = "<group>"; };
+		C0CE1DE71B447E6B00F0002E /* Data.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Data.h; sourceTree = "<group>"; };
+		C0CE1DE81B447E6B00F0002E /* Gate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Gate.cpp; sourceTree = "<group>"; };
+		C0CE1DE91B447E6B00F0002E /* Gate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Gate.h; sourceTree = "<group>"; };
+		C0CE1DEA1B447E6B00F0002E /* Genome.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Genome.cpp; sourceTree = "<group>"; };
+		C0CE1DEB1B447E6B00F0002E /* Genome.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Genome.h; sourceTree = "<group>"; };
+		C0CE1DEC1B447E6B00F0002E /* Optimizer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Optimizer.cpp; sourceTree = "<group>"; };
+		C0CE1DED1B447E6B00F0002E /* Optimizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Optimizer.h; sourceTree = "<group>"; };
+		C0CE1DEE1B447E6B00F0002E /* World.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = World.cpp; sourceTree = "<group>"; };
+		C0CE1DEF1B447E6B00F0002E /* World.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = World.h; sourceTree = "<group>"; };
+		C0CE1DFB1B447EAC00F0002E /* RedBlueBerry */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RedBlueBerry; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0CE1DFD1B447EAC00F0002E /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		C0CE1E021B447EC900F0002E /* RedBlueBerryWorld.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RedBlueBerryWorld.cpp; sourceTree = "<group>"; };
+		C0CE1E031B447EC900F0002E /* RedBlueBerryWorld.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RedBlueBerryWorld.h; sourceTree = "<group>"; };
+		C0CE1E171B447F1200F0002E /* MadBotAI */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MadBotAI; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0CE1E191B447F1200F0002E /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		C0CE1E1E1B447F3100F0002E /* MadBotAI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MadBotAI.cpp; sourceTree = "<group>"; };
+		C0CE1E1F1B447F3100F0002E /* MadBotAI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MadBotAI.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		C0CE1DD51B447E4700F0002E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C0CE1DF81B447EAC00F0002E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C0CE1E141B447F1200F0002E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -42,6 +122,8 @@
 			isa = PBXGroup;
 			children = (
 				C0CE1DDA1B447E4800F0002E /* BasicMarkovBrainTemplate */,
+				C0CE1DFC1B447EAC00F0002E /* RedBlueBerry */,
+				C0CE1E181B447F1200F0002E /* MadBotAI */,
 				C0CE1DD91B447E4700F0002E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -50,6 +132,8 @@
 			isa = PBXGroup;
 			children = (
 				C0CE1DD81B447E4700F0002E /* BasicMarkovBrainTemplate */,
+				C0CE1DFB1B447EAC00F0002E /* RedBlueBerry */,
+				C0CE1E171B447F1200F0002E /* MadBotAI */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -58,8 +142,42 @@
 			isa = PBXGroup;
 			children = (
 				C0CE1DDB1B447E4800F0002E /* main.cpp */,
+				C0CE1DE21B447E6B00F0002E /* Agent.cpp */,
+				C0CE1DE31B447E6B00F0002E /* Agent.h */,
+				C0CE1DE41B447E6B00F0002E /* Analyse.cpp */,
+				C0CE1DE51B447E6B00F0002E /* Analyse.h */,
+				C0CE1DE61B447E6B00F0002E /* Data.cpp */,
+				C0CE1DE71B447E6B00F0002E /* Data.h */,
+				C0CE1DE81B447E6B00F0002E /* Gate.cpp */,
+				C0CE1DE91B447E6B00F0002E /* Gate.h */,
+				C0CE1DEA1B447E6B00F0002E /* Genome.cpp */,
+				C0CE1DEB1B447E6B00F0002E /* Genome.h */,
+				C0CE1DEC1B447E6B00F0002E /* Optimizer.cpp */,
+				C0CE1DED1B447E6B00F0002E /* Optimizer.h */,
+				C0CE1DEE1B447E6B00F0002E /* World.cpp */,
+				C0CE1DEF1B447E6B00F0002E /* World.h */,
 			);
 			path = BasicMarkovBrainTemplate;
+			sourceTree = "<group>";
+		};
+		C0CE1DFC1B447EAC00F0002E /* RedBlueBerry */ = {
+			isa = PBXGroup;
+			children = (
+				C0CE1DFD1B447EAC00F0002E /* main.cpp */,
+				C0CE1E021B447EC900F0002E /* RedBlueBerryWorld.cpp */,
+				C0CE1E031B447EC900F0002E /* RedBlueBerryWorld.h */,
+			);
+			path = RedBlueBerry;
+			sourceTree = "<group>";
+		};
+		C0CE1E181B447F1200F0002E /* MadBotAI */ = {
+			isa = PBXGroup;
+			children = (
+				C0CE1E1E1B447F3100F0002E /* MadBotAI.cpp */,
+				C0CE1E1F1B447F3100F0002E /* MadBotAI.h */,
+				C0CE1E191B447F1200F0002E /* main.cpp */,
+			);
+			path = MadBotAI;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -82,6 +200,40 @@
 			productReference = C0CE1DD81B447E4700F0002E /* BasicMarkovBrainTemplate */;
 			productType = "com.apple.product-type.tool";
 		};
+		C0CE1DFA1B447EAC00F0002E /* RedBlueBerry */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C0CE1DFF1B447EAC00F0002E /* Build configuration list for PBXNativeTarget "RedBlueBerry" */;
+			buildPhases = (
+				C0CE1DF71B447EAC00F0002E /* Sources */,
+				C0CE1DF81B447EAC00F0002E /* Frameworks */,
+				C0CE1DF91B447EAC00F0002E /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RedBlueBerry;
+			productName = RedBlueBerry;
+			productReference = C0CE1DFB1B447EAC00F0002E /* RedBlueBerry */;
+			productType = "com.apple.product-type.tool";
+		};
+		C0CE1E161B447F1200F0002E /* MadBotAI */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C0CE1E1B1B447F1200F0002E /* Build configuration list for PBXNativeTarget "MadBotAI" */;
+			buildPhases = (
+				C0CE1E131B447F1200F0002E /* Sources */,
+				C0CE1E141B447F1200F0002E /* Frameworks */,
+				C0CE1E151B447F1200F0002E /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MadBotAI;
+			productName = MadBotAI;
+			productReference = C0CE1E171B447F1200F0002E /* MadBotAI */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -92,6 +244,12 @@
 				ORGANIZATIONNAME = "Arend Hintze";
 				TargetAttributes = {
 					C0CE1DD71B447E4700F0002E = {
+						CreatedOnToolsVersion = 6.3.1;
+					};
+					C0CE1DFA1B447EAC00F0002E = {
+						CreatedOnToolsVersion = 6.3.1;
+					};
+					C0CE1E161B447F1200F0002E = {
 						CreatedOnToolsVersion = 6.3.1;
 					};
 				};
@@ -109,6 +267,8 @@
 			projectRoot = "";
 			targets = (
 				C0CE1DD71B447E4700F0002E /* BasicMarkovBrainTemplate */,
+				C0CE1DFA1B447EAC00F0002E /* RedBlueBerry */,
+				C0CE1E161B447F1200F0002E /* MadBotAI */,
 			);
 		};
 /* End PBXProject section */
@@ -119,6 +279,46 @@
 			buildActionMask = 2147483647;
 			files = (
 				C0CE1DDC1B447E4800F0002E /* main.cpp in Sources */,
+				C0CE1DF01B447E6B00F0002E /* Agent.cpp in Sources */,
+				C0CE1DF61B447E6B00F0002E /* World.cpp in Sources */,
+				C0CE1DF11B447E6B00F0002E /* Analyse.cpp in Sources */,
+				C0CE1DF21B447E6B00F0002E /* Data.cpp in Sources */,
+				C0CE1DF41B447E6B00F0002E /* Genome.cpp in Sources */,
+				C0CE1DF31B447E6B00F0002E /* Gate.cpp in Sources */,
+				C0CE1DF51B447E6B00F0002E /* Optimizer.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C0CE1DF71B447EAC00F0002E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C0CE1E051B447EE900F0002E /* Agent.cpp in Sources */,
+				C0CE1E071B447EE900F0002E /* Analyse.cpp in Sources */,
+				C0CE1E091B447EE900F0002E /* Data.cpp in Sources */,
+				C0CE1E0B1B447EE900F0002E /* Gate.cpp in Sources */,
+				C0CE1E0D1B447EE900F0002E /* Genome.cpp in Sources */,
+				C0CE1E0F1B447EE900F0002E /* Optimizer.cpp in Sources */,
+				C0CE1E111B447EE900F0002E /* World.cpp in Sources */,
+				C0CE1DFE1B447EAC00F0002E /* main.cpp in Sources */,
+				C0CE1E041B447EC900F0002E /* RedBlueBerryWorld.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C0CE1E131B447F1200F0002E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C0CE1E211B447F3D00F0002E /* Agent.cpp in Sources */,
+				C0CE1E221B447F3E00F0002E /* Analyse.cpp in Sources */,
+				C0CE1E231B447F3E00F0002E /* Data.cpp in Sources */,
+				C0CE1E241B447F3E00F0002E /* Gate.cpp in Sources */,
+				C0CE1E251B447F3E00F0002E /* Genome.cpp in Sources */,
+				C0CE1E261B447F3E00F0002E /* Optimizer.cpp in Sources */,
+				C0CE1E271B447F3E00F0002E /* World.cpp in Sources */,
+				C0CE1E281B447F3E00F0002E /* RedBlueBerryWorld.cpp in Sources */,
+				C0CE1E201B447F3100F0002E /* MadBotAI.cpp in Sources */,
+				C0CE1E1A1B447F1200F0002E /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -216,6 +416,42 @@
 			};
 			name = Release;
 		};
+		C0CE1E001B447EAC00F0002E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		C0CE1E011B447EAC00F0002E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		C0CE1E1C1B447F1200F0002E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		C0CE1E1D1B447F1200F0002E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -233,6 +469,22 @@
 			buildConfigurations = (
 				C0CE1DE01B447E4800F0002E /* Debug */,
 				C0CE1DE11B447E4800F0002E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		C0CE1DFF1B447EAC00F0002E /* Build configuration list for PBXNativeTarget "RedBlueBerry" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0CE1E001B447EAC00F0002E /* Debug */,
+				C0CE1E011B447EAC00F0002E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		C0CE1E1B1B447F1200F0002E /* Build configuration list for PBXNativeTarget "MadBotAI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0CE1E1C1B447F1200F0002E /* Debug */,
+				C0CE1E1D1B447F1200F0002E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 		};
