@@ -115,7 +115,6 @@ int main(int argc, const char * argv[]) {
 	//Add additional Data through analyze mode
 	//not needed in the basic example here
 	//*
-	printf("Dude!\n");
 	 //get the LOD
 	/*
 	 vector<Genome*> LOD=Data::getLOD(population[0]->ancestor);
@@ -130,13 +129,13 @@ int main(int argc, const char * argv[]) {
 		 delete A;
 	 }
 	 //*/
-	Data::showAll();
+	//Data::showAll();
 
 	//save data
 	Data::saveLOD(population[0]->ancestor, LODFileName);
 	Data::saveGEN(population[0]->ancestor, GENFileName, intervall);
-	Agent *A=new Agent((ClassicMBGenome*)population[0],16);
-	printf("%s\n",A->gateList().c_str());
+	//Agent *A=new Agent((ClassicMBGenome*)population[0],16);
+	//printf("%s\n",A->gateList().c_str());
 	return 0;
 }
 

@@ -46,6 +46,8 @@ Agent::~Agent(){
 void Agent::resetBrain(){
 	for(int i=0;i<nrOfStates;i++)
 		states[i]=0.0;
+	for(int i=0;i<gates.size();i++)
+		gates[i]->resetGate();
 }
 
 void Agent::updateStates(){
@@ -79,6 +81,14 @@ int Agent::IntFromState(vector<int> I){
 	for(int i=0;i<I.size();i++)
 		r=(r<<1)+Bit(states[I[i]]);
 	return r;
+}
+
+int Agent::IntFromAllStates(){
+	int r=0;
+	for(int i=0;i<nrOfStates;i++)
+		r=(r<<1)+Bit(states[i]);
+	return r;
+	
 }
 
 string Agent::gateList(){

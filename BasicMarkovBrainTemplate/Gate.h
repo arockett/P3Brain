@@ -25,8 +25,8 @@ public:
 	vector<int> O;
 	vector<vector<double>> table;
 	
-	Gate();
-	Gate(ClassicMBGenome *genome,int startCodonAt);
+	Gate();											//this is an empty constructor, gate will remain empty
+	Gate(ClassicMBGenome *genome,int startCodonAt); //this constructor inherets from the parent
 	
 	virtual ~Gate();
 	
@@ -35,6 +35,7 @@ public:
 	virtual string description();
 	virtual void applyNodeMap(int *nodeMap,int maxNodes);
 	static void AddGate(int ID, function<Gate*(ClassicMBGenome*,int)> theFunction);
+	virtual void resetGate(void);
 };
 
 
@@ -50,17 +51,20 @@ public:
 /* ***** ADVANCED IMPLEMENTATION! - ENTER ON OWN RISK ***** */
 class FeedbackGate:public Gate{
 private:
+	vector<vector<double>> originalTable;
 	unsigned char posFBNode,negFBNode;
 	unsigned char nrPos,nrNeg;
 	vector<double> posLevelOfFB,negLevelOfFB;
 	deque<unsigned char> chosenInPos,chosenInNeg,chosenOutPos,chosenOutNeg;
 public:
+	static bool feedbackON;
 	FeedbackGate();
 	FeedbackGate(ClassicMBGenome *genome,int startCodonAt);
 	~FeedbackGate();
 	virtual void update(double *states,double *nextStates);
 	virtual string description();
 	virtual void applyNodeMap(int *nodeMap,int maxNodes);
+	virtual void resetGate(void);
 };
 
 class GPGate:public Gate{
@@ -86,5 +90,16 @@ public:
 	virtual string description();
 };
 
+class FixedEpsilonGate:public DeterministicGate{
+private:
+public:
+	vector<int> defaultOutput;
+	static double epsilon;
+	FixedEpsilonGate();
+	FixedEpsilonGate(ClassicMBGenome *genome,int startCodonAt);
+	virtual ~FixedEpsilonGate();
+	virtual void update(double *states,double *nextStates);
+	virtual string description();
+};
 
 #endif /* defined(__BasicMarkovBrainTemplate__Gate__) */

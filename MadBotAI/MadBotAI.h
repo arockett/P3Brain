@@ -47,10 +47,12 @@ public:
 	//MadBotGenome *genome;
 	MadBotAI();
 	MadBotAI(MadBotGenome *startGenome,int _nrOfStates);
+	MadBotAI(MadBotGenome *startGenome);
 	~MadBotAI();
 	virtual void resetBrain();
 	virtual void updateStates();
 	virtual string gateList();
+	virtual int makeUpdate(int input);
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__MadBotAI__) */

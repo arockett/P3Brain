@@ -39,10 +39,12 @@ public:
 	ClassicMBGenome();
 	ClassicMBGenome(Genome *from);
 	vector<unsigned char> genome;
+	static double insertionDeletionP;
 	
 	virtual void fillRandom();
 	virtual void copyGenome(Genome *from);
 	virtual void applyMutations(double mutationRate);
+	virtual void makePointMutation();
 	virtual Genome* makeMutatedOffspring(double mutationRate);
 	virtual void saveToFile(FILE *F);
 };

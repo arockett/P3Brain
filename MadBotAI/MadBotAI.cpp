@@ -108,6 +108,11 @@ MadBotAI::MadBotAI(MadBotGenome *startGenome,int _nrOfStates){
 	//printf("Initialized with: BI:%i BO:%i BH:%i\n",Ibits,Obits,Hbits);
 }
 
+MadBotAI::MadBotAI(MadBotGenome *startGenome){
+	genome=(ClassicMBGenome*)startGenome;
+	state=0;
+}
+
 MadBotAI::~MadBotAI(){
 	delete states;
 	delete nextStates;
@@ -129,22 +134,26 @@ void MadBotAI::updateStates(){
 		A++;
 		R=R>>1;
 	}
-	/* this is bullshit!!!
-	int R=rand()&((1<<genome->granularity)-1);
-	int A=0;
-	int L=genome->granularity;
-	while(A>(1<<L)){
-		L--;
-	}
-	 */
-//	int A=rand()%genome->granularity;
-//	A=0;
 	int theAction=((MadBotGenome*)genome)->brain[I+(((MadBotGenome*)genome)->states*state)][A].actionToDo;
 	state=((MadBotGenome*)genome)->brain[I+(((MadBotGenome*)genome)->states*state)][A].nextState;
 	for(int i=0;i<Obits;i++)
 		states[Ibits+i]=(double)((theAction>>i)&1);
 	for(int i=0;i<Hbits;i++)
 		states[Ibits+Obits+i]=(double)((state>>i)&1);
+}
+
+int MadBotAI::makeUpdate(int input){
+	int I=input;
+	int R=rand()&((1<<((MadBotGenome*)genome)->granularity)-1);
+	R|=1<<(((MadBotGenome*)genome)->granularity-1);
+	int A=0;
+	while((R&1)==0){
+		A++;
+		R=R>>1;
+	}
+	int theAction=((MadBotGenome*)genome)->brain[I+(((MadBotGenome*)genome)->states*state)][A].actionToDo;
+	state=((MadBotGenome*)genome)->brain[I+(((MadBotGenome*)genome)->states*state)][A].nextState;
+	return theAction;
 }
 
 string MadBotAI::gateList(){

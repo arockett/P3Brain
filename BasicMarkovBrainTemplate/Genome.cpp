@@ -60,6 +60,8 @@ void Genome::saveToFile(FILE *F){
 
 /* *** classic MB Genome implementation *** */
 
+double ClassicMBGenome::insertionDeletionP=0.02;
+
 ClassicMBGenome::ClassicMBGenome(){
 	referenceCounter=1;
 	ancestor=NULL;
@@ -82,7 +84,7 @@ void ClassicMBGenome::fillRandom(){
 		for(int i=0;i<4;i++){
 			int j=rand()%(int)(genome.size()-2);
 			genome[j]=codon;
-			genome[j+1]=255-codon;
+			genome[j+1]=256-codon;
 		}
 }
 
@@ -103,7 +105,7 @@ void ClassicMBGenome::applyMutations(double mutationRate){
 		int localMutations= distribution(generator);
 		for(i=0;i<localMutations;i++)
 			genome[rand()%nucleotides]=rand()&255;
-		if((((double)rand()/(double)RAND_MAX)<0.02)&&(genome.size()<20000)){
+		if((((double)rand()/(double)RAND_MAX)<insertionDeletionP)&&(genome.size()<20000)){
 			//duplication
 			w=128+rand()%(512-128);
 			s=rand()%((int)genome.size()-w);
@@ -112,7 +114,7 @@ void ClassicMBGenome::applyMutations(double mutationRate){
 			buffer.insert(buffer.begin(),genome.begin()+s,genome.begin()+s+w);
 			genome.insert(genome.begin()+o,buffer.begin(),buffer.end());
 		}
-		if((((double)rand()/(double)RAND_MAX)<0.02)&&(genome.size()>1000)){
+		if((((double)rand()/(double)RAND_MAX)<insertionDeletionP)&&(genome.size()>1000)){
 			//deletion
 			w=128+rand()%(512-128);
 			s=rand()%((int)genome.size()-w);
@@ -121,7 +123,11 @@ void ClassicMBGenome::applyMutations(double mutationRate){
 	}
 }
 
-//ClassicMBGenome* ClassicMBGenome::makeMutatedOffspring(double mutationRate){
+void ClassicMBGenome::makePointMutation(){
+	genome[rand()%genome.size()]=(unsigned char)(rand()&255);
+}
+
+
 Genome* ClassicMBGenome::makeMutatedOffspring(double mutationRate){
 	ClassicMBGenome* G=new ClassicMBGenome(this);
 	G->applyMutations(mutationRate);

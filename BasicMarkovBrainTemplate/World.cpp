@@ -51,17 +51,16 @@ vector<double> ExampleWorld::evaluateFitness(vector<Agent*> agents,bool analyse)
 
 double ExampleWorld::testIndividual(Agent *agent,bool analyse){
 	double fitness=0.0;
-	vector<int> S,B,Wone,Wtwo,Wtime;
 	agent->resetBrain();
 	for(int t=0;t<100;t++){
 		int I[8];
-		for(int i=0;i<8;i++){
+		for(int i=0;i<3;i++){
 			I[i]=rand()&1;
 			agent->states[i]=(double)I[i];
 		}
 		
 		agent->updateStates();
-		for(int i=0;i<8;i++){
+		for(int i=0;i<3;i++){
 			if(agent->Bit(agent->states[8+i])==(int)I[i]){
 				fitness+=1.0;
 			}

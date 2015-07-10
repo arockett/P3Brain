@@ -16,6 +16,9 @@ void Gate::AddGate(int ID, function<Gate*(ClassicMBGenome*,int)> theFunction){
 }
 
 /* *** Gate implementation *** */
+
+/*
+ */
 Gate::Gate(){
 }
 
@@ -105,6 +108,11 @@ void Gate::applyNodeMap(int *nodeMap,int maxNodes){
 	for(int i=0;i<O.size();i++)
 		O[i]=nodeMap[O[i]%maxNodes];
 }
+
+void Gate::resetGate(void){
+		//nothing to reset here!
+}
+
 
 
 /* *** Determistic Gate Implementation *** */
@@ -279,6 +287,8 @@ string GPGate::description(){
 }
 
 /* *** Feedback Gate *** */
+bool FeedbackGate::feedbackON=true;
+
 FeedbackGate::FeedbackGate(){
 
 }
@@ -326,8 +336,10 @@ FeedbackGate::FeedbackGate(ClassicMBGenome *genome,int startCodonAt){
 	k=k+16;
 	//get all the values into the table
 	table.resize(1<<_yDim);
+	originalTable.resize(1<<_yDim);
 	for(i=0;i<(1<<_yDim);i++){
 		table[i].resize(1<<_xDim);
+		originalTable[i].resize(1<<_xDim);
 		double S=0.0;
 		for(j=0;j<(1<<_xDim);j++){
 			table[i][j]=(double)genome->genome[(k+j+((1<<_xDim)*i))%genome->genome.size()];
@@ -341,6 +353,8 @@ FeedbackGate::FeedbackGate(ClassicMBGenome *genome,int startCodonAt){
 			for(j=0;j<(1<<_xDim);j++)
 				table[i][j]/=S;
 		}
+		for(j=0;j<(1<<_xDim);j++)
+			originalTable[i][j]=table[i][j];
 	}
 
 	
@@ -358,7 +372,7 @@ void FeedbackGate::update(double *states,double *nextStates){
 	double mod;
 	
 	//Apply the feedback
-	if((nrPos!=0)&&(states[posFBNode]>0.0)){
+	if((feedbackON)&&(nrPos!=0)&&(states[posFBNode]>0.0)){
 		for(i=0;i<chosenInPos.size();i++){
 			mod=((double)rand()/(double)RAND_MAX)*posLevelOfFB[i];
 			table[chosenInPos[i]][chosenOutPos[i]]+=mod;
@@ -369,7 +383,7 @@ void FeedbackGate::update(double *states,double *nextStates){
 				table[chosenInPos[i]][k]/=s;
 		}
 	}
-	if((nrNeg!=0)&&(states[negFBNode]>0.0)){
+	if((feedbackON)&&(nrNeg!=0)&&(states[negFBNode]>0.0)){
 		for(i=0;i<chosenInNeg.size();i++){
 			mod=((double)rand()/(double)RAND_MAX)*negLevelOfFB[i];
 			table[chosenInNeg[i]][chosenOutNeg[i]]-=mod;
@@ -397,25 +411,27 @@ void FeedbackGate::update(double *states,double *nextStates){
 		nextStates[O[i]]+=1.0*((output>>i)&1);
 
 	//remember the last actions for future feedback
-	chosenInPos.push_back(input);
-	chosenInNeg.push_back(input);
-	chosenOutPos.push_back(output);
-	chosenOutNeg.push_back(output);
-	while(chosenInPos.size()>nrPos)
-	{
-		chosenInPos.pop_front();
-	}
-	while(chosenOutPos.size()>nrPos)
-	{
-		chosenOutPos.pop_front();
-	}
-	while(chosenInNeg.size()>nrNeg)
-	{
-		chosenInNeg.pop_front();
-	}
-	while(chosenOutNeg.size()>nrNeg)
-	{
-		chosenOutNeg.pop_front();
+	if(feedbackON){
+		chosenInPos.push_back(input);
+		chosenInNeg.push_back(input);
+		chosenOutPos.push_back(output);
+		chosenOutNeg.push_back(output);
+		while(chosenInPos.size()>nrPos)
+		{
+			chosenInPos.pop_front();
+		}
+		while(chosenOutPos.size()>nrPos)
+		{
+			chosenOutPos.pop_front();
+		}
+		while(chosenInNeg.size()>nrNeg)
+		{
+			chosenInNeg.pop_front();
+		}
+		while(chosenOutNeg.size()>nrNeg)
+		{
+			chosenOutNeg.pop_front();
+		}
 	}
 }
 
@@ -430,6 +446,15 @@ void FeedbackGate::applyNodeMap(int *nodeMap, int maxNodes){
 	negFBNode=nodeMap[negFBNode%maxNodes];
 }
 
+void FeedbackGate::resetGate(){
+	chosenInPos.clear();
+	chosenInNeg.clear();
+	chosenOutPos.clear();
+	chosenOutNeg.clear();
+	for(int i=0;i<table.size();i++)
+		for(int j=0;j<table[i].size();j++)
+			table[i][j]=originalTable[i][j];
+}
 
 /* *** Threshold Gate *** */
 Thresholdgate::Thresholdgate(){
@@ -437,7 +462,7 @@ Thresholdgate::Thresholdgate(){
 }
 
 Thresholdgate::Thresholdgate(ClassicMBGenome *genome,int startCodonAt){
-	int i,j,k;
+	int i,k;
 	I.clear();
 	O.clear();
 	int _xDim;
@@ -485,5 +510,83 @@ void Thresholdgate::update(double *states,double *nextStates){
 
 string Thresholdgate::description(){
 	return "ThresholdgateGate: "+to_string(threshold)+"\n"+Gate::description();;
+}
+
+
+/* *** Fixed Epison Gate *** */
+/* this gate behaves like a deterministic gate with a constant externally set error */
+
+double FixedEpsilonGate::epsilon=0.0;
+
+FixedEpsilonGate::FixedEpsilonGate(){
+	
+}
+
+FixedEpsilonGate::FixedEpsilonGate(ClassicMBGenome *genome,int startCodonAt){
+	int i,j,k;
+	I.clear();
+	O.clear();
+	int _xDim,_yDim;
+	
+	//find the first nucleotide that isn't part of the start codon
+	k=(startCodonAt+2)%(int)genome->genome.size();
+	
+	//get the dimensions of the table
+	_xDim=1+(genome->genome[(k++)%genome->genome.size()]&3);
+	_yDim=1+(genome->genome[(k++)%genome->genome.size()]&3);
+	
+	//prepare the containers for the I and O addresses
+	I.resize(_yDim);
+	O.resize(_xDim);
+	
+	for(i=0;i<_yDim;i++)
+		I[i]=genome->genome[(k+i)%genome->genome.size()];
+	for(i=0;i<_xDim;i++)
+		O[i]=genome->genome[(k+4+i)%genome->genome.size()];
+	
+	k=k+16;
+	//get all the values into the table
+	table.resize(1<<_yDim);
+	for(i=0;i<(1<<_yDim);i++){
+		table[i].resize(_xDim);
+		for(j=0;j<_xDim;j++){
+			table[i][j]=1.0*(double)(genome->genome[(k+j+(_xDim*i))%genome->genome.size()]&1);
+		}
+	}
+	//now to the specifics of this gate
+	defaultOutput.clear();
+	for(int i=0;i<table.size();i++){
+		int D=0;
+		for(int j=0;j<table[i].size();j++)
+			D|=Bit(table[i][j])<<j;
+		defaultOutput.push_back(D);
+	}
+}
+
+FixedEpsilonGate::~FixedEpsilonGate(){
+	
+}
+
+void FixedEpsilonGate::update(double *states,double *nextStates){
+	int input=0;
+	for(int i=0;i<I.size();i++)
+		input=(input<<1)+Bit(states[I[i]]);
+	if(((double)rand()/(double)RAND_MAX)<epsilon){
+		//do a random output excluding the one otherwise given
+		int output=0;
+		do{
+			output=rand()&(table.size()-1);
+		}while(output==defaultOutput[input]);
+		for(int i=0;i<O.size();i++)
+			nextStates[O[i]]+=1.0*(double)((output>>i)&1);
+	} else {
+		//do the default output
+		for(int i=0;i<O.size();i++)
+			nextStates[O[i]]+=table[input][i];
+	}
+}
+
+string FixedEpsilonGate::description(){
+	return "Fixed Epsilon "+to_string(epsilon)+" "+Gate::description();
 }
 

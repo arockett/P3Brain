@@ -33,6 +33,7 @@ public:
 	static void initializeGates(vector<bool> isGateOn);
 	int Bit(double d);
 	virtual int IntFromState(vector<int> I);
+	virtual int IntFromAllStates();
 	virtual void resetBrain();
 	virtual void updateStates();
 	virtual string gateList();

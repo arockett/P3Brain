@@ -38,7 +38,7 @@ int main(int argc, const char * argv[]) {
 	bool gateFlags[8];
 	
 	//default command line paramters
-	Data::setDefaultParameter("updates", &updates, 100);
+	Data::setDefaultParameter("updates", &updates, 1000);
 	Data::setDefaultParameter("popSize", &popSize, 100);
 	Data::setDefaultParameter("intervall", &intervall, 100);
 	Data::setDefaultParameter("LOD", &LODFileName, "defaultLOD.csv");
@@ -52,6 +52,8 @@ int main(int argc, const char * argv[]) {
 	Data::setDefaultParameter("fbGate", &gateFlags[2], true);
 	Data::setDefaultParameter("gpGate", &gateFlags[3], false);
 	Data::setDefaultParameter("thGate", &gateFlags[4], false);
+	Data::setDefaultParameter("epsilonGate", &gateFlags[5], false);
+	Data::setDefaultParameter("epsilon", &FixedEpsilonGate::epsilon, 0.1);
 	Data::UseCommandLineParameters(argc,argv);
 	
 	//setup Gates
@@ -62,6 +64,7 @@ int main(int argc, const char * argv[]) {
 	if(gateFlags[2]) Gate::AddGate(44,[](ClassicMBGenome* genome,int pos) {return new FeedbackGate(genome,pos);});
 	if(gateFlags[3]) Gate::AddGate(45,[](ClassicMBGenome* genome,int pos) {return new GPGate(genome,pos);});
 	if(gateFlags[4]) Gate::AddGate(46,[](ClassicMBGenome* genome,int pos) {return new Thresholdgate(genome,pos);});
+	if(gateFlags[5]) Gate::AddGate(47,[](ClassicMBGenome* genome,int pos) {return new FixedEpsilonGate(genome,pos);});
 
 
 	//printf("Here!\n");
@@ -108,7 +111,7 @@ int main(int argc, const char * argv[]) {
     vector<Genome*> LOD=Data::getLOD(population[0]->ancestor);
     //iterate over the LOD and have analyze on
     //world will add all parameters you typically need to Data
-    for(int i=0;i<popSize;i++){
+    for(int i=0;i<LOD.size();i++){
         vector<Agent*> agents;
         Agent *A=new Agent((ClassicMBGenome*)LOD[i],nrOfBrainStates);
         agents.push_back(A);
