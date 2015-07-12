@@ -106,6 +106,13 @@ void fbLearnWorld::makeMap(){
 vector<double> fbLearnWorld::evaluateFitness(vector<Agent*> agents,bool analyse){
 	vector<double> allW;
 	makeMap();
+	/*
+	for(int i=0;i<24;i++){
+		int x,y;
+		do{ x=rand()%24; y=rand()%24;} while(x==y);
+		int d=subsample[x]; subsample[x]=subsample[y]; subsample[y]=d;
+	}*/
+	
 	for(int i=0;i<agents.size();i++){
 		if(analyse){
 			//analysis mode!
@@ -167,6 +174,17 @@ vector<double> fbLearnWorld::evaluateFitness(vector<Agent*> agents,bool analyse)
 				fprintf(F,"\n");
 			}
 			fclose(F);
+			/*compute no feedback performance on LOD */
+			FeedbackGate::feedbackON=false;
+			vector<Genome*> LOD=Data::getLOD(agents[i]->genome);
+			for(int l=0;l<LOD.size();l++){
+				Agent* A=new Agent((ClassicMBGenome*)LOD[l],agents[i]->nrOfStates);
+				for(int j=0;j<24;j++){
+					currentMapID=j;
+					testIndividual(A,true);
+				}
+			}
+			FeedbackGate::feedbackON=true;
 		} else {
 			//evolve mode
 			double W=0.0;
@@ -191,7 +209,7 @@ double fbLearnWorld::testIndividual(Agent *agent,bool analyse){
 	int i;
 	
 	vector<Pos> positions;
-	
+	agent->resetBrain();
 	xPos=startX;
 	yPos=startY;
 	dir=rand()&3;

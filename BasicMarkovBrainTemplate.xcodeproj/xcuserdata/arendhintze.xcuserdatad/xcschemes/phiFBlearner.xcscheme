@@ -61,7 +61,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "updates 1000"
+            argument = "updates 100"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

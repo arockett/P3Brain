@@ -9,13 +9,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "BasicMarkovBrainTemplate/Gate.cpp"
-            timestampString = "458235338.124668"
+            filePath = "phiFBlearner/fbLearnWorld.cpp"
+            timestampString = "458400946.64388"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "554"
-            endingLineNumber = "554"
-            landmarkName = "FixedEpsilonGate::FixedEpsilonGate(ClassicMBGenome *genome,int startCodonAt)"
+            startingLineNumber = "180"
+            endingLineNumber = "180"
+            landmarkName = "fbLearnWorld::evaluateFitness(vector&lt;Agent*&gt; agents,bool analyse)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
