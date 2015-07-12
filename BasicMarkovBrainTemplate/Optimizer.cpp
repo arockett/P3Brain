@@ -48,7 +48,7 @@ vector<Genome*> GA::makeNextGeneration(vector<Genome*> population,vector<double>
 			}while(pow(1.05,((double)rand()/(double)RAND_MAX))>pow(1.05,(W[who]/maxFitness)));
 		else
 			who=rand()%(int)W.size();
-		if(nextGeneration.size()<=elitism)
+		if((int)nextGeneration.size()<=elitism)
 			who=best;
 		nextGeneration.push_back((Genome*)population[who]->makeMutatedOffspring(Data::getDefaultDouble("pointMutationRate")));
 	}

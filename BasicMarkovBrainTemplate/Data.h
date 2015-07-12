@@ -39,6 +39,7 @@ public:
 	static void saveLOD(Genome *who,string filename);
 	static void saveGEN(Genome *who,string filename,int intervall);
     static vector<Genome*> getLOD(Genome *from);
+	static Genome* getMostRecentCommonAncestor(Genome *from);
 	
 	//this is the command line parameter part
 	static map<string,int*> parameterInt;

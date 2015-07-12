@@ -112,6 +112,16 @@ void Data::saveGEN(Genome *who,string filename,int intervall){
 	fclose(F);
 }
 
+Genome* Data::getMostRecentCommonAncestor(Genome *from){
+	vector<Genome*> LOD=getLOD(from);
+	for(Genome *G:LOD){
+		//printf("%i %i\n",G->ID,G->referenceCounter);
+		if(G->referenceCounter>1)
+			return G;
+	}
+	return from;
+}
+
 //implementation for parameters
 void Data::setDefaultParameter(string key,int *variable,int value){
 	parameterInt[key]=variable;

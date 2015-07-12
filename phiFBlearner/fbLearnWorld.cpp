@@ -207,8 +207,8 @@ double fbLearnWorld::testIndividual(Agent *agent,bool analyse){
 	string timeDelta="";
 	int steps=4*(xDim+yDim);
 	int i;
-	
-	vector<Pos> positions;
+	//return 1.0;//(double) rand()/(double)RAND_MAX;
+//	vector<Pos> positions;
 	agent->resetBrain();
 	xPos=startX;
 	yPos=startY;

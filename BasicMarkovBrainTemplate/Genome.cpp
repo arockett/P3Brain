@@ -24,6 +24,7 @@ Genome::Genome(Genome *from){
 }
 
 Genome::~Genome(){
+	Data::removeGenome(this);
 	if(ancestor!=NULL){
 		ancestor->kill();
 	}
@@ -39,7 +40,6 @@ void Genome::applyMutations(double mutationRate){
 void Genome::kill(){
 	referenceCounter--;
 	if(referenceCounter<=0){
-		Data::removeGenome(this);
 		delete this;
 	}
 }

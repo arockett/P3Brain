@@ -110,7 +110,8 @@ int main(int argc, const char * argv[]) {
 	//not needed in the basic example here
 	//*
 	//get the LOD
-	vector<Genome*> LOD=Data::getLOD(population[0]->ancestor->ancestor);
+	Genome *mostRecentCommonAncestor=Data::getMostRecentCommonAncestor(population[0]);
+	vector<Genome*> LOD=Data::getLOD(mostRecentCommonAncestor);
 	//iterate over the LOD and have analyze on
 	//world will add all parameters you typically need to Data
 	/*
@@ -125,12 +126,12 @@ int main(int argc, const char * argv[]) {
 	//Do the phi analysis on the last dude on the LOD...
 	if(true){
 		vector<Agent*> agents;
-		agents.push_back(new Agent((ClassicMBGenome*)population[0]->ancestor->ancestor,nrOfBrainStates));
+		agents.push_back(new Agent((ClassicMBGenome*)mostRecentCommonAncestor,nrOfBrainStates));
 		world->evaluateFitness(agents, true);
 	}
 	//save data
-	Data::saveLOD(population[0]->ancestor->ancestor, LODFileName);
-	Data::saveGEN(population[0]->ancestor->ancestor, GENFileName, intervall);
+	Data::saveLOD(mostRecentCommonAncestor, LODFileName);
+	Data::saveGEN(mostRecentCommonAncestor, GENFileName, intervall);
 	Agent *A=new Agent((ClassicMBGenome*)population[0],16);
 	printf("%s\n",A->gateList().c_str());
 	return 0;
