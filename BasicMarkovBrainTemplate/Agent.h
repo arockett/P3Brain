@@ -37,6 +37,7 @@ public:
 	virtual void resetBrain();
 	virtual void updateStates();
 	virtual string gateList();
+	virtual vector<vector<int>> getConnectivityMatrix();
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Agent__) */

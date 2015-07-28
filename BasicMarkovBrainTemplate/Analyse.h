@@ -24,6 +24,11 @@ public:
 	static double computeAtomicPhi(vector<int> A,int states);
 	static double computeR(vector<int> sensor,vector<int> brain,vector<int> environment,vector<int> total);
 	static double entropy(vector<int> list);
+	
+	//connectivity matrix analysis
+	static int getMaxConnectivityDensity(vector<vector<int>> M);
+	static double getMeanConnectivityDensity(vector<vector<int>> M);
+	static double getDensity(vector<vector<int>> M);
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Analyse__) */

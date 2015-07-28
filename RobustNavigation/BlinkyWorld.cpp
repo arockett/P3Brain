@@ -240,6 +240,10 @@ double BlinkyWorld::testIndividual(Agent *agent, bool analyse){
 		Data::Add(totalNrReturns,lead+"totalReturns",(Genome*)agent->genome);
 		Data::Add(backtrackFood,lead+"btFood",(Genome*)agent->genome);
 		Data::Add(backtrackHome,lead+"btHome",(Genome*)agent->genome);
+		vector<vector<int>> M=agent->getConnectivityMatrix();
+		Data::Add(Analyse::getDensity(M),"density",(Genome*)agent->genome);
+		Data::Add(Analyse::getMaxConnectivityDensity(M),"maxConDense",(Genome*)agent->genome);
+		Data::Add(Analyse::getMeanConnectivityDensity(M),"meanConDense",(Genome*)agent->genome);
 	}
 	return pow(1.01,fitness);
 

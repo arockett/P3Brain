@@ -113,6 +113,13 @@ void Gate::resetGate(void){
 		//nothing to reset here!
 }
 
+vector<int> Gate::getIns(){
+	return I;
+}
+
+vector<int> Gate::getOuts(){
+	return O;
+}
 
 
 /* *** Determistic Gate Implementation *** */
@@ -454,6 +461,14 @@ void FeedbackGate::resetGate(){
 	for(int i=0;i<table.size();i++)
 		for(int j=0;j<table[i].size();j++)
 			table[i][j]=originalTable[i][j];
+}
+
+vector<int> FeedbackGate::getIns(){
+	vector<int> R;
+	R.insert(R.begin(),I.begin(),I.end());
+	R.push_back(posFBNode);
+	R.push_back(negFBNode);
+	return R;
 }
 
 /* *** Threshold Gate *** */

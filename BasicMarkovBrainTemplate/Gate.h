@@ -36,6 +36,8 @@ public:
 	virtual void applyNodeMap(int *nodeMap,int maxNodes);
 	static void AddGate(int ID, function<Gate*(ClassicMBGenome*,int)> theFunction);
 	virtual void resetGate(void);
+	virtual vector<int> getIns();
+	virtual vector<int> getOuts();
 };
 
 
@@ -65,6 +67,7 @@ public:
 	virtual string description();
 	virtual void applyNodeMap(int *nodeMap,int maxNodes);
 	virtual void resetGate(void);
+	virtual vector<int> getIns();
 };
 
 class GPGate:public Gate{

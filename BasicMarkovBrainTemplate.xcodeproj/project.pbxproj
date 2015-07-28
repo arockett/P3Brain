@@ -67,6 +67,15 @@
 		C0CE1E391B45DE0700F0002E /* Optimizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DEC1B447E6B00F0002E /* Optimizer.cpp */; };
 		C0CE1E3A1B45DE0700F0002E /* World.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DEE1B447E6B00F0002E /* World.cpp */; };
 		C0CE1E3D1B45DEAD00F0002E /* BlinkyWorld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1E3B1B45DEAC00F0002E /* BlinkyWorld.cpp */; };
+		C0F7874A1B66481800921D66 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0F787491B66481800921D66 /* main.cpp */; };
+		C0F787501B66486A00921D66 /* DecisionMakerWorld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0F7874E1B66486A00921D66 /* DecisionMakerWorld.cpp */; };
+		C0F787511B667FD700921D66 /* Agent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DE21B447E6B00F0002E /* Agent.cpp */; };
+		C0F787521B667FD700921D66 /* Analyse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DE41B447E6B00F0002E /* Analyse.cpp */; };
+		C0F787531B667FD700921D66 /* Data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DE61B447E6B00F0002E /* Data.cpp */; };
+		C0F787541B667FD700921D66 /* Gate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DE81B447E6B00F0002E /* Gate.cpp */; };
+		C0F787551B667FD700921D66 /* Genome.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DEA1B447E6B00F0002E /* Genome.cpp */; };
+		C0F787561B667FD700921D66 /* Optimizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DEC1B447E6B00F0002E /* Optimizer.cpp */; };
+		C0F787571B667FD700921D66 /* World.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DEE1B447E6B00F0002E /* World.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -133,6 +142,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
+		C0F787451B66481800921D66 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -174,6 +192,10 @@
 		C0CE1E2F1B45DDDC00F0002E /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		C0CE1E3B1B45DEAC00F0002E /* BlinkyWorld.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BlinkyWorld.cpp; sourceTree = "<group>"; };
 		C0CE1E3C1B45DEAD00F0002E /* BlinkyWorld.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlinkyWorld.h; sourceTree = "<group>"; };
+		C0F787471B66481800921D66 /* DecisionMaker */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = DecisionMaker; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0F787491B66481800921D66 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		C0F7874E1B66486A00921D66 /* DecisionMakerWorld.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DecisionMakerWorld.cpp; sourceTree = "<group>"; };
+		C0F7874F1B66486A00921D66 /* DecisionMakerWorld.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DecisionMakerWorld.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -226,6 +248,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C0F787441B66481800921D66 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -267,6 +296,7 @@
 				C028CD281B4B0B16003DD7E4 /* MadBotAI_simpleDemo */,
 				C028CD381B4B1977003DD7E4 /* Hidato */,
 				C0B6F34E1B500D7D00457CC2 /* phiFBlearner */,
+				C0F787481B66481800921D66 /* DecisionMaker */,
 				C0CE1DD91B447E4700F0002E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -281,6 +311,7 @@
 				C028CD271B4B0B15003DD7E4 /* MadBotAI_simpleDemo */,
 				C028CD371B4B1977003DD7E4 /* Hidato */,
 				C0B6F34D1B500D7D00457CC2 /* phiFBlearner */,
+				C0F787471B66481800921D66 /* DecisionMaker */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -335,6 +366,16 @@
 				C0CE1E3C1B45DEAD00F0002E /* BlinkyWorld.h */,
 			);
 			path = RobustNavigation;
+			sourceTree = "<group>";
+		};
+		C0F787481B66481800921D66 /* DecisionMaker */ = {
+			isa = PBXGroup;
+			children = (
+				C0F787491B66481800921D66 /* main.cpp */,
+				C0F7874E1B66486A00921D66 /* DecisionMakerWorld.cpp */,
+				C0F7874F1B66486A00921D66 /* DecisionMakerWorld.h */,
+			);
+			path = DecisionMaker;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -459,6 +500,23 @@
 			productReference = C0CE1E2D1B45DDDC00F0002E /* RobustNavigation */;
 			productType = "com.apple.product-type.tool";
 		};
+		C0F787461B66481800921D66 /* DecisionMaker */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C0F7874D1B66481800921D66 /* Build configuration list for PBXNativeTarget "DecisionMaker" */;
+			buildPhases = (
+				C0F787431B66481800921D66 /* Sources */,
+				C0F787441B66481800921D66 /* Frameworks */,
+				C0F787451B66481800921D66 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DecisionMaker;
+			productName = DecisionMaker;
+			productReference = C0F787471B66481800921D66 /* DecisionMaker */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -489,6 +547,9 @@
 					C0CE1E2C1B45DDDC00F0002E = {
 						CreatedOnToolsVersion = 6.3.1;
 					};
+					C0F787461B66481800921D66 = {
+						CreatedOnToolsVersion = 6.4;
+					};
 				};
 			};
 			buildConfigurationList = C0CE1DD31B447E4700F0002E /* Build configuration list for PBXProject "BasicMarkovBrainTemplate" */;
@@ -510,6 +571,7 @@
 				C028CD261B4B0B15003DD7E4 /* MadBotAI_simpleDemo */,
 				C028CD361B4B1977003DD7E4 /* Hidato */,
 				C0B6F34C1B500D7D00457CC2 /* phiFBlearner */,
+				C0F787461B66481800921D66 /* DecisionMaker */,
 			);
 		};
 /* End PBXProject section */
@@ -621,6 +683,22 @@
 				C0CE1E3A1B45DE0700F0002E /* World.cpp in Sources */,
 				C0CE1E3D1B45DEAD00F0002E /* BlinkyWorld.cpp in Sources */,
 				C0CE1E301B45DDDC00F0002E /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C0F787431B66481800921D66 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C0F787511B667FD700921D66 /* Agent.cpp in Sources */,
+				C0F787521B667FD700921D66 /* Analyse.cpp in Sources */,
+				C0F787531B667FD700921D66 /* Data.cpp in Sources */,
+				C0F787541B667FD700921D66 /* Gate.cpp in Sources */,
+				C0F787551B667FD700921D66 /* Genome.cpp in Sources */,
+				C0F787561B667FD700921D66 /* Optimizer.cpp in Sources */,
+				C0F787571B667FD700921D66 /* World.cpp in Sources */,
+				C0F7874A1B66481800921D66 /* main.cpp in Sources */,
+				C0F787501B66486A00921D66 /* DecisionMakerWorld.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -826,6 +904,24 @@
 			};
 			name = Release;
 		};
+		C0F7874B1B66481800921D66 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		C0F7874C1B66481800921D66 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -854,6 +950,7 @@
 				C0B6F3521B500D7D00457CC2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		C0CE1DD31B447E4700F0002E /* Build configuration list for PBXProject "BasicMarkovBrainTemplate" */ = {
 			isa = XCConfigurationList;
@@ -899,6 +996,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		C0F7874D1B66481800921D66 /* Build configuration list for PBXNativeTarget "DecisionMaker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0F7874B1B66481800921D66 /* Debug */,
+				C0F7874C1B66481800921D66 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};

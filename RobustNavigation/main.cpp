@@ -25,7 +25,7 @@
 using namespace std;
 
 int main(int argc, const char * argv[]) {
-	int update,updates=100;
+	int updates=100;
 	int popSize=100;
 	int intervall=100;
 	int nrOfBrainStates=32;
@@ -45,7 +45,7 @@ int main(int argc, const char * argv[]) {
 	Data::setDefaultParameter("LOD", &LODFileName, "defaultLOD.csv");
 	Data::setDefaultParameter("GEN", &GENFileName, "defaultGEN.csv");
 	Data::setDefaultParameter("repeats", &World::repeats, 1);
-	Data::setDefaultParameter("elitism", &Optimizer::elitism, -1);
+	Data::setDefaultParameter("elitism", &Optimizer::elitism, 1);
 	Data::setDefaultParameter("pointMutationRate", Data::makeDefaultDouble("pointMutationRate"), 0.005);
 	Data::setDefaultParameter("brainSize", &nrOfBrainStates, 32);
 	Data::setDefaultParameter("probGate", &gateFlags[0], false);
@@ -100,7 +100,7 @@ int main(int argc, const char * argv[]) {
 	}
 	
 	//evolution loop
-	for(update=0;update<updates;update++){
+	for(Data::update=0;Data::update<updates;Data::update++){
 		//translate all genomes to agents
 		vector<Agent*> agents;
 		for(int i=0;i<popSize;i++)
@@ -115,7 +115,7 @@ int main(int argc, const char * argv[]) {
 		
 		//make next generation using an optimizer
 		newPopulation=optimizer->makeNextGeneration(population,W);
-		printf("update: %i maxFitness:%f\n",update,optimizer->maxFitness);
+		printf("update: %i maxFitness:%f\n",Data::update,optimizer->maxFitness);
 		for(int i=0;i<population.size();i++){
 			population[i]->kill();
 			population[i]=newPopulation[i];
@@ -127,6 +127,7 @@ int main(int argc, const char * argv[]) {
 	//not needed in the basic example here
 	//*
 	//get the LOD
+//	Genome *mostRecentCommonAncestor=Data::getMostRecentCommonAncestor(population[0]);
 	vector<Genome*> LOD=Data::getLOD(population[0]->ancestor);
 	//iterate over the LOD and have analyze on
 	//world will add all parameters you typically need to Data

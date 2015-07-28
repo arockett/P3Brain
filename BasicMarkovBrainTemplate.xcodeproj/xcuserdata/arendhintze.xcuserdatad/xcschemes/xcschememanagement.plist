@@ -9,6 +9,11 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
+		<key>DecisionMaker.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>7</integer>
+		</dict>
 		<key>Hidato.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -73,6 +78,11 @@
 			<true/>
 		</dict>
 		<key>C0CE1E2C1B45DDDC00F0002E</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>C0F787461B66481800921D66</key>
 		<dict>
 			<key>primary</key>
 			<true/>

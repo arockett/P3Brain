@@ -113,3 +113,36 @@ double Analyse::entropy(vector<int> list){
 	}
 	return -1.0*H;	
 }
+
+int Analyse::getMaxConnectivityDensity(vector<vector<int>> M){
+	int m=M[0][0];
+	for(auto x:M)
+		for(int v:x)
+			if(v>m)
+				m=v;
+	return m;
+}
+
+double Analyse::getMeanConnectivityDensity(vector<vector<int>> M){
+	double m;
+	int n;
+	for(auto x:M)
+		for(int v:x){
+			m+=(double)v;
+			n++;
+		}
+	return m/(double)n;
+}
+
+double Analyse::getDensity(vector<vector<int>> M){
+	double m;
+	int n;
+	for(auto x:M)
+		for(int v:x){
+			if(v>0)
+				m++;
+			n++;
+		}
+	return m/(double)n;
+}
+

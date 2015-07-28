@@ -41,6 +41,7 @@ Agent::~Agent(){
 		delete gates[i];
 	delete states;
 	delete nextStates;
+	delete nodeMap;
 }
 
 void Agent::resetBrain(){
@@ -97,6 +98,25 @@ string Agent::gateList(){
 		S=S+gates[i]->description();
 	}
 	return S;
+}
+
+
+vector<vector<int>> Agent::getConnectivityMatrix(){
+	vector<vector<int>> M;
+	M.resize(nrOfStates);
+	for(int i=0;i<nrOfStates;i++){
+		M[i].resize(nrOfStates);
+		for(int j=0;j<nrOfStates;j++)
+			M[i][j]=0;
+	}
+	for(Gate* G:gates){
+		vector<int> I=G->getIns();
+		vector<int> O=G->getOuts();
+		for(int i:I)
+			for(int o:O)
+				M[i][o]++;
+	}
+	return M;
 }
 
 

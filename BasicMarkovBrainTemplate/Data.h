@@ -21,6 +21,8 @@ class Genome;
 
 class Data{
 public:
+	//global variables that should be accessible from everywhere
+	static int update;
 	//this is the LOD and general data recording part
 	static int ID;
 	static map<int,map<string,string> > dataMap;

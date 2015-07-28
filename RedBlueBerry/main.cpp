@@ -26,7 +26,7 @@
 using namespace std;
 
 int main(int argc, const char * argv[]) {
-	int update,updates=100;
+	int updates=100;
 	int popSize=100;
 	int intervall=100;
     int nrOfBrainStates=16;
@@ -86,7 +86,7 @@ int main(int argc, const char * argv[]) {
 	}
     
 	//evolution loop
-	for(update=0;update<updates;update++){
+	for(Data::update=0;Data::update<updates;Data::update++){
         //translate all genomes to agents
         vector<Agent*> agents;
         for(int i=0;i<popSize;i++)
@@ -101,7 +101,7 @@ int main(int argc, const char * argv[]) {
         
 		//make next generation using an optimizer
 		newPopulation=optimizer->makeNextGeneration(population,W);
-		printf("update: %i maxFitness:%f %f\n",update,optimizer->maxFitness,Data::getDefaultDouble("pointMutationRate"));
+		printf("update: %i maxFitness:%f %f\n",Data::update,optimizer->maxFitness,Data::getDefaultDouble("pointMutationRate"));
 		for(int i=0;i<population.size();i++){
 			population[i]->kill();
 			population[i]=newPopulation[i];

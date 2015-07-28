@@ -9,9 +9,14 @@
 #include "Data.h"
 #include <cstring>
 
+//global variables that should be accessible to all
+int Data::update=-1;
+
 //LOD variables
 int Data::ID=0;
+
 map<int,map<string,string>> Data::dataMap;
+
 //Command Line Parameters
 map<string,int*> Data::parameterInt;
 map<string,double*> Data::parameterDouble;

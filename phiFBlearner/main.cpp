@@ -25,10 +25,10 @@
 using namespace std;
 
 int main(int argc, const char * argv[]) {
-	int update,updates=100;
-	int popSize=100;
-	int intervall=100;
-	int nrOfBrainStates=16;
+	int updates;
+	int popSize;
+	int intervall;
+	int nrOfBrainStates;
 	vector<Genome*> population,newPopulation;
 	vector<double> W;
 	string LODFileName="";
@@ -39,7 +39,7 @@ int main(int argc, const char * argv[]) {
 	bool gateFlags[8];
 	
 	//default command line paramters
-	Data::setDefaultParameter("updates", &updates, 10);
+	Data::setDefaultParameter("updates", &updates, 100);
 	Data::setDefaultParameter("popSize", &popSize, 100);
 	Data::setDefaultParameter("intervall", &intervall, 100);
 	Data::setDefaultParameter("LOD", &LODFileName, "defaultLOD.csv");
@@ -56,6 +56,7 @@ int main(int argc, const char * argv[]) {
 	Data::setDefaultParameter("thGate", &gateFlags[4], false);
 	Data::setDefaultParameter("epsilonGate", &gateFlags[5], false);
 	Data::setDefaultParameter("epsilon", &FixedEpsilonGate::epsilon, 0.1);
+	
 	Data::UseCommandLineParameters(argc,argv);
 	
 	//setup Gates
@@ -83,7 +84,7 @@ int main(int argc, const char * argv[]) {
 	}
 	
 	//evolution loop
-	for(update=0;update<updates;update++){
+	for(Data::update=0;Data::update<updates;Data::update++){
 		//translate all genomes to agents
 		vector<Agent*> agents;
 		for(int i=0;i<popSize;i++)
@@ -98,7 +99,7 @@ int main(int argc, const char * argv[]) {
 		
 		//make next generation using an optimizer
 		newPopulation=optimizer->makeNextGeneration(population,W);
-		printf("update: %i maxFitness:%f\n",update,optimizer->maxFitness);
+		printf("update: %i maxFitness:%f\n",Data::update,optimizer->maxFitness);
 		for(int i=0;i<population.size();i++){
 			population[i]->kill();
 			population[i]=newPopulation[i];
