@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		48E57B6E1BA2528400E630CC /* Agent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DE21B447E6B00F0002E /* Agent.cpp */; };
+		48E57B6F1BA2528400E630CC /* Analyse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DE41B447E6B00F0002E /* Analyse.cpp */; };
+		48E57B701BA2528400E630CC /* Data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DE61B447E6B00F0002E /* Data.cpp */; };
+		48E57B711BA2528400E630CC /* Gate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DE81B447E6B00F0002E /* Gate.cpp */; };
+		48E57B721BA2528400E630CC /* Genome.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DEA1B447E6B00F0002E /* Genome.cpp */; };
+		48E57B731BA2528400E630CC /* Optimizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DEC1B447E6B00F0002E /* Optimizer.cpp */; };
+		48E57B741BA2528400E630CC /* World.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DEE1B447E6B00F0002E /* World.cpp */; };
+		48E57B7D1BA2529600E630CC /* FrenchFlagWorld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 48E57B691BA1F20C00E630CC /* FrenchFlagWorld.cpp */; };
+		48E57B7E1BA2529C00E630CC /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 48E57B6B1BA1F20C00E630CC /* main.cpp */; };
 		C028CD2A1B4B0B16003DD7E4 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C028CD291B4B0B16003DD7E4 /* main.cpp */; };
 		C028CD2E1B4B0B31003DD7E4 /* Agent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DE21B447E6B00F0002E /* Agent.cpp */; };
 		C028CD2F1B4B0B31003DD7E4 /* Genome.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C0CE1DEA1B447E6B00F0002E /* Genome.cpp */; };
@@ -79,6 +88,15 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		48E57B781BA2528400E630CC /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		C028CD251B4B0B15003DD7E4 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -154,6 +172,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		48E57B691BA1F20C00E630CC /* FrenchFlagWorld.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FrenchFlagWorld.cpp; sourceTree = "<group>"; };
+		48E57B6A1BA1F20C00E630CC /* FrenchFlagWorld.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FrenchFlagWorld.h; sourceTree = "<group>"; };
+		48E57B6B1BA1F20C00E630CC /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		48E57B7C1BA2528400E630CC /* HourGlass */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = HourGlass; sourceTree = BUILT_PRODUCTS_DIR; };
 		C028CD271B4B0B15003DD7E4 /* MadBotAI_simpleDemo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MadBotAI_simpleDemo; sourceTree = BUILT_PRODUCTS_DIR; };
 		C028CD291B4B0B16003DD7E4 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		C028CD371B4B1977003DD7E4 /* Hidato */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Hidato; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -199,6 +221,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		48E57B771BA2528400E630CC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C028CD241B4B0B15003DD7E4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -258,6 +287,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		48E57B681BA1F20C00E630CC /* HourGlass */ = {
+			isa = PBXGroup;
+			children = (
+				48E57B691BA1F20C00E630CC /* FrenchFlagWorld.cpp */,
+				48E57B6A1BA1F20C00E630CC /* FrenchFlagWorld.h */,
+				48E57B6B1BA1F20C00E630CC /* main.cpp */,
+			);
+			path = HourGlass;
+			sourceTree = "<group>";
+		};
 		C028CD281B4B0B16003DD7E4 /* MadBotAI_simpleDemo */ = {
 			isa = PBXGroup;
 			children = (
@@ -297,6 +336,7 @@
 				C028CD381B4B1977003DD7E4 /* Hidato */,
 				C0B6F34E1B500D7D00457CC2 /* phiFBlearner */,
 				C0F787481B66481800921D66 /* DecisionMaker */,
+				48E57B681BA1F20C00E630CC /* HourGlass */,
 				C0CE1DD91B447E4700F0002E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -312,6 +352,7 @@
 				C028CD371B4B1977003DD7E4 /* Hidato */,
 				C0B6F34D1B500D7D00457CC2 /* phiFBlearner */,
 				C0F787471B66481800921D66 /* DecisionMaker */,
+				48E57B7C1BA2528400E630CC /* HourGlass */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -381,6 +422,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		48E57B6C1BA2528400E630CC /* HourGlass */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 48E57B791BA2528400E630CC /* Build configuration list for PBXNativeTarget "HourGlass" */;
+			buildPhases = (
+				48E57B6D1BA2528400E630CC /* Sources */,
+				48E57B771BA2528400E630CC /* Frameworks */,
+				48E57B781BA2528400E630CC /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HourGlass;
+			productName = DecisionMaker;
+			productReference = 48E57B7C1BA2528400E630CC /* HourGlass */;
+			productType = "com.apple.product-type.tool";
+		};
 		C028CD261B4B0B15003DD7E4 /* MadBotAI_simpleDemo */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C028CD2D1B4B0B16003DD7E4 /* Build configuration list for PBXNativeTarget "MadBotAI_simpleDemo" */;
@@ -572,11 +630,28 @@
 				C028CD361B4B1977003DD7E4 /* Hidato */,
 				C0B6F34C1B500D7D00457CC2 /* phiFBlearner */,
 				C0F787461B66481800921D66 /* DecisionMaker */,
+				48E57B6C1BA2528400E630CC /* HourGlass */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		48E57B6D1BA2528400E630CC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				48E57B6E1BA2528400E630CC /* Agent.cpp in Sources */,
+				48E57B6F1BA2528400E630CC /* Analyse.cpp in Sources */,
+				48E57B701BA2528400E630CC /* Data.cpp in Sources */,
+				48E57B711BA2528400E630CC /* Gate.cpp in Sources */,
+				48E57B721BA2528400E630CC /* Genome.cpp in Sources */,
+				48E57B731BA2528400E630CC /* Optimizer.cpp in Sources */,
+				48E57B741BA2528400E630CC /* World.cpp in Sources */,
+				48E57B7D1BA2529600E630CC /* FrenchFlagWorld.cpp in Sources */,
+				48E57B7E1BA2529C00E630CC /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C028CD231B4B0B15003DD7E4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -705,6 +780,24 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		48E57B7A1BA2528400E630CC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				PRODUCT_NAME = HourGlass;
+			};
+			name = Debug;
+		};
+		48E57B7B1BA2528400E630CC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = HourGlass;
+			};
+			name = Release;
+		};
 		C028CD2B1B4B0B16003DD7E4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -925,6 +1018,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		48E57B791BA2528400E630CC /* Build configuration list for PBXNativeTarget "HourGlass" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				48E57B7A1BA2528400E630CC /* Debug */,
+				48E57B7B1BA2528400E630CC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		C028CD2D1B4B0B16003DD7E4 /* Build configuration list for PBXNativeTarget "MadBotAI_simpleDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1004,6 +1106,7 @@
 				C0F7874C1B66481800921D66 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
