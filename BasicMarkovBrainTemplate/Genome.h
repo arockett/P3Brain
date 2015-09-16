@@ -22,30 +22,20 @@ public:
 	int ID;
 	Genome *ancestor;
 	int referenceCounter;
+	vector<unsigned char> sites;
+	static double insertionDeletionP;
+	
 	Genome();
 	Genome(Genome *from);
-
 	virtual ~Genome();
-	virtual void fillRandom();
-	virtual void copyGenome(Genome *from);
-	virtual void applyMutations(double mutationRate);
-	virtual Genome* makeMutatedOffspring(double mutationRate);
-	virtual void saveToFile(FILE *F);
-	virtual void kill();
-};
-
-class ClassicMBGenome:public Genome{
-public:
-	ClassicMBGenome();
-	ClassicMBGenome(Genome *from);
-	vector<unsigned char> genome;
-	static double insertionDeletionP;
 	
 	virtual void fillRandom();
 	virtual void copyGenome(Genome *from);
 	virtual void applyMutations(double mutationRate);
-	virtual void makePointMutation();
 	virtual Genome* makeMutatedOffspring(double mutationRate);
+	virtual void makePointMutation();
 	virtual void saveToFile(FILE *F);
+	virtual void kill();
 };
+
 #endif /* defined(__BasicMarkovBrainTemplate__Genome__) */

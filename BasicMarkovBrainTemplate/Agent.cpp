@@ -8,14 +8,16 @@
 
 #include "Agent.h"
 
+#define SKIPGATE 1
 
 bool Agent::serialProcessing=false;
 
 Agent::Agent(){
-
+	
 }
 
-Agent::Agent(ClassicMBGenome *startGenome,int _nrOfStates){
+Agent::Agent(Genome *startGenome,int _nrOfStates){ //this is a constructor. it is run whenever a new agent is created.
+	skipGate = *Data::parameterDouble["skipGate"];
 	nrOfStates=_nrOfStates;
 	states=new double[nrOfStates];
 	nextStates=new double[nrOfStates];
@@ -24,9 +26,9 @@ Agent::Agent(ClassicMBGenome *startGenome,int _nrOfStates){
 		nodeMap[i]=i%nrOfStates;
 	genome=startGenome;
 	gates.clear();
-	for(int i=0;i<genome->genome.size()-1;i++){
-		const int S=genome->genome[i];
-		if((S+genome->genome[i+1])==256){
+	for(int i=0;i<genome->sites.size()-1;i++){
+		const int S=genome->sites[i];
+		if((S+genome->sites[i+1])==256){
 			if(Gate::makeGate[S]!=NULL){
 				gates.push_back(Gate::makeGate[S](genome,i));
 			}
@@ -53,25 +55,37 @@ void Agent::resetBrain(){
 
 void Agent::updateStates(){
 	/*
-    if(serialProcessing){
-        //this is a special way of serialized updating
-        //experimental feature, should be default off!
-        //only change if you really know what you are doing!
-        for(int i=0;i<gates.size();i++){
-            gates[i]->update(states, states);
-        }
-    } else {*/
-        //this is the default way of parallel updating
-        for(int i=0;i<nrOfStates;i++)
-            nextStates[i]=0.0;
-        for(int i=0;i<gates.size();i++)
-            gates[i]->update(states, nextStates);
-        for(int i=0;i<nrOfStates;i++)
-            states[i]=nextStates[i];
-//    }
+	 if(serialProcessing){
+	 //this is a special way of serialized updating
+	 //experimental feature, should be default off!
+	 //only change if you really know what you are doing!
+	 for(int i=0;i<gates.size();i++){
+	 gates[i]->update(states, states);
+	 }
+	 } else {*/
+	//this is the default way of parallel updating
+	for(int i=0;i<nrOfStates;i++){ //reset all states to 0
+		nextStates[i]=0.0;
+	}
+	for(int i=0;i<gates.size();i++){ //update each gate
+#if SKIPGATE==1
+		//if(*Data::parameterDouble["skipGate"]>0){
+		if(((double)rand()/(double)RAND_MAX)>skipGate){
+			gates[i]->update(states, nextStates);
+		}
+		//}else{
+		//gates[i]->update(states, nextStates);
+		//}
+#else
+		gates[i]->update(states, nextStates);
+#endif // SKIPGATE
+	}
+	for(int i=0;i<nrOfStates;i++){ //sets states for t+1 to states just updated in the last line
+		states[i]=nextStates[i];
+	}
 }
 
-int Agent::Bit(double d){
+int Agent::Bit(double d){ //this is a function that returns a 1 if the number inputted is greater than 0 or returns a 0 if not
 	if (d>0.0)
 		return 1;
 	return 0;
@@ -119,4 +133,28 @@ vector<vector<int>> Agent::getConnectivityMatrix(){
 	return M;
 }
 
+set<int> Agent::findCodingRegions(int mask){ //if mask=0, all coding regions are returned. if mask=1, return everything except start codon. if mask=2, return everything except start codon and wiring.
+	set<int> allCodingRegions;
+	for(auto gateIterator = gates.begin(); gateIterator != gates.end(); gateIterator++) {
+		for(auto iterator = (*gateIterator)->codingRegions.begin(); iterator != (*gateIterator)->codingRegions.end(); iterator++) {
+			if(iterator->second >= mask){
+				allCodingRegions.insert(iterator->first);
+			}
+		}
+	}
+	/*for(auto iterator = allCodingRegions.begin(); iterator != allCodingRegions.end(); iterator++){
+	 cout << *iterator << "(" << (int)genome->genome[*iterator] << ") ";
+	 }
+	 cout << "\n";
+	 */
+	return allCodingRegions;
+}
+
+int Agent::brainSize(){
+	return (int)gates.size();
+}
+
+int Agent::numGates(){
+	return brainSize();
+}
 

@@ -178,7 +178,7 @@ vector<double> fbLearnWorld::evaluateFitness(vector<Agent*> agents,bool analyse)
 			FeedbackGate::feedbackON=false;
 			vector<Genome*> LOD=Data::getLOD(agents[i]->genome);
 			for(int l=0;l<LOD.size();l++){
-				Agent* A=new Agent((ClassicMBGenome*)LOD[l],agents[i]->nrOfStates);
+				Agent* A=new Agent(LOD[l],agents[i]->nrOfStates);
 				for(int j=0;j<24;j++){
 					currentMapID=j;
 					testIndividual(A,true);

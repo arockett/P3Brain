@@ -11,6 +11,7 @@
 
 #include <stdlib.h>
 #include <map>
+#include <set>
 #include <vector>
 #include <string>
 #include "Genome.h"
@@ -20,16 +21,24 @@ using namespace std;
 class Genome;
 
 class Data{
+private:
+	static int genomeIDCounter;
 public:
 	//global variables that should be accessible from everywhere
 	static int update;
+	static bool skipGate;
+	static set<int> inUseGateTypes;
+	static map<int,map<string,string>> genomeData;
+	static int repNumber;
+	
 	//this is the LOD and general data recording part
-	static int ID;
 	static map<int,map<string,string> > dataMap;
 	static map<string,double*> defaultDoubles;
 	static map<string,int*> defaultInts;
 	static map<string,string*> defaultStrings;
 	static map<string,bool*> defaultBools;
+	
+	
 	static void Add(int value,string key,Genome* to);
 	static void Add(double value,string key,Genome* to);
 	static string Get(string key,Genome *from);

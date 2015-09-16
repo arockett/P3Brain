@@ -1,10 +1,11 @@
 //
 //  main.cpp
-//  Hidato
+//  ValueJudgementBrainSize
 //
-//  Created by Arend Hintze on 7/6/15.
+//  Created by Arend Hintze on 7/29/15.
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
 //
+
 
 #include <stdlib.h>
 #include <vector>
@@ -14,7 +15,7 @@
 #include "World.h"
 #include "Data.h"
 #include "Agent.h"
-#include "HidatoWorld.h"
+#include "ValueJudgementWorld.h"
 
 #ifdef _WIN32
 #include <process.h>
@@ -25,17 +26,18 @@
 using namespace std;
 
 int main(int argc, const char * argv[]) {
-	int update,updates=100;
-	int popSize=100;
-	int intervall=100;
-	int nrOfBrainStates=16;
+	int updates;
+	int popSize;
+	int intervall;
+	int nrOfBrainStates;
 	vector<Genome*> population,newPopulation;
 	vector<double> W;
 	string LODFileName="";
 	string GENFileName="";
+	string DATAFileName="";
 	Optimizer *optimizer=(Optimizer*)new GA();
 	//	Optimizer *optimizer=(Optimizer*)new Tournament();
-	World *world= (World*)new HidatoWorld();//new World();
+	World *world= (World*)new ValueJudgementWorld();//new World();
 	bool gateFlags[8];
 	
 	//default command line paramters
@@ -44,9 +46,11 @@ int main(int argc, const char * argv[]) {
 	Data::setDefaultParameter("intervall", &intervall, 100);
 	Data::setDefaultParameter("LOD", &LODFileName, "defaultLOD.csv");
 	Data::setDefaultParameter("GEN", &GENFileName, "defaultGEN.csv");
-	Data::setDefaultParameter("repeats", &World::repeats, 4);
+	Data::setDefaultParameter("DATA", &DATAFileName, "defaultDATA.csv");
+	Data::setDefaultParameter("repeats", &World::repeats, 1);
 	Data::setDefaultParameter("elitism", &Optimizer::elitism, -1);
 	Data::setDefaultParameter("pointMutationRate", Data::makeDefaultDouble("pointMutationRate"), 0.005);
+	Data::setDefaultParameter("phiFileName", Data::makeDefaultString("phiFileName"), "defaultPHIfile.csv");
 	Data::setDefaultParameter("brainSize", &nrOfBrainStates, 16);
 	Data::setDefaultParameter("probGate", &gateFlags[0], true);
 	Data::setDefaultParameter("detGate", &gateFlags[1], true);
@@ -55,11 +59,12 @@ int main(int argc, const char * argv[]) {
 	Data::setDefaultParameter("thGate", &gateFlags[4], false);
 	Data::setDefaultParameter("epsilonGate", &gateFlags[5], false);
 	Data::setDefaultParameter("epsilon", &FixedEpsilonGate::epsilon, 0.1);
-	Data::setDefaultParameter("missing", &HidatoWorld::missing, 4);
 	
+	Data::setDefaultParameter("thinkTime", &ValueJudgementWorld::thinkTime, 10);
+	Data::setDefaultParameter("alpha", &ValueJudgementWorld::alpha, 0.3);
 	Data::setDefaultParameter("skipGate", Data::makeDefaultDouble("skipGate"), 0.0);
 	Data::setDefaultParameter("voidOutput", Data::makeDefaultDouble("voidOutput"), 0.0);
-
+	
 	Data::UseCommandLineParameters(argc,argv);
 	
 	//setup Gates
@@ -87,7 +92,7 @@ int main(int argc, const char * argv[]) {
 	}
 	
 	//evolution loop
-	for(update=0;update<updates;update++){
+	for(Data::update=0;Data::update<updates;Data::update++){
 		//translate all genomes to agents
 		vector<Agent*> agents;
 		for(int i=0;i<popSize;i++)
@@ -102,7 +107,7 @@ int main(int argc, const char * argv[]) {
 		
 		//make next generation using an optimizer
 		newPopulation=optimizer->makeNextGeneration(population,W);
-		printf("update: %i maxFitness:%f\n",update,optimizer->maxFitness);
+		printf("update: %i maxFitness:%f\n",Data::update,optimizer->maxFitness);
 		for(int i=0;i<population.size();i++){
 			population[i]->kill();
 			population[i]=newPopulation[i];
@@ -114,22 +119,42 @@ int main(int argc, const char * argv[]) {
 	//not needed in the basic example here
 	//*
 	//get the LOD
-	vector<Genome*> LOD=Data::getLOD(population[0]->ancestor);
-	//iterate over the LOD and have analyze on
-	//world will add all parameters you typically need to Data
-	for(int i=0;i<LOD.size();i++){
+	Genome *mostRecentCommonAncestor=Data::getMostRecentCommonAncestor(population[0]);
+	vector<Genome*> LOD=Data::getLOD(population[0]);//mostRecentCommonAncestor);
+	if(true){
 		vector<Agent*> agents;
-		Agent *A=new Agent((Genome*)LOD[i],nrOfBrainStates);
-		agents.push_back(A);
+		for(Genome* G:LOD){
+			agents.push_back(new Agent((Genome*)G,nrOfBrainStates));
+		}
 		world->evaluateFitness(agents, true);
-		delete A;
 	}
-	//*/
-	
 	//save data
-	Data::saveLOD(population[0]->ancestor, LODFileName);
-	Data::saveGEN(population[0]->ancestor, GENFileName, intervall);
+	Data::saveLOD(population[0], LODFileName);
+	Data::saveGEN(population[0], GENFileName, intervall);
 	Agent *A=new Agent((Genome*)population[0],16);
 	printf("%s\n",A->gateList().c_str());
+	
+	/* mutational robustness analysis */
+	double mutRates[]={0.0,0.01,0.02,0.03,0.04,0.05};
+	FILE *DF=fopen(DATAFileName.c_str(),"w+t");
+	fprintf(DF,"mutRate,W,correct,gates,connections,density\n");
+	for(int m=0;m<5;m++){
+		vector<Agent*> agents;
+		for(int i=0;i<10000;i++)
+			agents.push_back(new Agent((Genome*)mostRecentCommonAncestor->makeMutatedOffspring(mutRates[m]),nrOfBrainStates));
+		vector<double> W=world->evaluateFitness(agents, true);
+		for(int i=0;i<agents.size();i++){
+			fprintf(DF,"%f,%f,%s,%s,%s,%s\n",mutRates[m],W[i],
+				    Data::Get("correct",(Genome*)agents[i]->genome).c_str(),
+					Data::Get("gates",(Genome*)agents[i]->genome).c_str(),
+					Data::Get("connections",(Genome*)agents[i]->genome).c_str(),
+					Data::Get("density",(Genome*)agents[i]->genome).c_str());
+		}
+		for(Agent* A:agents){
+			A->genome->kill();
+			delete A;
+		}
+	}
+	fclose(DF);
 	return 0;
 }

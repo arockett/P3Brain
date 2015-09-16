@@ -24,6 +24,7 @@ private:
 public:
 	static int thinkTime;
 	static double pNoise,piNoise,alpha;
+	static string DATAFileName;
 	DecisionMakerWorld();
 	double testIndividual(Agent *agent,bool analyse);
 };

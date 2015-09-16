@@ -9,11 +9,14 @@
 #include "Data.h"
 #include <cstring>
 
+//Cliff put this here:
+set<int> Data::inUseGateTypes;
+
 //global variables that should be accessible to all
 int Data::update=-1;
 
 //LOD variables
-int Data::ID=0;
+int Data::genomeIDCounter=0;
 
 map<int,map<string,string>> Data::dataMap;
 
@@ -66,9 +69,9 @@ void Data::removeGenome(Genome* who){
 }
 
 int Data::registerGenome(Genome* who){
-	int I=ID;
-	dataMap[ID]["ID"]=to_string(ID);
-	ID++;
+	int I=genomeIDCounter;
+	dataMap[genomeIDCounter]["ID"]=to_string(genomeIDCounter);
+	genomeIDCounter++;
 	return I;
 }
 
@@ -92,7 +95,7 @@ void Data::saveLOD(Genome *who,string filename){
 //	for(int i=0;i<list.size();i++)
 //		printf("find %p %i\n",list[i],list[i]->ID);
 	//now save the data
-	for(int i=0;i<list.size();i++){
+	for(int i=1;i<list.size();i++){
 		fprintf(F,"%i",i);
 		for(map<string,string>::iterator I=dataMap[list[i]->ID].begin();I!=dataMap[list[i]->ID].end();I++){
 			fprintf(F,",%s",I->second.c_str());

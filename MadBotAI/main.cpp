@@ -75,7 +75,7 @@ int main(int argc, const char * argv[]) {
 	
 	//setup population
 	for(int i=0;i<popSize;i++){
-//		ClassicMBGenome *G=new ClassicMBGenome();
+//		Genome *G=new Genome();
 		MadBotGenome *G=new MadBotGenome();
 		G->fillRandom(MadBotAI_inputs,MadBotAI_actions,MadBotAI_states,MadBotAI_granularity);
 		population.push_back((Genome*)G);
@@ -86,7 +86,7 @@ int main(int argc, const char * argv[]) {
 		//translate all genomes to agents
 		vector<Agent*> agents;
 		for(int i=0;i<popSize;i++){
-//			agents.push_back(new Agent((ClassicMBGenome*)population[i],nrOfBrainStates));
+//			agents.push_back(new Agent((Genome*)population[i],nrOfBrainStates));
 			Agent *A=new MadBotAI((MadBotGenome*)population[i],nrOfBrainStates);
 			agents.push_back(A);
 		}
@@ -123,7 +123,7 @@ int main(int argc, const char * argv[]) {
 	 //world will add all parameters you typically need to Data
 	 for(int i=0;i<LOD.size();i++){
 		 vector<Agent*> agents;
-		 Agent *A=new Agent((ClassicMBGenome*)LOD[i],nrOfBrainStates);
+		 Agent *A=new Agent((Genome*)LOD[i],nrOfBrainStates);
 		 agents.push_back(A);
 		 world->evaluateFitness(agents, true);
 		 delete A;
@@ -134,7 +134,7 @@ int main(int argc, const char * argv[]) {
 	//save data
 	Data::saveLOD(population[0]->ancestor, LODFileName);
 	Data::saveGEN(population[0]->ancestor, GENFileName, intervall);
-	//Agent *A=new Agent((ClassicMBGenome*)population[0],16);
+	//Agent *A=new Agent((Genome*)population[0],16);
 	//printf("%s\n",A->gateList().c_str());
 	return 0;
 }

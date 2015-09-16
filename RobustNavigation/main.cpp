@@ -55,17 +55,20 @@ int main(int argc, const char * argv[]) {
 	Data::setDefaultParameter("thGate", &gateFlags[4], false);
 	Data::setDefaultParameter("epsilonGate", &gateFlags[5], true);
 	Data::setDefaultParameter("epsilon", &FixedEpsilonGate::epsilon, 0.1);
+	Data::setDefaultParameter("skipGate", Data::makeDefaultDouble("skipGate"), 0.0);
+	Data::setDefaultParameter("voidOutput", Data::makeDefaultDouble("voidOutput"), 0.0);
+	
 	Data::UseCommandLineParameters(argc,argv);
 	
 	//setup Gates
 	for(int i=0;i<256;i++)
 		Gate::AddGate(i, NULL);
-	if(gateFlags[0]) Gate::AddGate(42,[](ClassicMBGenome* genome,int pos) {return new Gate(genome,pos);});
-	if(gateFlags[1]) Gate::AddGate(43,[](ClassicMBGenome* genome,int pos) {return new DeterministicGate(genome,pos);});
-	if(gateFlags[2]) Gate::AddGate(44,[](ClassicMBGenome* genome,int pos) {return new FeedbackGate(genome,pos);});
-	if(gateFlags[3]) Gate::AddGate(45,[](ClassicMBGenome* genome,int pos) {return new GPGate(genome,pos);});
-	if(gateFlags[4]) Gate::AddGate(46,[](ClassicMBGenome* genome,int pos) {return new Thresholdgate(genome,pos);});
-	if(gateFlags[5]) Gate::AddGate(47,[](ClassicMBGenome* genome,int pos) {return new FixedEpsilonGate(genome,pos);});
+	if(gateFlags[0]) Gate::AddGate(42,[](Genome* genome,int pos) {return new Gate(genome,pos);});
+	if(gateFlags[1]) Gate::AddGate(43,[](Genome* genome,int pos) {return new DeterministicGate(genome,pos);});
+	if(gateFlags[2]) Gate::AddGate(44,[](Genome* genome,int pos) {return new FeedbackGate(genome,pos);});
+	if(gateFlags[3]) Gate::AddGate(45,[](Genome* genome,int pos) {return new GPGate(genome,pos);});
+	if(gateFlags[4]) Gate::AddGate(46,[](Genome* genome,int pos) {return new Thresholdgate(genome,pos);});
+	if(gateFlags[5]) Gate::AddGate(47,[](Genome* genome,int pos) {return new FixedEpsilonGate(genome,pos);});
 	
 	
 	//printf("Here!\n");
@@ -73,13 +76,13 @@ int main(int argc, const char * argv[]) {
 	
 	srand(getpid()); // need different includes for windows XPLATFORM
 	vector<double> lW;
-	ClassicMBGenome *defaultAncestor=NULL;
+	Genome *defaultAncestor=NULL;
 	int C=0;
 	do{
 		vector<Agent*> lPop;
 		if(defaultAncestor!=NULL)
 			defaultAncestor->kill();
-		defaultAncestor=new ClassicMBGenome();
+		defaultAncestor=new Genome();
 		defaultAncestor->fillRandom();
 		lPop.push_back(new Agent(defaultAncestor,nrOfBrainStates));
 		lW=world->evaluateFitness(lPop, false);
@@ -89,12 +92,12 @@ int main(int argc, const char * argv[]) {
 	
 	//setup population
 	for(int i=0;i<popSize;i++){
-		ClassicMBGenome *G;
+		Genome *G;
 		if(defaultAncestor==NULL){
-			G=new ClassicMBGenome();
+			G=new Genome();
 			G->fillRandom();
 		} else {
-			G=(ClassicMBGenome*)defaultAncestor->makeMutatedOffspring(0.01);
+			G=(Genome*)defaultAncestor->makeMutatedOffspring(0.01);
 		}
 		population.push_back((Genome*)G);
 	}
@@ -104,7 +107,7 @@ int main(int argc, const char * argv[]) {
 		//translate all genomes to agents
 		vector<Agent*> agents;
 		for(int i=0;i<popSize;i++)
-			agents.push_back(new Agent((ClassicMBGenome*)population[i],nrOfBrainStates));
+			agents.push_back(new Agent((Genome*)population[i],nrOfBrainStates));
 		
 		//evaluate each organism in the population using a World
 		W=world->evaluateFitness(agents,false);
@@ -149,10 +152,10 @@ int main(int argc, const char * argv[]) {
 				BlinkyWorld::constantHome=true;
 				break;
 		}
-		ClassicMBGenome::insertionDeletionP=0.0;
+		Genome::insertionDeletionP=0.0;
 		for(int i=0;i<LOD.size();i++){
 			vector<Agent*> agents;
-			Agent *A=new Agent((ClassicMBGenome*)LOD[i],nrOfBrainStates);
+			Agent *A=new Agent((Genome*)LOD[i],nrOfBrainStates);
 			agents.push_back(A);
 			world->evaluateFitness(agents, true);
 			/* testing Mutational Robustness */
@@ -165,7 +168,7 @@ int main(int argc, const char * argv[]) {
 						double W=0.0;
 						vector<Agent*> rob_agents;
 						for(int j=0;j<1000;j++)
-							rob_agents.push_back(new Agent((ClassicMBGenome*)LOD[i]->makeMutatedOffspring(mys[m]),nrOfBrainStates));
+							rob_agents.push_back(new Agent((Genome*)LOD[i]->makeMutatedOffspring(mys[m]),nrOfBrainStates));
 						vector<double> robW=world->evaluateFitness(rob_agents, false);
 						for(int j=0;j<rob_agents.size();j++){
 							W+=robW[j];
@@ -186,7 +189,7 @@ int main(int argc, const char * argv[]) {
 						double W=0.0;
 						vector<Agent*> rob_agents;
 						for(int j=0;j<1000;j++)
-							rob_agents.push_back(new Agent((ClassicMBGenome*)LOD[i]->makeMutatedOffspring(0.0),nrOfBrainStates));
+							rob_agents.push_back(new Agent((Genome*)LOD[i]->makeMutatedOffspring(0.0),nrOfBrainStates));
 						BlinkyWorld::externalCognitiveNoise=robMy[m];
 						vector<double> robW=world->evaluateFitness(rob_agents, false);
 						for(int j=0;j<rob_agents.size();j++){
