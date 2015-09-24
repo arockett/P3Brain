@@ -62,15 +62,15 @@ vector<double> MutationAnalyse::evalAgentNTimes(Agent* testAgent, World* world, 
 vector<set<int>> MutationAnalyse::getPossibleStartCodons(Genome* genome) {
 	vector<set<int>> possStartCodons;
 	possStartCodons.resize(2); //vector[0] is the list of first-position start codons (e.g. 42), vector[1] is the second-position start codons
-	for (unsigned int genomeSearcher = 0; genomeSearcher < genome->sites.size(); genomeSearcher++) { //for every spot in the genome
+	for (int genomeSearcher = 0; genomeSearcher < (int)genome->sites.size(); genomeSearcher++) { //for every spot in the genome
 		for (auto gateType : Data::inUseGateTypes) {
 			if (genome->sites[genomeSearcher] == gateType) { //if a nucleotide is one of these numbers
-				if (genome->sites[genomeSearcher + 1] != (256 - genome->sites[genomeSearcher])) { //if this is not already a gate
+				if (genome->sites[(genomeSearcher + 1)%genome->sites.size()] != (256 - genome->sites[genomeSearcher])) { //if this is not already a gate
 					possStartCodons[0].insert(genomeSearcher);
 				}
 			}
 			if (genome->sites[genomeSearcher] == 256 - gateType) { //FOR LOOKING FOR A CERTAIN GATE: CHANGE THIS NUMBER RIGHT HERE
-				if (genome->sites[genomeSearcher - 1] != 256 - (genome->sites[genomeSearcher])) {
+				if (genome->sites[(genomeSearcher - 1)%genome->sites.size()] != 256 - (genome->sites[genomeSearcher])) {
 					possStartCodons[1].insert(genomeSearcher);
 				}
 			}
@@ -109,22 +109,23 @@ vector<set<int>> MutationAnalyse::getPossibleStartCodons(Genome* genome) {
 void MutationAnalyse::evalPossibleAgents(Genome* genome, int brainStates, World *world, double &avgWildTypeFitness,
 		vector<double> &rawWildTypeFitness, map<int, vector<double>> &avePerVar, vector<double> &allVar,
 		vector<double> &avePerSite) { //evaluates all possible variations for all genomes in a population
+
 	int changedCount = 0; //failsafe to make sure we're changing the right number of nucleotides
 	int numVarRuns = 7;
 
 	Genome *testGenome = new Genome; //makes testGenome for testing
-	testGenome->sites = ((Genome*) genome)->sites; //assigns testGenome to the genome of the agent currently being tested
-	Genome *staticTestGenome = (Genome*) genome; //makes staticTestGenome for comparison - so that we don't need to keep recasting genome!
-	Agent *testAgent = new Agent((Genome*) testGenome, brainStates); //assigns testAgent to be the agent with the genome of testGenome
+	testGenome->sites = genome->sites; //assigns testGenome to the genome of the agent currently being tested
+	Genome *staticTestGenome = genome; //makes staticTestGenome for comparison - so that we don't need to keep recasting genome!
+	Agent *testAgent = new Agent(testGenome, brainStates); //assigns testAgent to be the agent with the genome of testGenome
 	set<int> agentCodingReg = testAgent->findCodingRegions(0); //finds coding regions (argument is mask) for the agent in question
 	vector<set<int>> possStartCodons = getPossibleStartCodons(testGenome);
 
 	//double avgFitnessChange=0.0; // avgFitnessChange is the average fitness change for all variations of all sites in the agent
 
-	//these loops check to make sure no possible start codons are not already in agentCodingRegions
+	//these loops check to make sure identified start codons are not already in agentCodingRegions
 	for (auto position : possStartCodons[0]) {
 		int testSite = position + 1;
-		if (testSite == testGenome->sites.size()) {
+		if (testSite == (int)testGenome->sites.size()) {
 			testSite = 0;
 		}
 		if (agentCodingReg.find(testSite) != agentCodingReg.end()) { //if the site after this site is in the list of coding regions
@@ -144,12 +145,13 @@ void MutationAnalyse::evalPossibleAgents(Genome* genome, int brainStates, World 
 
 	int numBaseFitnessRuns = (agentCodingReg.size() + possStartCodons[0].size() + possStartCodons[1].size()) * 256 * 7;
 	rawWildTypeFitness = evalAgentNTimes(testAgent, world, numBaseFitnessRuns);
-	for (int BFVars = 0; BFVars < rawWildTypeFitness.size(); BFVars++) {
+	for (size_t BFVars = 0; BFVars < rawWildTypeFitness.size(); BFVars++) {
 		avgWildTypeFitness += rawWildTypeFitness[BFVars];
 	}
 	avgWildTypeFitness = avgWildTypeFitness / double(numBaseFitnessRuns); //averages the wildtype fitnesses
 
 	delete (testAgent); //you have to delete testAgent because the coding regions can only be accessed by the gate constructor. You can't update the agent, only delete and recreate it.
+
 	for (int site : agentCodingReg) { //for every site in the agent's coding region
 		changedCount++; //this just increments the failsafe
 		double avgPerSiteFitness = 0.0; //creates new average for each coding site
@@ -162,7 +164,7 @@ void MutationAnalyse::evalPossibleAgents(Genome* genome, int brainStates, World 
 		for (int variation = (testGenome->sites[site] + 1) & 255; variation != staticTestGenome->sites[site];
 				variation = (variation + 1) & 255) { //
 			testGenome->sites[site] = variation; //changes the testAgent's site to a different variation
-			testAgent = new Agent((Genome*) testGenome, brainStates);
+			testAgent = new Agent(testGenome, brainStates);
 			double varFitnessTotal = 0.0;
 			vector<double> varFits = evalAgentNTimes(testAgent, world, numVarRuns);
 			for (double fits : varFits) {
@@ -195,7 +197,7 @@ void MutationAnalyse::evalPossibleAgents(Genome* genome, int brainStates, World 
 			}
 		}
 		testGenome->sites[startCod1 + 1] = 256 - (testGenome->sites[startCod1]); //sets the nucleotide after the first half of the start codon to 256-it
-		testAgent = new Agent((Genome*) testGenome, brainStates); //make new agent
+		testAgent = new Agent(testGenome, brainStates); //make new agent
 		double varFitnessTotal = 0.0;
 		vector<double> varFits = evalAgentNTimes(testAgent, world, numVarRuns);
 		for (double fits : varFits) {
@@ -223,7 +225,7 @@ void MutationAnalyse::evalPossibleAgents(Genome* genome, int brainStates, World 
 			}
 		}
 		testGenome->sites[startCod2 - 1] = 256 - (testGenome->sites[startCod2]);
-		testAgent = new Agent((Genome*) testGenome, brainStates); //make new agent
+		testAgent = new Agent(testGenome, brainStates); //make new agent
 		double varFitnessTotal = 0.0;
 		vector<double> varFits = evalAgentNTimes(testAgent, world, numVarRuns);
 		for (double fits : varFits) {
@@ -268,7 +270,7 @@ void MutationAnalyse::test_point_mutations_and_output(int gen, Genome* tester, b
 		vector<double> varsPerSite;
 		for (auto site = avePerVarStructure.begin(); site != avePerVarStructure.end(); site++) {
 			varsPerSite = avePerVarStructure[site->first];
-			for (int var = 0; var < varsPerSite.size(); var++) {
+			for (size_t var = 0; var < varsPerSite.size(); var++) {
 				AVE_FILE << varsPerSite[var] << ",";
 				if (var % 250 == 0) {
 					AVE_FILE << "\n";
@@ -291,7 +293,7 @@ void MutationAnalyse::test_point_mutations_and_output(int gen, Genome* tester, b
 		AVE_FILE.open(ave_File_Name.c_str());
 		AVE_FILE << "genomeSize = " << ((Genome*) subject)->sites.size() << "\n" << "wildTypeFit = " << avgWTF
 				<< "\n" << "numGates = " << subAgent->numGates() << "\n" << "data = [";
-		for (int i = 0; i < allVarStructure.size(); i++) {
+		for (size_t i = 0; i < allVarStructure.size(); i++) {
 			AVE_FILE << allVarStructure[i] << ",";
 			if (i % 250 == 0) {
 				AVE_FILE << "\n";
@@ -312,7 +314,7 @@ void MutationAnalyse::test_point_mutations_and_output(int gen, Genome* tester, b
 		AVE_FILE.open(ave_File_Name.c_str());
 		AVE_FILE << "genomeSize = " << ((Genome*) subject)->sites.size() << "\n" << "wildTypeFit = " << avgWTF
 				<< "\n" << "numGates = " << subAgent->numGates() << "\n" << "data = [";
-		for (int i = 0; i < rawWTF.size(); i++) {
+		for (size_t i = 0; i < rawWTF.size(); i++) {
 			AVE_FILE << rawWTF[i] << ",";
 			if (i % 250 == 0) {
 				AVE_FILE << "\n";

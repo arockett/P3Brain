@@ -21,20 +21,6 @@ string Parameters::configFileName;
 bool Parameters::paramVerbose;
 
 
-int ParametersSettings::rep;
-int ParametersSettings::populationSize;
-int ParametersSettings::updates;
-int ParametersSettings::update=0;
-
-
-void ParametersSettings::initializeParameters(){
-	Parameters::setupParameter("rep", rep, 101, "rep number, used in output file names and seeds random numbers");
-	Parameters::setupParameter("populationSize", populationSize, 10000, "number of agents");
-	Parameters::setupParameter("updates", update, 10000, "how long the program will run");
-}
-
-
-
 string valToString(int val){
 	return to_string(val);
 }

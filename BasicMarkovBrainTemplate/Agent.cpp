@@ -8,16 +8,24 @@
 
 #include "Agent.h"
 
-#define SKIPGATE 1
+#define SKIPGATE 1 // if 0, remove the skipgate code - FOR SPEED UP!
 
-bool Agent::serialProcessing=false;
+int AgentSettings::nrOfBrainStates;
+double AgentSettings::skipGate;
+bool AgentSettings::serialProcessing;
+
+void AgentSettings::initializeParameters(){
+	Parameters::setupParameter("brainSize", nrOfBrainStates, 16, "number of Brain Values");
+	Parameters::setupParameter("skipGate", skipGate, 0.0, "chance that a gate will not fire");
+	Parameters::setupParameter("serialProcessing", serialProcessing, false, "sets agents to overwrite... right?");
+}
+
 
 Agent::Agent(){
 	
 }
 
 Agent::Agent(Genome *startGenome,int _nrOfStates){ //this is a constructor. it is run whenever a new agent is created.
-	skipGate = *Data::parameterDouble["skipGate"];
 	nrOfStates=_nrOfStates;
 	states=new double[nrOfStates];
 	nextStates=new double[nrOfStates];
@@ -26,7 +34,7 @@ Agent::Agent(Genome *startGenome,int _nrOfStates){ //this is a constructor. it i
 		nodeMap[i]=i%nrOfStates;
 	genome=startGenome;
 	gates.clear();
-	for(int i=0;i<genome->sites.size()-1;i++){
+	for(size_t i=0;i<genome->sites.size()-1;i++){
 		const int S=genome->sites[i];
 		if((S+genome->sites[i+1])==256){
 			if(Gate::makeGate[S]!=NULL){
@@ -34,12 +42,12 @@ Agent::Agent(Genome *startGenome,int _nrOfStates){ //this is a constructor. it i
 			}
 		}
 	}
-	for(int i=0;i<gates.size();i++)
+	for(size_t i=0;i<gates.size();i++)
 		gates[i]->applyNodeMap(nodeMap, _nrOfStates);
 }
 
 Agent::~Agent(){
-	for(int i=0;i<gates.size();i++)
+	for(size_t i=0;i<gates.size();i++)
 		delete gates[i];
 	delete states;
 	delete nextStates;
@@ -49,13 +57,13 @@ Agent::~Agent(){
 void Agent::resetBrain(){
 	for(int i=0;i<nrOfStates;i++)
 		states[i]=0.0;
-	for(int i=0;i<gates.size();i++)
+	for(size_t i=0;i<gates.size();i++)
 		gates[i]->resetGate();
 }
 
 void Agent::updateStates(){
 	/*
-	 if(serialProcessing){
+	 if(AgentSettings::serialProcessing){
 	 //this is a special way of serialized updating
 	 //experimental feature, should be default off!
 	 //only change if you really know what you are doing!
@@ -67,15 +75,11 @@ void Agent::updateStates(){
 	for(int i=0;i<nrOfStates;i++){ //reset all states to 0
 		nextStates[i]=0.0;
 	}
-	for(int i=0;i<gates.size();i++){ //update each gate
+	for(size_t i=0;i<gates.size();i++){ //update each gate
 #if SKIPGATE==1
-		//if(*Data::parameterDouble["skipGate"]>0){
-		if(((double)rand()/(double)RAND_MAX)>skipGate){
+		if(((double)rand()/(double)RAND_MAX)>AgentSettings::skipGate){
 			gates[i]->update(states, nextStates);
 		}
-		//}else{
-		//gates[i]->update(states, nextStates);
-		//}
 #else
 		gates[i]->update(states, nextStates);
 #endif // SKIPGATE
@@ -93,7 +97,7 @@ int Agent::Bit(double d){ //this is a function that returns a 1 if the number in
 
 int Agent::IntFromState(vector<int> I){
 	int r=0;
-	for(int i=0;i<I.size();i++)
+	for(size_t i=0;i<I.size();i++)
 		r=(r<<1)+Bit(states[I[i]]);
 	return r;
 }
@@ -108,7 +112,7 @@ int Agent::IntFromAllStates(){
 
 string Agent::gateList(){
 	string S="";
-	for(int i=0;i<gates.size();i++){
+	for(size_t i=0;i<gates.size();i++){
 		S=S+gates[i]->description();
 	}
 	return S;

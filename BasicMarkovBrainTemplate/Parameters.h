@@ -356,7 +356,7 @@ public:
 	 * verbose 3 = also show in use values
 	 */
 	static int printParameterInfo(int verbose) {
-		int num_unused = 0; // counts number of paramaters set by command line of config file, but not used
+		int num_unused = 0; // counts number of paramaters set by command line or config file, but not used
 		if (verbose > 1) {
 			cout << "\n  - printParameterInfo\n";
 			cout
@@ -457,6 +457,8 @@ public:
 				cout << "      \"" << var.first
 						<< " was not registered. It will not be added to \""
 						<< fileName << "\"\n";
+			} else if (var.first == "makeConfigFile"){
+				cout << "      skipping \"makeConfigFile\" so that we don't make a new config file every time we run!\n";
 			} else { // if in use
 				newConfigFile << var.first << " = "; // print: "name = "
 				if (var.second.commandLineCount > 0) {

@@ -14,8 +14,17 @@
 #include <iostream>
 #include "Genome.h"
 #include "Gate.h"
+#include "Parameters.h"
 
 using namespace std;
+
+class AgentSettings{
+public:
+	static int nrOfBrainStates;
+	static double skipGate;
+	static bool serialProcessing;
+	static void initializeParameters();
+};
 
 
 class Agent{
@@ -23,19 +32,15 @@ protected:
 	vector<Gate*> gates;
 	
 public:
-	//static int nodeMap[256];
-	double skipGate;
 	Genome *genome;
 	double *states,*nextStates;
 	int *nodeMap;
 	int nrOfStates;
-	static bool serialProcessing;
 	
 	Agent();
 	Agent(Genome *startGenome,int _nrOfStates);
-	~Agent();
+	virtual ~Agent();
 	
-	//	static void initializeGates(vector<bool> isGateOn);
 	int Bit(double d);
 	virtual int IntFromState(vector<int> I);
 	virtual int IntFromAllStates();
@@ -48,5 +53,8 @@ public:
 	int numGates();
 
 };
+
+
+
 
 #endif /* defined(__BasicMarkovBrainTemplate__Agent__) */

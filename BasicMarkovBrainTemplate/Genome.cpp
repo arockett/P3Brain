@@ -9,7 +9,18 @@
 #include "Genome.h"
 #include <random>
 
-double Genome::insertionDeletionP=0.02;
+double GenomeSettings::pointMutationRate;
+double GenomeSettings::insertionDeletionP;
+
+void GenomeSettings::initializeParameters(){
+	Parameters::setupParameter("GenomeSettings::pointMutationRate", pointMutationRate, 0.005, "per site mutation rate");
+	Parameters::setupParameter("GenomeSettings::insertionDeletionP", insertionDeletionP, 0.005, "per genome insertion/deletion rate");
+}
+
+
+
+
+//double Genome::insertionDeletionP=0.02;
 
 Genome::Genome(){
 	referenceCounter=1;
@@ -35,7 +46,7 @@ Genome::~Genome(){
 void Genome::copyGenome(Genome *from){
 	Genome *who=from;
 	sites.resize(who->sites.size());
-	for(int i=0;i<sites.size();i++)
+	for(size_t i=0;i<sites.size();i++)
 		sites[i]=who->sites[i];
 }
 
@@ -49,7 +60,7 @@ void Genome::applyMutations(double mutationRate){
 		int localMutations= distribution(generator);
 		for(i=0;i<localMutations;i++)
 			sites[rand()%nucleotides]=rand()&255;
-		if((((double)rand()/(double)RAND_MAX)<insertionDeletionP)&&(sites.size()<20000)){
+		if((((double)rand()/(double)RAND_MAX)<GenomeSettings::insertionDeletionP)&&(sites.size()<20000)){
 			//duplication
 			w=128+rand()%(512-128);
 			s=rand()%((int)sites.size()-w);
@@ -58,7 +69,7 @@ void Genome::applyMutations(double mutationRate){
 			buffer.insert(buffer.begin(),sites.begin()+s,sites.begin()+s+w);
 			sites.insert(sites.begin()+o,buffer.begin(),buffer.end());
 		}
-		if((((double)rand()/(double)RAND_MAX)<insertionDeletionP)&&(sites.size()>1000)){
+		if((((double)rand()/(double)RAND_MAX)<GenomeSettings::insertionDeletionP)&&(sites.size()>1000)){
 			//deletion
 			w=128+rand()%(512-128);
 			s=rand()%((int)sites.size()-w);
@@ -76,7 +87,7 @@ void Genome::kill(){
 
 void Genome::fillRandom(){
 	sites.resize(5000);
-	for(int i=0;i<sites.size();i++)
+	for(size_t i=0;i<sites.size();i++)
 		sites[i]=(unsigned char)rand()&255;
 	for(int codon=42;codon<50;codon++)
 		for(int i=0;i<4;i++){
@@ -98,7 +109,7 @@ void Genome::makePointMutation(){
 
 
 void Genome::saveToFile(FILE *F){
-	for(int i=0;i<sites.size();i++)
+	for(size_t i=0;i<sites.size();i++)
 		fprintf(F,"	%i",sites[i]);
 	fprintf(F,"\n");
 }

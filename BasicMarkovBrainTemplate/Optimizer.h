@@ -9,17 +9,29 @@
 #ifndef __BasicMarkovBrainTemplate__Optimizer__
 #define __BasicMarkovBrainTemplate__Optimizer__
 
+#include <stdlib.h>
+#include <iostream>
 #include "Genome.h"
 #include <vector>
+#include "Parameters.h"
 
 using namespace std;
 
-class Optimizer{
+
+
+class OptimizerSettings{
 public:
 	static int elitism;
+	static void initializeParameters();
+};
+
+
+
+class Optimizer{
+public:
 	double maxFitness;
 	Optimizer();
-	~Optimizer();
+	virtual ~Optimizer();
 	virtual vector<Genome*> makeNextGeneration(vector<Genome*> population,vector<double> W);
 };
 

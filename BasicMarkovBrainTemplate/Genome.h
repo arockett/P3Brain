@@ -12,8 +12,20 @@
 #include <stdlib.h>
 #include <vector>
 #include "Data.h"
+#include "Parameters.h"
 
 using namespace std;
+
+
+class GenomeSettings{
+public:
+	static double pointMutationRate;
+	static double insertionDeletionP;
+	static void initializeParameters();
+};
+
+
+
 
 class Data;
 

@@ -12,6 +12,56 @@
 #include <time.h>
 //#include "Random.h"
 
+
+bool GateSettings::gateFlags[8];
+
+double GateSettings::voidOutPut;
+void GateSettings::initializeParameters(){
+	Parameters::setupParameter("probGate", gateFlags[0], false, "set to true to enable probabilistic gates");
+	Parameters::setupParameter("detGate", gateFlags[1], false, "set to true to enable deterministic gates?");
+	Parameters::setupParameter("fbGate", gateFlags[2], false, "set to true to enable feedback gates");
+	Parameters::setupParameter("gpGate", gateFlags[3], false, "set to true to enable GP (what?) gates");
+	Parameters::setupParameter("thGate", gateFlags[4], false, "set to true to enable theta gates");
+	Parameters::setupParameter("epsiGate", gateFlags[5], false, "set to true to enable epsilon gates");
+	Parameters::setupParameter("voidOutput", voidOutPut, 0.0, "chance that an output from a determinstic gate will be set to 0");
+}
+
+/*
+ * setupGates() populates Gate::makeGate (a structure containing functions) with the constructors for various types of gates.
+ * there are 256 possible gates identified each by a pair of codons (n followed by 256-n)
+ * after initalizing Gate::MakeGate, Gate::AddGate() adds values and the associated constructor function to Gate::MakeGate
+ */
+void setupGates(){
+	for(int i=0;i<256;i++){
+		Gate::AddGate(i, NULL);
+	}
+	if(GateSettings::gateFlags[0]){
+        Gate::AddGate(42,[](Genome* genome,int pos) {return new Gate(genome,pos);});
+        Data::inUseGateTypes.insert(42);
+    }
+	if(GateSettings::gateFlags[1]){
+        Gate::AddGate(43,[](Genome* genome,int pos) {return new DeterministicGate(genome,pos);});
+        Data::inUseGateTypes.insert(43);
+	}
+	if(GateSettings::gateFlags[2]){
+        Gate::AddGate(44,[](Genome* genome,int pos) {return new FeedbackGate(genome,pos);});
+        Data::inUseGateTypes.insert(44);
+	}
+	if(GateSettings::gateFlags[3]){
+        Gate::AddGate(45,[](Genome* genome,int pos) {return new GPGate(genome,pos);});
+        Data::inUseGateTypes.insert(45);
+	}
+	if(GateSettings::gateFlags[4]){
+        Gate::AddGate(46,[](Genome* genome,int pos) {return new Thresholdgate(genome,pos);});
+        Data::inUseGateTypes.insert(46);
+    }
+    if(GateSettings::gateFlags[5]){
+        Gate::AddGate(47,[](Genome* genome,int pos) {return new FixedEpsilonGate(genome,pos);});
+        Data::inUseGateTypes.insert(47);
+    }
+}
+
+
 /* *** some c++ 11 magic to speed up translation from genome to gates *** */
 function<Gate*(Genome*,int)> Gate::makeGate[256];
 void Gate::AddGate(int ID, function<Gate*(Genome*,int)> theFunction){
@@ -98,33 +148,33 @@ int Gate::Bit(double d){ //this returns 1 if you have inputted a number greater 
 void Gate::update(double *states,double *nextStates){ //this translates the input bits of the current states to the output bits of the next states
 	int input=0,output=0;
 	double r=(double)rand()/(double)RAND_MAX; //r is a random double between 0 and 1
-	for(int i=0;i<I.size();i++) //for everything in vector I...
+	for(size_t i=0;i<I.size();i++) //for everything in vector I...
 		input=(input<<1)+Bit(states[I[i]]); //stores the current states in bitstring input with bitshifting. it will now be a bitstring of length (inputs)
 	while(r>table[input][output]){ //this goes across the probability table in row (input) and subtracts each value from r until r is less than a value it reaches
 		r-=table[input][output];
 		output++;
 	}
-	for(int i=0;i<O.size();i++) //for each number in vector output...
+	for(size_t i=0;i<O.size();i++) //for each number in vector output...
 		nextStates[O[i]]+=1.0*((output>>i)&1); //carries the output selected by r into the output of nextStates
 }
 
 string Gate::description(){
 	string S="Gate\n";
 	S=S+"IN:";
-	for(int i=0;i<I.size();i++)
+	for(size_t i=0;i<I.size();i++)
 		S=S+" "+to_string(I[i]);
 	S=S+"\n";
 	S=S+"OUT:";
-	for(int i=0;i<O.size();i++)
+	for(size_t i=0;i<O.size();i++)
 		S=S+" "+to_string(O[i]);
 	S=S+"\n";
 	return S;
 }
 
 void Gate::applyNodeMap(int *nodeMap,int maxNodes){
-	for(int i=0;i<I.size();i++)
+	for(size_t i=0;i<I.size();i++)
 		I[i]=nodeMap[I[i]%maxNodes];
-	for(int i=0;i<O.size();i++)
+	for(size_t i=0;i<O.size();i++)
 		O[i]=nodeMap[O[i]%maxNodes];
 }
 
@@ -146,7 +196,6 @@ DeterministicGate::DeterministicGate(){
 }
 
 DeterministicGate::DeterministicGate(Genome *genome,int startCodonAt){//all this looks exactly the same as
-	voidOutput=*Data::parameterDouble["voidOutput"];
 	
 	//cout << "Deterministic gate is being called\n";
 	int i,j,k;
@@ -215,19 +264,19 @@ DeterministicGate::~DeterministicGate(){
 
 void DeterministicGate::update(double *states,double *nextStates){
 	int input=0;
-	for(int i=0;i<I.size();i++){
+	for(size_t i=0;i<I.size();i++){
 		input=(input<<1)+Bit(states[I[i]]); //stores current input states in bistring "input"
 	}
 	vector<double> outputRow = table[input];
 #if VOIDOUTPUT==1
 	//if(*Data::parameterDouble["voidOutput"]>0){
-	if(((double)rand()/(double)RAND_MAX)<=voidOutput){
+	if(((double)rand()/(double)RAND_MAX)<=GateSettings::voidOutPut){
 		int whichBit=rand()%O.size();
 		outputRow[whichBit]=0;
 	}
 	//}
 #endif // VOIDOUTPUT
-	for(int i=0;i<O.size();i++){
+	for(size_t i=0;i<O.size();i++){
 		nextStates[O[i]]+=outputRow[i]; //this is super weird. it should be |=
 	}
 }
@@ -251,7 +300,7 @@ GPGate::GPGate(){
 }
 
 GPGate::GPGate(Genome *genome,int startCodonAt){
-	int i,j,k;
+	int i,k;
 	I.clear();
 	O.clear();
 	int _xDim,_yDim;
@@ -290,7 +339,7 @@ GPGate::~GPGate(){
 void GPGate::update(double *states,double *nextStates){
 	double retValue=I[0];
 	int Z=0;
-	int i,o;
+	size_t i,o;
 	bool convReturn=true;
 	switch(myGateType){
 		case 0: //constant
@@ -345,7 +394,7 @@ void GPGate::update(double *states,double *nextStates){
 			break;
 	}
 	if(convReturn){
-		for(int o=0;o<O.size();o++)
+		for(size_t o=0;o<O.size();o++)
 			nextStates[O[o]]+=retValue;
 	}
 }
@@ -436,7 +485,7 @@ FeedbackGate::~FeedbackGate(){
 }
 
 void FeedbackGate::update(double *states,double *nextStates){
-	int i;
+	size_t i;
 	double mod;
 	
 	//Apply the feedback
@@ -445,9 +494,9 @@ void FeedbackGate::update(double *states,double *nextStates){
 			mod=((double)rand()/(double)RAND_MAX)*posLevelOfFB[i];
 			table[chosenInPos[i]][chosenOutPos[i]]+=mod;
 			double s=0.0;
-			for(int k=0;k<table[chosenInPos[i]].size();k++)
+			for(size_t k=0;k<table[chosenInPos[i]].size();k++)
 				s+=table[chosenInPos[i]][k];
-			for(int k=0;k<table[chosenInPos[i]].size();k++)
+			for(size_t k=0;k<table[chosenInPos[i]].size();k++)
 				table[chosenInPos[i]][k]/=s;
 		}
 	}
@@ -458,9 +507,9 @@ void FeedbackGate::update(double *states,double *nextStates){
 			if(table[chosenInNeg[i]][chosenOutNeg[i]]<0.001)
 				table[chosenInNeg[i]][chosenOutNeg[i]]=0.001;
 			double s=0.0;
-			for(int k=0;k<table[chosenInNeg[i]].size();k++)
+			for(size_t k=0;k<table[chosenInNeg[i]].size();k++)
 				s+=table[chosenInNeg[i]][k];
-			for(int k=0;k<table[chosenInNeg[i]].size();k++)
+			for(size_t k=0;k<table[chosenInNeg[i]].size();k++)
 				table[chosenInNeg[i]][k]/=s;
 		}
 	}
@@ -469,13 +518,13 @@ void FeedbackGate::update(double *states,double *nextStates){
 	int input=0;
 	int output=0;
 	double r=(double)rand()/(double)RAND_MAX;
-	for(int i=0;i<I.size();i++)
+	for(size_t i=0;i<I.size();i++)
 		input=(input<<1)+Bit(states[I[i]]);
 	while(r>table[input][output]){
 		r-=table[input][output];
 		output++;
 	}
-	for(int i=0;i<O.size();i++)
+	for(size_t i=0;i<O.size();i++)
 		nextStates[O[i]]+=1.0*((output>>i)&1);
 	
 	//remember the last actions for future feedback
@@ -519,8 +568,8 @@ void FeedbackGate::resetGate(){
 	chosenInNeg.clear();
 	chosenOutPos.clear();
 	chosenOutNeg.clear();
-	for(int i=0;i<table.size();i++)
-		for(int j=0;j<table[i].size();j++)
+	for(size_t i=0;i<table.size();i++)
+		for(size_t j=0;j<table[i].size();j++)
 			table[i][j]=originalTable[i][j];
 }
 
@@ -575,12 +624,12 @@ Thresholdgate::~Thresholdgate(){
 
 void Thresholdgate::update(double *states,double *nextStates){
 	int theCount=0;
-	for(int i=1;i<I.size();i++)
+	for(size_t i=1;i<I.size();i++)
 		theCount=(theCount<<1)+Bit(states[I[i]]);
 	theCount+=Bit(states[I[0]]);
 	if(theCount>threshold)
 		states[O[0]]+=1.0;
-	for(int i=1;i<O.size();i++)
+	for(size_t i=1;i<O.size();i++)
 		nextStates[O[i]]+=1.0*((theCount>>(i-1))&1);
 }
 
@@ -647,9 +696,9 @@ FixedEpsilonGate::FixedEpsilonGate(Genome *genome,int startCodonAt){
 	}
 	//now to the specifics of this gate
 	defaultOutput.clear(); //clear the vector<int>
-	for(int i=0;i<table.size();i++){ //for every row of the table (which is 2^inputs)
+	for(size_t i=0;i<table.size();i++){ //for every row of the table (which is 2^inputs)
 		int D=0;
-		for(int j=0;j<table[i].size();j++){ //for every space in the row
+		for(size_t j=0;j<table[i].size();j++){ //for every space in the row
 			D|=(Bit(table[i][j])<<j);//translate the value in that space to a bit (0 or 1), then bitshift it [position in row] times, then take D, bit-or it with that number,
 			//and make that the new D
 		}
@@ -663,7 +712,7 @@ FixedEpsilonGate::~FixedEpsilonGate(){
 
 void FixedEpsilonGate::update(double *states,double *nextStates){
 	int input=0; //input is the correct bitstring of outputs of the gate
-	for(int i=0;i<I.size();i++) //for every index in the input (I) vector
+	for(size_t i=0;i<I.size();i++) //for every index in the input (I) vector
 		input=(input<<1)+Bit(states[I[i]]);//stores current states in bitstring input
 	if(((double)rand()/(double)RAND_MAX)<epsilon){ //if there will be an error
 		//do a random output excluding the one otherwise given
@@ -671,12 +720,12 @@ void FixedEpsilonGate::update(double *states,double *nextStates){
 		do{
 			output=rand()&(table.size()-1); //pick a bitstring (random row in the table)
 		}while(output==defaultOutput[input]); //until you pick the correct bitstring of outputs of the gate. If you don't, move on.
-		for(int i=0;i<O.size();i++){
+		for(size_t i=0;i<O.size();i++){
 			nextStates[O[i]]+=1.0*(double)((output>>i)&1);
 		}
 	} else {
 		//do the default output
-		for(int i=0;i<O.size();i++){
+		for(size_t i=0;i<O.size();i++){
 			nextStates[O[i]]+=table[input][i];
 		}
 	}
@@ -685,3 +734,10 @@ void FixedEpsilonGate::update(double *states,double *nextStates){
 string FixedEpsilonGate::description(){
 	return "Fixed Epsilon "+to_string(epsilon)+" "+Gate::description();
 }
+
+
+
+
+
+
+

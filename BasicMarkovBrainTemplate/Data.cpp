@@ -1,240 +1,313 @@
-//
-//  Data.cpp
-//  BasicMarkovBrainTemplate
-//
-//  Created by Arend Hintze on 5/31/15.
-//  Copyright (c) 2015 Arend Hintze. All rights reserved.
-//
-
 #include "Data.h"
 #include <cstring>
 
-//Cliff put this here:
-set<int> Data::inUseGateTypes;
-
 //global variables that should be accessible to all
-int Data::update=-1;
+int Data::update = 0;
+int Data::lastSaveUpdate = 0;
+set<int> Data::inUseGateTypes;
+bool Data::initFiles = false;
 
 //LOD variables
-int Data::genomeIDCounter=0;
+int Data::genomeIDCounter = 0;
 
-map<int,map<string,string>> Data::dataMap;
+// dataMap holds generic data
+// key will always be a genome ID (unique) which adresses to a map of type of data to value (for this genome)
+map<int, map<string, string>> Data::dataMap;
 
-//Command Line Parameters
-map<string,int*> Data::parameterInt;
-map<string,double*> Data::parameterDouble;
-map<string,string*> Data::parameterString;
-map<string,bool*> Data::parameterBool;
-map<string,double*> Data::defaultDoubles;
-map<string,int*> Data::defaultInts;
-map<string,string*> Data::defaultStrings;
-map<string,bool*> Data::defaultBools;
+int DataSettings::repNumber;
+int DataSettings::dataInterval;
+int DataSettings::genomeInterval;
+string DataSettings::DataFileName;
+string DataSettings::GenomeFileName;
 
+void DataSettings::initializeParameters() {
+	Parameters::setupParameter("repNumber", repNumber, 101, "Replicate ID and seed (if seedWithPID not set true)");
+	Parameters::setupParameter("Data::dataInterval", dataInterval, 1, "How often to write to data file");
+	Parameters::setupParameter("Data::genomeInterval", genomeInterval, 1, "How often to write genome file");
+
+	Parameters::setupParameter("Data::dataFileName", DataFileName, "data.csv",
+			"name of genome file (stores genomes for line of decent)");
+	Parameters::setupParameter("Data::genomeFileName", GenomeFileName, "genome.csv",
+			"name of data file (stores data i.e. scores");
+
+	// ad repNumber directory to file names
+	DataFileName = repNumber + "/" + DataFileName;
+	GenomeFileName = repNumber + "/" + GenomeFileName;
+}
 
 // implementation for LOD
-void Data::Add(int value,string key,Genome* to){
-	dataMap[to->ID][key]=to_string(value);
+void Data::Add(int value, string key, Genome* to) {
+	dataMap[to->ID][key] = to_string(value);
 }
 
-void Data::Add(double value,string key,Genome* to){
-	dataMap[to->ID][key]=to_string(value);
+void Data::Add(double value, string key, Genome* to) {
+	dataMap[to->ID][key] = to_string(value);
 }
 
-string Data::Get(string key,Genome *from){
-		return dataMap[from->ID][key];
+/*
+ * takes a genome and a key. returns the value of key for genome from "dataMap"
+ */
+string Data::Get(string key, Genome *from) {
+	return dataMap[from->ID][key];
 }
 
-vector<string> Data::GetLODItem(string key,Genome *from){
+/*
+ * Given a genome and a key(to data that has been saved into "dataMap"
+ * return a list of the value for key for genome and all genomes ancestors ordered oldest first
+ */
+vector<string> Data::GetLODItem(string key, Genome *from) {
 	vector<string> list;
-	Genome *G=from;
-	while(G!=NULL){
+	Genome *G = from;
+	while (G != NULL) {
 		list.insert(list.begin(), dataMap[G->ID][key]);
-		G=G->ancestor;
+		G = G->ancestor;
 	}
 	return list;
 }
-vector<Genome*> Data::getLOD(Genome *from){
+
+/*
+ * Given a genome
+ * return a list of genomes containing genome and all genomes ancestors ordered oldest first
+ */
+vector<Genome*> Data::getLOD(Genome *from) {
 	vector<Genome*> list;
-	Genome *G=from;
-	while(G!=NULL){
-		list.insert(list.begin(), G);
-		G=G->ancestor;
+	Genome *G = from;
+	while (G != NULL) { // which G has an ancestor
+		list.insert(list.begin(), G); // add that ancestor to the front of the LOD list
+		G = G->ancestor; // move to the ancestor
 	}
-	return list;    
+	return list;
 }
 
-void Data::removeGenome(Genome* who){
-	if(dataMap.find(who->ID)!=dataMap.end())
+/*
+ * find the Most Recent Common Ancestor
+ * uses getLOD to get a list of ancestors (oldest first). seaches the list for the first ancestor with a referenceCounter > 1
+ * that is the first reference counter with more then one offspring.
+ * If none are found, then return "from"
+ * Note: a currently active genome has a referenceCounter = 1 (it has not reproduced yet, it only has 1 for it's self)
+ *       a dead genome with a referenceCounter = 0 will not be in the LOD (it has no offspring and will have been pruned)
+ *       a dead genome with a referenceCounter = 1 has only one offspring.
+ *       a dead genome with a referenceCounter > 1 has more then one spring with surviving lines of decent.
+ */
+Genome* Data::getMostRecentCommonAncestor(Genome *from) {
+	vector<Genome*> LOD = getLOD(from); // get line of decent from "from"
+	for (Genome *G : LOD) { // starting at the oldest ancestor, moving to the youngest
+		printf("%i %i\n",G->ID,G->referenceCounter);
+		if (G->referenceCounter > 1) // the first (oldest) ancestor with more then one surviving offspring is the oldest
+			return G;
+	}
+	return from; // a currently active genome will have referenceCounter = 1 but may be the Most Recent Common Ancestor
+}
+
+void Data::removeGenome(Genome* who) {
+	if (dataMap.find(who->ID) != dataMap.end())
 		dataMap.erase(dataMap.find(who->ID));
 }
 
-int Data::registerGenome(Genome* who){
-	int I=genomeIDCounter;
-	dataMap[genomeIDCounter]["ID"]=to_string(genomeIDCounter);
+int Data::registerGenome(Genome* who) {
+	int I = genomeIDCounter;
+	dataMap[genomeIDCounter]["ID"] = to_string(genomeIDCounter);
 	genomeIDCounter++;
 	return I;
 }
 
+/*
+ * Save the data from dataMap for one genomes ("from") LOD from the last save until the last convergance
+ * this function assumes
+ * a) all of the fields in dataMap that genomes will be writting to have been created
+ * b) all genomes have the same fields
+ * if a) and or b) are not true, the function will still work, but the output will be mislabeled garbage
+ */
+void Data::saveDataOnLOD(Genome *who) {
+	FILE *DATAFILE;
+	FILE *GENOMEFILE;
+	if (initFiles != true) { // if this file has not been initialized
+		initFiles = true; // make a note that it has been initialized
+		DATAFILE = fopen(DataSettings::DataFileName.c_str(), "w+t"); // open the data file for writing (w) in text mode (t) and overwrite the file if it's already there (+)
 
-void Data::saveLOD(Genome *who,string filename){
-	FILE *F=fopen(filename.c_str(),"w+t");
-	Genome *G=who;
-	vector<Genome*> list;
-	//save the header
-	fprintf(F,"N");
-	for(map<string,string>::iterator I=dataMap[who->ID].begin();I!=dataMap[who->ID].end();I++)
-		fprintf(F,",%s",I->first.c_str());
-	fprintf(F,"\n");
-	
-	
-	//get al the LOD pointers
-	while(G!=NULL){
-		list.insert(list.begin(),G);
-		G=(Genome*)G->ancestor;
-	}
-//	for(int i=0;i<list.size();i++)
-//		printf("find %p %i\n",list[i],list[i]->ID);
-	//now save the data
-	for(int i=1;i<list.size();i++){
-		fprintf(F,"%i",i);
-		for(map<string,string>::iterator I=dataMap[list[i]->ID].begin();I!=dataMap[list[i]->ID].end();I++){
-			fprintf(F,",%s",I->second.c_str());
+		// write the file header (labels)
+		fprintf(DATAFILE, "update"); // print update in the file
+		for (map<string, string>::iterator I = dataMap[who->ID].begin(); I != dataMap[who->ID].end(); I++){
+			fprintf(DATAFILE, ",%s", I->first.c_str()); // print the names of all the the elements in dataMap as a header
 		}
-		fprintf(F,"\n");
+		fprintf(DATAFILE, "\n");
+
+		GENOMEFILE = fopen(DataSettings::GenomeFileName.c_str(), "w+t"); // open the genome file for writing (w) in text mode (t) and overwrite the file if it's already there (+)
+		fprintf(GENOMEFILE,"genomeInterval = %i", DataSettings::genomeInterval);
+
+	} else { // if files have already been initialized, open them for writing
+		DATAFILE = fopen(DataSettings::DataFileName.c_str(), "wt"); // open the file for writing (w) in text mode (t)
+		GENOMEFILE = fopen(DataSettings::GenomeFileName.c_str(), "wt"); // open the file for writing (w) in text mode (t)
+
 	}
-	fclose(F);
+
+	vector<Genome*> LOD = getLOD(who); // get line of decent for "from"
+	cout << "HERE!! \n";
+	Genome * MRCA = getMostRecentCommonAncestor(who);
+
+	int outputTime = 0;
+
+	while ((outputTime + Data::lastSaveUpdate < update) && (LOD[outputTime] != MRCA)) {
+	cout << "HERE!! "<< outputTime << "\n";
+
+		// write data to DATAFILE if this is a dataInterval
+		if ((outputTime + Data::lastSaveUpdate) % DataSettings::dataInterval == 0) {
+			fprintf(DATAFILE, "%i", outputTime + Data::lastSaveUpdate);
+			//save the data for each element in the list
+			for (map<string, string>::iterator genomeData = dataMap[LOD[outputTime]->ID].begin();
+					genomeData != dataMap[LOD[outputTime]->ID].end(); genomeData++) {
+				fprintf(DATAFILE, ",%s", genomeData->second.c_str());
+			}
+			fprintf(DATAFILE, "\n");
+		}
+
+		// write the Genome to GENOMEFILE if this is a genomeInterval
+		if ((outputTime + Data::lastSaveUpdate) % DataSettings::genomeInterval == 0) {
+			LOD[outputTime]->saveToFile(GENOMEFILE);
+		}
+	}
+	Data::lastSaveUpdate = Data::lastSaveUpdate + outputTime;
+	fclose(DATAFILE);
+	fclose(GENOMEFILE);
+
 }
 
-void Data::saveGEN(Genome *who,string filename,int intervall){
-	Genome *G=who;
+void Data::saveGenomesOnLOD(Genome *who, string filename, int intervall) {
+	Genome *G = who;
 	vector<Genome*> list;
-	FILE *F=fopen(filename.c_str(),"w+t");
+	FILE *F = fopen(filename.c_str(), "w+t");
 	//get al the LOD pointers
-	while(G!=NULL){
-		list.insert(list.begin(),G);
-		G=G->ancestor;
+	while (G != NULL) {
+		list.insert(list.begin(), G);
+		G = G->ancestor;
 	}
-	for(int i=0;i<list.size();i+=intervall){
+	for (size_t i = 0; i < list.size(); i += intervall) {
 		list[i]->saveToFile(F);
 	}
 	fclose(F);
 }
 
-Genome* Data::getMostRecentCommonAncestor(Genome *from){
-	vector<Genome*> LOD=getLOD(from);
-	for(Genome *G:LOD){
-		//printf("%i %i\n",G->ID,G->referenceCounter);
-		if(G->referenceCounter>1)
-			return G;
-	}
-	return from;
-}
-
-//implementation for parameters
-void Data::setDefaultParameter(string key,int *variable,int value){
-	parameterInt[key]=variable;
-	*variable=value;
-}
-
-void Data::setDefaultParameter(string key,double *variable,double value){
-	parameterDouble[key]=variable;
-	*variable=value;
-}
-
-void Data::setDefaultParameter(string key,string *variable,string value){
-	parameterString[key]=variable;
-	*variable=value;
-}
-
-void Data::setDefaultParameter(string key,bool *variable,bool value){
-	parameterBool[key]=variable;
-	*variable=value;
-}
-
-void Data::UseCommandLineParameters(int argc, const char * argv[]){
-	for(int i=1;i<argc;i+=2){
-		string S=string(argv[i]);
-		if(parameterInt.find(S)!=parameterInt.end()){
-			*parameterInt[S]=atoi(argv[i+1]);
-			printf("set int %s to %i\n",S.c_str(),(*parameterInt[S]));
-		}
-		if(parameterDouble.find(S)!=parameterDouble.end()){
-			*parameterDouble[S]=(double)atof(argv[i+1]);
-			printf("set double %s to %f\n",S.c_str(),(*parameterDouble[S]));
-		}
-		if(parameterString.find(S)!=parameterString.end()){
-			*parameterString[S]=string(argv[i+1]);
-			printf("set string %s to %s\n",S.c_str(),(*parameterString[S]).c_str());
-		}
-		if(parameterBool.find(S)!=parameterBool.end()){
-			*parameterBool[S]=strcmp(argv[i+1],"true");
-			printf("set bool %s to %i\n",S.c_str(),(*parameterBool[S]));
-		}
-	}
-}
-
-
-double Data::getDefaultDouble(string S){
-	return (*defaultDoubles[S]);
-}
-
-int Data::getDefaultInt(string S){
-	return (*defaultInts[S]);
-}
-
-string Data::getDefaultString(string S){
-	return (*defaultStrings[S]);
-}
-
-bool Data::getDefaultBool(string S){
-	return (*defaultBools[S]);
-}
-
-double* Data::makeDefaultDouble(string S){
-	double *D=new double;
-	defaultDoubles[S]=D;
-	return D;
-}
-
-int* Data::makeDefaultInt(string S){
-	int *I=new int;
-	defaultInts[S]=I;
-	return I;
-}
-string* Data::makeDefaultString(string S){
-	string *D=new string();
-	defaultStrings[S]=D;
-	return D;
-}
-
-bool* Data::makeDefaultBool(string S){
-	bool *B=new bool;
-	defaultBools[S]=B;
-	return B;
-}
-
-void Data::setDefaultDouble(string S,double to){
-    (*defaultDoubles[S])=to;
-}
-
-void Data::setDefaultInt(string S,int to){
-    (*defaultInts[S])=to;
-    
-}
-
-void Data::setDefaultString(string S,string to){
-    (*defaultStrings[S])=to;
-
-}
-
-void Data::setDefaultBool(string S,bool to){
-    (*defaultBools[S])=to;
-}
-
-void Data::showAll(){
+void Data::showAll() {
 	for (auto& A : dataMap)
-		for(auto& B : A.second)
-			printf("%p %s %s\n",A.first,B.first.c_str(),B.second.c_str());
+		for (auto& B : A.second)
+			printf("%i %s %s\n", A.first, B.first.c_str(), B.second.c_str());
 }
 
+////////////////////////////////////// OLD, will be removed in time /////////////////////////////////////////////
+//////////////////////////////////////      DO NOT EDIT BELOW!      /////////////////////////////////////////////
+/*
+ *
+ *
+
+ //Command Line Parameters
+ map<string,int*> Data::parameterInt;
+ map<string,double*> Data::parameterDouble;
+ map<string,string*> Data::parameterString;
+ map<string,bool*> Data::parameterBool;
+ map<string,double*> Data::defaultDoubles;
+ map<string,int*> Data::defaultInts;
+ map<string,string*> Data::defaultStrings;
+ map<string,bool*> Data::defaultBools;
+
+ //implementation for parameters
+ void Data::setDefaultParameter(string key,int *variable,int value){
+ parameterInt[key]=variable;
+ *variable=value;
+ }
+
+ void Data::setDefaultParameter(string key,double *variable,double value){
+ parameterDouble[key]=variable;
+ *variable=value;
+ }
+
+ void Data::setDefaultParameter(string key,string *variable,string value){
+ parameterString[key]=variable;
+ *variable=value;
+ }
+
+ void Data::setDefaultParameter(string key,bool *variable,bool value){
+ parameterBool[key]=variable;
+ *variable=value;
+ }
+
+ void Data::UseCommandLineParameters(int argc, const char * argv[]){
+ for(int i=1;i<argc;i+=2){
+ string S=string(argv[i]);
+ if(parameterInt.find(S)!=parameterInt.end()){
+ *parameterInt[S]=atoi(argv[i+1]);
+ printf("set int %s to %i\n",S.c_str(),(*parameterInt[S]));
+ }
+ if(parameterDouble.find(S)!=parameterDouble.end()){
+ *parameterDouble[S]=(double)atof(argv[i+1]);
+ printf("set double %s to %f\n",S.c_str(),(*parameterDouble[S]));
+ }
+ if(parameterString.find(S)!=parameterString.end()){
+ *parameterString[S]=string(argv[i+1]);
+ printf("set string %s to %s\n",S.c_str(),(*parameterString[S]).c_str());
+ }
+ if(parameterBool.find(S)!=parameterBool.end()){
+ *parameterBool[S]=(strcmp(argv[i+1],"true")==0);
+ printf("set bool %s to %i\n",S.c_str(),(*parameterBool[S]));
+ }
+ }
+ }
+
+
+ double Data::getDefaultDouble(string S){
+ return (*defaultDoubles[S]);
+ }
+
+ int Data::getDefaultInt(string S){
+ return (*defaultInts[S]);
+ }
+
+ string Data::getDefaultString(string S){
+ return (*defaultStrings[S]);
+ }
+
+ bool Data::getDefaultBool(string S){
+ return (*defaultBools[S]);
+ }
+
+ double* Data::makeDefaultDouble(string S){
+ double *D=new double;
+ defaultDoubles[S]=D;
+ return D;
+ }
+
+ int* Data::makeDefaultInt(string S){
+ int *I=new int;
+ defaultInts[S]=I;
+ return I;
+ }
+ string* Data::makeDefaultString(string S){
+ string *D=new string();
+ defaultStrings[S]=D;
+ return D;
+ }
+
+ bool* Data::makeDefaultBool(string S){
+ bool *B=new bool;
+ defaultBools[S]=B;
+ return B;
+ }
+
+ void Data::setDefaultDouble(string S,double to){
+ (*defaultDoubles[S])=to;
+ }
+
+ void Data::setDefaultInt(string S,int to){
+ (*defaultInts[S])=to;
+
+ }
+
+ void Data::setDefaultString(string S,string to){
+ (*defaultStrings[S])=to;
+
+ }
+
+ void Data::setDefaultBool(string S,bool to){
+ (*defaultBools[S])=to;
+ }
+ */
 

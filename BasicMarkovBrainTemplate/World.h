@@ -17,9 +17,18 @@
 
 using namespace std;
 
-class World{
+
+
+class WorldSettings{
 public:
 	static int repeats;
+	static void initializeParameters();
+};
+
+
+
+class World{
+public:
 	World();
 	virtual ~World();
 	virtual vector<double> evaluateFitness(vector<Agent*> agents,bool analyse);

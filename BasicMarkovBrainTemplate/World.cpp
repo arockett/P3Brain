@@ -10,7 +10,13 @@
 #include <math.h>
 
 
-int World::repeats=1;
+int WorldSettings::repeats;
+
+void WorldSettings::initializeParameters(){
+	Parameters::setupParameter("world::repeats", repeats, 1, "WHAT IS THIS?");
+}
+
+
 
 World::World(){
 }
@@ -20,7 +26,7 @@ World::~World(){
 
 vector<double> World::evaluateFitness(vector<Agent*> agents,bool analyse){
 	vector<double> W;
-	for(int i=0;i<agents.size();i++)
+	for(size_t i=0;i<agents.size();i++)
 		W.push_back(testIndividual(agents[i],analyse));
 	return W;
 }
@@ -38,13 +44,13 @@ ExampleWorld::~ExampleWorld(){
 
 vector<double> ExampleWorld::evaluateFitness(vector<Agent*> agents,bool analyse){
 	vector<double> W;
-	for(int i=0;i<agents.size();i++){
+	for(size_t i=0;i<agents.size();i++){
 		double w=0.0;
-		for(int r=0;r<repeats;r++){
+		for(int r=0;r<WorldSettings::repeats;r++){
 			w+=testIndividual(agents[i],analyse);
 		}
-        W.push_back(w/(double)repeats);
-//		W.push_back(pow(w,1.0/(double)repeats));
+        W.push_back(w/(double)WorldSettings::repeats);
+//		W.push_back(pow(w,1.0/(double)WorldSettings::repeats));
 	}
 	return W;
 }
@@ -81,7 +87,7 @@ double ExampleWorld::testIndividual(Agent *agent,bool analyse){
 /*
 void threadedEvaluateFitness(int chunkBegin, int chunkEnd, const vector<Agent*>& agents, Game& game, int& evaluations){
     for (int chunk_index=chunkBegin; chunk_index<chunkEnd; chunk_index++) {
-		for (int replicate_i=0; replicate_i < repeats; replicate_i++) {
+		for (int replicate_i=0; replicate_i < WorldSettings::repeats; replicate_i++) {
 			game.executeAgent(agents[chunk_index]);
 			agents[chunk_index]->fitnesses.push_back(agents[chunk_index]->fitness);
 		}
@@ -110,13 +116,13 @@ vector<double> MultiThreadWorld::evaluateFitness(vector<Agent*> agents,bool anal
     threads.clear();
     int chunksize=(int)agents.size()/nthreads;
     for (int threadid=0; threadid < nthreads; threadid++)
-        threads.push_back(thread(threadedEvaluateFitness, chunksize*threadid, chunksize*threadid+chunksize, ref(agents), ref(repeats)));
+        threads.push_back(thread(threadedEvaluateFitness, chunksize*threadid, chunksize*threadid+chunksize, ref(agents), ref(WorldSettings::repeats)));
     
     if (agents.size()%nthreads != 0) {// take care of any uneven division of workload
-        threads.push_back(thread(threadedEvaluateFitness, nthreads*chunksize, agents.size(), ref(agents), ref(repeats)));
+        threads.push_back(thread(threadedEvaluateFitness, nthreads*chunksize, agents.size(), ref(agents), ref(WorldSettings::repeats)));
     }
     for (thread& t : threads) t.join(); // wait for all threads to finish
-	for(int i=0;i<agents.size();i++)
+	for(size_t i=0;i<agents.size();i++)
 		W.push_back((double)atof(Data::Get("W", (Genome*)agents[i]->genome).c_str()));
 	return W;
 }

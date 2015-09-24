@@ -15,21 +15,45 @@
 #include "Genome.h"
 #include "World.h"
 #include "Analyse.h"
+#include <iostream>
+#include <fstream>
+#include "Parameters.h"
+
+#include <unistd.h>
 
 using namespace std;
 
-#define xDim 16
-#define yDim 16
+#define xDim 8
+#define yDim 8
 
-const int xm[8]={0,1,1,1,0,-1,-1,-1};
+const int xm[8]={0,1,1,1,0,-1,-1,-1}; //these are directions
 const int ym[8]={-1,-1,0,1,1,1,0,-1};
+
+
+class RedBlueBerryWorldSettings{
+public:
+	static double TSK;
+	static void initializeParameters();
+};
+
+
 
 class MadBotAI;
 
 class RedBlueBerryWorld: public World{
 	double testIndividual(Agent *agent,bool analyse);
+
+
+	ofstream RED_FILE;
+    ofstream BLUE_FILE;
+    ofstream SWITCH_FILE;
+
 public:
+	RedBlueBerryWorld();
+    void saveData(string mode, string outputDirectory_Name, int update, vector<Genome*> population);
 	static double TSK;
+	bool initDataFiles;
+
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__RedBlueBerryWorld__) */

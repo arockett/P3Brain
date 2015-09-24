@@ -14,8 +14,20 @@
 #include <deque>
 #include "Genome.h"
 #include <functional>
+#include "Parameters.h"
 
 using namespace std;
+
+
+void setupGates();
+
+class GateSettings{
+public:
+	static bool gateFlags[8];
+	static double voidOutPut;
+	static void initializeParameters();
+};
+
 
 class Gate{  //conventional probabilistic gate
 	
@@ -109,5 +121,7 @@ public:
 	virtual void update(double *states,double *nextStates);
 	virtual string description();
 };
+
+
 
 #endif /* defined(__BasicMarkovBrainTemplate__Gate__) */
