@@ -9,10 +9,12 @@
 #include "Genome.h"
 #include <random>
 
+int GenomeSettings::initialGenomeSize;
 double GenomeSettings::pointMutationRate;
 double GenomeSettings::insertionDeletionP;
 
 void GenomeSettings::initializeParameters(){
+	Parameters::setupParameter("GenomeSettings::initialGenomeSize", initialGenomeSize, 5000, "how long default genomes will be");
 	Parameters::setupParameter("GenomeSettings::pointMutationRate", pointMutationRate, 0.005, "per site mutation rate");
 	Parameters::setupParameter("GenomeSettings::insertionDeletionP", insertionDeletionP, 0.005, "per genome insertion/deletion rate");
 }
@@ -25,7 +27,7 @@ void GenomeSettings::initializeParameters(){
 Genome::Genome(){
 	referenceCounter=1;
 	ancestor=NULL;
-	ID=-1;
+	ID=Data::registerGenome(this);
 }
 
 Genome::Genome(Genome *from){
@@ -86,7 +88,7 @@ void Genome::kill(){
 }
 
 void Genome::fillRandom(){
-	sites.resize(5000);
+	sites.resize(GenomeSettings::initialGenomeSize);
 	for(size_t i=0;i<sites.size();i++)
 		sites[i]=(unsigned char)rand()&255;
 	for(int codon=42;codon<50;codon++)

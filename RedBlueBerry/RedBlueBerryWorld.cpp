@@ -19,7 +19,7 @@ void RedBlueBerryWorldSettings::initializeParameters(){
 
 
 RedBlueBerryWorld::RedBlueBerryWorld() {
-	initDataFiles = 0;
+
 }
 
 double RedBlueBerryWorld::testIndividual(Agent *agent, bool analyse) {
@@ -170,48 +170,4 @@ double RedBlueBerryWorld::testIndividual(Agent *agent, bool analyse) {
 		//Data::Add(Analyse::computeAtomicPhi(stateCollector, agent->nrOfStates), "phi", (Genome*) agent->genome);
 	}
 	return score;
-}
-
-void RedBlueBerryWorld::saveData(string mode, string outputDirectory_Name, int update, vector<Genome*> population) {
-
-	if (initDataFiles != 1) {    // open the files and start them.
-		initDataFiles = 1;
-
-		string red_File_Name = outputDirectory_Name + "/Reds_dat.py";
-		string blue_File_Name = outputDirectory_Name + "/Blues_dat.py";
-		string switch_File_Name = outputDirectory_Name + "/Switch_dat.py";
-
-		RED_FILE.open(red_File_Name.c_str());
-		RED_FILE << "data = [";
-
-		BLUE_FILE.open(blue_File_Name.c_str());
-		BLUE_FILE << "data = [";
-
-		SWITCH_FILE.open(switch_File_Name.c_str());
-		SWITCH_FILE << "data = [";
-	}
-	if (mode == "write") {    // add data to files that are already open
-		RED_FILE << "[";
-		BLUE_FILE << "[";
-		SWITCH_FILE << "[";
-		for (size_t i = 0; i < population.size(); i++) {
-			RED_FILE << Data::Get("red", (Genome*) population[i]) << ",";
-			BLUE_FILE << Data::Get("blue", (Genome*) population[i]) << ",";
-			SWITCH_FILE << Data::Get("switches", (Genome*) population[i]) << ",";
-		}
-		RED_FILE << "],\n";
-		BLUE_FILE << "],\n";
-		SWITCH_FILE << "],\n";
-	}
-	if (mode == "close") {    //Close red, blue, and switch files
-		RED_FILE << "]\n\n\n";
-		RED_FILE.close();
-
-		BLUE_FILE << "]\n\n\n";
-		BLUE_FILE.close();
-
-		SWITCH_FILE << "]\n\n\n";
-		SWITCH_FILE.close();
-	}
-
 }

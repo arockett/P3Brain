@@ -15,24 +15,36 @@ int Data::genomeIDCounter = 0;
 map<int, map<string, string>> Data::dataMap;
 
 int DataSettings::repNumber;
+bool DataSettings::seedWithPID;
+int DataSettings::updates;
+int DataSettings::popSize;
 int DataSettings::dataInterval;
 int DataSettings::genomeInterval;
+int DataSettings::pruneInterval;
 string DataSettings::DataFileName;
 string DataSettings::GenomeFileName;
 
 void DataSettings::initializeParameters() {
 	Parameters::setupParameter("repNumber", repNumber, 101, "Replicate ID and seed (if seedWithPID not set true)");
+	Parameters::setupParameter("seedWithPID", seedWithPID, false,
+			"if seedWithPID, random number generator will see with process ID");
+	Parameters::setupParameter("updates", updates, 200, "how long the program will run");
+	Parameters::setupParameter("popSize", popSize, 100, "number of brains in the populaiton");
+
 	Parameters::setupParameter("Data::dataInterval", dataInterval, 1, "How often to write to data file");
 	Parameters::setupParameter("Data::genomeInterval", genomeInterval, 1, "How often to write genome file");
+	Parameters::setupParameter("Data::pruneInterval", pruneInterval, dataInterval, "How often to write to data file");
 
 	Parameters::setupParameter("Data::dataFileName", DataFileName, "data.csv",
 			"name of genome file (stores genomes for line of decent)");
 	Parameters::setupParameter("Data::genomeFileName", GenomeFileName, "genome.csv",
 			"name of data file (stores data i.e. scores");
 
-	// ad repNumber directory to file names
-	DataFileName = repNumber + "/" + DataFileName;
-	GenomeFileName = repNumber + "/" + GenomeFileName;
+	// add repNumber directory to file names
+	DataFileName = to_string(repNumber) + "/" + DataFileName;
+	GenomeFileName = to_string(repNumber) + "/" + GenomeFileName;
+	cout << DataFileName << " " << GenomeFileName << "\n";
+
 }
 
 // implementation for LOD
@@ -73,6 +85,7 @@ vector<Genome*> Data::getLOD(Genome *from) {
 	vector<Genome*> list;
 	Genome *G = from;
 	while (G != NULL) { // which G has an ancestor
+		//printf("IN getLOD - %i %i\n",G->ID,G->referenceCounter);
 		list.insert(list.begin(), G); // add that ancestor to the front of the LOD list
 		G = G->ancestor; // move to the ancestor
 	}
@@ -92,7 +105,7 @@ vector<Genome*> Data::getLOD(Genome *from) {
 Genome* Data::getMostRecentCommonAncestor(Genome *from) {
 	vector<Genome*> LOD = getLOD(from); // get line of decent from "from"
 	for (Genome *G : LOD) { // starting at the oldest ancestor, moving to the youngest
-		printf("%i %i\n",G->ID,G->referenceCounter);
+		//printf("IN getMRCA - %i %i\n",G->ID,G->referenceCounter);
 		if (G->referenceCounter > 1) // the first (oldest) ancestor with more then one surviving offspring is the oldest
 			return G;
 	}
@@ -112,7 +125,7 @@ int Data::registerGenome(Genome* who) {
 }
 
 /*
- * Save the data from dataMap for one genomes ("from") LOD from the last save until the last convergance
+ * Save the data from dataMap and genomes for one genomes ("from") LOD from the last save until the last convergance
  * this function assumes
  * a) all of the fields in dataMap that genomes will be writting to have been created
  * b) all genomes have the same fields
@@ -133,22 +146,24 @@ void Data::saveDataOnLOD(Genome *who) {
 		fprintf(DATAFILE, "\n");
 
 		GENOMEFILE = fopen(DataSettings::GenomeFileName.c_str(), "w+t"); // open the genome file for writing (w) in text mode (t) and overwrite the file if it's already there (+)
-		fprintf(GENOMEFILE,"genomeInterval = %i", DataSettings::genomeInterval);
+		fprintf(GENOMEFILE,"genomeInterval = %i\n", DataSettings::genomeInterval);
 
 	} else { // if files have already been initialized, open them for writing
-		DATAFILE = fopen(DataSettings::DataFileName.c_str(), "wt"); // open the file for writing (w) in text mode (t)
-		GENOMEFILE = fopen(DataSettings::GenomeFileName.c_str(), "wt"); // open the file for writing (w) in text mode (t)
+		DATAFILE = fopen(DataSettings::DataFileName.c_str(), "at"); // open the file for writing (w) in text mode (t)
+		GENOMEFILE = fopen(DataSettings::GenomeFileName.c_str(), "at"); // open the file for writing (w) in text mode (t)
 
 	}
 
 	vector<Genome*> LOD = getLOD(who); // get line of decent for "from"
-	cout << "HERE!! \n";
 	Genome * MRCA = getMostRecentCommonAncestor(who);
+	// cout << "IN saveDataOnLOD : MRCA = " << MRCA->ID << "\n";
 
-	int outputTime = 0;
+	int outputTime = 0; // this update, but relitive to the last save update
 
-	while ((outputTime + Data::lastSaveUpdate < update) && (LOD[outputTime] != MRCA)) {
-	cout << "HERE!! "<< outputTime << "\n";
+	// while we have not caught up with the current update
+	// and we have not passed the MRCA
+	// and we have not passed DataSettings::updates (how long we wanted this to run)
+	while ((outputTime + Data::lastSaveUpdate < update) && (LOD[outputTime] != MRCA) && (outputTime + Data::lastSaveUpdate < DataSettings::updates)) {
 
 		// write data to DATAFILE if this is a dataInterval
 		if ((outputTime + Data::lastSaveUpdate) % DataSettings::dataInterval == 0) {
@@ -157,6 +172,7 @@ void Data::saveDataOnLOD(Genome *who) {
 			for (map<string, string>::iterator genomeData = dataMap[LOD[outputTime]->ID].begin();
 					genomeData != dataMap[LOD[outputTime]->ID].end(); genomeData++) {
 				fprintf(DATAFILE, ",%s", genomeData->second.c_str());
+				printf(",%s", genomeData->second.c_str());
 			}
 			fprintf(DATAFILE, "\n");
 		}
@@ -165,26 +181,12 @@ void Data::saveDataOnLOD(Genome *who) {
 		if ((outputTime + Data::lastSaveUpdate) % DataSettings::genomeInterval == 0) {
 			LOD[outputTime]->saveToFile(GENOMEFILE);
 		}
+		outputTime++;
 	}
-	Data::lastSaveUpdate = Data::lastSaveUpdate + outputTime;
+	Data::lastSaveUpdate = Data::lastSaveUpdate + outputTime; // update lastSaveUpdate, so we know where to start next time
 	fclose(DATAFILE);
 	fclose(GENOMEFILE);
 
-}
-
-void Data::saveGenomesOnLOD(Genome *who, string filename, int intervall) {
-	Genome *G = who;
-	vector<Genome*> list;
-	FILE *F = fopen(filename.c_str(), "w+t");
-	//get al the LOD pointers
-	while (G != NULL) {
-		list.insert(list.begin(), G);
-		G = G->ancestor;
-	}
-	for (size_t i = 0; i < list.size(); i += intervall) {
-		list[i]->saveToFile(F);
-	}
-	fclose(F);
 }
 
 void Data::showAll() {

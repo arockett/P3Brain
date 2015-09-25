@@ -19,6 +19,7 @@ using namespace std;
 
 class GenomeSettings{
 public:
+	static int initialGenomeSize;
 	static double pointMutationRate;
 	static double insertionDeletionP;
 	static void initializeParameters();

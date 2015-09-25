@@ -44,15 +44,10 @@ class RedBlueBerryWorld: public World{
 	double testIndividual(Agent *agent,bool analyse);
 
 
-	ofstream RED_FILE;
-    ofstream BLUE_FILE;
-    ofstream SWITCH_FILE;
 
 public:
 	RedBlueBerryWorld();
-    void saveData(string mode, string outputDirectory_Name, int update, vector<Genome*> population);
 	static double TSK;
-	bool initDataFiles;
 
 };
 
