@@ -14,17 +14,17 @@ int Data::genomeIDCounter = 0;
 // key will always be a genome ID (unique) which adresses to a map of type of data to value (for this genome)
 map<int, map<string, string>> Data::dataMap;
 
-int DataSettings::repNumber;
-bool DataSettings::seedWithPID;
-int DataSettings::updates;
-int DataSettings::popSize;
-int DataSettings::dataInterval;
-int DataSettings::genomeInterval;
-int DataSettings::pruneInterval;
-string DataSettings::DataFileName;
-string DataSettings::GenomeFileName;
+int Data::repNumber;
+bool Data::seedWithPID;
+int Data::updates;
+int Data::popSize;
+int Data::dataInterval;
+int Data::genomeInterval;
+int Data::pruneInterval;
+string Data::DataFileName;
+string Data::GenomeFileName;
 
-void DataSettings::initializeParameters() {
+void Data::initializeParameters() {
 	Parameters::setupParameter("repNumber", repNumber, 101, "Replicate ID and seed (if seedWithPID not set true)");
 	Parameters::setupParameter("seedWithPID", seedWithPID, false,
 			"if seedWithPID, random number generator will see with process ID");
@@ -136,7 +136,7 @@ void Data::saveDataOnLOD(Genome *who) {
 	FILE *GENOMEFILE;
 	if (initFiles != true) { // if this file has not been initialized
 		initFiles = true; // make a note that it has been initialized
-		DATAFILE = fopen(DataSettings::DataFileName.c_str(), "w+t"); // open the data file for writing (w) in text mode (t) and overwrite the file if it's already there (+)
+		DATAFILE = fopen(Data::DataFileName.c_str(), "w+t"); // open the data file for writing (w) in text mode (t) and overwrite the file if it's already there (+)
 
 		// write the file header (labels)
 		fprintf(DATAFILE, "update"); // print update in the file
@@ -145,12 +145,12 @@ void Data::saveDataOnLOD(Genome *who) {
 		}
 		fprintf(DATAFILE, "\n");
 
-		GENOMEFILE = fopen(DataSettings::GenomeFileName.c_str(), "w+t"); // open the genome file for writing (w) in text mode (t) and overwrite the file if it's already there (+)
-		fprintf(GENOMEFILE,"genomeInterval = %i\n", DataSettings::genomeInterval);
+		GENOMEFILE = fopen(Data::GenomeFileName.c_str(), "w+t"); // open the genome file for writing (w) in text mode (t) and overwrite the file if it's already there (+)
+		fprintf(GENOMEFILE,"genomeInterval = %i\n", Data::genomeInterval);
 
 	} else { // if files have already been initialized, open them for writing
-		DATAFILE = fopen(DataSettings::DataFileName.c_str(), "at"); // open the file for writing (w) in text mode (t)
-		GENOMEFILE = fopen(DataSettings::GenomeFileName.c_str(), "at"); // open the file for writing (w) in text mode (t)
+		DATAFILE = fopen(Data::DataFileName.c_str(), "at"); // open the file for writing (w) in text mode (t)
+		GENOMEFILE = fopen(Data::GenomeFileName.c_str(), "at"); // open the file for writing (w) in text mode (t)
 
 	}
 
@@ -162,23 +162,22 @@ void Data::saveDataOnLOD(Genome *who) {
 
 	// while we have not caught up with the current update
 	// and we have not passed the MRCA
-	// and we have not passed DataSettings::updates (how long we wanted this to run)
-	while ((outputTime + Data::lastSaveUpdate < update) && (LOD[outputTime] != MRCA) && (outputTime + Data::lastSaveUpdate < DataSettings::updates)) {
+	// and we have not passed Data::updates (how long we wanted this to run)
+	while ((outputTime + Data::lastSaveUpdate < update) && (LOD[outputTime] != MRCA) && (outputTime + Data::lastSaveUpdate < Data::updates)) {
 
 		// write data to DATAFILE if this is a dataInterval
-		if ((outputTime + Data::lastSaveUpdate) % DataSettings::dataInterval == 0) {
+		if ((outputTime + Data::lastSaveUpdate) % Data::dataInterval == 0) {
 			fprintf(DATAFILE, "%i", outputTime + Data::lastSaveUpdate);
 			//save the data for each element in the list
 			for (map<string, string>::iterator genomeData = dataMap[LOD[outputTime]->ID].begin();
 					genomeData != dataMap[LOD[outputTime]->ID].end(); genomeData++) {
 				fprintf(DATAFILE, ",%s", genomeData->second.c_str());
-				printf(",%s", genomeData->second.c_str());
 			}
 			fprintf(DATAFILE, "\n");
 		}
 
 		// write the Genome to GENOMEFILE if this is a genomeInterval
-		if ((outputTime + Data::lastSaveUpdate) % DataSettings::genomeInterval == 0) {
+		if ((outputTime + Data::lastSaveUpdate) % Data::genomeInterval == 0) {
 			LOD[outputTime]->saveToFile(GENOMEFILE);
 		}
 		outputTime++;

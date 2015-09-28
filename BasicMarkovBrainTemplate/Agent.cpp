@@ -10,12 +10,13 @@
 
 #define SKIPGATE 1 // if 0, remove the skipgate code - FOR SPEED UP!
 
-int AgentSettings::nrOfBrainStates;
-double AgentSettings::skipGate;
-bool AgentSettings::serialProcessing;
+int Agent::nrOfBrainStates;
+int Agent::defaultNrOfBrainStates;
+double Agent::skipGate;
+bool Agent::serialProcessing;
 
-void AgentSettings::initializeParameters(){
-	Parameters::setupParameter("brainSize", nrOfBrainStates, 16, "number of Brain Values");
+void Agent::initializeParameters(){
+	Parameters::setupParameter("brainSize", defaultNrOfBrainStates, 16, "number of Brain Values");
 	Parameters::setupParameter("skipGate", skipGate, 0.0, "chance that a gate will not fire");
 	Parameters::setupParameter("serialProcessing", serialProcessing, false, "sets agents to overwrite... right?");
 }
@@ -25,13 +26,10 @@ Agent::Agent(){
 	
 }
 
-Agent::Agent(Genome *startGenome,int _nrOfStates){ //this is a constructor. it is run whenever a new agent is created.
-	nrOfStates=_nrOfStates;
-	states=new double[nrOfStates];
-	nextStates=new double[nrOfStates];
-	nodeMap=new int[256];
-	for(int i=0;i<256;i++)
-		nodeMap[i]=i%nrOfStates;
+Agent::Agent(Genome *startGenome,int _nrOfBrainStates){ //this is a constructor. it is run whenever a new agent is created.
+	nrOfBrainStates=_nrOfBrainStates;
+	states.resize(nrOfBrainStates);
+	nextStates.resize(nrOfBrainStates);
 	genome=startGenome;
 	gates.clear();
 	for(size_t i=0;i<genome->sites.size()-1;i++){
@@ -42,20 +40,18 @@ Agent::Agent(Genome *startGenome,int _nrOfStates){ //this is a constructor. it i
 			}
 		}
 	}
-	for(size_t i=0;i<gates.size();i++)
-		gates[i]->applyNodeMap(nodeMap, _nrOfStates);
+	inOutReMap();
+	//for(size_t i=0;i<gates.size();i++)
+	//	gates[i]->applyNodeMap(nodeMap, _nrOfBrainStates);
 }
 
 Agent::~Agent(){
 	for(size_t i=0;i<gates.size();i++)
 		delete gates[i];
-	delete states;
-	delete nextStates;
-	delete nodeMap;
 }
 
 void Agent::resetBrain(){
-	for(int i=0;i<nrOfStates;i++)
+	for(int i=0;i<nrOfBrainStates;i++)
 		states[i]=0.0;
 	for(size_t i=0;i<gates.size();i++)
 		gates[i]->resetGate();
@@ -63,7 +59,7 @@ void Agent::resetBrain(){
 
 void Agent::updateStates(){
 	/*
-	 if(AgentSettings::serialProcessing){
+	 if(Agent::serialProcessing){
 	 //this is a special way of serialized updating
 	 //experimental feature, should be default off!
 	 //only change if you really know what you are doing!
@@ -72,27 +68,35 @@ void Agent::updateStates(){
 	 }
 	 } else {*/
 	//this is the default way of parallel updating
-	for(int i=0;i<nrOfStates;i++){ //reset all states to 0
+	for(int i=0;i<nrOfBrainStates;i++){ //reset all states to 0
 		nextStates[i]=0.0;
 	}
 	for(size_t i=0;i<gates.size();i++){ //update each gate
 #if SKIPGATE==1
-		if(((double)rand()/(double)RAND_MAX)>AgentSettings::skipGate){
+		if(((double)rand()/(double)RAND_MAX)>Agent::skipGate){
 			gates[i]->update(states, nextStates);
 		}
 #else
-		gates[i]->update(states, nextStates);
+		gates[i]->update(&states, &nextStates);
 #endif // SKIPGATE
 	}
-	for(int i=0;i<nrOfStates;i++){ //sets states for t+1 to states just updated in the last line
+	for(int i=0;i<nrOfBrainStates;i++){ //sets states for t+1 to states just updated in the last line
 		states[i]=nextStates[i];
+		//cout << states[i] << " ";
 	}
+	//cout << "\n";
 }
 
-int Agent::Bit(double d){ //this is a function that returns a 1 if the number inputted is greater than 0 or returns a 0 if not
-	if (d>0.0)
-		return 1;
-	return 0;
+void Agent::inOutReMap(){
+
+	vector <int> nodeMap;
+	for(int i=0;i<256;i++){
+		nodeMap.push_back(i%nrOfBrainStates);
+	}
+	for(size_t i=0;i<gates.size();i++){
+		gates[i]->applyNodeMap(nodeMap, nrOfBrainStates);
+	}
+
 }
 
 int Agent::IntFromState(vector<int> I){
@@ -104,7 +108,7 @@ int Agent::IntFromState(vector<int> I){
 
 int Agent::IntFromAllStates(){
 	int r=0;
-	for(int i=0;i<nrOfStates;i++)
+	for(int i=0;i<nrOfBrainStates;i++)
 		r=(r<<1)+Bit(states[i]);
 	return r;
 	
@@ -121,10 +125,10 @@ string Agent::gateList(){
 
 vector<vector<int>> Agent::getConnectivityMatrix(){
 	vector<vector<int>> M;
-	M.resize(nrOfStates);
-	for(int i=0;i<nrOfStates;i++){
-		M[i].resize(nrOfStates);
-		for(int j=0;j<nrOfStates;j++)
+	M.resize(nrOfBrainStates);
+	for(int i=0;i<nrOfBrainStates;i++){
+		M[i].resize(nrOfBrainStates);
+		for(int j=0;j<nrOfBrainStates;j++)
 			M[i][j]=0;
 	}
 	for(Gate* G:gates){

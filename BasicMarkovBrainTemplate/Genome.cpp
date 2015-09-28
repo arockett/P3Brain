@@ -9,14 +9,14 @@
 #include "Genome.h"
 #include <random>
 
-int GenomeSettings::initialGenomeSize;
-double GenomeSettings::pointMutationRate;
-double GenomeSettings::insertionDeletionP;
+int Genome::initialGenomeSize;
+double Genome::pointMutationRate;
+double Genome::insertionDeletionP;
 
-void GenomeSettings::initializeParameters(){
-	Parameters::setupParameter("GenomeSettings::initialGenomeSize", initialGenomeSize, 5000, "how long default genomes will be");
-	Parameters::setupParameter("GenomeSettings::pointMutationRate", pointMutationRate, 0.005, "per site mutation rate");
-	Parameters::setupParameter("GenomeSettings::insertionDeletionP", insertionDeletionP, 0.005, "per genome insertion/deletion rate");
+void Genome::initializeParameters(){
+	Parameters::setupParameter("Genome::initialGenomeSize", initialGenomeSize, 5000, "how long default genomes will be");
+	Parameters::setupParameter("Genome::pointMutationRate", pointMutationRate, 0.005, "per site mutation rate");
+	Parameters::setupParameter("Genome::insertionDeletionP", insertionDeletionP, 0.005, "per genome insertion/deletion rate");
 }
 
 
@@ -62,7 +62,7 @@ void Genome::applyMutations(double mutationRate){
 		int localMutations= distribution(generator);
 		for(i=0;i<localMutations;i++)
 			sites[rand()%nucleotides]=rand()&255;
-		if((((double)rand()/(double)RAND_MAX)<GenomeSettings::insertionDeletionP)&&(sites.size()<20000)){
+		if((((double)rand()/(double)RAND_MAX)<Genome::insertionDeletionP)&&(sites.size()<20000)){
 			//duplication
 			w=128+rand()%(512-128);
 			s=rand()%((int)sites.size()-w);
@@ -71,7 +71,7 @@ void Genome::applyMutations(double mutationRate){
 			buffer.insert(buffer.begin(),sites.begin()+s,sites.begin()+s+w);
 			sites.insert(sites.begin()+o,buffer.begin(),buffer.end());
 		}
-		if((((double)rand()/(double)RAND_MAX)<GenomeSettings::insertionDeletionP)&&(sites.size()>1000)){
+		if((((double)rand()/(double)RAND_MAX)<Genome::insertionDeletionP)&&(sites.size()>1000)){
 			//deletion
 			w=128+rand()%(512-128);
 			s=rand()%((int)sites.size()-w);
@@ -88,7 +88,7 @@ void Genome::kill(){
 }
 
 void Genome::fillRandom(){
-	sites.resize(GenomeSettings::initialGenomeSize);
+	sites.resize(Genome::initialGenomeSize);
 	for(size_t i=0;i<sites.size();i++)
 		sites[i]=(unsigned char)rand()&255;
 	for(int codon=42;codon<50;codon++)

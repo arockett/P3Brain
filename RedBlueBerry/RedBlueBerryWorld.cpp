@@ -10,9 +10,9 @@
 
 /* *** implementation of the World *** */
 
-double RedBlueBerryWorldSettings::TSK;
+double RedBlueBerryWorld::TSK;
 
-void RedBlueBerryWorldSettings::initializeParameters(){
+void RedBlueBerryWorld::initializeParameters(){
 	Parameters::setupParameter("RedBlueBerryWorld::TSC", TSK, 1.4, "cost to change food sources");
 }
 
@@ -88,7 +88,7 @@ double RedBlueBerryWorld::testIndividual(Agent *agent, bool analyse) {
 			for (int i = 0; i < 10; i++)
 				S = (S << 1) + agent->Bit(agent->states[i]);
 			agent->updateStates();
-			for (int i = 10; i < agent->nrOfStates; i++)
+			for (int i = 10; i < agent->nrOfBrainStates; i++)
 				S = (S << 1) + agent->Bit(agent->states[i]);
 			stateCollector.push_back(S);
 		} else {
@@ -105,7 +105,7 @@ double RedBlueBerryWorld::testIndividual(Agent *agent, bool analyse) {
 					score += 1.0;
 					eaten[grid[xp][yp] - 1]++;
 				} else {
-					score = score + 1.0 - RedBlueBerryWorldSettings::TSK;
+					score = score + 1.0 - RedBlueBerryWorld::TSK;
 					lastFood = grid[xp][yp];
 					eaten[grid[xp][yp] - 1]++;
 					switched++;

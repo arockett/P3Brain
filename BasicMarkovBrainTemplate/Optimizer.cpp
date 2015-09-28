@@ -13,9 +13,9 @@ using namespace std;
 
 
 
-int OptimizerSettings::elitism;
+int Optimizer::elitism;
 
-void OptimizerSettings::initializeParameters(){
+void Optimizer::initializeParameters(){
 	Parameters::setupParameter("elitism", elitism, -1, "WHAT IS THIS?");
 }
 
@@ -59,9 +59,9 @@ vector<Genome*> GA::makeNextGeneration(vector<Genome*> population,vector<double>
 			}while(pow(1.05,((double)rand()/(double)RAND_MAX))>pow(1.05,(W[who]/maxFitness)));
 		else
 			who=rand()%(int)W.size();
-		if((int)nextGeneration.size()<=OptimizerSettings::elitism)
+		if((int)nextGeneration.size()<=Optimizer::elitism)
 			who=best;
-		nextGeneration.push_back((Genome*)population[who]->makeMutatedOffspring(GenomeSettings::pointMutationRate));
+		nextGeneration.push_back((Genome*)population[who]->makeMutatedOffspring(Genome::pointMutationRate));
 	}
 	return nextGeneration;
 }
@@ -88,9 +88,9 @@ vector<Genome*> Tournament::makeNextGeneration(vector<Genome*> population,vector
 			w2=rand()%population.size();
 		}while(w1==w2);
 		if(W[w1]>W[w2])
-			nextGeneration.push_back((Genome*)population[w1]->makeMutatedOffspring(GenomeSettings::pointMutationRate));
+			nextGeneration.push_back((Genome*)population[w1]->makeMutatedOffspring(Genome::pointMutationRate));
 		else
-			nextGeneration.push_back((Genome*)population[w2]->makeMutatedOffspring(GenomeSettings::pointMutationRate));
+			nextGeneration.push_back((Genome*)population[w2]->makeMutatedOffspring(Genome::pointMutationRate));
 	}
 	return nextGeneration;
 }

@@ -19,19 +19,15 @@
 using namespace std;
 
 
-void setupGates();
 
-class GateSettings{
+class Gate{  //conventional probabilistic gate
 public:
 	static bool gateFlags[8];
 	static double voidOutPut;
 	static void initializeParameters();
-};
-
-
-class Gate{  //conventional probabilistic gate
 	
 public:
+	static void setupGates();
 	static function<Gate*(Genome*,int)> makeGate[256];
 	vector<int> I;
 	vector<int> O;
@@ -43,10 +39,10 @@ public:
 	
 	virtual ~Gate();
 	
-	virtual void update(double *states,double *nextStates);
+	virtual void update(vector <double> & states, vector <double> & nextStates);
 	int Bit(double d);
 	virtual string description();
-	virtual void applyNodeMap(int *nodeMap,int maxNodes);
+	virtual void applyNodeMap(vector <int> nodeMap,int maxNodes);
 	static void AddGate(int ID, function<Gate*(Genome*,int)> theFunction);
 	virtual void resetGate(void);
 	virtual vector<int> getIns();
@@ -59,7 +55,7 @@ public:
 	DeterministicGate();
 	DeterministicGate(Genome *genome,int startCodonAt);
 	virtual ~DeterministicGate();
-	virtual void update(double *states,double *nextStates);
+	virtual void update(vector <double> & states, vector <double> & nextStates);
 	virtual string description();
 	
 	void setupForBits(int* Ins,int nrOfIns, int Out, int logic);
@@ -80,9 +76,9 @@ public:
 	FeedbackGate();
 	FeedbackGate(Genome *genome,int startCodonAt);
 	~FeedbackGate();
-	virtual void update(double *states,double *nextStates);
+	virtual void update(vector <double> & states, vector <double> & nextStates);
 	virtual string description();
-	virtual void applyNodeMap(int *nodeMap,int maxNodes);
+	virtual void applyNodeMap(vector <int> nodeMap,int maxNodes);
 	virtual void resetGate(void);
 	virtual vector<int> getIns();
 };
@@ -95,7 +91,7 @@ public:
 	GPGate();
 	GPGate(Genome *genome,int startCodonAt);
 	virtual ~GPGate();
-	virtual void update(double *states,double *nextStates);
+	virtual void update(vector <double> & states, vector <double> & nextStates);
 	virtual string description();
 };
 
@@ -106,7 +102,7 @@ public:
 	Thresholdgate();
 	Thresholdgate(Genome *genome,int startCodonAt);
 	virtual ~Thresholdgate();
-	virtual void update(double *states,double *nextStates);
+	virtual void update(vector <double> & states, vector <double> & nextStates);
 	virtual string description();
 };
 
@@ -118,7 +114,7 @@ public:
 	FixedEpsilonGate();
 	FixedEpsilonGate(Genome *genome,int startCodonAt);
 	virtual ~FixedEpsilonGate();
-	virtual void update(double *states,double *nextStates);
+	virtual void update(vector <double> & states, vector <double> & nextStates);
 	virtual string description();
 };
 

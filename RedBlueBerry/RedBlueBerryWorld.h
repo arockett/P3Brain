@@ -30,24 +30,19 @@ const int xm[8]={0,1,1,1,0,-1,-1,-1}; //these are directions
 const int ym[8]={-1,-1,0,1,1,1,0,-1};
 
 
-class RedBlueBerryWorldSettings{
-public:
-	static double TSK;
-	static void initializeParameters();
-};
-
-
-
 class MadBotAI;
 
 class RedBlueBerryWorld: public World{
+public:
+	static double TSK;
+	static void initializeParameters();
+
 	double testIndividual(Agent *agent,bool analyse);
 
 
 
 public:
 	RedBlueBerryWorld();
-	static double TSK;
 
 };
 

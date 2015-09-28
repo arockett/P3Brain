@@ -493,15 +493,4 @@ public:
 
 };
 
-class ParametersSettings {
-public:
-	static int rep;
-	static int populationSize;
-	static int updates;
-	static int update;
-	static bool paramVerbose;
-
-	static void initializeParameters(); // fuction of set values for modual specific parameters
-};
-
 #endif // __BasicMarkovBrainTemplate__Parameters__

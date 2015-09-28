@@ -20,7 +20,7 @@ using namespace std;
 
 class Genome;
 
-class DataSettings {
+class Data {
 public:
 	static int repNumber;
 	static bool seedWithPID;
@@ -33,9 +33,7 @@ public:
 	static string GenomeFileName;
 
 	static void initializeParameters();
-};
 
-class Data {
 private:
 	static int genomeIDCounter; // used to issue unique ids to Genomes
 public:

@@ -17,26 +17,20 @@
 using namespace std;
 
 
-class GenomeSettings{
+class Data;
+
+class Genome{
 public:
 	static int initialGenomeSize;
 	static double pointMutationRate;
 	static double insertionDeletionP;
 	static void initializeParameters();
-};
 
-
-
-
-class Data;
-
-class Genome{
 public:
 	int ID;
 	Genome *ancestor;
 	int referenceCounter;
 	vector<unsigned char> sites;
-	static double insertionDeletionP;
 	
 	Genome();
 	Genome(Genome *from);

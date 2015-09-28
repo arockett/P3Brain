@@ -17,17 +17,11 @@
 
 using namespace std;
 
-
-
-class WorldSettings{
+class World{
 public:
 	static int repeats;
 	static void initializeParameters();
-};
 
-
-
-class World{
 public:
 	World();
 	virtual ~World();

@@ -17,17 +17,10 @@
 
 using namespace std;
 
-
-
-class OptimizerSettings{
+class Optimizer{
 public:
 	static int elitism;
 	static void initializeParameters();
-};
-
-
-
-class Optimizer{
 public:
 	double maxFitness;
 	Optimizer();

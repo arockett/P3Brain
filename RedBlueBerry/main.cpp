@@ -28,7 +28,7 @@ using namespace std;
 
 /*
  * setupParameters reads command line arguments and a config file and then creates and tracks parameters that are requested from various moduals
- * the working paradigme is that parameters that are local to a module are defined in that modual and setup by a call to "Parameters::setupParameter()"
+ * parameters that are local to a module are defined in that modual and setup by a call to "Parameters::setupParameter()"
  * also from that module. Parameters used in main are directly setup in setupParameters.
  */
 void setupParameters(int argc, const char** argv) {
@@ -38,8 +38,10 @@ void setupParameters(int argc, const char** argv) {
 
 	// load arguments from command line
 	Parameters::loadArguments(argc, argv);
+
 	// set the config file name (it may have been set on the command line)
 	Parameters::setupParameter("configFileName", Parameters::configFileName, "settings.cfg", "name of the config file");
+
 	// load arguments from config file
 	Parameters::loadConfigFile();
 
@@ -48,14 +50,19 @@ void setupParameters(int argc, const char** argv) {
 	Parameters::setupParameter("paramVerbose", Parameters::paramVerbose, false,
 			"if true: program reports info when registering parameters");
 
-	// call local initializeParameters for each module
-	DataSettings::initializeParameters();
-	OptimizerSettings::initializeParameters();
-	GenomeSettings::initializeParameters();
-	GateSettings::initializeParameters();
-	AgentSettings::initializeParameters();
-	WorldSettings::initializeParameters();
-	RedBlueBerryWorldSettings::initializeParameters();
+	// initializeParameters - sets up variables with their values
+	// Critical initializeParameters DO NOT CHANGE THESE!
+	Data::initializeParameters();
+	Optimizer::initializeParameters();
+	Genome::initializeParameters();
+	Gate::initializeParameters();
+	Agent::initializeParameters();
+	World::initializeParameters();
+
+	// Add addtional initializeParameters below
+	RedBlueBerryWorld::initializeParameters();
+
+
 
 	// debugging/display methods
 	int printParameterDetail;
@@ -80,12 +87,12 @@ void setupParameters(int argc, const char** argv) {
 
 int main(int argc, const char * argv[]) {
 	setupParameters(argc, argv); // read command line and config file and set up parameters
-	setupGates(); // determines which gate types will be in use.
+	Gate::setupGates(); // determines which gate types will be in use.
 
-	if (DataSettings::seedWithPID) { // need to change this out with proper engine!
+	if (Data::seedWithPID) { // need to change this out with proper engine!
 		srand(getpid()); // need different includes for windows XPLATFORM
 	} else {
-		srand(DataSettings::repNumber);
+		srand(Data::repNumber);
 	}
 
 	vector<Genome*> population, newPopulation;
@@ -95,7 +102,7 @@ int main(int argc, const char * argv[]) {
 	World *world = (World*) new RedBlueBerryWorld(); //new World();
 
 	// Make the output directory for this rep
-	string makeDirCommand = "mkdir " + to_string(DataSettings::repNumber);
+	string makeDirCommand = "mkdir " + to_string(Data::repNumber);
 	const char * DirCommand = makeDirCommand.c_str();
 	system(DirCommand);
 
@@ -107,7 +114,7 @@ int main(int argc, const char * argv[]) {
 	Agent *progenitorAgent = new Agent(progenitor,16);
 	world->testIndividual(progenitorAgent,true);
 	delete progenitorAgent;
-	for (int i = 0; i < DataSettings::popSize; i++) {
+	for (int i = 0; i < Data::popSize; i++) {
 		Genome *G = new Genome();
 		G->fillRandom();
 		G->ancestor = progenitor;
@@ -117,26 +124,26 @@ int main(int argc, const char * argv[]) {
 	progenitor->kill();
 
 	// evolution loop
-	for (Data::update = 0; Data::lastSaveUpdate < DataSettings::updates; Data::update++) {
+	for (Data::update = 0; Data::lastSaveUpdate < Data::updates; Data::update++) {
 
 		// translate all genomes to agents
 		vector<Agent*> agents;
-		for (int i = 0; i < DataSettings::popSize; i++) {
-			agents.push_back(new Agent(population[i], AgentSettings::nrOfBrainStates));
+		for (int i = 0; i < Data::popSize; i++) {
+			agents.push_back(new Agent(population[i], Agent::defaultNrOfBrainStates));
 		}
 
 		// evaluate each organism in the population using a World
 		W = world->evaluateFitness(agents, true);
 
 		// delete all agents
-		for (int i = 0; i < DataSettings::popSize; i++)
+		for (int i = 0; i < Data::popSize; i++)
 			delete agents[i];
 
 		// remove agent pointers (which are pointing to null, since the agents were deleted)
 		agents.clear();
 
 		// write data to file and prune LOD every pruneInterval
-		if (Data::update % DataSettings::pruneInterval == 0) {
+		if (Data::update % Data::pruneInterval == 0) {
 			Data::saveDataOnLOD(population[0]); // write out data and genomes
 			// data and genomes have now been written out up till the MRCA
 			// so all data and genomes from before the MRCA can be deleted
@@ -149,7 +156,7 @@ int main(int argc, const char * argv[]) {
 
 		//make next generation using an optimizer
 		newPopulation = optimizer->makeNextGeneration(population, W);
-		printf("update: %i maxFitness:%f %f\n", Data::update, optimizer->maxFitness, GenomeSettings::pointMutationRate);
+		printf("update: %i maxFitness:%f %f\n", Data::update, optimizer->maxFitness, Genome::pointMutationRate);
 		for (size_t i = 0; i < population.size(); i++) {
 			population[i]->kill(); // this deletes the genome if it has no offspring
 			population[i] = newPopulation[i];
@@ -157,7 +164,7 @@ int main(int argc, const char * argv[]) {
 		newPopulation.clear();
 	}
 
-	Agent *A = new Agent((Genome*) population[0]->ancestor->ancestor, AgentSettings::nrOfBrainStates);
+	Agent *A = new Agent((Genome*) population[0]->ancestor->ancestor, Agent::nrOfBrainStates);
 	printf("%s\n", A->gateList().c_str());
 
 	return 0;

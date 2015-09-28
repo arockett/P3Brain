@@ -10,9 +10,9 @@
 #include <math.h>
 
 
-int WorldSettings::repeats;
+int World::repeats;
 
-void WorldSettings::initializeParameters(){
+void World::initializeParameters(){
 	Parameters::setupParameter("world::repeats", repeats, 1, "WHAT IS THIS?");
 }
 
@@ -46,11 +46,11 @@ vector<double> ExampleWorld::evaluateFitness(vector<Agent*> agents,bool analyse)
 	vector<double> W;
 	for(size_t i=0;i<agents.size();i++){
 		double w=0.0;
-		for(int r=0;r<WorldSettings::repeats;r++){
+		for(int r=0;r<World::repeats;r++){
 			w+=testIndividual(agents[i],analyse);
 		}
-        W.push_back(w/(double)WorldSettings::repeats);
-//		W.push_back(pow(w,1.0/(double)WorldSettings::repeats));
+        W.push_back(w/(double)World::repeats);
+//		W.push_back(pow(w,1.0/(double)World::repeats));
 	}
 	return W;
 }
@@ -87,7 +87,7 @@ double ExampleWorld::testIndividual(Agent *agent,bool analyse){
 /*
 void threadedEvaluateFitness(int chunkBegin, int chunkEnd, const vector<Agent*>& agents, Game& game, int& evaluations){
     for (int chunk_index=chunkBegin; chunk_index<chunkEnd; chunk_index++) {
-		for (int replicate_i=0; replicate_i < WorldSettings::repeats; replicate_i++) {
+		for (int replicate_i=0; replicate_i < World::repeats; replicate_i++) {
 			game.executeAgent(agents[chunk_index]);
 			agents[chunk_index]->fitnesses.push_back(agents[chunk_index]->fitness);
 		}
@@ -116,10 +116,10 @@ vector<double> MultiThreadWorld::evaluateFitness(vector<Agent*> agents,bool anal
     threads.clear();
     int chunksize=(int)agents.size()/nthreads;
     for (int threadid=0; threadid < nthreads; threadid++)
-        threads.push_back(thread(threadedEvaluateFitness, chunksize*threadid, chunksize*threadid+chunksize, ref(agents), ref(WorldSettings::repeats)));
+        threads.push_back(thread(threadedEvaluateFitness, chunksize*threadid, chunksize*threadid+chunksize, ref(agents), ref(World::repeats)));
     
     if (agents.size()%nthreads != 0) {// take care of any uneven division of workload
-        threads.push_back(thread(threadedEvaluateFitness, nthreads*chunksize, agents.size(), ref(agents), ref(WorldSettings::repeats)));
+        threads.push_back(thread(threadedEvaluateFitness, nthreads*chunksize, agents.size(), ref(agents), ref(World::repeats)));
     }
     for (thread& t : threads) t.join(); // wait for all threads to finish
 	for(size_t i=0;i<agents.size();i++)
