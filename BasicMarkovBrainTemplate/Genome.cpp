@@ -9,6 +9,8 @@
 #include "Genome.h"
 #include <random>
 
+int Genome::genomeIDCounter = 0;
+
 int Genome::initialGenomeSize;
 double Genome::pointMutationRate;
 double Genome::insertionDeletionP;
@@ -27,26 +29,34 @@ void Genome::initializeParameters(){
 Genome::Genome(){
 	referenceCounter=1;
 	ancestor=NULL;
-	ID=Data::registerGenome(this);
+	ID=registerGenome();
+	data["ID"] = to_string(ID);
 }
 
-Genome::Genome(Genome *from){
+Genome::Genome(Genome* from){
 	referenceCounter=1;
 	ancestor=from;
 	from->referenceCounter++;
 	copyGenome(from);
-	ID=Data::registerGenome(this);
+	ID=registerGenome();
+	data["ID"] = to_string(ID);
 }
 
 Genome::~Genome(){
-	Data::removeGenome(this);
 	if(ancestor!=NULL){
 		ancestor->kill();
 	}
 }
 
-void Genome::copyGenome(Genome *from){
-	Genome *who=from;
+int Genome::registerGenome() {
+	int I = genomeIDCounter;
+	genomeIDCounter++;
+	return I;
+}
+
+
+void Genome::copyGenome(Genome* from){
+	Genome* who=from;
 	sites.resize(who->sites.size());
 	for(size_t i=0;i<sites.size();i++)
 		sites[i]=who->sites[i];

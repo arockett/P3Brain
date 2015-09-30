@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <vector>
+#include <memory>
 
 #include "Genome.h"
 #include "Optimizer.h"
@@ -95,10 +96,9 @@ int main(int argc, const char * argv[]) {
 		srand(Data::repNumber);
 	}
 
-	vector<Genome*> population, newPopulation;
-	vector<double> W;
+
 	Optimizer *optimizer = (Optimizer*) new GA();
-	//	Optimizer *optimizer=(Optimizer*)new Tournament();
+
 	World *world = (World*) new RedBlueBerryWorld(); //new World();
 
 	// Make the output directory for this rep
@@ -106,10 +106,13 @@ int main(int argc, const char * argv[]) {
 	const char * DirCommand = makeDirCommand.c_str();
 	system(DirCommand);
 
+
 	// setup population
+	vector<Genome*> population, newPopulation;
+	vector<double> W;
 	// a progenitor must exist - that is, one ancestor genome
 	// this genome is evaluated to populate the dataMap
-	Genome *progenitor = new Genome();
+	Genome* progenitor = new Genome();
 	progenitor->sites.resize(1);
 	Agent *progenitorAgent = new Agent(progenitor,16);
 	world->testIndividual(progenitorAgent,true);
@@ -122,6 +125,7 @@ int main(int argc, const char * argv[]) {
 		population.push_back(G);
 	}
 	progenitor->kill();
+
 
 	// evolution loop
 	for (Data::update = 0; Data::lastSaveUpdate < Data::updates; Data::update++) {
@@ -164,7 +168,7 @@ int main(int argc, const char * argv[]) {
 		newPopulation.clear();
 	}
 
-	Agent *A = new Agent((Genome*) population[0]->ancestor->ancestor, Agent::nrOfBrainStates);
+	Agent *A = new Agent(population[0]->ancestor->ancestor, Agent::defaultNrOfBrainStates);
 	printf("%s\n", A->gateList().c_str());
 
 	return 0;

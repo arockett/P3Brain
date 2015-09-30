@@ -12,6 +12,7 @@
 #include <vector>
 #include <set>
 #include <iostream>
+#include <memory>
 #include "Genome.h"
 #include "Gate.h"
 #include "Parameters.h"
@@ -20,11 +21,11 @@ using namespace std;
 
 class Agent{
 protected:
-	vector<Gate*> gates;
+	vector<shared_ptr<Gate>> gates;
 
 public:
 	static int defaultNrOfBrainStates; // default value for number of states in all brains
-	static int nrOfBrainStates; // the number of states in THIS brain
+	int nrOfBrainStates; // the number of states in THIS brain
 	static double skipGate; // probablity to skip a gate when this brain is updating
 	static bool serialProcessing; // write directly states (overwrite) - do not use nextStates
 

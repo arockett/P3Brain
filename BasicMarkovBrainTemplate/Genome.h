@@ -19,7 +19,11 @@ using namespace std;
 
 class Data;
 
-class Genome{
+class Genome : public enable_shared_from_this<Genome>{
+private:
+	static int genomeIDCounter; // used to issue unique ids to Genomes
+	int registerGenome(); // get a Genome_id (uses genomeIDCounter)
+
 public:
 	static int initialGenomeSize;
 	static double pointMutationRate;
@@ -28,16 +32,17 @@ public:
 
 public:
 	int ID;
-	Genome *ancestor;
+	Genome* ancestor;
 	int referenceCounter;
 	vector<unsigned char> sites;
+	map <string,string> data;
 	
 	Genome();
-	Genome(Genome *from);
+	Genome(Genome* from);
 	virtual ~Genome();
 	
 	virtual void fillRandom();
-	virtual void copyGenome(Genome *from);
+	virtual void copyGenome(Genome* from);
 	virtual void applyMutations(double mutationRate);
 	virtual Genome* makeMutatedOffspring(double mutationRate);
 	virtual void makePointMutation();

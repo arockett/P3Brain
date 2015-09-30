@@ -14,6 +14,7 @@
 #include <set>
 #include <vector>
 #include <string>
+#include <memory>
 #include "Genome.h"
 
 using namespace std;
@@ -34,8 +35,6 @@ public:
 
 	static void initializeParameters();
 
-private:
-	static int genomeIDCounter; // used to issue unique ids to Genomes
 public:
 	static int update;  // this is a global variable - the current "time"
 	static int lastSaveUpdate; // the last time data was written to file
@@ -47,21 +46,19 @@ public:
 												   // file output
 	static bool initFiles; // false if we have not started the data file yet
 
-	static void saveDataOnLOD(Genome *who); // for genome, save to file data for this genome and it's LOD
+	static void saveDataOnLOD(Genome* who); // for genome, save to file data for this genome and it's LOD
 
 	// LOD tracking
-	static vector<Genome*> getLOD(Genome *from); // return a list of genomes containing genome and all genomes ancestors ordered oldest first
-	static Genome* getMostRecentCommonAncestor(Genome *from);
+	static vector<Genome*> getLOD(Genome* from); // return a list of genomes containing genome and all genomes ancestors ordered oldest first
+	static Genome* getMostRecentCommonAncestor(Genome* from);
 	static void showAll(); // show all data in dataMap (for testing)
 
 	//data recording
 
-	static int registerGenome(Genome* who); // get a Genome_id (uses genomeIDCounter)
-	static void removeGenome(Genome* who); // remove a genomes data from dataMap
-	static void Add(int value, string key, Genome* to); // adds an int value to dataMap with keys "key" and Genome_id
-	static void Add(double value, string key, Genome* to); // adds an double value to dataMap with keys "key" and Genome_id
-	static string Get(string key, Genome *from); //retrive the sting in dataMap with keys "key" and Genome_id
-	static vector<string> GetLODItem(string key, Genome *from); // returns a list of strings for "key" for all ancestors of Genome
+	static void Add(int value, string key, map <string,string> & dataMap); // adds an int value to dataMap with keys "key" and Genome_id
+	static void Add(double value, string key, map <string,string> & dataMap); // adds an double value to dataMap with keys "key" and Genome_id
+	static string Get(string key, map <string,string> dataMap); //retrive the sting in dataMap with keys "key" and Genome_id
+	static vector<string> GetLODItem(string key, Genome* from); // returns a list of strings for "key" for all ancestors of Genome
 
 	//this is the command line parameter part (replaced by parameters.h/.cpp)
 

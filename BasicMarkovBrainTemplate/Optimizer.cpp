@@ -61,7 +61,7 @@ vector<Genome*> GA::makeNextGeneration(vector<Genome*> population,vector<double>
 			who=rand()%(int)W.size();
 		if((int)nextGeneration.size()<=Optimizer::elitism)
 			who=best;
-		nextGeneration.push_back((Genome*)population[who]->makeMutatedOffspring(Genome::pointMutationRate));
+		nextGeneration.push_back(population[who]->makeMutatedOffspring(Genome::pointMutationRate));
 	}
 	return nextGeneration;
 }
@@ -88,9 +88,9 @@ vector<Genome*> Tournament::makeNextGeneration(vector<Genome*> population,vector
 			w2=rand()%population.size();
 		}while(w1==w2);
 		if(W[w1]>W[w2])
-			nextGeneration.push_back((Genome*)population[w1]->makeMutatedOffspring(Genome::pointMutationRate));
+			nextGeneration.push_back(population[w1]->makeMutatedOffspring(Genome::pointMutationRate));
 		else
-			nextGeneration.push_back((Genome*)population[w2]->makeMutatedOffspring(Genome::pointMutationRate));
+			nextGeneration.push_back(population[w2]->makeMutatedOffspring(Genome::pointMutationRate));
 	}
 	return nextGeneration;
 }

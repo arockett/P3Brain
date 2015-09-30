@@ -10,7 +10,6 @@
 
 #define SKIPGATE 1 // if 0, remove the skipgate code - FOR SPEED UP!
 
-int Agent::nrOfBrainStates;
 int Agent::defaultNrOfBrainStates;
 double Agent::skipGate;
 bool Agent::serialProcessing;
@@ -26,7 +25,7 @@ Agent::Agent(){
 	
 }
 
-Agent::Agent(Genome *startGenome,int _nrOfBrainStates){ //this is a constructor. it is run whenever a new agent is created.
+Agent::Agent(Genome* startGenome,int _nrOfBrainStates){ //this is a constructor. it is run whenever a new agent is created.
 	nrOfBrainStates=_nrOfBrainStates;
 	states.resize(nrOfBrainStates);
 	nextStates.resize(nrOfBrainStates);
@@ -41,13 +40,9 @@ Agent::Agent(Genome *startGenome,int _nrOfBrainStates){ //this is a constructor.
 		}
 	}
 	inOutReMap();
-	//for(size_t i=0;i<gates.size();i++)
-	//	gates[i]->applyNodeMap(nodeMap, _nrOfBrainStates);
 }
 
 Agent::~Agent(){
-	for(size_t i=0;i<gates.size();i++)
-		delete gates[i];
 }
 
 void Agent::resetBrain(){
@@ -87,7 +82,7 @@ void Agent::updateStates(){
 	//cout << "\n";
 }
 
-void Agent::inOutReMap(){
+void Agent::inOutReMap(){ // remaps genome site values to valid brain state addresses
 
 	vector <int> nodeMap;
 	for(int i=0;i<256;i++){
@@ -131,7 +126,7 @@ vector<vector<int>> Agent::getConnectivityMatrix(){
 		for(int j=0;j<nrOfBrainStates;j++)
 			M[i][j]=0;
 	}
-	for(Gate* G:gates){
+	for(auto G:gates){
 		vector<int> I=G->getIns();
 		vector<int> O=G->getOuts();
 		for(int i:I)

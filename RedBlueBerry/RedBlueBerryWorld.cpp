@@ -162,11 +162,11 @@ double RedBlueBerryWorld::testIndividual(Agent *agent, bool analyse) {
 		score = 0.0;
 	if (analyse) {
 		//printf("%p\n",agent->genome);
-		Data::Add(switched, "switches", agent->genome);
-		Data::Add(eaten[0], "red", (Genome*) agent->genome);
-		Data::Add(eaten[1], "blue", (Genome*) agent->genome);
-		Data::Add(eaten[0] + eaten[1], "total", (Genome*) agent->genome);
-		Data::Add(score, "score", (Genome*) agent->genome);
+		Data::Add(switched, "switches", agent->genome->data);
+		Data::Add(eaten[0], "red", agent->genome->data);
+		Data::Add(eaten[1], "blue", agent->genome->data);
+		Data::Add(eaten[0] + eaten[1], "total", agent->genome->data);
+		Data::Add(score, "score", agent->genome->data);
 		//Data::Add(Analyse::computeAtomicPhi(stateCollector, agent->nrOfStates), "phi", (Genome*) agent->genome);
 	}
 	return score;

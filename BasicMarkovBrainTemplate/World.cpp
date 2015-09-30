@@ -32,7 +32,7 @@ vector<double> World::evaluateFitness(vector<Agent*> agents,bool analyse){
 }
 
 double World::testIndividual(Agent *agent,bool analyse){
-	Data::Add(0.0, "W", agent->genome);
+	Data::Add(0.0, "W", agent->genome->data);
     return 1.0;
 }
 
@@ -72,7 +72,7 @@ double ExampleWorld::testIndividual(Agent *agent,bool analyse){
 			}
 		}
 	}
-	Data::Add(fitness, "W", (Genome*)agent->genome);
+	Data::Add(fitness, "W", agent->genome->data);
 	
 	return fitness;
 }
@@ -123,11 +123,11 @@ vector<double> MultiThreadWorld::evaluateFitness(vector<Agent*> agents,bool anal
     }
     for (thread& t : threads) t.join(); // wait for all threads to finish
 	for(size_t i=0;i<agents.size();i++)
-		W.push_back((double)atof(Data::Get("W", (Genome*)agents[i]->genome).c_str()));
+		W.push_back((double)atof(Data::Get("W", agents[i]->genome->data).c_str()));
 	return W;
 }
 
 void MultiThreadWorld::staticTestIndividual(Agent *agent,bool analyse){
-	Data::Add((double)rand()/(double)RAND_MAX, "W", (Genome*)agent->genome);
+	Data::Add((double)rand()/(double)RAND_MAX, "W", agent->genome->data);
 }
 

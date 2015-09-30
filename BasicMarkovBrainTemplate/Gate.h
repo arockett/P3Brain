@@ -14,6 +14,7 @@
 #include <deque>
 #include "Genome.h"
 #include <functional>
+#include <memory>
 #include "Parameters.h"
 
 using namespace std;
@@ -28,9 +29,9 @@ public:
 	
 public:
 	static void setupGates();
-	static function<Gate*(Genome*,int)> makeGate[256];
-	vector<int> I;
-	vector<int> O;
+	static function<shared_ptr<Gate>(Genome*,int)> makeGate[256];
+	vector<int> inputs;
+	vector<int> outputs;
 	vector<vector<double>> table;
 	map<int,int> codingRegions; //indicates coding regions. maps genome index to usage of nucleotide in gate. 0=start codon. 1=wiring(defines # of inputs and outputs and what they are). 2=gate specific information
 	
@@ -43,7 +44,7 @@ public:
 	int Bit(double d);
 	virtual string description();
 	virtual void applyNodeMap(vector <int> nodeMap,int maxNodes);
-	static void AddGate(int ID, function<Gate*(Genome*,int)> theFunction);
+	static void AddGate(int ID, function<shared_ptr<Gate>(Genome*,int)> theFunction);
 	virtual void resetGate(void);
 	virtual vector<int> getIns();
 	virtual vector<int> getOuts();

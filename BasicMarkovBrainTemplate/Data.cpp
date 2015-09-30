@@ -1,14 +1,12 @@
 #include "Data.h"
 #include <cstring>
+#include <memory>
 
 //global variables that should be accessible to all
 int Data::update = 0;
 int Data::lastSaveUpdate = 0;
 set<int> Data::inUseGateTypes;
 bool Data::initFiles = false;
-
-//LOD variables
-int Data::genomeIDCounter = 0;
 
 // dataMap holds generic data
 // key will always be a genome ID (unique) which adresses to a map of type of data to value (for this genome)
@@ -48,28 +46,28 @@ void Data::initializeParameters() {
 }
 
 // implementation for LOD
-void Data::Add(int value, string key, Genome* to) {
-	dataMap[to->ID][key] = to_string(value);
+void Data::Add(int value, string key, map<string, string> & dataMap) {
+	dataMap[key] = to_string(value);
 }
 
-void Data::Add(double value, string key, Genome* to) {
-	dataMap[to->ID][key] = to_string(value);
+void Data::Add(double value, string key, map<string, string> & dataMap) {
+	dataMap[key] = to_string(value);
 }
 
 /*
  * takes a genome and a key. returns the value of key for genome from "dataMap"
  */
-string Data::Get(string key, Genome *from) {
-	return dataMap[from->ID][key];
+string Data::Get(string key, map<string, string> dataMap) {
+	return dataMap[key];
 }
 
 /*
  * Given a genome and a key(to data that has been saved into "dataMap"
  * return a list of the value for key for genome and all genomes ancestors ordered oldest first
  */
-vector<string> Data::GetLODItem(string key, Genome *from) {
+vector<string> Data::GetLODItem(string key, Genome * from) {
 	vector<string> list;
-	Genome *G = from;
+	Genome* G = from;
 	while (G != NULL) {
 		list.insert(list.begin(), dataMap[G->ID][key]);
 		G = G->ancestor;
@@ -81,9 +79,9 @@ vector<string> Data::GetLODItem(string key, Genome *from) {
  * Given a genome
  * return a list of genomes containing genome and all genomes ancestors ordered oldest first
  */
-vector<Genome*> Data::getLOD(Genome *from) {
+vector<Genome*> Data::getLOD(Genome * from) {
 	vector<Genome*> list;
-	Genome *G = from;
+	Genome * G = from;
 	while (G != NULL) { // which G has an ancestor
 		//printf("IN getLOD - %i %i\n",G->ID,G->referenceCounter);
 		list.insert(list.begin(), G); // add that ancestor to the front of the LOD list
@@ -102,26 +100,14 @@ vector<Genome*> Data::getLOD(Genome *from) {
  *       a dead genome with a referenceCounter = 1 has only one offspring.
  *       a dead genome with a referenceCounter > 1 has more then one spring with surviving lines of decent.
  */
-Genome* Data::getMostRecentCommonAncestor(Genome *from) {
+Genome* Data::getMostRecentCommonAncestor(Genome * from) {
 	vector<Genome*> LOD = getLOD(from); // get line of decent from "from"
-	for (Genome *G : LOD) { // starting at the oldest ancestor, moving to the youngest
+	for (auto G : LOD) { // starting at the oldest ancestor, moving to the youngest
 		//printf("IN getMRCA - %i %i\n",G->ID,G->referenceCounter);
 		if (G->referenceCounter > 1) // the first (oldest) ancestor with more then one surviving offspring is the oldest
 			return G;
 	}
 	return from; // a currently active genome will have referenceCounter = 1 but may be the Most Recent Common Ancestor
-}
-
-void Data::removeGenome(Genome* who) {
-	if (dataMap.find(who->ID) != dataMap.end())
-		dataMap.erase(dataMap.find(who->ID));
-}
-
-int Data::registerGenome(Genome* who) {
-	int I = genomeIDCounter;
-	dataMap[genomeIDCounter]["ID"] = to_string(genomeIDCounter);
-	genomeIDCounter++;
-	return I;
 }
 
 /*
@@ -131,7 +117,7 @@ int Data::registerGenome(Genome* who) {
  * b) all genomes have the same fields
  * if a) and or b) are not true, the function will still work, but the output will be mislabeled garbage
  */
-void Data::saveDataOnLOD(Genome *who) {
+void Data::saveDataOnLOD(Genome * who) {
 	FILE *DATAFILE;
 	FILE *GENOMEFILE;
 	if (initFiles != true) { // if this file has not been initialized
@@ -140,13 +126,13 @@ void Data::saveDataOnLOD(Genome *who) {
 
 		// write the file header (labels)
 		fprintf(DATAFILE, "update"); // print update in the file
-		for (map<string, string>::iterator I = dataMap[who->ID].begin(); I != dataMap[who->ID].end(); I++){
+		for (map<string, string>::iterator I = who->data.begin(); I != who->data.end(); I++) {
 			fprintf(DATAFILE, ",%s", I->first.c_str()); // print the names of all the the elements in dataMap as a header
 		}
 		fprintf(DATAFILE, "\n");
 
 		GENOMEFILE = fopen(Data::GenomeFileName.c_str(), "w+t"); // open the genome file for writing (w) in text mode (t) and overwrite the file if it's already there (+)
-		fprintf(GENOMEFILE,"genomeInterval = %i\n", Data::genomeInterval);
+		fprintf(GENOMEFILE, "genomeInterval = %i\n", Data::genomeInterval);
 
 	} else { // if files have already been initialized, open them for writing
 		DATAFILE = fopen(Data::DataFileName.c_str(), "at"); // open the file for writing (w) in text mode (t)
@@ -155,7 +141,7 @@ void Data::saveDataOnLOD(Genome *who) {
 	}
 
 	vector<Genome*> LOD = getLOD(who); // get line of decent for "from"
-	Genome * MRCA = getMostRecentCommonAncestor(who);
+	Genome* MRCA = getMostRecentCommonAncestor(who);
 	// cout << "IN saveDataOnLOD : MRCA = " << MRCA->ID << "\n";
 
 	int outputTime = 0; // this update, but relitive to the last save update
@@ -163,14 +149,15 @@ void Data::saveDataOnLOD(Genome *who) {
 	// while we have not caught up with the current update
 	// and we have not passed the MRCA
 	// and we have not passed Data::updates (how long we wanted this to run)
-	while ((outputTime + Data::lastSaveUpdate < update) && (LOD[outputTime] != MRCA) && (outputTime + Data::lastSaveUpdate < Data::updates)) {
+	while ((outputTime + Data::lastSaveUpdate < update) && (LOD[outputTime] != MRCA)
+			&& (outputTime + Data::lastSaveUpdate < Data::updates)) {
 
 		// write data to DATAFILE if this is a dataInterval
 		if ((outputTime + Data::lastSaveUpdate) % Data::dataInterval == 0) {
 			fprintf(DATAFILE, "%i", outputTime + Data::lastSaveUpdate);
 			//save the data for each element in the list
-			for (map<string, string>::iterator genomeData = dataMap[LOD[outputTime]->ID].begin();
-					genomeData != dataMap[LOD[outputTime]->ID].end(); genomeData++) {
+			for (map<string, string>::iterator genomeData = LOD[outputTime]->data.begin();
+					genomeData != LOD[outputTime]->data.end(); genomeData++) {
 				fprintf(DATAFILE, ",%s", genomeData->second.c_str());
 			}
 			fprintf(DATAFILE, "\n");
