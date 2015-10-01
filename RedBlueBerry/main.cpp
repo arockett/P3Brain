@@ -88,6 +88,11 @@ using namespace std;
 
 int main(int argc, const char * argv[]) {
 	//setupParameters(argc, argv); // read command line and config file and set up parameters
+
+	Parameters::initialize_parameters(argc, argv);
+
+	Parameters::dump_parameters(cout);
+
 	Gate::setupGates(); // determines which gate types will be in use.
 
 	if (Data::seedWithPID) { // need to change this out with proper engine!

@@ -69,6 +69,7 @@ void Genome::applyMutations(double mutationRate){
 		if((((double)rand()/(double)RAND_MAX)<Genome::insertionDeletionP)&&(sites.size()<20000)){
 			//duplication
 			w=128+rand()%(512-128);
+			if (w == (int)sites.size()) w--;
 			s=rand()%((int)sites.size()-w);
 			o=rand()%(int)sites.size();
 			buffer.clear();
