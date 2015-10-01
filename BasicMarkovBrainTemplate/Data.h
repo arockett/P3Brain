@@ -23,17 +23,16 @@ class Genome;
 
 class Data {
 public:
-	static int repNumber;
-	static bool seedWithPID;
-	static int updates;
-	static int popSize;
-	static int dataInterval;
-	static int genomeInterval;
-	static int pruneInterval;
-	static string DataFileName;
-	static string GenomeFileName;
+	static int& repNumber;
+	static bool& seedWithPID;
+	static int& updates;
+	static int& popSize;
+	static int& dataInterval;
+	static int& genomeInterval;
+	static int& pruneInterval;
+	static string& DataFileName;
+	static string& GenomeFileName;
 
-	static void initializeParameters();
 
 public:
 	static int update;  // this is a global variable - the current "time"

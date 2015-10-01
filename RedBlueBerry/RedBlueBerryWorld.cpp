@@ -10,12 +10,7 @@
 
 /* *** implementation of the World *** */
 
-double RedBlueBerryWorld::TSK;
-
-void RedBlueBerryWorld::initializeParameters(){
-	Parameters::setupParameter("RedBlueBerryWorld::TSC", TSK, 1.4, "cost to change food sources");
-}
-
+double& RedBlueBerryWorld::TSK = Parameters::register_parameter("RedBlueBerryWorld::TSC", 1.4, "cost to change food sources");
 
 
 RedBlueBerryWorld::RedBlueBerryWorld() {

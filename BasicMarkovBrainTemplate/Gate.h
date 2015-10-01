@@ -23,9 +23,13 @@ using namespace std;
 
 class Gate{  //conventional probabilistic gate
 public:
-	static bool gateFlags[8];
-	static double voidOutPut;
-	static void initializeParameters();
+	static bool& usingProbGate;
+	static bool& usingDetGate;
+	static bool& usingFBGate;
+	static bool& usingGPGate;
+	static bool& usingThGate;
+	static bool& usingEpsiGate;
+	static double& voidOutPut;
 	
 public:
 	static void setupGates();
@@ -43,7 +47,7 @@ public:
 	virtual void update(vector <double> & states, vector <double> & nextStates);
 	int Bit(double d);
 	virtual string description();
-	virtual void applyNodeMap(vector <int> nodeMap,int maxNodes);
+	virtual void applyNodeMap(vector<int> nodeMap,int maxNodes);
 	static void AddGate(int ID, function<shared_ptr<Gate>(Genome*,int)> theFunction);
 	virtual void resetGate(void);
 	virtual vector<int> getIns();

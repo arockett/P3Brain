@@ -11,15 +11,9 @@
 
 int Genome::genomeIDCounter = 0;
 
-int Genome::initialGenomeSize;
-double Genome::pointMutationRate;
-double Genome::insertionDeletionP;
-
-void Genome::initializeParameters(){
-	Parameters::setupParameter("Genome::initialGenomeSize", initialGenomeSize, 5000, "how long default genomes will be");
-	Parameters::setupParameter("Genome::pointMutationRate", pointMutationRate, 0.005, "per site mutation rate");
-	Parameters::setupParameter("Genome::insertionDeletionP", insertionDeletionP, 0.005, "per genome insertion/deletion rate");
-}
+int& Genome::initialGenomeSize = Parameters::register_parameter("Genome::initialGenomeSize", 5000, "how long default genomes will be");
+double& Genome::pointMutationRate = Parameters::register_parameter("Genome::pointMutationRate", 0.005, "per site mutation rate");
+double& Genome::insertionDeletionP = Parameters::register_parameter("Genome::insertionDeletionP", 0.005, "per genome insertion/deletion rate");
 
 
 

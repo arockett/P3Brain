@@ -34,8 +34,7 @@ class MadBotAI;
 
 class RedBlueBerryWorld: public World{
 public:
-	static double TSK;
-	static void initializeParameters();
+	static double& TSK;
 
 	double testIndividual(Agent *agent,bool analyse);
 

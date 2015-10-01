@@ -27,67 +27,67 @@
 
 using namespace std;
 
-/*
- * setupParameters reads command line arguments and a config file and then creates and tracks parameters that are requested from various moduals
- * parameters that are local to a module are defined in that modual and setup by a call to "Parameters::setupParameter()"
- * also from that module. Parameters used in main are directly setup in setupParameters.
- */
-void setupParameters(int argc, const char** argv) {
-	cout << "-----\n"
-			<< "  to see available command line/config file arguments set \"displayParameterDescriptions\" to true.\n"
-			<< "  to write out a new config file set \"makeConfigFile\" to true.\n" << "-----\n";
-
-	// load arguments from command line
-	Parameters::loadArguments(argc, argv);
-
-	// set the config file name (it may have been set on the command line)
-	Parameters::setupParameter("configFileName", Parameters::configFileName, "settings.cfg", "name of the config file");
-
-	// load arguments from config file
-	Parameters::loadConfigFile();
-
-	// first see if user wants us to be verbose when registering parameters
-	Parameters::paramVerbose = false; // must be set in order to call getParameterValue
-	Parameters::setupParameter("paramVerbose", Parameters::paramVerbose, false,
-			"if true: program reports info when registering parameters");
-
-	// initializeParameters - sets up variables with their values
-	// Critical initializeParameters DO NOT CHANGE THESE!
-	Data::initializeParameters();
-	Optimizer::initializeParameters();
-	Genome::initializeParameters();
-	Gate::initializeParameters();
-	Agent::initializeParameters();
-	World::initializeParameters();
-
-	// Add addtional initializeParameters below
-	RedBlueBerryWorld::initializeParameters();
-
-
-
-	// debugging/display methods
-	int printParameterDetail;
-	Parameters::setupParameter("printParameterDetail", printParameterDetail, 1,
-			"used in main to determine mow much information printParameterInfo will provide");
-	bool displayParameterDescriptions;
-	Parameters::setupParameter("displayParameterDescriptions", displayParameterDescriptions, false,
-			"used in main to switch on showing params");
-	bool makeConfigFile;
-	Parameters::setupParameter("makeConfigFile", makeConfigFile, false, "write out config file to \"configFileName\"");
-
-	if (printParameterDetail) {
-		Parameters::printParameterInfo(printParameterDetail);
-	}
-	if (displayParameterDescriptions) {
-		Parameters::printParameterDescriptions();
-	}
-	if (makeConfigFile) {
-		Parameters::makeConfigFile(Parameters::configFileName, 1);
-	}
-}
+///*
+// * setupParameters reads command line arguments and a config file and then creates and tracks parameters that are requested from various moduals
+// * parameters that are local to a module are defined in that modual and setup by a call to "Parameters::setupParameter()"
+// * also from that module. Parameters used in main are directly setup in setupParameters.
+// */
+//void setupParameters(int argc, const char** argv) {
+//	cout << "-----\n"
+//			<< "  to see available command line/config file arguments set \"displayParameterDescriptions\" to true.\n"
+//			<< "  to write out a new config file set \"makeConfigFile\" to true.\n" << "-----\n";
+//
+//	// load arguments from command line
+//	Parameters::loadArguments(argc, argv);
+//
+//	// set the config file name (it may have been set on the command line)
+//	Parameters::setupParameter("configFileName", Parameters::configFileName, "settings.cfg", "name of the config file");
+//
+//	// load arguments from config file
+//	Parameters::loadConfigFile();
+//
+//	// first see if user wants us to be verbose when registering parameters
+//	Parameters::paramVerbose = false; // must be set in order to call getParameterValue
+//	Parameters::setupParameter("paramVerbose", Parameters::paramVerbose, false,
+//			"if true: program reports info when registering parameters");
+//
+//	// initializeParameters - sets up variables with their values
+//	// Critical initializeParameters DO NOT CHANGE THESE!
+//	Data::initializeParameters();
+//	Optimizer::initializeParameters();
+//	Genome::initializeParameters();
+//	Gate::initializeParameters();
+//	Agent::initializeParameters();
+//	World::initializeParameters();
+//
+//	// Add addtional initializeParameters below
+//	RedBlueBerryWorld::initializeParameters();
+//
+//
+//
+//	// debugging/display methods
+//	int printParameterDetail;
+//	Parameters::setupParameter("printParameterDetail", printParameterDetail, 1,
+//			"used in main to determine mow much information printParameterInfo will provide");
+//	bool displayParameterDescriptions;
+//	Parameters::setupParameter("displayParameterDescriptions", displayParameterDescriptions, false,
+//			"used in main to switch on showing params");
+//	bool makeConfigFile;
+//	Parameters::setupParameter("makeConfigFile", makeConfigFile, false, "write out config file to \"configFileName\"");
+//
+//	if (printParameterDetail) {
+//		Parameters::printParameterInfo(printParameterDetail);
+//	}
+//	if (displayParameterDescriptions) {
+//		Parameters::printParameterDescriptions();
+//	}
+//	if (makeConfigFile) {
+//		Parameters::makeConfigFile(Parameters::configFileName, 1);
+//	}
+//}
 
 int main(int argc, const char * argv[]) {
-	setupParameters(argc, argv); // read command line and config file and set up parameters
+	//setupParameters(argc, argv); // read command line and config file and set up parameters
 	Gate::setupGates(); // determines which gate types will be in use.
 
 	if (Data::seedWithPID) { // need to change this out with proper engine!

@@ -12,38 +12,19 @@ bool Data::initFiles = false;
 // key will always be a genome ID (unique) which adresses to a map of type of data to value (for this genome)
 map<int, map<string, string>> Data::dataMap;
 
-int Data::repNumber;
-bool Data::seedWithPID;
-int Data::updates;
-int Data::popSize;
-int Data::dataInterval;
-int Data::genomeInterval;
-int Data::pruneInterval;
-string Data::DataFileName;
-string Data::GenomeFileName;
+int& Data::repNumber = Parameters::register_parameter("repNumber", 101, "Replicate ID and seed (if seedWithPID not set true)");
+bool& Data::seedWithPID = Parameters::register_parameter("seedWithPID", false,
+		"if seedWithPID, random number generator will see with process ID");
+int& Data::updates = Parameters::register_parameter("updates", 200, "how long the program will run");
+int& Data::popSize = Parameters::register_parameter("popSize", 100, "number of brains in the populaiton");
+int& Data::dataInterval = Parameters::register_parameter("Data::dataInterval", 1, "How often to write to data file");
+int& Data::genomeInterval = Parameters::register_parameter("Data::genomeInterval", 1, "How often to write genome file");
+int& Data::pruneInterval = Parameters::register_parameter("Data::pruneInterval", dataInterval, "How often to write to data file");
+string& Data::DataFileName = Parameters::register_parameter("Data::dataFileName", (string)"data.csv",
+		"name of genome file (stores genomes for line of decent)");
+string& Data::GenomeFileName = Parameters::register_parameter("Data::genomeFileName", (string)"genome.csv",
+		"name of data file (stores data i.e. scores");
 
-void Data::initializeParameters() {
-	Parameters::setupParameter("repNumber", repNumber, 101, "Replicate ID and seed (if seedWithPID not set true)");
-	Parameters::setupParameter("seedWithPID", seedWithPID, false,
-			"if seedWithPID, random number generator will see with process ID");
-	Parameters::setupParameter("updates", updates, 200, "how long the program will run");
-	Parameters::setupParameter("popSize", popSize, 100, "number of brains in the populaiton");
-
-	Parameters::setupParameter("Data::dataInterval", dataInterval, 1, "How often to write to data file");
-	Parameters::setupParameter("Data::genomeInterval", genomeInterval, 1, "How often to write genome file");
-	Parameters::setupParameter("Data::pruneInterval", pruneInterval, dataInterval, "How often to write to data file");
-
-	Parameters::setupParameter("Data::dataFileName", DataFileName, "data.csv",
-			"name of genome file (stores genomes for line of decent)");
-	Parameters::setupParameter("Data::genomeFileName", GenomeFileName, "genome.csv",
-			"name of data file (stores data i.e. scores");
-
-	// add repNumber directory to file names
-	DataFileName = to_string(repNumber) + "/" + DataFileName;
-	GenomeFileName = to_string(repNumber) + "/" + GenomeFileName;
-	cout << DataFileName << " " << GenomeFileName << "\n";
-
-}
 
 // implementation for LOD
 void Data::Add(int value, string key, map<string, string> & dataMap) {

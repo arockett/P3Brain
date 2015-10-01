@@ -16,6 +16,8 @@
 #include "Genome.h"
 #include "Gate.h"
 #include "Parameters.h"
+#include <math.h>
+
 
 using namespace std;
 
@@ -24,13 +26,26 @@ protected:
 	vector<shared_ptr<Gate>> gates;
 
 public:
-	static int defaultNrOfBrainStates; // default value for number of states in all brains
+	static int& defaultNrOfBrainStates; // default value for number of states in all brains
 	int nrOfBrainStates; // the number of states in THIS brain
-	static double skipGate; // probablity to skip a gate when this brain is updating
-	static bool serialProcessing; // write directly states (overwrite) - do not use nextStates
+	static double& skipGate; // probablity to skip a gate when this brain is updating
+	static bool& serialProcessing; // write directly states (overwrite) - do not use nextStates
 
 	static void initializeParameters();
 	
+	static int makeDefaultNodeMap(vector <int> & nodeMap, int bitCount, int defaultNrOfBrainStates){
+		//cout << "HERE:\n";
+		for(int i=0;i<pow(2,bitCount);i++){
+			//cout << i << "\n";
+			//cout << defaultNrOfBrainStates << "\n";
+			//cout << i%defaultNrOfBrainStates << "\n";
+			nodeMap.push_back(i%defaultNrOfBrainStates);
+		}
+		//cout << "HERE2:\n";
+
+		return 1;
+	}
+	static vector <int> defaultNodeMap;
 
 	Genome *genome;
 	vector <double> states;

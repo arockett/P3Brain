@@ -25,10 +25,9 @@ private:
 	int registerGenome(); // get a Genome_id (uses genomeIDCounter)
 
 public:
-	static int initialGenomeSize;
-	static double pointMutationRate;
-	static double insertionDeletionP;
-	static void initializeParameters();
+	static int& initialGenomeSize;
+	static double& pointMutationRate;
+	static double& insertionDeletionP;
 
 public:
 	int ID;

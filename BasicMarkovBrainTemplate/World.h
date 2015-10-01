@@ -19,8 +19,7 @@ using namespace std;
 
 class World{
 public:
-	static int repeats;
-	static void initializeParameters();
+	static int& repeats;
 
 public:
 	World();

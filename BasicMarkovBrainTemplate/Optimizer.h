@@ -19,8 +19,8 @@ using namespace std;
 
 class Optimizer{
 public:
-	static int elitism;
-	static void initializeParameters();
+	static int& elitism;
+
 public:
 	double maxFitness;
 	Optimizer();

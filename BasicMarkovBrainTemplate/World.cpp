@@ -10,12 +10,7 @@
 #include <math.h>
 
 
-int World::repeats;
-
-void World::initializeParameters(){
-	Parameters::setupParameter("world::repeats", repeats, 1, "WHAT IS THIS?");
-}
-
+int& World::repeats = Parameters::register_parameter("world::repeats", 1, "Number of times to test each Genome per generation");
 
 
 World::World(){
