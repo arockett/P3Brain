@@ -10,8 +10,8 @@
 
 /* *** implementation of the World *** */
 
-double& RedBlueBerryWorld::TSK = Parameters::register_parameter("RedBlueBerryWorld::TSC", 1.4, "cost to change food sources");
-
+double& RedBlueBerryWorld::TSK = Parameters::register_parameter("taskSwitchingCost", 1.4,
+		"cost to change food sources","WORLD - RED BLUE");
 
 RedBlueBerryWorld::RedBlueBerryWorld() {
 
@@ -153,16 +153,16 @@ double RedBlueBerryWorld::testIndividual(Agent *agent, bool analyse) {
 		 for (int blah = 0; blah < 1000000; blah++){}
 		 */
 	}
-	if (score < 0.0)
+	if (score < 0.0) {
 		score = 0.0;
+	}
+	Data::Add(switched, "switches", agent->genome->data);
+	Data::Add(eaten[0], "red", agent->genome->data);
+	Data::Add(eaten[1], "blue", agent->genome->data);
+	Data::Add(eaten[0] + eaten[1], "total", agent->genome->data);
+	Data::Add(score, "score", agent->genome->data);
 	if (analyse) {
-		//printf("%p\n",agent->genome);
-		Data::Add(switched, "switches", agent->genome->data);
-		Data::Add(eaten[0], "red", agent->genome->data);
-		Data::Add(eaten[1], "blue", agent->genome->data);
-		Data::Add(eaten[0] + eaten[1], "total", agent->genome->data);
-		Data::Add(score, "score", agent->genome->data);
-		//Data::Add(Analyse::computeAtomicPhi(stateCollector, agent->nrOfStates), "phi", (Genome*) agent->genome);
+		Data::Add(Analyse::computeAtomicPhi(stateCollector, agent->nrOfBrainStates), "phi", agent->genome->data);
 	}
 	return score;
 }

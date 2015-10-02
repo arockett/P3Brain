@@ -11,9 +11,9 @@
 
 int Genome::genomeIDCounter = 0;
 
-int& Genome::initialGenomeSize = Parameters::register_parameter("Genome::initialGenomeSize", 5000, "how long default genomes will be");
-double& Genome::pointMutationRate = Parameters::register_parameter("Genome::pointMutationRate", 0.005, "per site mutation rate");
-double& Genome::insertionDeletionP = Parameters::register_parameter("Genome::insertionDeletionP", 0.005, "per genome insertion/deletion rate");
+int& Genome::initialGenomeSize = Parameters::register_parameter("initialGenomeSize", 5000, "how long default genomes will be","GENOME");
+double& Genome::pointMutationRate = Parameters::register_parameter("pointMutationRate", 0.005, "per site mutation rate","GENOME");
+double& Genome::insertionDeletionP = Parameters::register_parameter("insertionDeletionP", 0.005, "per genome insertion/deletion rate","GENOME");
 
 
 
@@ -69,7 +69,9 @@ void Genome::applyMutations(double mutationRate){
 		if((((double)rand()/(double)RAND_MAX)<Genome::insertionDeletionP)&&(sites.size()<20000)){
 			//duplication
 			w=128+rand()%(512-128);
-			if (w == (int)sites.size()) w--;
+			if (w < (int)sites.size()) {
+				w = (int)sites.size() - 1;
+			}
 			s=rand()%((int)sites.size()-w);
 			o=rand()%(int)sites.size();
 			buffer.clear();

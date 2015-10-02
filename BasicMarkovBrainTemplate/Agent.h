@@ -28,20 +28,20 @@ protected:
 public:
 	static int& defaultNrOfBrainStates; // default value for number of states in all brains
 	int nrOfBrainStates; // the number of states in THIS brain
+	static int& sitesPerBrainAddress; // how many sites are evaluated to determin the brain adresses
 	static double& skipGate; // probablity to skip a gate when this brain is updating
 	static bool& serialProcessing; // write directly states (overwrite) - do not use nextStates
 
 	static void initializeParameters();
 	
-	static int makeDefaultNodeMap(vector <int> & nodeMap, int bitCount, int defaultNrOfBrainStates){
-		//cout << "HERE:\n";
-		for(int i=0;i<pow(2,bitCount);i++){
-			//cout << i << "\n";
-			//cout << defaultNrOfBrainStates << "\n";
-			//cout << i%defaultNrOfBrainStates << "\n";
+	/*
+	 * Builds a look up table to convert genome site values into brain state addresses - this is only used when there is a fixed number of brain states
+	 * if there is a variable number of brain states, then the node map must be rebuilt.
+	 */
+	static int makeNodeMap(vector <int> & nodeMap, int sitesCount, int defaultNrOfBrainStates){
+		for(int i=0;i<pow(2,(sitesCount*8));i++){ // each site in the genome has 8 bits so we need to count though (  2 to the (8 * number of sites)  )
 			nodeMap.push_back(i%defaultNrOfBrainStates);
 		}
-		//cout << "HERE2:\n";
 
 		return 1;
 	}

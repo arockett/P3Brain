@@ -10,26 +10,16 @@
 
 #define SKIPGATE 1 // if 0, remove the skipgate code - FOR SPEED UP!
 
-
-int& Agent::defaultNrOfBrainStates = Parameters::register_parameter("brainSize", 16, "number of Brain Values");
-double& Agent::skipGate = Parameters::register_parameter("skipGate", 0.0, "chance that a gate will not fire");
-bool& Agent::serialProcessing = Parameters::register_parameter("serialProcessing", false, "sets agents to overwrite... right?");
-
-
-
-/////////////////////// THIS NEEDS TO HAPPEN LATER (after brainSize has been imported - probably in main)
-/////////////////////// THIS NEEDS TO HAPPEN LATER
-/////////////////////// THIS NEEDS TO HAPPEN LATER
-/////////////////////// THIS NEEDS TO HAPPEN LATER
 vector<int> Agent::defaultNodeMap;
-int x = Agent::makeDefaultNodeMap(Agent::defaultNodeMap, 16, 16);
-/////////////////////// THIS NEEDS TO HAPPEN LATER
-/////////////////////// THIS NEEDS TO HAPPEN LATER
-/////////////////////// THIS NEEDS TO HAPPEN LATER
-/////////////////////// THIS NEEDS TO HAPPEN LATER
 
+int& Agent::defaultNrOfBrainStates = Parameters::register_parameter("brainSize", 16, "number of Brain Values", "AGENT");
+int& Agent::sitesPerBrainAddress = Parameters::register_parameter("sitesPerBrainAddress", 2,
+		"how many sites are evaluated to determine the brain addresses", "AGENT");
 
+double& Agent::skipGate = Parameters::register_parameter("skipGate", 0.0, "chance that a gate will not fire", "AGENT");
 
+bool& Agent::serialProcessing = Parameters::register_parameter("serialProcessing", false,
+		"sets agents to overwrite... right?", "AGENT");
 
 Agent::Agent() {
 }
@@ -51,20 +41,20 @@ Agent::Agent(Genome* startGenome, int _nrOfBrainStates) { //this is a constructo
 	}
 	inOutReMap();
 	/*
-	for (auto gate : gates) {
-		cout << "remapped inputs: ";
-		for (int x = 0; x < gate->inputs.size(); x++) {
-			cout << gate->inputs[x] << " ";
-		}
-		cout << "\n";
-		cout << "remapped outputs: ";
-		for (int x = 0; x < gate->outputs.size(); x++) {
-			cout << gate->outputs[x] << " ";
-		}
-		cout << "\n";
-	}
-	cout << "leaving agent contructor\n";
-	*/
+	 for (auto gate : gates) {
+	 cout << "remapped inputs: ";
+	 for (int x = 0; x < gate->inputs.size(); x++) {
+	 cout << gate->inputs[x] << " ";
+	 }
+	 cout << "\n";
+	 cout << "remapped outputs: ";
+	 for (int x = 0; x < gate->outputs.size(); x++) {
+	 cout << gate->outputs[x] << " ";
+	 }
+	 cout << "\n";
+	 }
+	 cout << "leaving agent contructor\n";
+	 */
 }
 
 Agent::~Agent() {

@@ -13,7 +13,7 @@ using namespace std;
 
 
 
-int& Optimizer::elitism = Parameters::register_parameter("elitism", -1, "The highest scoring agent will be included in the next generation this many times (-1 = no elitism)?");
+int& Optimizer::elitism = Parameters::register_parameter("elitism", -1, "The highest scoring agent will be included in the next generation this many times (-1 = no elitism)?","OPTIMIZER");
 
 
 

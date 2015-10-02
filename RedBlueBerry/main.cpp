@@ -91,7 +91,8 @@ int main(int argc, const char * argv[]) {
 
 	Parameters::initialize_parameters(argc, argv);
 
-	Parameters::dump_parameters(cout);
+	//make a node map to handle genome value to brain state address look up.
+	Agent::makeNodeMap(Agent::defaultNodeMap, Agent::sitesPerBrainAddress, Agent::defaultNrOfBrainStates);
 
 	Gate::setupGates(); // determines which gate types will be in use.
 
@@ -142,7 +143,7 @@ int main(int argc, const char * argv[]) {
 		}
 
 		// evaluate each organism in the population using a World
-		W = world->evaluateFitness(agents, true);
+		W = world->evaluateFitness(agents, false);
 
 		// delete all agents
 		for (int i = 0; i < Data::popSize; i++)

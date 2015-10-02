@@ -12,18 +12,18 @@ bool Data::initFiles = false;
 // key will always be a genome ID (unique) which adresses to a map of type of data to value (for this genome)
 map<int, map<string, string>> Data::dataMap;
 
-int& Data::repNumber = Parameters::register_parameter("repNumber", 101, "Replicate ID and seed (if seedWithPID not set true)");
+int& Data::repNumber = Parameters::register_parameter("repNumber", 101, "Replicate ID and seed (if seedWithPID not set true)", "GLOBAL");
 bool& Data::seedWithPID = Parameters::register_parameter("seedWithPID", false,
-		"if seedWithPID, random number generator will see with process ID");
-int& Data::updates = Parameters::register_parameter("updates", 200, "how long the program will run");
-int& Data::popSize = Parameters::register_parameter("popSize", 100, "number of brains in the populaiton");
-int& Data::dataInterval = Parameters::register_parameter("Data::dataInterval", 1, "How often to write to data file");
-int& Data::genomeInterval = Parameters::register_parameter("Data::genomeInterval", 1, "How often to write genome file");
-int& Data::pruneInterval = Parameters::register_parameter("Data::pruneInterval", dataInterval, "How often to write to data file");
-string& Data::DataFileName = Parameters::register_parameter("Data::dataFileName", (string)"data.csv",
-		"name of genome file (stores genomes for line of decent)");
-string& Data::GenomeFileName = Parameters::register_parameter("Data::genomeFileName", (string)"genome.csv",
-		"name of data file (stores data i.e. scores");
+		"if seedWithPID, random number generator will see with process ID", "GLOBAL");
+int& Data::updates = Parameters::register_parameter("updates", 200, "how long the program will run", "GLOBAL");
+int& Data::popSize = Parameters::register_parameter("popSize", 100, "number of genomes in the populaiton", "GLOBAL");
+int& Data::dataInterval = Parameters::register_parameter("dataInterval", 1, "How often to write to data file","DATA");
+int& Data::genomeInterval = Parameters::register_parameter("genomeInterval", 1, "How often to write genome file","DATA");
+int& Data::pruneInterval = Parameters::register_parameter("pruneInterval", dataInterval, "How often to write to data file","DATA");
+string& Data::DataFileName = Parameters::register_parameter("dataFileName", (string)"data.csv",
+		"name of genome file (stores genomes for line of decent)","DATA");
+string& Data::GenomeFileName = Parameters::register_parameter("genomeFileName", (string)"genome.csv",
+		"name of data file (stores data i.e. scores","DATA");
 
 
 // implementation for LOD
@@ -101,9 +101,13 @@ Genome* Data::getMostRecentCommonAncestor(Genome * from) {
 void Data::saveDataOnLOD(Genome * who) {
 	FILE *DATAFILE;
 	FILE *GENOMEFILE;
+
+	string local_DataFileName = to_string(Data::repNumber) + "/" + Data::DataFileName;
+	string local_GenomeFileName = to_string(Data::repNumber) + "/" + Data::GenomeFileName;
+
 	if (initFiles != true) { // if this file has not been initialized
 		initFiles = true; // make a note that it has been initialized
-		DATAFILE = fopen(Data::DataFileName.c_str(), "w+t"); // open the data file for writing (w) in text mode (t) and overwrite the file if it's already there (+)
+		DATAFILE = fopen(local_DataFileName.c_str(), "w+t"); // open the data file for writing (w) in text mode (t) and overwrite the file if it's already there (+)
 
 		// write the file header (labels)
 		fprintf(DATAFILE, "update"); // print update in the file
@@ -112,12 +116,12 @@ void Data::saveDataOnLOD(Genome * who) {
 		}
 		fprintf(DATAFILE, "\n");
 
-		GENOMEFILE = fopen(Data::GenomeFileName.c_str(), "w+t"); // open the genome file for writing (w) in text mode (t) and overwrite the file if it's already there (+)
+		GENOMEFILE = fopen(local_GenomeFileName.c_str(), "w+t"); // open the genome file for writing (w) in text mode (t) and overwrite the file if it's already there (+)
 		fprintf(GENOMEFILE, "genomeInterval = %i\n", Data::genomeInterval);
 
 	} else { // if files have already been initialized, open them for writing
-		DATAFILE = fopen(Data::DataFileName.c_str(), "at"); // open the file for writing (w) in text mode (t)
-		GENOMEFILE = fopen(Data::GenomeFileName.c_str(), "at"); // open the file for writing (w) in text mode (t)
+		DATAFILE = fopen(local_DataFileName.c_str(), "at"); // open the file for writing (w) in text mode (t)
+		GENOMEFILE = fopen(local_GenomeFileName.c_str(), "at"); // open the file for writing (w) in text mode (t)
 
 	}
 

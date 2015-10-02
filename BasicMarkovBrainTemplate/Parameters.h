@@ -2,6 +2,7 @@
 #define __BasicMarkovBrainTemplate__Parameters__
 
 #include <unordered_map>
+#include <map>
 using std::string;
 using std::unordered_map;
 #include <sstream>
@@ -17,9 +18,10 @@ template<class T>
 struct Entry {
 	T variable; // The current value of the parameter
 	string documentation; // A string descrbing the purpose of the parameter
+	string classification; // A string that broadly indicates what this Entry is involved in
 	Entry() = default;
-	Entry(T default_value, string doc) :
-			variable(default_value), documentation(doc) {
+	Entry(T default_value, string doc, string cl = "none") :
+			variable(default_value), documentation(doc), classification(cl) {
 	}
 };
 
@@ -47,18 +49,16 @@ public:
 			if (comand_line_list.find(string(argv[i])) == comand_line_list.end()) {
 				comand_line_list[string(argv[i])] = string(argv[i + 1]);
 			} else {
-				cout << "  \"" << string(argv[i])
-						<< " is defined more then once on the command line. Using first definition!";
+				cout << "  - \"" << string(argv[i])
+						<< "\" is defined more then once on the command line. Using first definition!\n";
 			}
 		}
+		cout << "\n";
 		return comand_line_list;
 	}
 
 	static unordered_map<string, string> readConfigFile(string configFileName) {
 		unordered_map<string, string> config_file_list;
-
-		cout << "  - loading Config File.\n";
-
 		set<char> nameFirstLegalChars = { // characters that can be used as the first "letter" of a name
 				'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
 						'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
@@ -144,8 +144,8 @@ public:
 						if (config_file_list.find(parameterName) == config_file_list.end()) {
 							config_file_list[parameterName] = string(parameterValue);
 						} else {
-							cout << "  \"" << string(parameterName)
-									<< " is defined more then once in config file (line " << line_number
+							cout << "  - \"" << string(parameterName)
+									<< "\" is defined more then once in config file (line " << line_number
 									<< "). Using first definition!\n";
 						}
 
@@ -158,18 +158,23 @@ public:
 			configFile.close();
 		}
 
-		else
+		else {
 			cout << "  - Config File: WARNING unable to open file \"" << configFileName << "\". Proceeding without.\n";
+		}
+		cout << "\n";
 		return config_file_list;
 
 	}
 
-
-
 // Use static calls to set up the parameter before main calls "set parameters"
 	template<class T>
-	static T& register_parameter(string name, const T& default_value, const string& documentation) {
-		registry<T>()[name] = Entry<T>(default_value, documentation);
+	static T& register_parameter(string name, const T& default_value, const string& documentation,
+			const string& classification = "none") {
+		if (registry<T>().find(name) != registry<T>().end()) {
+			cout << "  - registering parameters :: \"" << name
+					<< "\" is being registered more then once... you should look into this!\n";
+		}
+		registry<T>()[name] = Entry<T>(default_value, documentation, classification);
 		return registry<T>()[name].variable;
 	}
 
@@ -190,7 +195,7 @@ public:
 
 // Loads all of the parameters for a given type of variable from the key_value map
 	template<class T>
-	static void load_parameters_of_type(const unordered_map<string, string> & key_value) {
+	static void load_parameters_of_type(unordered_map<string, string> & key_value) {
 		for (auto & pair : registry<T>()) {
 			const auto & it = key_value.find(pair.first);
 			// Only set the configuration if no argument given
@@ -200,30 +205,58 @@ public:
 					throw std::invalid_argument(
 							"Bad configuration option for '" + it->first + "' given: " + it->second);
 				}
+				key_value.erase(pair.first);
 			}
 		}
 	}
 
-	static void load_parameters(const unordered_map<string, string> & key_value) {
+	static void load_parameters(unordered_map<string, string> & key_value) {
 		load_parameters_of_type<int>(key_value);
 		load_parameters_of_type<double>(key_value);
 		load_parameters_of_type<bool>(key_value);
 		load_parameters_of_type<string>(key_value);
 	}
 
+	static void initialize_parameters(int argc, const char** argv) {
 
-	static void initialize_parameters(int argc, const char** argv){
+		cout << "-----\n" << "  to write out a new config file set \"makeConfigFile\" to 1.\n" << "-----\n";
+
 		unordered_map<string, string> comand_line_list = readCommandLine(argc, argv);
 
-		string configFileName = (comand_line_list.find("configFileName") == comand_line_list.end())?"settings.cfg":comand_line_list["configFileName"];
+		string configFileName =
+				(comand_line_list.find("configFileName") == comand_line_list.end()) ?
+						"settings.cfg" : comand_line_list["configFileName"];
+
+		comand_line_list.erase("configFileName");
 
 		unordered_map<string, string> config_file_list = readConfigFile(configFileName);
 
 		load_parameters(config_file_list);
 		load_parameters(comand_line_list);
+
+		string makeConfigFile =
+				(comand_line_list.find("makeConfigFile") == comand_line_list.end()) ?
+						"0" : comand_line_list["makeConfigFile"];
+		comand_line_list.erase("makeConfigFile");
+		if (makeConfigFile == "1") {
+			ofstream CONFIGFILE(configFileName);
+			dump_parameters(CONFIGFILE);
+		}
+
+		if (!comand_line_list.empty()) {
+			cout << "  - The following values were defined on the command line, but were not used:\n";
+			for (auto name : comand_line_list) {
+				cout << "  -  \"" << name.first << "\"\n";
+			}
+		}
+		if (!config_file_list.empty()) {
+			cout << "  - The following values were defined in the config file, but were not used:\n";
+			for (auto name : config_file_list) {
+				cout << "  -  \"" << name.first << "\"\n";
+			}
+		}
+
 	}
-
-
 
 	// Junk you already had
 	static string get_type(int parameter) {
@@ -244,22 +277,60 @@ public:
 
 // Output the type, name, current value, and doc string for each parameter of a given type
 	template<class T>
-	static void dump_parameters_of_type(ostream & out) {
-		for (const auto & pair : registry<T>()) {
-			out << get_type(pair.second.variable) << " " << pair.first << " " << pair.second.variable << " # "
-					<< pair.second.documentation << std::endl;
+	static void dump_parameters_of_type(map<string, map<string, string>> & sorted_parameters) {
+		ostringstream build_string;
+
+		for (const auto & parameter : registry<T>()) {
+
+			build_string << parameter.first << " = " << parameter.second.variable;
+
+			int size = build_string.str().size();
+			while (size < 35) {
+				build_string << " ";
+				size++;
+			}
+
+			build_string << " # (" << get_type(parameter.second.variable) << ") " << parameter.second.documentation;
+
+			sorted_parameters[parameter.second.classification][parameter.first] = build_string.str();
+
+			build_string.str(string());
 		}
 	}
 
 	static void dump_parameters(ostream & out) {
-		dump_parameters_of_type<int>(out);
-		dump_parameters_of_type<double>(out);
-		dump_parameters_of_type<bool>(out);
-		dump_parameters_of_type<string>(out);
+
+		map<string, map<string, string>> sorted_parameters;
+
+		dump_parameters_of_type<int>(sorted_parameters);
+		dump_parameters_of_type<double>(sorted_parameters);
+		dump_parameters_of_type<bool>(sorted_parameters);
+		dump_parameters_of_type<string>(sorted_parameters);
+
+		if (sorted_parameters.find("GLOBAL") != sorted_parameters.end()) {
+			out << "# GLOBAL:" << "\n";
+			for (auto parameter : sorted_parameters["GLOBAL"]) {
+				out << "  " << parameter.second << "\n";
+			}
+
+		}
+
+		sorted_parameters.erase("GLOBAL");
+
+		out << "\n";
+
+		for (auto group : sorted_parameters) {
+			out << "# " << group.first << ":\n";
+			for (auto parameter : group.second) {
+				out << "  " << parameter.second << "\n";
+			}
+			out << "\n";
+		}
 
 	}
 
-};
+}
+;
 
 #endif // __BasicMarkovBrainTemplate__Parameters__
 

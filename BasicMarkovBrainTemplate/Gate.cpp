@@ -12,15 +12,15 @@
 #include <time.h>
 //#include "Random.h"
 
-bool& Gate::usingProbGate = Parameters::register_parameter("probGate", false, "set to true to enable probabilistic gates");
-bool& Gate::usingDetGate = Parameters::register_parameter("detGate", false, "set to true to enable deterministic gates?");
-bool& Gate::usingFBGate = Parameters::register_parameter("fbGate", false, "set to true to enable feedback gates");
-bool& Gate::usingGPGate = Parameters::register_parameter("gpGate", false, "set to true to enable GP (what?) gates");
-bool& Gate::usingThGate = Parameters::register_parameter("thGate", false, "set to true to enable theta gates");
-bool& Gate::usingEpsiGate = Parameters::register_parameter("epsiGate", false, "set to true to enable epsilon gates");
+bool& Gate::usingProbGate = Parameters::register_parameter("probGate", false, "set to true to enable probabilistic gates", "GATE TYPES");
+bool& Gate::usingDetGate = Parameters::register_parameter("detGate", false, "set to true to enable deterministic gates?", "GATE TYPES");
+bool& Gate::usingFBGate = Parameters::register_parameter("fbGate", false, "set to true to enable feedback gates", "GATE TYPES");
+bool& Gate::usingGPGate = Parameters::register_parameter("gpGate", false, "set to true to enable GP (what?) gates", "GATE TYPES");
+bool& Gate::usingThGate = Parameters::register_parameter("thGate", false, "set to true to enable theta gates", "GATE TYPES");
+bool& Gate::usingEpsiGate = Parameters::register_parameter("epsiGate", false, "set to true to enable epsilon gates", "GATE TYPES");
 
 double& Gate::voidOutPut = Parameters::register_parameter("voidOutput", 0.0,
-		"chance that an output from a determinstic gate will be set to 0");
+		"chance that an output from a determinstic gate will be set to 0", "GATES");
 /*
  * setupGates() populates Gate::makeGate (a structure containing functions) with the constructors for various types of gates.
  * there are 256 possible gates identified each by a pair of codons (n followed by 256-n)
