@@ -12,12 +12,18 @@
 #include <time.h>
 //#include "Random.h"
 
-bool& Gate::usingProbGate = Parameters::register_parameter("probGate", false, "set to true to enable probabilistic gates", "GATE TYPES");
-bool& Gate::usingDetGate = Parameters::register_parameter("detGate", false, "set to true to enable deterministic gates?", "GATE TYPES");
-bool& Gate::usingFBGate = Parameters::register_parameter("fbGate", false, "set to true to enable feedback gates", "GATE TYPES");
-bool& Gate::usingGPGate = Parameters::register_parameter("gpGate", false, "set to true to enable GP (what?) gates", "GATE TYPES");
-bool& Gate::usingThGate = Parameters::register_parameter("thGate", false, "set to true to enable theta gates", "GATE TYPES");
-bool& Gate::usingEpsiGate = Parameters::register_parameter("epsiGate", false, "set to true to enable epsilon gates", "GATE TYPES");
+bool& Gate::usingProbGate = Parameters::register_parameter("probGate", false,
+		"set to true to enable probabilistic gates", "GATE TYPES");
+bool& Gate::usingDetGate = Parameters::register_parameter("detGate", false,
+		"set to true to enable deterministic gates?", "GATE TYPES");
+bool& Gate::usingFBGate = Parameters::register_parameter("fbGate", false, "set to true to enable feedback gates",
+		"GATE TYPES");
+bool& Gate::usingGPGate = Parameters::register_parameter("gpGate", false, "set to true to enable GP (what?) gates",
+		"GATE TYPES");
+bool& Gate::usingThGate = Parameters::register_parameter("thGate", false, "set to true to enable theta gates",
+		"GATE TYPES");
+bool& Gate::usingEpsiGate = Parameters::register_parameter("epsiGate", false, "set to true to enable epsilon gates",
+		"GATE TYPES");
 
 double& Gate::voidOutPut = Parameters::register_parameter("voidOutput", 0.0,
 		"chance that an output from a determinstic gate will be set to 0", "GATES");
@@ -45,8 +51,7 @@ void Gate::setupGates() {
 		Data::inUseGateTypes.insert(44);
 	}
 	if (usingGPGate) {
-		AddGate(45,
-				[](Genome* genome,int pos) {shared_ptr<GPGate> newGate(new GPGate(genome,pos)); return newGate;});
+		AddGate(45, [](Genome* genome,int pos) {shared_ptr<GPGate> newGate(new GPGate(genome,pos)); return newGate;});
 		Data::inUseGateTypes.insert(45);
 	}
 	if (usingThGate) {
@@ -207,6 +212,12 @@ DeterministicGate::DeterministicGate() {
 DeterministicGate::DeterministicGate(Genome *genome, int startCodonAt) { //all this looks exactly the same as
 
 	//cout << "in DeterministicGate constructor\n";
+
+	//int genome_loc = 10;
+	//Gate::getIOAddress(genome_loc, genome);
+	//Gate::getIOAddress(genome_loc, genome);
+	//Gate::getIOAddress(genome_loc, genome);
+
 	int i, j, k;
 	inputs.clear();
 	outputs.clear();
@@ -230,22 +241,44 @@ DeterministicGate::DeterministicGate(Genome *genome, int startCodonAt) { //all t
 	inputs.resize(_yDim);
 	outputs.resize(_xDim);
 
+	int currLocation = k;
 	for (i = 0; i < _yDim; i++) {
-		inputs[i] = (((int) genome->sites[(k + (i * 2)) % genome->sites.size()]) << 8)
-				| ((int) genome->sites[(k + (i * 2) + 1) % genome->sites.size()]); //fills each input with 2 bytes from genome
+		int lastLocation = currLocation;
+		inputs[i] = getIOAddress(currLocation, genome);
 		//cout << inputs.size() << "   " << i << " :: " << inputs[i] << "\n";
-		codingRegions[(k + (i * 2)) % genome->sites.size()] = 1;
-		codingRegions[(k + (i * 2) + 1) % genome->sites.size()] = 1;
+		while (lastLocation < currLocation) {
+			codingRegions[lastLocation++] = 1;
+		}
 	}
-	for (i = 0; i < _xDim; i++) {
-		outputs[i] = (((int) genome->sites[(k + 8 + (i * 2)) % genome->sites.size()]) << 8)
-				| ((int) genome->sites[(k + 8 + (i * 2) + 1) % genome->sites.size()]); //fills each input with 2 bytes from genome
-		//cout << outputs.size() << "   " << i << " -- " << outputs[i] << "\n";
-		codingRegions[(k + 8 + (i * 2)) % genome->sites.size()] = 1;
-		codingRegions[(k + 8 + (i * 2) + 1) % genome->sites.size()] = 1;
-	}
+	k += ((ceil((double)Data::bitsPerBrainAddress / 8.0)) * 4);
 
-	k = k + 32; //move forward 32 spaces in genome
+	currLocation = k;
+	for (i = 0; i < _yDim; i++) {
+		int lastLocation = currLocation;
+		outputs[i] = getIOAddress(currLocation, genome);
+		//cout << outputs.size() << "   " << i << " -- " << outputs[i] << "\n";
+		while (lastLocation < currLocation) {
+			codingRegions[lastLocation++] = 1;
+		}
+	}
+	/*
+	 for (i = 0; i < _yDim; i++) {
+	 inputs[i] = (((int) genome->sites[(k + (i * 2)) % genome->sites.size()]) << 8)
+	 | ((int) genome->sites[(k + (i * 2) + 1) % genome->sites.size()]); //fills each input with 2 bytes from genome
+	 //cout << inputs.size() << "   " << i << " :: " << inputs[i] << "\n";
+	 codingRegions[(k + (i * 2)) % genome->sites.size()] = 1;
+	 codingRegions[(k + (i * 2) + 1) % genome->sites.size()] = 1;
+	 }
+	 for (i = 0; i < _xDim; i++) {
+	 outputs[i] = (((int) genome->sites[(k + 8 + (i * 2)) % genome->sites.size()]) << 8)
+	 | ((int) genome->sites[(k + 8 + (i * 2) + 1) % genome->sites.size()]); //fills each input with 2 bytes from genome
+	 //cout << outputs.size() << "   " << i << " -- " << outputs[i] << "\n";
+	 codingRegions[(k + 8 + (i * 2)) % genome->sites.size()] = 1;
+	 codingRegions[(k + 8 + (i * 2) + 1) % genome->sites.size()] = 1;
+	 }
+	 */
+
+	k = k + 16; //move forward 32 spaces in genome
 	//get all the values into the table
 	table.resize(1 << _yDim); //the y dimension of the table is still a list of binary 2^(number of inputs)
 	for (i = 0; i < (1 << _yDim); i++) {

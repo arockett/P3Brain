@@ -24,6 +24,8 @@ string& Data::DataFileName = Parameters::register_parameter("dataFileName", (str
 		"name of genome file (stores genomes for line of decent)","DATA");
 string& Data::GenomeFileName = Parameters::register_parameter("genomeFileName", (string)"genome.csv",
 		"name of data file (stores data i.e. scores","DATA");
+int& Data::bitsPerBrainAddress = Parameters::register_parameter("bitsPerBrainAddress", 10,
+		"how many bits are evaluated to determine the brain addresses", "AGENT");
 
 
 // implementation for LOD

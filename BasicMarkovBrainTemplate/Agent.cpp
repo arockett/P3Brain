@@ -13,8 +13,6 @@
 vector<int> Agent::defaultNodeMap;
 
 int& Agent::defaultNrOfBrainStates = Parameters::register_parameter("brainSize", 16, "number of Brain Values", "AGENT");
-int& Agent::sitesPerBrainAddress = Parameters::register_parameter("sitesPerBrainAddress", 2,
-		"how many sites are evaluated to determine the brain addresses", "AGENT");
 
 double& Agent::skipGate = Parameters::register_parameter("skipGate", 0.0, "chance that a gate will not fire", "AGENT");
 
@@ -39,6 +37,7 @@ Agent::Agent(Genome* startGenome, int _nrOfBrainStates) { //this is a constructo
 			}
 		}
 	}
+
 	inOutReMap();
 	/*
 	 for (auto gate : gates) {
@@ -53,11 +52,14 @@ Agent::Agent(Genome* startGenome, int _nrOfBrainStates) { //this is a constructo
 	 }
 	 cout << "\n";
 	 }
-	 cout << "leaving agent contructor\n";
 	 */
+	//cout << "leaving agent contructor\n";
+
 }
 
 Agent::~Agent() {
+	cout << "HERE?\n";
+	cout << gates.size() << "--\n";
 }
 
 void Agent::resetBrain() {

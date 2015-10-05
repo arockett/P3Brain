@@ -32,6 +32,7 @@ public:
 	static int& pruneInterval;
 	static string& DataFileName;
 	static string& GenomeFileName;
+	static int& bitsPerBrainAddress; // how many sites are evaluated to determine the brain addresses
 
 
 public:

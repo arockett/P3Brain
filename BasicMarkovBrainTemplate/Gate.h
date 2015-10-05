@@ -42,6 +42,27 @@ public:
 	Gate();
 	Gate(Genome *genome,int startCodonAt);
 	
+	/*
+	 * gets an address with Agent::bitsPerBrainAddress bits
+	 * reads the required number of sites and then trims the leading bits.
+	 */
+	int getIOAddress(int& geomeLocation, Genome *genome){
+		int bitCount;
+		int address = (int)genome->sites[geomeLocation];
+		geomeLocation = (geomeLocation + 1) % genome->sites.size();
+
+		for (bitCount = 8; Data::bitsPerBrainAddress > bitCount; bitCount += 8){
+			address = (address << 8) | (int)genome->sites[geomeLocation];
+			geomeLocation = (geomeLocation + 1) % genome->sites.size();
+		}
+		int bitMask = 0;
+		for (bitCount = 0; bitCount < Data::bitsPerBrainAddress; bitCount++){
+			bitMask = (bitMask << 1)|1;
+		}
+		return address&bitMask;
+	}
+
+
 	virtual ~Gate();
 	
 	virtual void update(vector <double> & states, vector <double> & nextStates);
