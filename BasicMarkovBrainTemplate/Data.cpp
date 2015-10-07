@@ -13,8 +13,8 @@ bool Data::initFiles = false;
 map<int, map<string, string>> Data::dataMap;
 
 int& Data::repNumber = Parameters::register_parameter("repNumber", 101, "Replicate ID and seed (if seedWithPID not set true)", "GLOBAL");
-bool& Data::seedWithPID = Parameters::register_parameter("seedWithPID", false,
-		"if seedWithPID, random number generator will see with process ID", "GLOBAL");
+bool& Data::randomSeed = Parameters::register_parameter("randomSeed", false,
+		"if randomSeed, random number generator will seeded randomly", "GLOBAL");
 int& Data::updates = Parameters::register_parameter("updates", 200, "how long the program will run", "GLOBAL");
 int& Data::popSize = Parameters::register_parameter("popSize", 100, "number of genomes in the populaiton", "GLOBAL");
 int& Data::dataInterval = Parameters::register_parameter("dataInterval", 1, "How often to write to data file","DATA");

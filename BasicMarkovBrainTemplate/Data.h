@@ -24,7 +24,7 @@ class Genome;
 class Data {
 public:
 	static int& repNumber;
-	static bool& seedWithPID;
+	static bool& randomSeed;
 	static int& updates;
 	static int& popSize;
 	static int& dataInterval;

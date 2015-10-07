@@ -58,8 +58,6 @@ Agent::Agent(Genome* startGenome, int _nrOfBrainStates) { //this is a constructo
 }
 
 Agent::~Agent() {
-	cout << "HERE?\n";
-	cout << gates.size() << "--\n";
 }
 
 void Agent::resetBrain() {

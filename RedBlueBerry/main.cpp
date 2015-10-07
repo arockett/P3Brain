@@ -18,6 +18,7 @@
 #include "Agent.h"
 #include "Parameters.h"
 #include "RedBlueBerryWorld.h"
+#include "Random.h"
 
 #ifdef _WIN32
 #include <process.h>
@@ -38,10 +39,12 @@ int main(int argc, const char * argv[]) {
 
 	Gate::setupGates(); // determines which gate types will be in use.
 
-	if (Data::seedWithPID) { // need to change this out with proper engine!
-		srand(getpid()); // need different includes for windows XPLATFORM
+	if (Data::randomSeed) {
+		Random::seed();
+		Random::seedAlt();
 	} else {
-		srand(Data::repNumber);
+		Random::seed(Data::repNumber);
+		Random::seedAlt(Data::repNumber+1);
 	}
 
 
