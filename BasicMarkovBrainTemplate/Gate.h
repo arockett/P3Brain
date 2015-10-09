@@ -91,7 +91,6 @@ public:
 	virtual ~Gate();
 
 	virtual void update(vector<double> & states, vector<double> & nextStates);
-	int Bit(double d);
 	virtual string description();
 	virtual void applyNodeMap(vector<int> nodeMap, int maxNodes);
 	static void AddGate(int ID, function<shared_ptr<Gate>(Genome*, int)> theFunction);

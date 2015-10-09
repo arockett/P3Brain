@@ -18,10 +18,9 @@
 #include "Parameters.h"
 #include <math.h>
 
-
 using namespace std;
 
-class Agent{
+class Agent {
 protected:
 	vector<shared_ptr<Gate>> gates;
 
@@ -32,33 +31,29 @@ public:
 	static bool& serialProcessing; // write directly states (overwrite) - do not use nextStates
 
 	static void initializeParameters();
-	
+
 	/*
 	 * Builds a look up table to convert genome site values into brain state addresses - this is only used when there is a fixed number of brain states
 	 * if there is a variable number of brain states, then the node map must be rebuilt.
 	 */
-	static int makeNodeMap(vector <int> & nodeMap, int sizeInBits, int defaultNrOfBrainStates){
-		for(int i=0;i<pow(2,(sizeInBits));i++){ // each site in the genome has 8 bits so we need to count though (  2 to the (8 * number of sites)  )
-			nodeMap.push_back(i%defaultNrOfBrainStates);
+	static int makeNodeMap(vector<int> & nodeMap, int sizeInBits, int defaultNrOfBrainStates) {
+		for (int i = 0; i < pow(2, (sizeInBits)); i++) { // each site in the genome has 8 bits so we need to count though (  2 to the (8 * number of sites)  )
+			nodeMap.push_back(i % defaultNrOfBrainStates);
 		}
 
 		return 1;
 	}
-	static vector <int> defaultNodeMap;
+	static vector<int> defaultNodeMap;
 
 	Genome *genome;
-	vector <double> states;
-	vector <double> nextStates;
-	
-	Agent();
-	Agent(Genome *startGenome,int _nrOfStates);
-	virtual ~Agent();
-	
-	void inOutReMap();
+	vector<double> states;
+	vector<double> nextStates;
 
-	inline int Bit(double d){ // returns 1 if "d" is greater than 0, else return 0
-		return (d>0.0);
-	}
+	Agent();
+	Agent(Genome *startGenome, int _nrOfStates);
+	virtual ~Agent();
+
+	void inOutReMap();
 
 	virtual int IntFromState(vector<int> I);
 	virtual int IntFromAllStates();
@@ -70,9 +65,24 @@ public:
 	set<int> findCodingRegions(int mask);
 	int numGates();
 
+public:
+	inline void setState(const int& state, const double& value) {
+		if (state < (int)states.size()) {
+			states[state] = value;
+		} else {
+			cout << "Writing to invalid brain state - this brain needs more states!\nExiting\n";
+			exit(1);
+		}
+	}
+	inline double getState(const int& state) {
+		if (state < (int)states.size()) {
+			return states[state];
+		} else {
+			cout << "Reading from invalid brain state - this brain needs more states!\nExiting\n";
+			exit(1);
+		}
+	}
+
 };
-
-
-
 
 #endif /* defined(__BasicMarkovBrainTemplate__Agent__) */

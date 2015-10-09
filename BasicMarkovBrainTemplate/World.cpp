@@ -8,10 +8,11 @@
 
 #include "World.h"
 #include "Random.h"
+#include "Utilities.h"
 #include <math.h>
 
 
-int& World::repeats = Parameters::register_parameter("world::repeats", 1, "Number of times to test each Genome per generation","WORLD");
+int& World::repeats = Parameters::register_parameter("repeats", 1, "Number of times to test each Genome per generation","WORLD");
 
 
 World::World(){
@@ -57,13 +58,13 @@ double ExampleWorld::testIndividual(Agent *agent,bool analyse){
 	for(int t=0;t<100;t++){
 		int I[8];
 		for(int i=0;i<3;i++){
-			I[i]=rand()&1;
+			I[i]=Random::getInt(1);
 			agent->states[i]=(double)I[i];
 		}
 		
 		agent->updateStates();
 		for(int i=0;i<3;i++){
-			if(agent->Bit(agent->states[8+i])==(int)I[i]){
+			if(Bit(agent->states[8+i])==(int)I[i]){
 				fitness+=1.0;
 			}
 		}

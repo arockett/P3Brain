@@ -10,6 +10,7 @@
 #include <iostream>
 #include <time.h>
 #include "Random.h"
+#include "Utilities.h"
 
 
 #define VOIDOUTPUT 0//1
@@ -165,12 +166,6 @@ Gate::Gate(Genome *genome, int startCodonAt) {
 }
 
 Gate::~Gate() { //this can delete gates
-}
-
-int Gate::Bit(double d) { //this returns 1 if you have inputted a number greater than 0
-	if (d > 0.0)
-		return 1;
-	return 0;
 }
 
 void Gate::update(vector<double> & states, vector<double> & nextStates) { //this translates the input bits of the current states to the output bits of the next states

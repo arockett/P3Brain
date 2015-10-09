@@ -8,6 +8,7 @@
 
 #include "Agent.h"
 #include "Random.h"
+#include "Utilities.h"
 
 #define SKIPGATE 0 // if 0, remove the skipgate code - FOR SPEED UP!
 
