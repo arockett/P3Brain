@@ -7,10 +7,13 @@
 //
 
 #include "Gate.h"
-#include <math.h>
 #include <iostream>
 #include <time.h>
-//#include "Random.h"
+#include "Random.h"
+
+
+#define VOIDOUTPUT 0//1
+
 
 bool& Gate::usingProbGate = Parameters::register_parameter("probGate", false,
 		"set to true to enable probabilistic gates", "GATE TYPES");
@@ -98,22 +101,47 @@ Gate::Gate(Genome *genome, int startCodonAt) {
 	inputs.resize(_yDim); //inputsis the input vector with length yDim
 	outputs.resize(_xDim); //outputs is the output vector with length xDim
 
-	for (i = 0; i < _yDim; i++) {
-		inputs[i] = (((int) genome->sites[(k + (i * 2)) % genome->sites.size()]) << 8)
-				| ((int) genome->sites[(k + (i * 2) + 1) % genome->sites.size()]); //fills each input with 2 bytes from genome
-		//cout << inputs.size() << "   " << i << " :: " << inputs[i] << "\n";
-		codingRegions[(k + (i * 2)) % genome->sites.size()] = 1;
-		codingRegions[(k + (i * 2) + 1) % genome->sites.size()] = 1;
-	}
-	for (i = 0; i < _xDim; i++) {
-		outputs[i] = (((int) genome->sites[(k + 8 + (i * 2)) % genome->sites.size()]) << 8)
-				| ((int) genome->sites[(k + 8 + (i * 2) + 1) % genome->sites.size()]); //fills each input with 2 bytes from genome
-		//cout << outputs.size() << "   " << i << " -- " << outputs[i] << "\n";
-		codingRegions[(k + 8 + (i * 2)) % genome->sites.size()] = 1;
-		codingRegions[(k + 8 + (i * 2) + 1) % genome->sites.size()] = 1;
-	}
+	getInputsAndOutputs(_yDim,_xDim,4,4,k,genome,codingRegions); // (#in #out max#in max#out,currentIndexInGenome,genome,codingRegions)
+//	static void getInputsAndOutputs(const int& insCount,const int& outsCount,const int& insMaxCount,const int& outsMaxCount,int& genome_index,const Genome* genome,map<int,int>& codingRegions){ // (#in #out max#in max#out,currentIndexInGenome,genome,codingRegions)
+//
+//	int currLocation = k;
+//	for (i = 0; i < _yDim; i++) {
+//		int lastLocation = currLocation;
+//		inputs[i] = getIOAddress(currLocation, genome);
+//		//cout << inputs.size() << "   " << i << " :: " << inputs[i] << "\n";
+//		while (lastLocation < currLocation) {
+//			codingRegions[lastLocation++] = 1;
+//		}
+//	}
+//	k += ((ceil((double)Data::bitsPerBrainAddress / 8.0)) * 4);
+//
+//	currLocation = k;
+//	for (i = 0; i < _yDim; i++) {
+//		int lastLocation = currLocation;
+//		outputs[i] = getIOAddress(currLocation, genome);
+//		//cout << outputs.size() << "   " << i << " -- " << outputs[i] << "\n";
+//		while (lastLocation < currLocation) {
+//			codingRegions[lastLocation++] = 1;
+//		}
+//	}
+//	k += ((ceil((double)Data::bitsPerBrainAddress / 8.0)) * 4);
 
-	k = k + 32; //move forward 32 spaces in genome	//get all the values into the table
+//	for (i = 0; i < _yDim; i++) {
+//		inputs[i] = (((int) genome->sites[(k + (i * 2)) % genome->sites.size()]) << 8)
+//				| ((int) genome->sites[(k + (i * 2) + 1) % genome->sites.size()]); //fills each input with 2 bytes from genome
+//		//cout << inputs.size() << "   " << i << " :: " << inputs[i] << "\n";
+//		codingRegions[(k + (i * 2)) % genome->sites.size()] = 1;
+//		codingRegions[(k + (i * 2) + 1) % genome->sites.size()] = 1;
+//	}
+//	for (i = 0; i < _xDim; i++) {
+//		outputs[i] = (((int) genome->sites[(k + 8 + (i * 2)) % genome->sites.size()]) << 8)
+//				| ((int) genome->sites[(k + 8 + (i * 2) + 1) % genome->sites.size()]); //fills each input with 2 bytes from genome
+//		//cout << outputs.size() << "   " << i << " -- " << outputs[i] << "\n";
+//		codingRegions[(k + 8 + (i * 2)) % genome->sites.size()] = 1;
+//		codingRegions[(k + 8 + (i * 2) + 1) % genome->sites.size()] = 1;
+//	}
+//
+	k = k + 16; //move forward 16 spaces in genome	//get all the values into the table
 	table.resize(1 << _yDim); //table is a vector of vectors of doubles. this resizes the first level vector to 2^(number of inputs).
 	for (i = 0; i < (1 << _yDim); i++) { //for each input vector...
 		table[i].resize(1 << _xDim); //resize the second level vectors to 2^(number of outputs)
@@ -147,7 +175,7 @@ int Gate::Bit(double d) { //this returns 1 if you have inputted a number greater
 
 void Gate::update(vector<double> & states, vector<double> & nextStates) { //this translates the input bits of the current states to the output bits of the next states
 	int input = 0, output = 0;
-	double r = (double) rand() / (double) RAND_MAX; //r is a random double between 0 and 1
+	double r = Random::getDouble(1); //r is a random double between 0 and 1
 	for (size_t i = 0; i < inputs.size(); i++) //for everything in vector inputs...
 		input = (input << 1) + Bit(states[inputs[i]]); //stores the current states in bitstring input with bitshifting. it will now be a bitstring of length (inputs)
 	while (r > table[input][output]) { //this goes across the probability table in row (input) and subtracts each value from r until r is less than a value it reaches
@@ -241,26 +269,29 @@ DeterministicGate::DeterministicGate(Genome *genome, int startCodonAt) { //all t
 	inputs.resize(_yDim);
 	outputs.resize(_xDim);
 
-	int currLocation = k;
-	for (i = 0; i < _yDim; i++) {
-		int lastLocation = currLocation;
-		inputs[i] = getIOAddress(currLocation, genome);
-		//cout << inputs.size() << "   " << i << " :: " << inputs[i] << "\n";
-		while (lastLocation < currLocation) {
-			codingRegions[lastLocation++] = 1;
-		}
-	}
-	k += ((ceil((double)Data::bitsPerBrainAddress / 8.0)) * 4);
+	getInputsAndOutputs(_yDim,_xDim,4,4,k,genome,codingRegions); // (#in #out max#in max#out,currentIndexInGenome,genome,codingRegions)
 
-	currLocation = k;
-	for (i = 0; i < _yDim; i++) {
-		int lastLocation = currLocation;
-		outputs[i] = getIOAddress(currLocation, genome);
-		//cout << outputs.size() << "   " << i << " -- " << outputs[i] << "\n";
-		while (lastLocation < currLocation) {
-			codingRegions[lastLocation++] = 1;
-		}
-	}
+//	int currLocation = k;
+//	for (i = 0; i < _yDim; i++) {
+//		int lastLocation = currLocation;
+//		inputs[i] = getIOAddress(currLocation, genome);
+//		//cout << inputs.size() << "   " << i << " :: " << inputs[i] << "\n";
+//		while (lastLocation < currLocation) {
+//			codingRegions[lastLocation++] = 1;
+//		}
+//	}
+//	k += ((ceil((double)Data::bitsPerBrainAddress / 8.0)) * 4);
+//
+//	currLocation = k;
+//	for (i = 0; i < _yDim; i++) {
+//		int lastLocation = currLocation;
+//		outputs[i] = getIOAddress(currLocation, genome);
+//		//cout << outputs.size() << "   " << i << " -- " << outputs[i] << "\n";
+//		while (lastLocation < currLocation) {
+//			codingRegions[lastLocation++] = 1;
+//		}
+//	}
+//	k += ((ceil((double)Data::bitsPerBrainAddress / 8.0)) * 4);
 	/*
 	 for (i = 0; i < _yDim; i++) {
 	 inputs[i] = (((int) genome->sites[(k + (i * 2)) % genome->sites.size()]) << 8)
@@ -277,8 +308,8 @@ DeterministicGate::DeterministicGate(Genome *genome, int startCodonAt) { //all t
 	 codingRegions[(k + 8 + (i * 2) + 1) % genome->sites.size()] = 1;
 	 }
 	 */
-
 	k = k + 16; //move forward 32 spaces in genome
+
 	//get all the values into the table
 	table.resize(1 << _yDim); //the y dimension of the table is still a list of binary 2^(number of inputs)
 	for (i = 0; i < (1 << _yDim); i++) {
@@ -306,7 +337,6 @@ void DeterministicGate::setupForBits(int* Ins, int nrOfIns, int Out, int logic) 
 	}
 }
 
-#define VOIDOUTPUT 1
 
 DeterministicGate::~DeterministicGate() {
 }
@@ -319,9 +349,8 @@ void DeterministicGate::update(vector<double> & states, vector<double> & nextSta
 	vector<double> outputRow = table[input];
 #if VOIDOUTPUT==1
 	//if(*Data::parameterDouble["voidOutput"]>0){
-	if (((double) rand() / (double) RAND_MAX) <= Gate::voidOutPut) {
-		int whichBit = rand() % outputs.size();
-		outputRow[whichBit] = 0;
+	if (Random::P(Gate::voidOutPut)) {
+		outputRow[Random::getIndex(outputs.size())] = 0; // pick and output and set it to 0
 	}
 	//}
 #endif // VOIDOUTPUT
@@ -537,7 +566,7 @@ void FeedbackGate::update(vector<double> & states, vector<double> & nextStates) 
 	//Apply the feedback
 	if ((feedbackON) && (nrPos != 0) && (states[posFBNode] > 0.0)) {
 		for (i = 0; i < chosenInPos.size(); i++) {
-			mod = ((double) rand() / (double) RAND_MAX) * posLevelOfFB[i];
+			mod = Random::getDouble(1) * posLevelOfFB[i];
 			table[chosenInPos[i]][chosenOutPos[i]] += mod;
 			double s = 0.0;
 			for (size_t k = 0; k < table[chosenInPos[i]].size(); k++)
@@ -548,7 +577,7 @@ void FeedbackGate::update(vector<double> & states, vector<double> & nextStates) 
 	}
 	if ((feedbackON) && (nrNeg != 0) && (states[negFBNode] > 0.0)) {
 		for (i = 0; i < chosenInNeg.size(); i++) {
-			mod = ((double) rand() / (double) RAND_MAX) * negLevelOfFB[i];
+			mod = Random::getDouble(1) * negLevelOfFB[i];
 			table[chosenInNeg[i]][chosenOutNeg[i]] -= mod;
 			if (table[chosenInNeg[i]][chosenOutNeg[i]] < 0.001)
 				table[chosenInNeg[i]][chosenOutNeg[i]] = 0.001;
@@ -563,7 +592,7 @@ void FeedbackGate::update(vector<double> & states, vector<double> & nextStates) 
 	//do the logic of the gate
 	int input = 0;
 	int output = 0;
-	double r = (double) rand() / (double) RAND_MAX;
+	double r = Random::getDouble(1);
 	for (size_t i = 0; i < inputs.size(); i++)
 		input = (input << 1) + Bit(states[inputs[i]]);
 	while (r > table[input][output]) {
@@ -754,11 +783,13 @@ void FixedEpsilonGate::update(vector<double> & states, vector<double> & nextStat
 	int input = 0; //input is the correct bitstring of outputs of the gate
 	for (size_t i = 0; i < inputs.size(); i++) //for every index in the input (I) vector
 		input = (input << 1) + Bit(states[inputs[i]]); //stores current states in bitstring input
-	if (((double) rand() / (double) RAND_MAX) < epsilon) { //if there will be an error
+	// WAS if (Random::P(epsilon)) { //if there will be an error
+	if (Random::P(epsilon)) { //if there will be an error
 		//do a random output excluding the one otherwise given
 		int output = 0;
 		do {
-			output = rand() & (table.size() - 1); //pick a bitstring (random row in the table)
+			// WAS output = rand() & (table.size() - 1); //pick a bitstring (random row in the table)
+			output = Random::getIndex(table.size()); //pick a bitstring (random row in the table)
 		} while (output == defaultOutput[input]); //until you pick the correct bitstring of outputs of the gate. If you don't, move on.
 		for (size_t i = 0; i < outputs.size(); i++) {
 			nextStates[outputs[i]] += 1.0 * (double) ((output >> i) & 1);

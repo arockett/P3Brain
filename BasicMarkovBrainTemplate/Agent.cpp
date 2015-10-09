@@ -7,8 +7,9 @@
 //
 
 #include "Agent.h"
+#include "Random.h"
 
-#define SKIPGATE 1 // if 0, remove the skipgate code - FOR SPEED UP!
+#define SKIPGATE 0 // if 0, remove the skipgate code - FOR SPEED UP!
 
 vector<int> Agent::defaultNodeMap;
 
@@ -83,11 +84,11 @@ void Agent::updateStates() {
 	}
 	for (size_t i = 0; i < gates.size(); i++) { //update each gate
 #if SKIPGATE==1
-		if (((double) rand() / (double) RAND_MAX) > Agent::skipGate) {
+		if (!Random::P(Agent::skipGate)) {
 			gates[i]->update(states, nextStates);
 		}
 #else
-		gates[i]->update(&states, &nextStates);
+		gates[i]->update(states, nextStates);
 #endif // SKIPGATE
 	}
 	for (int i = 0; i < nrOfBrainStates; i++) { //sets states for t+1 to states just updated in the last line

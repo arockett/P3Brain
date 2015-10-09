@@ -2,6 +2,9 @@
 #include <cstring>
 #include <memory>
 
+
+int Data::klyphCount = 0;
+
 //global variables that should be accessible to all
 int Data::update = 0;
 int Data::lastSaveUpdate = 0;
@@ -29,11 +32,11 @@ int& Data::bitsPerBrainAddress = Parameters::register_parameter("bitsPerBrainAdd
 
 
 // implementation for LOD
-void Data::Add(int value, string key, map<string, string> & dataMap) {
+void Data::Add(int value, const string& key, map<string, string> & dataMap) {
 	dataMap[key] = to_string(value);
 }
 
-void Data::Add(double value, string key, map<string, string> & dataMap) {
+void Data::Add(double value, const string& key, map<string, string> & dataMap) {
 	dataMap[key] = to_string(value);
 }
 
@@ -104,8 +107,8 @@ void Data::saveDataOnLOD(Genome * who) {
 	FILE *DATAFILE;
 	FILE *GENOMEFILE;
 
-	string local_DataFileName = to_string(Data::repNumber) + "/" + Data::DataFileName;
-	string local_GenomeFileName = to_string(Data::repNumber) + "/" + Data::GenomeFileName;
+	string local_DataFileName = "OUTPUT" + to_string(Data::repNumber) + "/" + Data::DataFileName;
+	string local_GenomeFileName = "OUTPUT" + to_string(Data::repNumber) + "/" + Data::GenomeFileName;
 
 	if (initFiles != true) { // if this file has not been initialized
 		initFiles = true; // make a note that it has been initialized

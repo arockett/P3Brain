@@ -12,6 +12,8 @@
 #include <random>
 #include <iostream>
 
+#include "Data.h" // DELETE ME : HERE FOR klyphcount
+
 using namespace std;
 
 /*
@@ -60,7 +62,7 @@ public:
 		return dist(mainRandEng);
 	}
 	inline static double getDouble(const double& val2) {
-		return getDouble(0.0, val2);
+		return getDouble(0, val2);
 	}
 
 	inline static double getDoubleAlt(const double& val1, const double& val2) {
@@ -68,7 +70,7 @@ public:
 		return dist(altRandEng);
 	}
 	inline static double getDoubleAlt(const double& val2) {
-		return getDoubleAlt(0.0, val2);
+		return getDoubleAlt(0, val2);
 	}
 
 //////////////////////////////////// getInt ////////////////////////////////////
@@ -81,7 +83,7 @@ public:
 		return dist(mainRandEng);
 	}
 	inline static int getInt(const int& val2) {
-		return getInt(0.0, val2);
+		return getInt(0, val2);
 	}
 
 	inline static int getIntAlt(const double& val1, const double& val2) {
@@ -89,23 +91,23 @@ public:
 		return dist(altRandEng);
 	}
 	inline static int getIntAlt(const double& val2) {
-		return getIntAlt(0.0, val2);
+		return getIntAlt(0, val2);
 	}
 
 //////////////////////////////////// getIndex ////////////////////////////////////
 
 	inline static int getIndex(const int& val1, const int& val2) {
-		return getInt(val1, val2-1);
+		return getInt(val1, val2 - 1);
 	}
 	inline static int getIndex(const int& val2) {
-		return getInt(0.0, val2 - 1);
+		return getInt(0, val2 - 1);
 	}
 
 	inline static int getIndexAlt(const int& val1, const int& val2) {
-		return getIntAlt(val1, val2-1);
+		return getIntAlt(val1, val2 - 1);
 	}
 	inline static int getIndexAlt(const int& val2) {
-		return getIntAlt(0.0, val2 - 1);
+		return getIntAlt(0, val2 - 1);
 	}
 
 //////////////////////////////////// binomial distribution ////////////////////////////////////
@@ -122,10 +124,10 @@ public:
 //////////////////////////////////// P ////////////////////////////////////
 
 	inline static bool P(const double& testVal) {
-		return (testVal > getDouble(1.0));
+		return (testVal > getDouble(1));
 	}
 	inline static bool PAlt(const double& testVal) {
-		return (testVal > getDoubleAlt(1.0));
+		return (testVal > getDoubleAlt(1));
 	}
 
 };

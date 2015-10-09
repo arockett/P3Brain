@@ -26,14 +26,14 @@ using namespace std;
 #define xDim 8
 #define yDim 8
 
-const int xm[8]={0,1,1,1,0,-1,-1,-1}; //these are directions
-const int ym[8]={-1,-1,0,1,1,1,0,-1};
 
 
 class MadBotAI;
 
 class RedBlueBerryWorld: public World{
 public:
+	const int xm[8] = { 0, 1, 1, 1, 0, -1, -1, -1 }; //these are directions
+	const int ym[8] = { -1, -1, 0, 1, 1, 1, 0, -1 };
 	static double& TSK;
 
 	double testIndividual(Agent *agent,bool analyse);

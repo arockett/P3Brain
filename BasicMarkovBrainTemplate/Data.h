@@ -23,6 +23,10 @@ class Genome;
 
 class Data {
 public:
+
+	static int klyphCount;
+
+
 	static int& repNumber;
 	static bool& randomSeed;
 	static int& updates;
@@ -55,8 +59,8 @@ public:
 
 	//data recording
 
-	static void Add(int value, string key, map <string,string> & dataMap); // adds an int value to dataMap with keys "key" and Genome_id
-	static void Add(double value, string key, map <string,string> & dataMap); // adds an double value to dataMap with keys "key" and Genome_id
+	static void Add(int value, const string& key, map <string,string> & dataMap); // adds an int value to dataMap with keys "key" and Genome_id
+	static void Add(double value, const string& key, map <string,string> & dataMap); // adds an double value to dataMap with keys "key" and Genome_id
 	static string Get(string key, map <string,string> dataMap); //retrive the sting in dataMap with keys "key" and Genome_id
 	static vector<string> GetLODItem(string key, Genome* from); // returns a list of strings for "key" for all ancestors of Genome
 

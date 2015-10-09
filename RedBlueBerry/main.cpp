@@ -53,7 +53,7 @@ int main(int argc, const char * argv[]) {
 	World *world = (World*) new RedBlueBerryWorld(); //new World();
 
 	// Make the output directory for this rep
-	string makeDirCommand = "mkdir " + to_string(Data::repNumber);
+	string makeDirCommand = "mkdir OUTPUT" + to_string(Data::repNumber);
 	const char * DirCommand = makeDirCommand.c_str();
 	system(DirCommand);
 
@@ -67,7 +67,6 @@ int main(int argc, const char * argv[]) {
 	progenitor->sites.resize(1);
 	Agent *progenitorAgent = new Agent(progenitor,Agent::defaultNrOfBrainStates);
 	world->testIndividual(progenitorAgent,true);
-	cout << "HERE\n";
 	delete progenitorAgent;
 	for (int i = 0; i < Data::popSize; i++) {
 		Genome *G = new Genome();
@@ -112,13 +111,15 @@ int main(int argc, const char * argv[]) {
 
 		//make next generation using an optimizer
 		newPopulation = optimizer->makeNextGeneration(population, W);
-		printf("update: %i maxFitness:%f %f\n", Data::update, optimizer->maxFitness, Genome::pointMutationRate);
+		cout << "update: " << Data::update << "   maxFitness: " << optimizer->maxFitness << "\n";
 		for (size_t i = 0; i < population.size(); i++) {
 			population[i]->kill(); // this deletes the genome if it has no offspring
 			population[i] = newPopulation[i];
 		}
 		newPopulation.clear();
 	}
+	cout << "In main(): " << Data::klyphCount <<"\n";
+
 	Agent *A = new Agent(population[0]->ancestor->ancestor, Agent::defaultNrOfBrainStates);
 	printf("%s\n", A->gateList().c_str());
 
