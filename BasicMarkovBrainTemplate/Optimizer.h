@@ -42,4 +42,10 @@ public:
 	virtual vector<Genome*> makeNextGeneration(vector<Genome*> population,vector<double> W);
 };
 
+class Runoff:Optimizer{
+public:
+	int strengthOfSelection = Data::popSize/50+1;
+	virtual vector<Genome*> makeNextGeneration(vector<Genome*> population,vector<double> W);
+};
+
 #endif /* defined(__BasicMarkovBrainTemplate__Optimizer__) */

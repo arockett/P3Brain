@@ -10,7 +10,7 @@
 #include "Random.h"
 #include "Utilities.h"
 
-#define SKIPGATE 0 // if 0, remove the skipgate code - FOR SPEED UP!
+#define SKIPGATE 1 // if 0, remove the skipgate code - FOR SPEED UP!
 
 vector<int> Agent::defaultNodeMap;
 

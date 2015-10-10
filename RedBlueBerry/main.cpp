@@ -48,7 +48,8 @@ int main(int argc, const char * argv[]) {
 	}
 
 
-	Optimizer *optimizer = (Optimizer*) new GA();
+	//Optimizer *optimizer = (Optimizer*) new GA();
+	Optimizer *optimizer = (Optimizer*) new Runoff();
 
 	World *world = (World*) new RedBlueBerryWorld(); //new World();
 
@@ -120,7 +121,9 @@ int main(int argc, const char * argv[]) {
 	}
 	cout << "In main(): " << Data::klyphCount <<"\n";
 
-	Agent *A = new Agent(population[0]->ancestor->ancestor, Agent::defaultNrOfBrainStates);
+	Genome * MRCA = Data::getMostRecentCommonAncestor(population[0]);
+
+	Agent *A = new Agent(MRCA, Agent::defaultNrOfBrainStates);
 	printf("%s\n", A->gateList().c_str());
 
 	return 0;

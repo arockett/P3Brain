@@ -9,6 +9,7 @@
 #include "Optimizer.h"
 #include "Random.h"
 #include <math.h>
+#include <stdlib.h>     /* atoi */
 
 using namespace std;
 
@@ -43,6 +44,9 @@ vector<Genome*> GA::makeNextGeneration(vector<Genome*> population, vector<double
 			best = i;
 		}
 
+	cout << "r: " << population[best]->data["food1"] << " b:" << population[best]->data["food2"] << " g:" << population[best]->data["food3"] << " s:"
+			<< population[best]->data["switches"] << " t:" << population[best]->data["total"] << "\n   ";
+
 	//now to roulette wheel selection:
 	nextGeneration.clear();
 	while (nextGeneration.size() < population.size()) {
@@ -71,10 +75,14 @@ vector<Genome*> Tournament::makeNextGeneration(vector<Genome*> population, vecto
 	//We don't need to know max fitness,
 	//but we do it anyways for good form
 	maxFitness = W[0];
+	int best = 0;
 	for (size_t i = 1; i < W.size(); i++)
 		if (W[i] > maxFitness) {
 			maxFitness = W[i];
+			best = i;
 		}
+	cout << "r: " << population[best]->data["food1"] << " b:" << population[best]->data["food2"] << " g:" << population[best]->data["food3"] << " s:"
+			<< population[best]->data["switches"] << " t:" << population[best]->data["total"] << "\n   ";
 
 	//tournament selection:
 	// pick two organisms, the one with the higher fitness
@@ -90,6 +98,39 @@ vector<Genome*> Tournament::makeNextGeneration(vector<Genome*> population, vecto
 			nextGeneration.push_back(population[w1]->makeMutatedOffspring(Genome::pointMutationRate));
 		else
 			nextGeneration.push_back(population[w2]->makeMutatedOffspring(Genome::pointMutationRate));
+	}
+	return nextGeneration;
+}
+
+vector<Genome*> Runoff::makeNextGeneration(vector<Genome*> population, vector<double> W) {
+	vector<Genome*> nextGeneration;
+
+	//We don't need to know max fitness,
+	//but we do it anyways for good form
+	maxFitness = W[0];
+	int best = 0;
+	for (size_t i = 1; i < W.size(); i++)
+		if (W[i] > maxFitness) {
+			maxFitness = W[i];
+			best = i;
+		}
+	cout << "r: " << population[best]->data["food1"] << " b:" << population[best]->data["food2"] << " g:" << population[best]->data["food3"] << " s:"
+			<< population[best]->data["switches"] << " t:" << population[best]->data["total"] << "\n   ";
+
+	//tournament selection:
+	// pick two organisms, the one with the higher fitness
+	// makes and offspring into the next population
+	nextGeneration.clear();
+	while (nextGeneration.size() < population.size()) {
+		int winner, challanger;
+		winner = Random::getIndex(population.size());
+		for (int i = 0; i < strengthOfSelection; i++) {
+			challanger = Random::getIndex(population.size());
+			if (W[challanger] > W[winner]) {
+				winner = challanger;
+			}
+		}
+		nextGeneration.push_back(population[winner]->makeMutatedOffspring(Genome::pointMutationRate));
 	}
 	return nextGeneration;
 }

@@ -8,6 +8,8 @@
 
 #include "RedBlueBerryWorld.h"
 #include "Random.h"
+#include <stdlib.h>     /* atoi */
+
 /* *** implementation of the World *** */
 
 double& RedBlueBerryWorld::TSK = Parameters::register_parameter("RBW_taskSwitchingCost", 1.4,
@@ -68,6 +70,9 @@ RedBlueBerryWorld::RedBlueBerryWorld() {
 				+ (2 * (senseFrontSides * foodSourceTypes));
 		// sense down * types of food, same for senseFront, same for senseFrontSides, but there are 2
 	}
+
+	cout << "  World using following BrainSates:\n    Inputs: 0 to " << inputStatesCount - 1 << "\n    Outputs: "
+			<< inputStatesCount << " to " << inputStatesCount + outputStatesCount - 1 << "\n";
 }
 
 double RedBlueBerryWorld::testIndividual(Agent *agent, bool analyse) {
@@ -82,7 +87,6 @@ double RedBlueBerryWorld::testIndividual(Agent *agent, bool analyse) {
 	double score = 0.0;
 	int lastFood = -1; //nothing has been eaten yet!
 
-	int foodSourceTypes = 2;
 	vector<int> foodRewards;
 	foodRewards.resize(8);
 	foodRewards[0] = rewardForFood1;
@@ -100,7 +104,7 @@ double RedBlueBerryWorld::testIndividual(Agent *agent, bool analyse) {
 	if (borderWalls) {
 		for (i = 1; i < xDim - 1; i++)
 			for (j = 1; j < yDim - 1; j++) { //as you go across the x and y directions in grid...
-				grid[i][j] = Random::getInt(1) + 1; // plant red or blue food
+				grid[i][j] = Random::getInt(1, foodSourceTypes); // plant red or blue food
 			}
 		for (i = 0; i < xDim; i++) { //makes horizontal walls
 			grid[i][0] = WALL;
@@ -114,7 +118,7 @@ double RedBlueBerryWorld::testIndividual(Agent *agent, bool analyse) {
 	} else { // no border walls
 		for (i = 0; i < xDim; i++) {
 			for (j = 0; j < yDim; j++) { //as you go across the x and y directions in grid...
-				grid[i][j] = Random::getInt(1) + 1; // plant red or blue food
+				grid[i][j] = Random::getInt(1, foodSourceTypes); // plant red or blue food
 			}
 		}
 	}
@@ -178,76 +182,13 @@ double RedBlueBerryWorld::testIndividual(Agent *agent, bool analyse) {
 			}
 		}
 
-//		if (senseWalls) {
-//			if (senseDown) {
-//				for (int i = 0; i < foodSourceTypes; i++) { // fill first states with food values at here location
-//					agent->states[statesAssignmentCounter++] = (here == i + 1);
-//				}
-//			}
-//			if (senseFront) {
-//				for (int i = 0; i < foodSourceTypes; i++) { // fill first states with food values at front location
-//					agent->states[statesAssignmentCounter++] = (front == i + 1);
-//				}
-//				agent->states[statesAssignmentCounter++] = (front == WALL);
-//			}
-//			if (senseFrontSides) {
-//				for (int i = 0; i < foodSourceTypes; i++) { // fill first states with food values at front location
-//					agent->states[statesAssignmentCounter++] = (leftFront == i + 1);
-//					agent->states[statesAssignmentCounter++] = (rightFront == i + 1);
-//				}
-//				agent->states[statesAssignmentCounter++] = (leftFront == WALL);
-//				agent->states[statesAssignmentCounter++] = (rightFront == WALL);
-//			}
-//		} else { // don't sense walls
-//			if (senseDown) {
-//				for (int i = 0; i < foodSourceTypes; i++) { // fill first states with food values at here location
-//					agent->states[statesAssignmentCounter++] = (here == i + 1);
-//				}
-//			}
-//			if (senseFront) {
-//				for (int i = 0; i < foodSourceTypes; i++) { // fill first states with food values at front location
-//					agent->states[statesAssignmentCounter++] = (front == i + 1);
-//				}
-//			}
-//			if (senseFrontSides) {
-//				for (int i = 0; i < foodSourceTypes; i++) { // fill first states with food values at front location
-//					agent->states[statesAssignmentCounter++] = (leftFront == i + 1);
-//					agent->states[statesAssignmentCounter++] = (rightFront == i + 1);
-//				}
-//			}
-//		}
-
-//		if (borderWalls) {
-//		agent->states[0] = (here == RED); // standing on red
-//		agent->states[1] = (here == BLUE); // standing on blue
-//		agent->states[2] = (front == RED); // front is red
-//		agent->states[3] = (front == BLUE); // front is blue
-//		agent->states[4] = (front == WALL); // front is wall
-//		agent->states[5] = (leftFront == RED); // front left is red
-//		agent->states[6] = (rightFront == RED); // front right is red
-//		agent->states[7] = (leftFront == BLUE); // front left is blue
-//		agent->states[8] = (rightFront == BLUE); // front right is blue
-//		agent->states[9] = (leftFront == WALL); // front left is wall
-//		agent->states[10] = (rightFront == WALL); // front right is wall
-//
-//		} else {
-//			agent->states[0] = here == RED; // standing on red
-//			agent->states[1] = here == BLUE; // standing on blue
-//			agent->states[2] = leftFront == RED; // front left is red
-//			agent->states[3] = front == RED; // front is red
-//			agent->states[4] = rightFront == RED; // front right is red
-//			agent->states[5] = leftFront == BLUE; // front left is blue
-//			agent->states[6] = front == BLUE; // front is blue
-//			agent->states[7] = rightFront == BLUE; // front right is blue
-//		}
-
 		if (clearOutputs) {
 			agent->setState(inputStatesCount, 0.0);
 			agent->setState(inputStatesCount + 1, 0.0);
 			agent->setState(inputStatesCount + 2, 0.0);
 		}
 
-		if (analyse) { // gather some datta before and after running update
+		if (analyse) { // gather some data before and after running update
 			int S = 0;
 			for (int i = 0; i < inputStatesCount; i++)
 				S = (S << 1) + Bit(agent->states[i]);
@@ -261,12 +202,12 @@ double RedBlueBerryWorld::testIndividual(Agent *agent, bool analyse) {
 
 		// set output values
 		output1 = Bit(agent->getState(inputStatesCount)) + (Bit(agent->getState(inputStatesCount + 1)) << 1);
-		//output2 = Bit(agent->getState(inputStatesCount + 2));
+		output2 = Bit(agent->getState(inputStatesCount + 2));
 
-		if ((output1 == 0) && (grid[xp][yp] != EMPTY)) { // eat food here (if there is food here)
+		if ((output2 == 1) && (grid[xp][yp] != EMPTY)) { // eat food here (if there is food here)
 			if (lastFood != -1) { // if some food has already been eaten
 				if (lastFood != grid[xp][yp]) { // if this food is different then the last food eaten
-					score -= TSK; // pay the task switch cost
+					score -= RedBlueBerryWorld::TSK; // pay the task switch cost
 					switched++;
 				}
 			}
@@ -275,7 +216,7 @@ double RedBlueBerryWorld::testIndividual(Agent *agent, bool analyse) {
 			eaten[grid[xp][yp] - 1]++; // track the number of each berry eaten
 			grid[xp][yp] = 0; // clear this location
 		}
-		if (1) {//((output2 == 0) || (allowMoveAndEat == 1)) { // if we did not eat or we allow moving and eating in the same world update
+		if ((output2 == 0) || (allowMoveAndEat == 1)) { // if we did not eat or we allow moving and eating in the same world update
 			switch (output1) {
 			case 0: //nothing
 				break;
@@ -288,7 +229,7 @@ double RedBlueBerryWorld::testIndividual(Agent *agent, bool analyse) {
 			case 3: //move forward
 				if (grid[loopMod((xp + xm[dir]), (xDim))][loopMod((yp + ym[dir]), (yDim))] != WALL) { // if the proposed move is not a wall
 					if (grid[xp][yp] == EMPTY) { // if the current location is empty
-						grid[xp][yp] = Random::getInt(1) + 1; // plant a red or blue food
+						grid[xp][yp] = Random::getInt(1, foodSourceTypes); // plant a red or blue food
 					}
 					xp = loopMod((xp + xm[dir]), xDim); // move to the new X
 					yp = loopMod((yp + ym[dir]), yDim); // move to the new Y
@@ -317,9 +258,13 @@ double RedBlueBerryWorld::testIndividual(Agent *agent, bool analyse) {
 		score = 0.0;
 	}
 	Data::Add(switched, "switches", agent->genome->data);
-	Data::Add(eaten[0], "red", agent->genome->data);
-	Data::Add(eaten[1], "blue", agent->genome->data);
-	Data::Add(eaten[0] + eaten[1], "total", agent->genome->data);
+	int total_eaten = 0;
+	for (int i = 0; i < foodSourceTypes; i++) {
+		total_eaten += eaten[i];
+		string temp_name = "food" + to_string(i + 1);
+		Data::Add(eaten[i], temp_name, agent->genome->data);
+	}
+	Data::Add(total_eaten, "total", agent->genome->data);
 	Data::Add(score, "score", agent->genome->data);
 	if (analyse) {
 		Data::Add(Analyse::computeAtomicPhi(stateCollector, agent->nrOfBrainStates), "phi", agent->genome->data);

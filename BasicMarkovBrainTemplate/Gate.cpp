@@ -13,7 +13,7 @@
 #include "Utilities.h"
 
 
-#define VOIDOUTPUT 0//1
+#define VOIDOUTPUT 1
 
 
 bool& Gate::usingProbGate = Parameters::register_parameter("probGate", false,
