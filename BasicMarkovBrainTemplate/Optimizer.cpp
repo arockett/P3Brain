@@ -114,7 +114,7 @@ vector<Genome*> Runoff::makeNextGeneration(vector<Genome*> population, vector<do
 			maxFitness = W[i];
 			best = i;
 		}
-	cout << "r: " << population[best]->data["food1"] << " b:" << population[best]->data["food2"] << " g:" << population[best]->data["food3"] << " s:"
+	cout << "f1: " << population[best]->data["food1"] << " f2:" << population[best]->data["food2"] << " f3:" << population[best]->data["food3"] << " f4:" << population[best]->data["food4"] << " f5:" << population[best]->data["food5"] << " s:"
 			<< population[best]->data["switches"] << " t:" << population[best]->data["total"] << "\n   ";
 
 	//tournament selection:

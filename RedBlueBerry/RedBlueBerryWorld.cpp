@@ -87,7 +87,7 @@ double RedBlueBerryWorld::testIndividual(Agent *agent, bool analyse) {
 	double score = 0.0;
 	int lastFood = -1; //nothing has been eaten yet!
 
-	vector<int> foodRewards;
+	vector<double> foodRewards;
 	foodRewards.resize(8);
 	foodRewards[0] = rewardForFood1;
 	foodRewards[1] = rewardForFood2;
