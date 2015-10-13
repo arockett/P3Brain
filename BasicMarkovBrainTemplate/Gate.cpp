@@ -31,6 +31,13 @@ bool& Gate::usingEpsiGate = Parameters::register_parameter("epsiGate", false, "s
 
 double& Gate::voidOutPut = Parameters::register_parameter("voidOutput", 0.0,
 		"chance that an output from a determinstic gate will be set to 0", "GATES");
+
+double& Gate::FixedEpsilonGateP= Parameters::register_parameter("FixedEpsilonGateProb", 0.05,
+		"chance that an output from a FixedEpsilonGate gate will be randomized", "GATES");
+
+
+
+
 /*
  * setupGates() populates Gate::makeGate (a structure containing functions) with the constructors for various types of gates.
  * there are 256 possible gates identified each by a pair of codons (n followed by 256-n)
@@ -103,45 +110,8 @@ Gate::Gate(Genome *genome, int startCodonAt) {
 	outputs.resize(_xDim); //outputs is the output vector with length xDim
 
 	getInputsAndOutputs(_yDim,_xDim,4,4,k,genome,codingRegions); // (#in #out max#in max#out,currentIndexInGenome,genome,codingRegions)
-//	static void getInputsAndOutputs(const int& insCount,const int& outsCount,const int& insMaxCount,const int& outsMaxCount,int& genome_index,const Genome* genome,map<int,int>& codingRegions){ // (#in #out max#in max#out,currentIndexInGenome,genome,codingRegions)
-//
-//	int currLocation = k;
-//	for (i = 0; i < _yDim; i++) {
-//		int lastLocation = currLocation;
-//		inputs[i] = getIOAddress(currLocation, genome);
-//		//cout << inputs.size() << "   " << i << " :: " << inputs[i] << "\n";
-//		while (lastLocation < currLocation) {
-//			codingRegions[lastLocation++] = 1;
-//		}
-//	}
-//	k += ((ceil((double)Data::bitsPerBrainAddress / 8.0)) * 4);
-//
-//	currLocation = k;
-//	for (i = 0; i < _yDim; i++) {
-//		int lastLocation = currLocation;
-//		outputs[i] = getIOAddress(currLocation, genome);
-//		//cout << outputs.size() << "   " << i << " -- " << outputs[i] << "\n";
-//		while (lastLocation < currLocation) {
-//			codingRegions[lastLocation++] = 1;
-//		}
-//	}
-//	k += ((ceil((double)Data::bitsPerBrainAddress / 8.0)) * 4);
+	// get _yDim inputs and _xDim outputs, advance k (genomeIndex) as if we had gotten 4 of each and record this in codingRegions
 
-//	for (i = 0; i < _yDim; i++) {
-//		inputs[i] = (((int) genome->sites[(k + (i * 2)) % genome->sites.size()]) << 8)
-//				| ((int) genome->sites[(k + (i * 2) + 1) % genome->sites.size()]); //fills each input with 2 bytes from genome
-//		//cout << inputs.size() << "   " << i << " :: " << inputs[i] << "\n";
-//		codingRegions[(k + (i * 2)) % genome->sites.size()] = 1;
-//		codingRegions[(k + (i * 2) + 1) % genome->sites.size()] = 1;
-//	}
-//	for (i = 0; i < _xDim; i++) {
-//		outputs[i] = (((int) genome->sites[(k + 8 + (i * 2)) % genome->sites.size()]) << 8)
-//				| ((int) genome->sites[(k + 8 + (i * 2) + 1) % genome->sites.size()]); //fills each input with 2 bytes from genome
-//		//cout << outputs.size() << "   " << i << " -- " << outputs[i] << "\n";
-//		codingRegions[(k + 8 + (i * 2)) % genome->sites.size()] = 1;
-//		codingRegions[(k + 8 + (i * 2) + 1) % genome->sites.size()] = 1;
-//	}
-//
 	k = k + 16; //move forward 16 spaces in genome	//get all the values into the table
 	table.resize(1 << _yDim); //table is a vector of vectors of doubles. this resizes the first level vector to 2^(number of inputs).
 	for (i = 0; i < (1 << _yDim); i++) { //for each input vector...
@@ -248,7 +218,7 @@ DeterministicGate::DeterministicGate(Genome *genome, int startCodonAt) { //all t
 	codingRegions.clear();
 
 	codingRegions[startCodonAt] = 0;
-	codingRegions[startCodonAt + 1] = 0;
+	codingRegions[(startCodonAt + 1) % genome->sites.size()] = 0;
 	//find the first nucleotide that isn't part of the start codon
 	k = (startCodonAt + 2) % (int) genome->sites.size();
 
@@ -266,43 +236,8 @@ DeterministicGate::DeterministicGate(Genome *genome, int startCodonAt) { //all t
 
 	getInputsAndOutputs(_yDim,_xDim,4,4,k,genome,codingRegions); // (#in #out max#in max#out,currentIndexInGenome,genome,codingRegions)
 
-//	int currLocation = k;
-//	for (i = 0; i < _yDim; i++) {
-//		int lastLocation = currLocation;
-//		inputs[i] = getIOAddress(currLocation, genome);
-//		//cout << inputs.size() << "   " << i << " :: " << inputs[i] << "\n";
-//		while (lastLocation < currLocation) {
-//			codingRegions[lastLocation++] = 1;
-//		}
-//	}
-//	k += ((ceil((double)Data::bitsPerBrainAddress / 8.0)) * 4);
-//
-//	currLocation = k;
-//	for (i = 0; i < _yDim; i++) {
-//		int lastLocation = currLocation;
-//		outputs[i] = getIOAddress(currLocation, genome);
-//		//cout << outputs.size() << "   " << i << " -- " << outputs[i] << "\n";
-//		while (lastLocation < currLocation) {
-//			codingRegions[lastLocation++] = 1;
-//		}
-//	}
-//	k += ((ceil((double)Data::bitsPerBrainAddress / 8.0)) * 4);
-	/*
-	 for (i = 0; i < _yDim; i++) {
-	 inputs[i] = (((int) genome->sites[(k + (i * 2)) % genome->sites.size()]) << 8)
-	 | ((int) genome->sites[(k + (i * 2) + 1) % genome->sites.size()]); //fills each input with 2 bytes from genome
-	 //cout << inputs.size() << "   " << i << " :: " << inputs[i] << "\n";
-	 codingRegions[(k + (i * 2)) % genome->sites.size()] = 1;
-	 codingRegions[(k + (i * 2) + 1) % genome->sites.size()] = 1;
-	 }
-	 for (i = 0; i < _xDim; i++) {
-	 outputs[i] = (((int) genome->sites[(k + 8 + (i * 2)) % genome->sites.size()]) << 8)
-	 | ((int) genome->sites[(k + 8 + (i * 2) + 1) % genome->sites.size()]); //fills each input with 2 bytes from genome
-	 //cout << outputs.size() << "   " << i << " -- " << outputs[i] << "\n";
-	 codingRegions[(k + 8 + (i * 2)) % genome->sites.size()] = 1;
-	 codingRegions[(k + 8 + (i * 2) + 1) % genome->sites.size()] = 1;
-	 }
-	 */
+	// get _yDim inputs and _xDim outputs, advance k (genomeIndex) as if we had gotten 4 of each and record this in codingRegions
+
 	k = k + 16; //move forward 32 spaces in genome
 
 	//get all the values into the table
@@ -375,29 +310,42 @@ GPGate::GPGate(Genome *genome, int startCodonAt) {
 	inputs.clear();
 	outputs.clear();
 	int _xDim, _yDim;
+	codingRegions.clear();
+
+	codingRegions[startCodonAt] = 0;
+	codingRegions[(startCodonAt + 1) % genome->sites.size()] = 0;
 
 	//find the first nucleotide that isn't part of the start codon
 	k = (startCodonAt + 2) % (int) genome->sites.size();
 
 	//get the dimensions of the table
+	codingRegions[k] = 1;
 	_xDim = 1 + (genome->sites[(k++) % genome->sites.size()] & 3);
+	codingRegions[k] = 1;
 	_yDim = 1 + (genome->sites[(k++) % genome->sites.size()] & 3);
 
 	//prepare the containers for the inputsand outputs addresses
 	inputs.resize(_yDim);
 	outputs.resize(_xDim);
 
-	for (i = 0; i < _yDim; i++)
-		inputs[i] = genome->sites[(k + i) % genome->sites.size()];
-	for (i = 0; i < _xDim; i++)
-		outputs[i] = genome->sites[(k + 4 + i) % genome->sites.size()];
+	getInputsAndOutputs(_yDim,_xDim,4,4,k,genome,codingRegions);
+	// get _yDim inputs and _xDim outputs, advance k (genomeIndex) as if we had gotten 4 of each and record this in codingRegions
+
+//	for (i = 0; i < _yDim; i++)
+//		inputs[i] = genome->sites[(k + i) % genome->sites.size()];
+//	for (i = 0; i < _xDim; i++)
+//		outputs[i] = genome->sites[(k + 4 + i) % genome->sites.size()];
+
 	k += 8;
+
+	codingRegions[k] = 2;
 	myGateType = genome->sites[(k++) % genome->sites.size()] % 8;
 	myValues.clear();
 	for (i = 0; i < _xDim; i++) {
 		intToFloatBitByBit V;
 		V.I = 0;
 		for (int j = 0; j < 4; j++)
+			codingRegions[k] = 2;
 			V.I = (V.I << (int) 8) + (int) genome->sites[(k++) % genome->sites.size()];
 		myValues.push_back(V.F);
 	}
@@ -483,6 +431,11 @@ FeedbackGate::FeedbackGate() {
 }
 
 FeedbackGate::FeedbackGate(Genome *genome, int startCodonAt) {
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// need to move to new Get Address
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	int i, j, k;
 	inputs.clear();
 	outputs.clear();
@@ -510,6 +463,8 @@ FeedbackGate::FeedbackGate(Genome *genome, int startCodonAt) {
 	negLevelOfFB.resize(nrNeg);
 
 	//get the Ioutputs addresses
+
+
 	for (i = 0; i < _yDim; i++)
 		inputs[i] = genome->sites[(k + i) % genome->sites.size()];
 	for (i = 0; i < _xDim; i++)
@@ -658,17 +613,22 @@ Thresholdgate::Thresholdgate(Genome *genome, int startCodonAt) {
 	outputs.clear();
 	int _xDim;
 
+	codingRegions.clear();
+
+	codingRegions[startCodonAt] = 0;
+	codingRegions[(startCodonAt + 1) % genome->sites.size()] = 0;
 	//find the first nucleotide that isn't part of the start codon
 	k = (startCodonAt + 2) % (int) genome->sites.size();
 
-	//The dimensions are different here, the first inputsis the trigger
+	//The dimensions are different here, the first inputs is the trigger
 	//the next one are the current state Counter
 	//the outputSize is the same, the first bit of the output is the ping
 	//the others are the current state counter, they are the same as the inputs!
 	//get the dimensions of the table
+	codingRegions[k] = 1;
 	_xDim = 1 + (genome->sites[(k++) % genome->sites.size()] & 7);
 
-	//prepare the containers for the inputsand outputs addresses
+	//prepare the containers for the inputs and outputs addresses
 	inputs.resize(_xDim);
 	outputs.resize(_xDim);
 
@@ -706,10 +666,10 @@ string Thresholdgate::description() {
 /* *** Fixed Epison Gate *** */
 /* this gate behaves like a deterministic gate with a constant externally set error */
 
-double FixedEpsilonGate::epsilon = 0.0;
+//double FixedEpsilonGate::epsilon = 0.0;
 
 FixedEpsilonGate::FixedEpsilonGate() {
-
+	epsilon = FixedEpsilonGateP; // in case you want to have different epsilon for different gates (who am I to judge?)
 }
 
 FixedEpsilonGate::FixedEpsilonGate(Genome *genome, int startCodonAt) {
@@ -736,16 +696,8 @@ FixedEpsilonGate::FixedEpsilonGate(Genome *genome, int startCodonAt) {
 	inputs.resize(_yDim);
 	outputs.resize(_xDim);
 
-	for (i = 0; i < _yDim; i++) {
-		codingRegions[(k + i) % genome->sites.size()] = 1; //maps these values
-		inputs[i] = genome->sites[(k + i) % genome->sites.size()]; //fill vector I
-		//cout << k+i << " is an index of an input\n";
-	}
-	for (i = 0; i < _xDim; i++) {
-		codingRegions[(k + 4 + i) % genome->sites.size()] = 1; //maps these values
-		outputs[i] = genome->sites[(k + 4 + i) % genome->sites.size()]; //fill vector O
-		//cout << k+4+i << " is an index of an output\n";
-	}
+	getInputsAndOutputs(_yDim,_xDim,4,4,k,genome,codingRegions);
+	// get _yDim inputs and _xDim outputs, advance k (genomeIndex) as if we had gotten 4 of each and record this in codingRegions
 
 	k = k + 16;
 	//get all the values into the table
@@ -785,7 +737,7 @@ void FixedEpsilonGate::update(vector<double> & states, vector<double> & nextStat
 		do {
 			// WAS output = rand() & (table.size() - 1); //pick a bitstring (random row in the table)
 			output = Random::getIndex(table.size()); //pick a bitstring (random row in the table)
-		} while (output == defaultOutput[input]); //until you pick the correct bitstring of outputs of the gate. If you don't, move on.
+		} while (output == defaultOutput[input]); //if you pick the a bit string which happens to match the correct output, pick again
 		for (size_t i = 0; i < outputs.size(); i++) {
 			nextStates[outputs[i]] += 1.0 * (double) ((output >> i) & 1);
 		}

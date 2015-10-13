@@ -32,11 +32,11 @@ int& Data::bitsPerBrainAddress = Parameters::register_parameter("bitsPerBrainAdd
 
 
 // implementation for LOD
-void Data::Add(int value, const string& key, map<string, string> & dataMap) {
+void Data::Add(int value, const string& key, map<string, string>& dataMap) {
 	dataMap[key] = to_string(value);
 }
 
-void Data::Add(double value, const string& key, map<string, string> & dataMap) {
+void Data::Add(double value, const string& key, map<string, string>& dataMap) {
 	dataMap[key] = to_string(value);
 }
 

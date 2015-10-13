@@ -1,132 +1,139 @@
 //
 //  main.cpp
-//  BasicMarkovBrainTemplate
+//  Red Berry Blue Berry World
 //
 //  Created by Arend Hintze on 5/29/15.
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
 //
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <vector>
+#include <memory>
 
 #include "Genome.h"
 #include "Optimizer.h"
 #include "World.h"
 #include "Data.h"
 #include "Agent.h"
-#include "MutationAnalyse.h"
+#include "Parameters.h"
+#include "Random.h"
 
-#ifdef _WIN32
-#include <process.h>
-#else
-#include <unistd.h>
-#endif
+//#include "RedBlueBerryWorld.h"
+//#include "BitAgent.h"
+#include "DecisionMakerWorld.h"
+
+
+//#ifdef _WIN32
+//#include <process.h>
+//#else
+//#include <unistd.h>
+//#endif
 
 using namespace std;
 
 int main(int argc, const char * argv[]) {
-	int updates=100;
-	int popSize=100;
-	int intervall=100;
-    int nrOfBrainStates=16;
-	vector<Genome*> population,newPopulation;
-	vector<double> W;
-	string LODFileName="";
-	string GENFileName="";
-	Optimizer *optimizer=(Optimizer*)new GA();
-//	Optimizer *optimizer=(Optimizer*)new Tournament();
-	World *world= (World*)new ExampleWorld();//new World();
-	bool gateFlags[8];
-	
-	//default command line paramters
-	Data::setDefaultParameter("updates", &updates, 1000);
-	Data::setDefaultParameter("popSize", &popSize, 100);
-	Data::setDefaultParameter("intervall", &intervall, 100);
-	Data::setDefaultParameter("LOD", &LODFileName, "defaultLOD.csv");
-	Data::setDefaultParameter("GEN", &GENFileName, "defaultGEN.csv");
-	Data::setDefaultParameter("repeats", &World::repeats, 1);
-	Data::setDefaultParameter("elitism", &Optimizer::elitism, -1);
-	Data::setDefaultParameter("pointMutationRate", Data::makeDefaultDouble("pointMutationRate"), 0.005);
-    Data::setDefaultParameter("brainSize", &nrOfBrainStates, 16);
-	Data::setDefaultParameter("probGate", &gateFlags[0], true);
-	Data::setDefaultParameter("detGate", &gateFlags[1], true);
-	Data::setDefaultParameter("fbGate", &gateFlags[2], true);
-	Data::setDefaultParameter("gpGate", &gateFlags[3], false);
-	Data::setDefaultParameter("thGate", &gateFlags[4], false);
-	Data::setDefaultParameter("epsilonGate", &gateFlags[5], false);
-	Data::setDefaultParameter("epsilon", &FixedEpsilonGate::epsilon, 0.1);
-	Data::setDefaultParameter("skipGate", Data::makeDefaultDouble("skipGate"), 0.0);
-	Data::setDefaultParameter("voidOutput", Data::makeDefaultDouble("voidOutput"), 0.0);
+	//setupParameters(argc, argv); // read command line and config file and set up parameters
 
-	Data::UseCommandLineParameters(argc,argv);
-	//setup Gates
-	for(int i=0;i<256;i++)
-		Gate::AddGate(i, NULL);
-	if(gateFlags[0]) Gate::AddGate(42,[](Genome* genome,int pos) {return new Gate(genome,pos);});
-	if(gateFlags[1]) Gate::AddGate(43,[](Genome* genome,int pos) {return new DeterministicGate(genome,pos);});
-	if(gateFlags[2]) Gate::AddGate(44,[](Genome* genome,int pos) {return new FeedbackGate(genome,pos);});
-	if(gateFlags[3]) Gate::AddGate(45,[](Genome* genome,int pos) {return new GPGate(genome,pos);});
-	if(gateFlags[4]) Gate::AddGate(46,[](Genome* genome,int pos) {return new Thresholdgate(genome,pos);});
-	if(gateFlags[5]) Gate::AddGate(47,[](Genome* genome,int pos) {return new FixedEpsilonGate(genome,pos);});
+	Parameters::initialize_parameters(argc, argv); // loads command line and configFile values into registered parameters
+												   // also writes out a config file if requested
 
+	//make a node map to handle genome value to brain state address look up.
+	Agent::makeNodeMap(Agent::defaultNodeMap, Data::bitsPerBrainAddress, Agent::defaultNrOfBrainStates);
 
-	//printf("Here!\n");
-	//exit(0);
+	Gate::setupGates(); // determines which gate types will be in use.
 
-	srand(getpid()); // need different includes for windows XPLATFORM
-	
-
-	//setup population
-	for(int i=0;i<popSize;i++){
-		Genome *G=new Genome();
-		G->fillRandom();
-		population.push_back((Genome*)G);
+	if (Data::randomSeed) {
+		Random::seed();
+		Random::seedAlt();
+	} else {
+		Random::seed(Data::repNumber);
+		Random::seedAlt(Data::repNumber+1);
 	}
-    
-	//evolution loop
-	for(Data::update=0;Data::update<updates;Data::update++){
-        //translate all genomes to agents
-        vector<Agent*> agents;
-        for(int i=0;i<popSize;i++)
-            agents.push_back(new Agent((Genome*)population[i],nrOfBrainStates));
-		
-        //evaluate each organism in the population using a World
-		W=world->evaluateFitness(agents,false);
 
-        //delete all agents
-        for(int i=0;i<popSize;i++)
-            delete agents[i];
-        
+
+	Optimizer *optimizer = (Optimizer*) new GA();
+	//Optimizer *optimizer = (Optimizer*) new Runoff();
+
+//	World *world = (World*) new RedBlueBerryWorld(); //new World();
+//    World *world= (World*)new fbLearnWorld(); //new World();
+    World *world= (World*)new DecisionMakerWorld(); //new World();
+
+
+
+	// Make the output directory for this rep
+	string makeDirCommand = "mkdir OUTPUT" + to_string(Data::repNumber);
+	const char * DirCommand = makeDirCommand.c_str();
+	system(DirCommand);
+
+
+	// setup population
+	vector<Genome*> population, newPopulation;
+	vector<double> W;
+	// a progenitor must exist - that is, one ancestor genome
+	// this genome is evaluated to populate the dataMap
+	Genome* progenitor = new Genome();
+	progenitor->sites.resize(1);
+	Agent *progenitorAgent = new Agent(progenitor,Agent::defaultNrOfBrainStates);
+	world->testIndividual(progenitorAgent,true);
+	delete progenitorAgent;
+	for (int i = 0; i < Data::popSize; i++) {
+		Genome *G = new Genome();
+		G->fillRandom();
+		G->ancestor = progenitor;
+		progenitor->referenceCounter++;
+		population.push_back(G);
+	}
+	progenitor->kill();
+
+	// evolution loop
+	for (Data::update = 0; Data::lastSaveUpdate < Data::updates; Data::update++) {
+		// translate all genomes to agents
+		vector<Agent*> agents;
+		for (int i = 0; i < Data::popSize; i++) {
+			agents.push_back(new Agent(population[i], Agent::defaultNrOfBrainStates));
+		}
+
+		// evaluate each organism in the population using a World
+		W = world->evaluateFitness(agents, false);
+
+		// delete all agents
+		for (int i = 0; i < Data::popSize; i++){
+			delete agents[i];
+		}
+
+		// remove agent pointers (which are pointing to null, since the agents were deleted)
+		agents.clear();
+
+		// write data to file and prune LOD every pruneInterval
+		if (Data::update % Data::pruneInterval == 0) {
+			Data::saveDataOnLOD(population[0]); // write out data and genomes
+			// data and genomes have now been written out up till the MRCA
+			// so all data and genomes from before the MRCA can be deleted
+			Genome * MRCA = Data::getMostRecentCommonAncestor(population[0]);
+			if (MRCA->ancestor != NULL) {
+				MRCA->ancestor->kill();
+				MRCA->ancestor=NULL; // MRCA is now the oldest genome!
+			}
+
+		}
+
 		//make next generation using an optimizer
-		newPopulation=optimizer->makeNextGeneration(population,W);
-		printf("update: %i maxFitness:%f\n",Data::update,optimizer->maxFitness);
-		for(int i=0;i<population.size();i++){
-			population[i]->kill();
-			population[i]=newPopulation[i];
+		newPopulation = optimizer->makeNextGeneration(population, W);
+		cout << "update: " << Data::update << "   maxFitness: " << optimizer->maxFitness << "\n";
+		for (size_t i = 0; i < population.size(); i++) {
+			population[i]->kill(); // this deletes the genome if it has no offspring
+			population[i] = newPopulation[i];
 		}
 		newPopulation.clear();
 	}
-    
-    //Add additional Data through analyze mode
-    //not needed in the basic example here
-    //*
-    //get the LOD
-    vector<Genome*> LOD=Data::getLOD(population[0]->ancestor);
-    //iterate over the LOD and have analyze on
-    //world will add all parameters you typically need to Data
-    for(int i=0;i<LOD.size();i++){
-        vector<Agent*> agents;
-        Agent *A=new Agent((Genome*)LOD[i],nrOfBrainStates);
-        agents.push_back(A);
-        world->evaluateFitness(agents, true);
-        delete A;
-    }
-    //*/
+	cout << "In main(): " << Data::klyphCount <<"\n";
 
-	//save data
-	Data::saveLOD(population[0]->ancestor, LODFileName);
-	Data::saveGEN(population[0]->ancestor, GENFileName, intervall);
-	Agent *A=new Agent((Genome*)population[0],16);
-	printf("%s\n",A->gateList().c_str());
-    return 0;
+	Genome * MRCA = Data::getMostRecentCommonAncestor(population[0]);
+
+	Agent *A = new Agent(MRCA, Agent::defaultNrOfBrainStates);
+	printf("%s\n", A->gateList().c_str());
+
+	return 0;
 }
+

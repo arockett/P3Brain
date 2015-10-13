@@ -13,12 +13,18 @@
 
 int Genome::genomeIDCounter = 0;
 
-int& Genome::initialGenomeSize = Parameters::register_parameter("initialGenomeSize", 5000,
-		"how long default genomes will be", "GENOME");
+int& Genome::initialGenomeSize = Parameters::register_parameter("genomeSizeInitial", 5000,
+		"starting size for genomes", "GENOME");
 double& Genome::pointMutationRate = Parameters::register_parameter("pointMutationRate", 0.005, "per site mutation rate",
 		"GENOME");
-double& Genome::insertionDeletionP = Parameters::register_parameter("insertionDeletionP", 0.005,
+double& Genome::insertionRate = Parameters::register_parameter("insertionRate", 0.02,
 		"per genome insertion/deletion rate", "GENOME");
+double& Genome::deletionRate = Parameters::register_parameter("deletionRate", 0.02,
+		"insertion rate per 1000 genome sites", "GENOME");
+int& Genome::minGenomeSize = Parameters::register_parameter("genomeSizeMin", 5000, "if the genome is smaller then this, mutations will only increse genome size",
+		"GENOME");
+int& Genome::maxGenomeSize = Parameters::register_parameter("GenomeSizeMax", 20000,
+		"if the genome is larger then this, mutations will only decrease genome size", "GENOME");
 
 //double Genome::insertionDeletionP=0.02;
 
@@ -70,28 +76,42 @@ void Genome::applyMutations(double mutationRate) {
 			//WAS sites[rand() % nucleotides] = rand() & 255;
 			sites[Random::getIndex(nucleotides)] = Random::getIndex(256);
 		}
-		//if ((((double) rand() / (double) RAND_MAX) < Genome::insertionDeletionP) && (sites.size() < 20000)) {
-		if (Random::P(Genome::insertionDeletionP) && (sites.size() < 20000)) {
-			//duplication
-			//WAS w = 128 + rand() % (512 - 128);
-			w = 128 + Random::getIndex(512 - 128); // w is between 128 and 255 (size of the chunk to be duplicated)
-			if (w >= nucleotides) { // if w is > the size of the genome, make w smaller!
-				w = nucleotides - 1;
+		//if ((((double) rand() / (double) RAND_MAX) < Genome::insertionDeletionP) && (sites.size() < MaxGenomeSize)) {
+		int numInsertions = Random::getBinomial((int) sites.size(), (Genome::insertionRate / 1000));
+		while (numInsertions > 0) {
+			//if (Random::getBinomial((int) sites.size(),Genome::insertionDeletionP/1000) && ((int) sites.size() < 20000)) {
+			if ((int) nucleotides < maxGenomeSize) {
+				//duplication
+				//WAS w = 128 + rand() % (512 - 128);
+				w = 128 + Random::getIndex(512 - 128);	// w is between 128 and 512 (size of the chunk to be duplicated)
+				if (w >= nucleotides) { // if w is >= the size of the genome, make w smaller!
+					w = nucleotides - 1;
+				}
+				s = Random::getIndex(nucleotides - w); // s is where to start copying from.
+				o = Random::getIndex(nucleotides); // o is where the chunk will be written
+				buffer.clear();
+				buffer.insert(buffer.begin(), sites.begin() + s, sites.begin() + s + w); // put s to (s+w) in buffer
+				sites.insert(sites.begin() + o, buffer.begin(), buffer.end()); // insert buffer into genome
 			}
-			s = Random::getIndex(nucleotides - w); // s is where to start copying from.
-			o = Random::getIndex(nucleotides); // o is where the chunk will be written
-			buffer.clear();
-			buffer.insert(buffer.begin(), sites.begin() + s, sites.begin() + s + w); // put s to (s+w) in buffer
-			sites.insert(sites.begin() + o, buffer.begin(), buffer.end()); // insert buffer into genome
+			nucleotides = (int) sites.size();
+			numInsertions--;
 		}
-		if (Random::P(Genome::insertionDeletionP) && (sites.size() > 1000)) {
-			//deletion
-			w = 128 + Random::getIndex(512 - 128); //  w is between 128 and 255 (size of the chunk to be deleted)
-			if (w >= nucleotides) { // if w is > the size of the genome, make w smaller!
-				w = nucleotides - 1;
+
+		int numDels = Random::getBinomial(nucleotides, (Genome::deletionRate / 1000));
+		while (numDels > 0) {
+
+			//if (Random::P(Genome::insertionDeletionP) && (nucleotides > 1000)) {
+			if (nucleotides > minGenomeSize) {
+				//deletion
+				w = 128 + Random::getIndex(512 - 128); //  w is between 128 and 255 (size of the chunk to be deleted)
+				if (w >= nucleotides) { // if w is >= the size of the genome, make w smaller!
+					w = nucleotides - 1;
+				}
+				s = Random::getIndex(nucleotides - w); // s is where to start deleting from.
+				sites.erase(sites.begin() + s, sites.begin() + s + w); // erase everything between s and (s+w)
 			}
-			s = Random::getIndex(nucleotides - w); // s is where to start deleting from.
-			sites.erase(sites.begin() + s, sites.begin() + s + w); // erase everything between s and (s+w)
+			nucleotides = (int) sites.size();
+			numDels--;
 		}
 	}
 }

@@ -27,7 +27,11 @@ private:
 public:
 	static int& initialGenomeSize;
 	static double& pointMutationRate;
-	static double& insertionDeletionP;
+	static double& insertionRate;
+	static double& deletionRate;
+	static int& minGenomeSize;
+	static int& maxGenomeSize;
+
 
 public:
 	int ID;

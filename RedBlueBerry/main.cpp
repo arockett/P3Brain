@@ -17,14 +17,18 @@
 #include "Data.h"
 #include "Agent.h"
 #include "Parameters.h"
-#include "RedBlueBerryWorld.h"
 #include "Random.h"
 
-#ifdef _WIN32
-#include <process.h>
-#else
-#include <unistd.h>
-#endif
+//#include "RedBlueBerryWorld.h"
+//#include "BitAgent.h"
+#include "DecisionMakerWorld.h"
+
+
+//#ifdef _WIN32
+//#include <process.h>
+//#else
+//#include <unistd.h>
+//#endif
 
 using namespace std;
 
@@ -48,10 +52,14 @@ int main(int argc, const char * argv[]) {
 	}
 
 
-	//Optimizer *optimizer = (Optimizer*) new GA();
-	Optimizer *optimizer = (Optimizer*) new Runoff();
+	Optimizer *optimizer = (Optimizer*) new GA();
+	//Optimizer *optimizer = (Optimizer*) new Runoff();
 
-	World *world = (World*) new RedBlueBerryWorld(); //new World();
+//	World *world = (World*) new RedBlueBerryWorld(); //new World();
+//    World *world= (World*)new fbLearnWorld(); //new World();
+    World *world= (World*)new DecisionMakerWorld(); //new World();
+
+
 
 	// Make the output directory for this rep
 	string makeDirCommand = "mkdir OUTPUT" + to_string(Data::repNumber);

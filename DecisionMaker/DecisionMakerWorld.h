@@ -21,6 +21,7 @@ using namespace std;
 class DecisionMakerWorld: public World{
 private:
 	double getPi(double p,double theAlpha);
+
 public:
 	static int thinkTime;
 	static double pNoise,piNoise,alpha;

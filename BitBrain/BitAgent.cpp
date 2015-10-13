@@ -10,52 +10,52 @@
 #include <math.h>
 
 int BitAgent::nrOfInsPerGate=3;
+vector<int> BitAgent::nodeMap;
+
 /* Bit Genome Part */
 BitAgent::BitAgent(){
 	
 }
 
 BitAgent::BitAgent(Genome *startGenome,int _nrOfStates){
-	nrOfStates=_nrOfStates;
-	states=new double[nrOfStates];
-	nextStates=new double[nrOfStates];
-	nodeMap=new int[256];
-	int bitsPerAddress=ceil(log(nrOfStates)/log(nrOfStates));
+	// WAS nrOfStates=_nrOfStates;
+	nrOfBrainStates=_nrOfStates;
+	states.resize(nrOfBrainStates);
+	nextStates.resize(nrOfBrainStates);
+	nodeMap.resize(256);
+	int bitsPerAddress= 1; // this = 1, right?? -> ceil(log(nrOfBrainStates)/log(nrOfBrainStates));
 	int bitsPerLogic=1<<nrOfInsPerGate;
 	int bitsPerGate=(bitsPerAddress*nrOfInsPerGate)+bitsPerLogic;
 	for(int i=0;i<256;i++)
-		nodeMap[i]=i%nrOfStates;
+		nodeMap[i]=i%nrOfBrainStates;
 	genome=startGenome;
 	if(_nrOfStates!=32){
 		printf("Nr of states MUST be 32!\n");
 		exit(0);
 	}
 	gates.clear();
-	for(int i=0;i<nrOfStates;i++){
+	for(int i=0;i<nrOfBrainStates;i++){
 		int I[nrOfInsPerGate];
 		int O=i;
 		int logic=0;
 		for(int j=0;j<nrOfInsPerGate;j++){
 			I[j]=0;
 			for(int k=0;k<bitsPerAddress;k++)
-				I[j]=(I[j]<<1)+startGenome->sites[(i*bitsPerGate)+(j*bitsPerAddress)+k]&1;
+				I[j]=(  (I[j]<<1)  +  startGenome->sites[(i*bitsPerGate)+(j*bitsPerAddress)+k]  )  &  1; // Is this correct - sum, then & 1?
 		}
 		for(int j=0;j<bitsPerLogic;j++)
-			logic=(logic<<1)+startGenome->sites[(bitsPerGate*nrOfInsPerGate)+j]&1;
-		DeterministicGate *G=new DeterministicGate();
+			logic=(  (logic<<1) + startGenome->sites[(bitsPerGate*nrOfInsPerGate)+j]  ) & 1; // Is this correct - sum, then & 1?
+		// WAS DeterministicGate *G=new DeterministicGate();
+		shared_ptr<DeterministicGate> G(new DeterministicGate());
 		G->setupForBits(I,nrOfInsPerGate, O, logic);
-		gates.push_back(G);
+		gates.resize((int)gates.size()+1);
+		gates[(int)gates.size()-1]=G;
 	}
-	for(int i=0;i<gates.size();i++)
+	for(size_t i=0;i<gates.size();i++)
 		gates[i]->applyNodeMap(nodeMap, _nrOfStates);
 }
 
 BitAgent::~BitAgent(){
-	for(int i=0;i<gates.size();i++)
-		delete gates[i];
-	delete states;
-	delete nextStates;
-	delete nodeMap;	
 }
 
 

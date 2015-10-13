@@ -23,6 +23,7 @@ class Data;
 class BitAgent:public Agent{
 public:
 	static int nrOfInsPerGate;
+	static vector<int> nodeMap;
 	BitAgent();
 	BitAgent(Genome *startGenome,int _nrOfStates);
 	~BitAgent();

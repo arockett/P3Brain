@@ -9,7 +9,6 @@
 #ifndef __BasicMarkovBrainTemplate__Gate__
 #define __BasicMarkovBrainTemplate__Gate__
 
-
 #include <deque>
 #include <functional>
 #include <math.h>
@@ -31,6 +30,7 @@ public:
 	static bool& usingThGate;
 	static bool& usingEpsiGate;
 	static double& voidOutPut;
+	static double& FixedEpsilonGateP;
 
 public:
 	static void setupGates();
@@ -46,47 +46,50 @@ public:
 	/*
 	 * gets an address with Agent::bitsPerBrainAddress bits
 	 * reads the required number of sites and then trims the leading bits.
+	 * if bitsPerBrainAddress = 10 and the next two sites were 14 (00001110) and 25(00011001)
+	 * the result would be 0000111000011001 masked with 0000001111111111 = 0000001000011001 or 537
 	 */
-	int getIOAddress(int& geomeLocation, const Genome *genome) {
+	int getIOAddress(int& genome_index, const Genome *genome) {
 		int bitCount;
-		int address = (int) genome->sites[geomeLocation];
-		geomeLocation = (geomeLocation + 1) % genome->sites.size();
+		int address = (int) genome->sites[genome_index]; // grab a byte from the genome
+		genome_index = (genome_index + 1) % genome->sites.size(); // advance the genome_index
 
-		for (bitCount = 8; Data::bitsPerBrainAddress > bitCount; bitCount += 8) {
-			address = (address << 8) | (int) genome->sites[geomeLocation];
-			geomeLocation = (geomeLocation + 1) % genome->sites.size();
+		for (bitCount = 8; Data::bitsPerBrainAddress > bitCount; bitCount += 8) { // now, one site (8 bits) at a time, add sites to the address, until we have enough bits
+			address = (address << 8) | (int) genome->sites[genome_index]; // shift the current value 8 bits left and add the next site
+			genome_index = (genome_index + 1) % genome->sites.size(); // advance the genome_index
 		}
 		int bitMask = 0;
-		for (bitCount = 0; bitCount < Data::bitsPerBrainAddress; bitCount++) {
+		for (bitCount = 0; bitCount < Data::bitsPerBrainAddress; bitCount++) { // create the bit mask - this is used to trim off unwanted leading bits from the address
 			bitMask = (bitMask << 1) | 1;
 		}
-		return address & bitMask;
+		return address & bitMask; // trim the address with the bitMask
 	}
 
-	void getInputsAndOutputs(const int& insCount, const int& outsCount, const int& insMaxCount,
-			const int& outsMaxCount, int& genome_index, const Genome* genome, map<int, int>& codingRegions) { // (#in #out max#in max#out,currentIndexInGenome,genome,codingRegions)
-		int currLocation = genome_index;
-		for (auto i = 0; i < insCount; i++) {
-			int lastLocation = currLocation;
-			inputs[i] = getIOAddress(currLocation, genome);
-			while (lastLocation < currLocation) {
-				codingRegions[lastLocation++] = 1;
-			}
+	/*
+	 * Gets "howMany" addresses, advances the genome_index buy "howManyMax" addresses and updates "codingRegions" with the addresses being used.
+	 */
+	void getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, int& genome_index,
+			const Genome* genome, map<int, int>& codingRegions) {
+		int lastLocation = genome_index; //make a note of where were are now so we can get codingRegions later
+		for (auto i = 0; i < howMany; i++) { // for the number of addresses we need
+			addresses[i] = getIOAddress(genome_index, genome); // get an address
 		}
-		genome_index += ((ceil((double) Data::bitsPerBrainAddress / 8.0)) * 4);
-
-		currLocation = genome_index;
-		for (auto i = 0; i < outsCount; i++) {
-
-			int lastLocation = currLocation;
-			outputs[i] = getIOAddress(currLocation, genome);
-			while (lastLocation < currLocation) {
-				codingRegions[lastLocation++] = 1;
-			}
+		while (lastLocation < genome_index) { // fill in codingRegions between lastLocation and currLocation
+			codingRegions[lastLocation] = 1;  // with 1 (connections)
+			lastLocation++;
 		}
-		genome_index += ((ceil((double) Data::bitsPerBrainAddress / 8.0)) * 4);
+		genome_index += ((ceil(((double) Data::bitsPerBrainAddress) / 8.0)) * (howManyMax-howMany));
+		// move the genome_index ahead to account not only the addresses we need, but the total number of possible addresses
 	}
 
+	/*
+	 * a shortcut for getSomeBrainAddresses() when you need to inputs, outputs and want to set them to this Agents inputs and outputs
+	 */
+	void getInputsAndOutputs(const int& insCount, const int& outsCount, const int& insMaxCount, const int& outsMaxCount,
+			int& genome_index, const Genome* genome, map<int, int>& codingRegions) { // (#in, #out, max#in, max#out,currentIndexInGenome,genome,codingRegions)
+		getSomeBrainAddresses(insCount, insMaxCount, inputs, genome_index, genome, codingRegions);
+		getSomeBrainAddresses(outsCount, outsMaxCount, outputs, genome_index, genome, codingRegions);
+	}
 
 	virtual ~Gate();
 
@@ -109,7 +112,7 @@ public:
 
 	void setupForBits(int* Ins, int nrOfIns, int Out, int logic);
 
-	double voidOutput;
+	//double voidOutput;
 };
 
 /* ***** ADVANCED IMPLEMENTATION! - ENTER ON OWN RISK ***** */
@@ -159,7 +162,7 @@ class FixedEpsilonGate: public DeterministicGate {
 private:
 public:
 	vector<int> defaultOutput;
-	static double epsilon;
+	double epsilon;
 	FixedEpsilonGate();
 	FixedEpsilonGate(Genome *genome, int startCodonAt);
 	virtual ~FixedEpsilonGate();
