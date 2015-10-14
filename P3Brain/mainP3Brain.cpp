@@ -53,7 +53,7 @@ using namespace std;
 #include "MiddleLayer.h"
 #include "Population.h"
 #include "Configuration.h"
-#include "Optimizer.h"
+#include "BitStringOptimizer.h"
 #include "OptimizationCollection.h"
 #include "Record.h"
 #include "Experiments.h"
