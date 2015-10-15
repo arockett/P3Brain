@@ -17,7 +17,7 @@ class BitAgent : public Agent
 {
 public:
     BitAgent();
-    BitAgent(const vector<bool>& genome);
+    BitAgent(const vector<bool>& genome, int _nrOfStates);
     virtual ~BitAgent();
 };
 

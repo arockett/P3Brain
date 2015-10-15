@@ -1,4 +1,3 @@
-
 /******************************************************************************
 * file: BitAgent.cpp
 *
@@ -14,7 +13,7 @@ BitAgent::BitAgent()
 }
 
 
-BitAgent::BitAgent(const vector<bool>& genome)
+BitAgent::BitAgent(const vector<bool>& genome, int _nrOfStates)
 {
 }
 
