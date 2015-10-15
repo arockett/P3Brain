@@ -86,8 +86,10 @@ int main( int argc, char * argv[] )
     config.dump( cfg_out );
     cfg_out.close();
 
-    // choose the problem and the optimization method
+    // choose the problem (Evaluator)
     auto problem = config.get<evaluation::pointer>( "problem" );
+
+    // choose the optimizer (P3, LTGA, HBOA, etc...)
     auto optimizer_method = config.get<optimize::pointer>( "optimizer" );
 
     if ( config.get<string>( "experiment" ) == "bisection" )
@@ -143,6 +145,8 @@ int main( int argc, char * argv[] )
         meta << metadata;
         meta.close();
     }
+
+    cin.ignore();
 
     return 0;
 }

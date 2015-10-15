@@ -17,6 +17,9 @@
 #include "Configuration.h"
 #include "Util.h"
 
+// Include the Markov World header to use for the MarkovWorld Evaluator
+#include "World.h"
+
 #define PI 3.14159265
 
 using std::vector;
@@ -264,6 +267,28 @@ class External : public Evaluator {
   string in_file;
 };
 
+/*
+ * The 'MarkovWorld' evaluator essentially uses a World defined in the
+ * MarkovBrain project to evaluate P3 bit strings and return a fitness
+ * to the P3 algorithm.
+ */
+class MarkovWorld : public Evaluator {
+public:
+    MarkovWorld(Configuration& config, int run_number)
+    {
+    }
+    float evaluate(const vector<bool>& solution) override;
+    create_evaluator(MarkovWorld);
+
+    void setWorld(World& world) {
+        trainingGround = world;
+    }
+
+private:
+    World trainingGround;
+};
+
+
 // This mapping is used to convert a problem's name into an instance
 // of that Evaluator object
 namespace evaluation {
@@ -282,6 +307,7 @@ static std::unordered_map<string, pointer> lookup( {
     { "IsingSpinGlass", IsingSpinGlass::create },
     { "Rastrigin", Rastrigin::create },
     { "External", External::create },
+    { "MarkovWorld", MarkovWorld::create },
 });
 }
 
