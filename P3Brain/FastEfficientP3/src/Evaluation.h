@@ -274,15 +274,9 @@ class External : public Evaluator {
  */
 class MarkovWorld : public Evaluator {
 public:
-    MarkovWorld(Configuration& config, int run_number)
-    {
-    }
+    MarkovWorld(Configuration& config, int run_number);
     float evaluate(const vector<bool>& solution) override;
     create_evaluator(MarkovWorld);
-
-    void setWorld(World& world) {
-        trainingGround = world;
-    }
 
 private:
     World trainingGround;
