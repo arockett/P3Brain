@@ -20,6 +20,7 @@ using namespace std;
 class Optimizer{
 public:
 	static int& elitism;
+	static int& tournamentSize;
 
 public:
 	double maxFitness;
@@ -39,12 +40,6 @@ class P3:Optimizer{
 
 class Tournament:Optimizer{
 public:
-	virtual vector<Genome*> makeNextGeneration(vector<Genome*> population,vector<double> W);
-};
-
-class Runoff:Optimizer{
-public:
-	int strengthOfSelection = Data::popSize/50+1;
 	virtual vector<Genome*> makeNextGeneration(vector<Genome*> population,vector<double> W);
 };
 
