@@ -19,9 +19,9 @@
 #include "Parameters.h"
 #include "Random.h"
 
-//#include "RedBlueBerryWorld.h"
+#include "RedBlueBerryWorld.h"
 //#include "BitAgent.h"
-#include "DecisionMakerWorld.h"
+//#include "DecisionMakerWorld.h"
 
 
 //#ifdef _WIN32
