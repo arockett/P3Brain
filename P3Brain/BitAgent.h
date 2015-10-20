@@ -8,6 +8,8 @@
 
 #include "Agent.h"
 
+#include <memory>
+
 /*
  * The BitAgent class is a type of Agent that uses a bit string to represent
  * a Markov Brain. It can be used in conjunction with P3 and the MarkovWorld
@@ -17,7 +19,10 @@ class BitAgent : public Agent
 {
 public:
     BitAgent();
-    BitAgent(const vector<bool>& genome, int _nrOfStates);
+    BitAgent(const vector<bool>& genome);
     virtual ~BitAgent();
+
+private:
+    shared_ptr<vector<bool>> mGenome;
 };
 
