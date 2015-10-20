@@ -279,7 +279,7 @@ public:
     create_evaluator(MarkovWorld);
 
 private:
-    World trainingGround;
+    shared_ptr<World> trainingGround = nullptr;
 };
 
 

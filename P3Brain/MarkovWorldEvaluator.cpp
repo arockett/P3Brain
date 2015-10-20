@@ -25,7 +25,7 @@
 */
 MarkovWorld::MarkovWorld(Configuration& config, int run_number)
 {
-    trainingGround = ExampleWorld();
+    trainingGround = shared_ptr<World>(new AmpersandWorld());
 }
 
 /*
@@ -35,9 +35,9 @@ MarkovWorld::MarkovWorld(Configuration& config, int run_number)
 * function will be called by P3, allowing us to translate the bit string to
 * a Markov Brain and evaluate its fitness in the 'trainingGround'.
 */
-float MarkovWorld::evaluate(const vector<bool>& solution) {
-
+float MarkovWorld::evaluate(const vector<bool>& solution)
+{
     BitAgent agent = BitAgent(solution);
 
-    return (float)trainingGround.testIndividual(&agent, false);
+    return trainingGround->testIndividual(&agent, false);
 }

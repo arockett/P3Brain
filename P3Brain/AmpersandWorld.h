@@ -14,7 +14,7 @@ public:
     AmpersandWorld();
     virtual ~AmpersandWorld();
 
-    virtual vector<double> evaluateFitness(vector<Agent*> agents, bool analyse);
-    virtual double testIndividual(Agent *agent, bool analyse);
+    vector<double> evaluateFitness(vector<Agent*> agents, bool analyse) override;
+    double testIndividual(Agent *agent, bool analyse) override;
 };
 
