@@ -9,6 +9,7 @@
 //#include <random>
 
 #include "Genome.h"
+#include "Global.h"
 
 #include "../Utilities/Random.h"
 
@@ -33,7 +34,9 @@ Genome::Genome() {
 	referenceCounter = 1;
 	ancestor = NULL;
 	ID = registerGenome();
+	birthDate = Global::update;
 	data["ID"] = to_string(ID);
+	data["birthDate"] = to_string(birthDate);
 }
 
 Genome::Genome(Genome* from) {
@@ -42,7 +45,9 @@ Genome::Genome(Genome* from) {
 	from->referenceCounter++;
 	copyGenome(from);
 	ID = registerGenome();
+	birthDate = Global::update;
 	data["ID"] = to_string(ID);
+	data["birthDate"] = to_string(birthDate);
 }
 
 Genome::~Genome() {
@@ -153,4 +158,54 @@ void Genome::saveToFile(FILE *F) {
 	for (size_t i = 0; i < sites.size(); i++)
 		fprintf(F, "	%i", sites[i]);
 	fprintf(F, "\n");
+}
+
+
+/*
+ * Given a genome and a key(to data that has been saved into "dataMap"
+ * return a list of the value for key for genome and all genomes ancestors ordered oldest first
+ */
+vector<string> Genome::GetLODItem(string key) {
+	vector<string> list;
+	Genome* G = this;
+	while (G != NULL) {
+		list.insert(list.begin(), Data::Get(key,G->data));
+		G = G->ancestor;
+	}
+	return list;
+}
+
+/*
+ * Given a genome
+ * return a list of genomes containing genome and all genomes ancestors ordered oldest first
+ */
+vector<Genome*> Genome::getLOD() {
+	vector<Genome*> list;
+	Genome * G = this;
+	while (G != NULL) { // which G has an ancestor
+		//printf("IN getLOD - %i %i\n",G->ID,G->referenceCounter);
+		list.insert(list.begin(), G); // add that ancestor to the front of the LOD list
+		G = G->ancestor; // move to the ancestor
+	}
+	return list;
+}
+
+/*
+ * find the Most Recent Common Ancestor
+ * uses getLOD to get a list of ancestors (oldest first). seaches the list for the first ancestor with a referenceCounter > 1
+ * that is the first reference counter with more then one offspring.
+ * If none are found, then return "from"
+ * Note: a currently active genome has a referenceCounter = 1 (it has not reproduced yet, it only has 1 for it's self)
+ *       a dead genome with a referenceCounter = 0 will not be in the LOD (it has no offspring and will have been pruned)
+ *       a dead genome with a referenceCounter = 1 has only one offspring.
+ *       a dead genome with a referenceCounter > 1 has more then one spring with surviving lines of decent.
+ */
+Genome* Genome::getMostRecentCommonAncestor() {
+	vector<Genome*> LOD = this->getLOD(); // get line of decent from "from"
+	for (auto G : LOD) { // starting at the oldest ancestor, moving to the youngest
+		//printf("IN getMRCA - %i %i\n",G->ID,G->referenceCounter);
+		if (G->referenceCounter > 1) // the first (oldest) ancestor with more then one surviving offspring is the oldest
+			return G;
+	}
+	return this; // a currently active genome will have referenceCounter = 1 but may be the Most Recent Common Ancestor
 }

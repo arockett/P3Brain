@@ -79,7 +79,7 @@ int main(int argc, const char * argv[]) {
 	progenitor->kill();
 
 	// evolution loop
-	for (Global::update = 0; Data::lastSaveUpdate < Global::updates; Global::update++) {
+	for (Global::update = 0; (Data::lastSaveUpdate < Global::updates) && (Global::update <= (Global::updates + Global::terminateAfter)); Global::update++) {
 		// translate all genomes to agents
 		vector<Agent*> agents;
 		for (int i = 0; i < Global::popSize; i++) {
@@ -99,10 +99,10 @@ int main(int argc, const char * argv[]) {
 
 		// write data to file and prune LOD every pruneInterval
 		if (Global::update % Global::pruneInterval == 0) {
-			Data::saveDataOnLOD(population[0]); // write out data and genomes
+			Data::saveDataOnLOD(population[0],1); // write out data and genomes
 			// data and genomes have now been written out up till the MRCA
 			// so all data and genomes from before the MRCA can be deleted
-			Genome * MRCA = Data::getMostRecentCommonAncestor(population[0]);
+			Genome * MRCA = population[0]->getMostRecentCommonAncestor();
 			if (MRCA->ancestor != NULL) {
 				MRCA->ancestor->kill();
 				MRCA->ancestor=NULL; // MRCA is now the oldest genome!
@@ -119,10 +119,14 @@ int main(int argc, const char * argv[]) {
 		}
 		newPopulation.clear();
 	}
+	if (Data::lastSaveUpdate < Global::updates){
+		Data::saveDataOnLOD(population[0],0); // write out data and genomes, but don't require MRCA
+	}
 
-	Genome * MRCA = Data::getMostRecentCommonAncestor(population[0]);
+	Genome * MRCA = population[0]->getMostRecentCommonAncestor();
 
 	Agent *A = new Agent(MRCA, Agent::defaultNrOfBrainStates);
+	printf("MRCA - born on: %d\n", MRCA->birthDate);
 	printf("%s\n", A->gateList().c_str());
 
 	return 0;

@@ -37,6 +37,7 @@ public:
 
 public:
 	int ID;
+	int birthDate;
 	Genome* ancestor;
 	int referenceCounter;
 	vector<unsigned char> sites;
@@ -53,6 +54,10 @@ public:
 	virtual void makePointMutation();
 	virtual void saveToFile(FILE *F);
 	virtual void kill();
+
+	virtual vector<string> GetLODItem(string key);
+	virtual vector<Genome*> getLOD();
+	virtual Genome* getMostRecentCommonAncestor();
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Genome__) */

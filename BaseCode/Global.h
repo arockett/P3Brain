@@ -26,6 +26,7 @@ public:
 	static int& repNumber; // number used for output directory names and random seed
 	static bool& seedRandom; // if this is true, seed with a random value
 	static int& updates; // run until there is a MCRA at this time
+	static int& terminateAfter; // if evolution is still running this many updates after updates, stop running. Use population[0] for LOD
 	static int& popSize; // number of genomes in the population
 	static int& dataInterval; // how often to write out data
 	static int& genomeInterval; // how often to write out genomes
