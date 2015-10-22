@@ -26,14 +26,14 @@ BitGate::~BitGate()
 void BitGate::update( double *states, double *nextStates )
 {
     int outIndex = 0;
-    if( Bit( states[I[0]] ) )
+    if( (bool)states[I[0]] )
     {
         outIndex += 2;
     }
-    if( Bit( states[I[1]] ) )
+    if( (bool)states[I[1]] )
     {
         ++outIndex;
     }
 
-    nextStates[mGateIndex] = Bit( mLogic[outIndex] );
+    nextStates[mGateIndex] = (double)mLogic[outIndex];
 }

@@ -25,7 +25,7 @@
 */
 MarkovWorld::MarkovWorld(Configuration& config, int run_number)
 {
-    trainingGround = shared_ptr<World>(new AmpersandWorld());
+    trainingGround = shared_ptr<World>( new AmpersandWorld( AmpersandWorld::Logic::XOR ) );
 }
 
 /*
