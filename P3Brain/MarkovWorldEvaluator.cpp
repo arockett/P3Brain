@@ -26,7 +26,8 @@
 MarkovWorld::MarkovWorld(Configuration& config, int run_number)
 {
     vector<LogicalWorld::Logic> args = {
-        LogicalWorld::Logic::XOR
+        LogicalWorld::Logic::XOR,
+        LogicalWorld::Logic::NAND
     };
 
     trainingGround = shared_ptr<World>( new LogicalWorld( args ) );

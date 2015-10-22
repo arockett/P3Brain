@@ -44,6 +44,11 @@ vector<double> LogicalWorld::evaluateFitness(vector<Agent*> agents, bool analyse
 }
 
 double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
+    // If there aren't enough non-input nodes to check then return 0 fitness
+    // because the bit string is not long enough
+    if( logic.size() > agent->nrOfStates - 2 )
+        return 0.0;
+
     double fitness = 0.0;
 
     /*
