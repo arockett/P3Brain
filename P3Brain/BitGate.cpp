@@ -9,12 +9,12 @@
 
 
 BitGate::BitGate( const vector<int>& ins, int id, const vector<bool>& logic ) :
-    mGateIndex(id),
-    mLogic(logic)
+    gateIndex(id),
+    logic(logic)
 {
     I = ins;
     O.clear();
-    O.push_back( mGateIndex );
+    O.push_back( gateIndex );
 }
 
 
@@ -35,5 +35,5 @@ void BitGate::update( double *states, double *nextStates )
         ++outIndex;
     }
 
-    nextStates[mGateIndex] = (double)mLogic[outIndex];
+    nextStates[gateIndex] = (double)logic[outIndex];
 }

@@ -18,7 +18,7 @@ public:
     void update( double *states, double *nextStates ) override;
 
 private:
-    int mGateIndex;
-    vector<bool> mLogic;
+    int gateIndex;
+    vector<bool> logic;
 };
 

@@ -30,13 +30,14 @@ public:
         TRUE    // 1111
     };
 
-    LogicalWorld(Logic l = AND);
+    LogicalWorld(const vector<Logic>& outputLogics = vector<Logic>());
     virtual ~LogicalWorld();
 
     vector<double> evaluateFitness(vector<Agent*> agents, bool analyse) override;
     double testIndividual( Agent *agent, bool analyse ) override;
 
 private:
-    Logic logic;
+    vector<Logic> logic;
+    double fitnessIncrement;
 };
 

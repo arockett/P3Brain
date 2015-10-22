@@ -25,7 +25,7 @@ BitAgent::BitAgent(const vector<bool>& startGenome)
     // need to use it since the destructor of Agent calls delete on nodeMap
     nodeMap = new int[1];
     
-    mGenome = make_shared<vector<bool>>(startGenome);
+    genome = make_shared<vector<bool>>(startGenome);
     gates.clear();
     for( int i = 2; i < nrOfStates; i++ )
     {

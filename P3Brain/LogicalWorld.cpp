@@ -7,9 +7,27 @@
 
 #include "LogicalWorld.h"
 
+unsigned input1( unsigned );
+unsigned input2( unsigned );
+unsigned input3( unsigned );
+unsigned input4( unsigned );
 
-LogicalWorld::LogicalWorld( Logic l ) : logic(l)
+
+LogicalWorld::LogicalWorld( const vector<Logic>& outputLogics )
 {
+    if( outputLogics.size() > 0 )
+    {
+        for( auto l : outputLogics )
+        {
+            logic.push_back( l );
+        }
+    }
+    else
+    {
+        logic.push_back( AND );
+    }
+
+    fitnessIncrement = 1.0 / 4 / logic.size();
 }
 
 
@@ -28,11 +46,6 @@ vector<double> LogicalWorld::evaluateFitness(vector<Agent*> agents, bool analyse
 double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
     double fitness = 0.0;
 
-    unsigned input1 = ( logic & 8 ) >> 3;
-    unsigned input2 = ( logic & 4 ) >> 2;
-    unsigned input3 = ( logic & 2 ) >> 1;
-    unsigned input4 = logic & 1;
-
     /*
      * Test the agent to make them develop an "and" gate
      */
@@ -46,7 +59,11 @@ double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
         agent->states[1] = 0.0;
         agent->updateStates();
     }
-    if( agent->states[agent->nrOfStates - 1] == (double)input1 ) fitness += .25;
+    for( int i = 0; i < logic.size(); i++ )
+    {
+        if( agent->states[agent->nrOfStates - (logic.size() - i)] == (double)input1(logic[i]) )
+            fitness += fitnessIncrement;
+    }
 
     // 0 1
     agent->resetBrain();
@@ -58,7 +75,11 @@ double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
         agent->states[1] = 1.0;
         agent->updateStates();
     }
-    if( agent->states[agent->nrOfStates - 1] == (double)input2 ) fitness += .25;
+    for( int i = 0; i < logic.size(); i++ )
+    {
+        if( agent->states[agent->nrOfStates - ( logic.size() - i )] == (double)input2( logic[i] ) )
+            fitness += fitnessIncrement;
+    }
     
     // 1 0
     agent->resetBrain();
@@ -70,7 +91,11 @@ double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
         agent->states[1] = 0.0;
         agent->updateStates();
     }
-    if( agent->states[agent->nrOfStates - 1] == (double)input3 ) fitness += .25;
+    for( int i = 0; i < logic.size(); i++ )
+    {
+        if( agent->states[agent->nrOfStates - ( logic.size() - i )] == (double)input3( logic[i] ) )
+            fitness += fitnessIncrement;
+    }
 
     // 1 1
     agent->resetBrain();
@@ -82,7 +107,34 @@ double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
         agent->states[1] = 1.0;
         agent->updateStates();
     }
-    if( agent->states[agent->nrOfStates - 1] == (double)input4 ) fitness += .25;
+    for( int i = 0; i < logic.size(); i++ )
+    {
+        if( agent->states[agent->nrOfStates - ( logic.size() - i )] == (double)input4( logic[i] ) )
+            fitness += fitnessIncrement;
+    }
 
     return fitness;
+}
+
+/*
+ * Some utility functions
+ */
+unsigned input1( unsigned l )
+{
+    return ( l & 8 ) >> 3;
+}
+
+unsigned input2( unsigned l )
+{
+    return ( l & 4 ) >> 2;
+}
+
+unsigned input3( unsigned l )
+{
+    return ( l & 2 ) >> 1;
+}
+
+unsigned input4( unsigned l )
+{
+    return l & 1;
 }

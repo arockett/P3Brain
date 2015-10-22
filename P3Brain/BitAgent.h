@@ -23,6 +23,6 @@ public:
     virtual ~BitAgent();
 
 private:
-    shared_ptr<vector<bool>> mGenome;
+    shared_ptr<vector<bool>> genome;
 };
 
