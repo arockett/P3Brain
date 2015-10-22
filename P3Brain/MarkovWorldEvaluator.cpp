@@ -17,7 +17,7 @@
 #include "Evaluation.h"
 
 #include "BitAgent.h"
-#include "AmpersandWorld.h"
+#include "LogicalWorld.h"
 
 /*
 * Make sure you set trainingGround to an instance of the World you
@@ -25,7 +25,7 @@
 */
 MarkovWorld::MarkovWorld(Configuration& config, int run_number)
 {
-    trainingGround = shared_ptr<World>( new AmpersandWorld( AmpersandWorld::Logic::XOR ) );
+    trainingGround = shared_ptr<World>( new LogicalWorld( LogicalWorld::Logic::XOR ) );
 }
 
 /*

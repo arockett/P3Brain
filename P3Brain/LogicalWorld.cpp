@@ -1,31 +1,31 @@
 /******************************************************************************
-* file: AmpersandWorld.cpp
+* file: LogicalWorld.cpp
 *
 * author: Aaron Beckett
 * date: 10/15/2015
 ******************************************************************************/
 
-#include "AmpersandWorld.h"
+#include "LogicalWorld.h"
 
 
-AmpersandWorld::AmpersandWorld( Logic l ) : logic(l)
+LogicalWorld::LogicalWorld( Logic l ) : logic(l)
 {
 }
 
 
-AmpersandWorld::~AmpersandWorld()
+LogicalWorld::~LogicalWorld()
 {
 }
 
 
-vector<double> AmpersandWorld::evaluateFitness(vector<Agent*> agents, bool analyse) {
+vector<double> LogicalWorld::evaluateFitness(vector<Agent*> agents, bool analyse) {
     vector<double> fitnesses;
     for (int i = 0; i<agents.size(); i++)
         fitnesses.push_back(testIndividual(agents[i], analyse));
     return fitnesses;
 }
 
-double AmpersandWorld::testIndividual(Agent *agent, bool analyse) {
+double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
     double fitness = 0.0;
 
     unsigned input1 = ( logic & 8 ) >> 3;
