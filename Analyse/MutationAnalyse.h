@@ -18,10 +18,10 @@
 #include <vector>
 
 #include "../BaseCode/Agent.h"
-#include "../BaseCode/Data.h"
 #include "../BaseCode/Genome.h"
 #include "../BaseCode/World.h"
 #include "../Worlds/RedBlueBerryWorld.h"
+#include "../Utilities/Data.h"
 
 
 

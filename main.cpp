@@ -12,7 +12,6 @@
 #include <vector>
 
 #include "BaseCode/Agent.h"
-#include "BaseCode/Data.h"
 #include "BaseCode/Genome.h"
 #include "BaseCode/Global.h"
 #include "BaseCode/Optimizer.h"
@@ -20,6 +19,7 @@
 
 #include "Utilities/Parameters.h"
 #include "Utilities/Random.h"
+#include "Utilities/Data.h"
 
 #include "Worlds/RedBlueBerryWorld.h"
 
@@ -67,7 +67,7 @@ int main(int argc, const char * argv[]) {
 	Genome* progenitor = new Genome();
 	progenitor->sites.resize(1);
 	Agent *progenitorAgent = new Agent(progenitor,Agent::defaultNrOfBrainStates);
-	world->testIndividual(progenitorAgent,true);
+	world->testIndividual(progenitorAgent,false);
 	delete progenitorAgent;
 	for (int i = 0; i < Global::popSize; i++) {
 		Genome *G = new Genome();
@@ -79,7 +79,8 @@ int main(int argc, const char * argv[]) {
 	progenitor->kill();
 
 	// evolution loop
-	for (Global::update = 0; (Data::lastSaveUpdate < Global::updates) && (Global::update <= (Global::updates + Global::terminateAfter)); Global::update++) {
+	Global::update = 0;
+	while ((Global::savedUpTo(Global::updates)==false) && (Global::update <= (Global::updates + Global::terminateAfter))) {
 		// translate all genomes to agents
 		vector<Agent*> agents;
 		for (int i = 0; i < Global::popSize; i++) {
@@ -99,7 +100,8 @@ int main(int argc, const char * argv[]) {
 
 		// write data to file and prune LOD every pruneInterval
 		if (Global::update % Global::pruneInterval == 0) {
-			Data::saveDataOnLOD(population[0],1); // write out data and genomes
+			population[0]->saveDataOnLOD("data.dat",{"update","ID","score","food1","food2","switches","total"}); // write out data and genomes
+			population[0]->saveDataOnLOD("history.dat",{"update","ID","birthDate"});
 			// data and genomes have now been written out up till the MRCA
 			// so all data and genomes from before the MRCA can be deleted
 			Genome * MRCA = population[0]->getMostRecentCommonAncestor();
@@ -110,18 +112,21 @@ int main(int argc, const char * argv[]) {
 
 		}
 
+		Global::update++;
+
 		//make next generation using an optimizer
 		newPopulation = optimizer->makeNextGeneration(population, W);
-		cout << "update: " << Global::update << "   maxFitness: " << optimizer->maxFitness << "\n";
+		cout << "update: " << Global::update-1 << "   maxFitness: " << optimizer->maxFitness << "\n";
 		for (size_t i = 0; i < population.size(); i++) {
 			population[i]->kill(); // this deletes the genome if it has no offspring
 			population[i] = newPopulation[i];
 		}
 		newPopulation.clear();
 	}
-	if (Data::lastSaveUpdate < Global::updates){
-		Data::saveDataOnLOD(population[0],0); // write out data and genomes, but don't require MRCA
-	}
+
+	cout << "Finished Evolution Loop... force file writes\n";
+	population[0]->saveDataOnLOD("data.dat",{"update","ID","score","food1","food2","switches","total"},0);
+	population[0]->saveDataOnLOD("history.dat",{"update","ID","birthDate"},0);
 
 	Genome * MRCA = population[0]->getMostRecentCommonAncestor();
 

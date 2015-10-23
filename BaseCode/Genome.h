@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <vector>
 
-#include "Data.h"
+#include "../Utilities/Data.h"
 
 #include "../Utilities/Parameters.h"
 
@@ -41,8 +41,8 @@ public:
 	Genome* ancestor;
 	int referenceCounter;
 	vector<unsigned char> sites;
-	map <string,string> data;
-	
+	DataMap dataMap;
+
 	Genome();
 	Genome(Genome* from);
 	virtual ~Genome();
@@ -58,6 +58,12 @@ public:
 	virtual vector<string> GetLODItem(string key);
 	virtual vector<Genome*> getLOD();
 	virtual Genome* getMostRecentCommonAncestor();
+
+	virtual void saveDataOnLOD(string fileName, vector<string> keys, int requireConvergance); // for genome, save to file data for this genome and it's LOD
+	virtual void saveDataOnLOD(string fileName);
+	virtual void saveDataOnLOD(string fileName, vector<string> keys);
+	virtual void saveDataOnLOD(string fileName, int requireConvergance); // for genome, save to file data for this genome and it's LOD
+
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Genome__) */

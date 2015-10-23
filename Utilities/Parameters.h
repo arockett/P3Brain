@@ -8,9 +8,6 @@
 #include <stdexcept>
 #include <unordered_map>
 
-//using std::string;
-//using std::unordered_map;
-//using std::ostream;
 using namespace std;
 
 // This structure aggregates all information about a single configurable parameter

@@ -12,6 +12,7 @@
 
 #include "../Utilities/Random.h"
 #include "../Utilities/Utilities.h"
+#include "../Utilities/Data.h"
 
 
 int& World::repeats = Parameters::register_parameter("repeats", 1, "Number of times to test each Genome per generation","WORLD");
@@ -25,13 +26,15 @@ World::~World(){
 
 vector<double> World::evaluateFitness(vector<Agent*> agents,bool analyse){
 	vector<double> W;
-	for(size_t i=0;i<agents.size();i++)
+	for(size_t i=0;i<agents.size();i++){
+		agents[i]->genome->dataMap.Set("update",Global::update);
 		W.push_back(testIndividual(agents[i],analyse));
+	}
 	return W;
 }
 
 double World::testIndividual(Agent *agent,bool analyse){
-	Data::Add(0.0, "W", agent->genome->data);
+	agent->genome->dataMap.Set("W",0.0);
     return 1.0;
 }
 
@@ -71,7 +74,7 @@ double ExampleWorld::testIndividual(Agent *agent,bool analyse){
 			}
 		}
 	}
-	Data::Add(fitness, "W", agent->genome->data);
+	agent->genome->dataMap.Set("W", fitness);
 	
 	return fitness;
 }
@@ -121,12 +124,16 @@ vector<double> MultiThreadWorld::evaluateFitness(vector<Agent*> agents,bool anal
         threads.push_back(thread(threadedEvaluateFitness, nthreads*chunksize, agents.size(), ref(agents), ref(World::repeats)));
     }
     for (thread& t : threads) t.join(); // wait for all threads to finish
-	for(size_t i=0;i<agents.size();i++)
-		W.push_back((double)atof(Data::Get("W", agents[i]->genome->data).c_str()));
+	for(size_t i=0;i<agents.size();i++){
+		double thisW;
+		std::stringstream ss(agents[i]->genome->dataMap.Get("W"));
+		ss >> thisW; // use a string stream to convert string to double
+		W.push_back(thisW);
+	}
 	return W;
 }
 
 void MultiThreadWorld::staticTestIndividual(Agent *agent,bool analyse){
-	Data::Add((double)rand()/(double)RAND_MAX, "W", agent->genome->data);
+	agent->genome->dataMap.Set("W",Random::getDouble(1));
 }
 

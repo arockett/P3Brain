@@ -259,17 +259,17 @@ double RedBlueBerryWorld::testIndividual(Agent *agent, bool analyse) {
 	if (score < 0.0) {
 		score = 0.0;
 	}
-	Data::Add(switched, "switches", agent->genome->data);
+	agent->genome->dataMap.Set("switches", switched);
 	int total_eaten = 0;
 	for (int i = 0; i < foodSourceTypes; i++) {
 		total_eaten += eaten[i];
 		string temp_name = "food" + to_string(i + 1);
-		Data::Add(eaten[i], temp_name, agent->genome->data);
+		agent->genome->dataMap.Set(temp_name, eaten[i]);
 	}
-	Data::Add(total_eaten, "total", agent->genome->data);
-	Data::Add(score, "score", agent->genome->data);
+	agent->genome->dataMap.Set("total",total_eaten);
+	agent->genome->dataMap.Set("score",score);
 	if (analyse) {
-		Data::Add(Analyse::computeAtomicPhi(stateCollector, agent->nrOfBrainStates), "phi", agent->genome->data);
+		agent->genome->dataMap.Set("phi", Analyse::computeAtomicPhi(stateCollector, agent->nrOfBrainStates));
 	}
 	return score;
 }

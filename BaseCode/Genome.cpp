@@ -12,19 +12,20 @@
 #include "Global.h"
 
 #include "../Utilities/Random.h"
+#include "../Utilities/Utilities.h"
 
 int Genome::genomeIDCounter = 0;
 
-int& Genome::initialGenomeSize = Parameters::register_parameter("genomeSizeInitial", 5000,
-		"starting size for genomes", "GENOME");
+int& Genome::initialGenomeSize = Parameters::register_parameter("genomeSizeInitial", 5000, "starting size for genomes",
+		"GENOME");
 double& Genome::pointMutationRate = Parameters::register_parameter("pointMutationRate", 0.005, "per site mutation rate",
 		"GENOME");
 double& Genome::insertionRate = Parameters::register_parameter("insertionRate", 0.02,
 		"per genome insertion/deletion rate", "GENOME");
 double& Genome::deletionRate = Parameters::register_parameter("deletionRate", 0.02,
 		"insertion rate per 1000 genome sites", "GENOME");
-int& Genome::minGenomeSize = Parameters::register_parameter("genomeSizeMin", 5000, "if the genome is smaller then this, mutations will only increse genome size",
-		"GENOME");
+int& Genome::minGenomeSize = Parameters::register_parameter("genomeSizeMin", 5000,
+		"if the genome is smaller then this, mutations will only increse genome size", "GENOME");
 int& Genome::maxGenomeSize = Parameters::register_parameter("GenomeSizeMax", 20000,
 		"if the genome is larger then this, mutations will only decrease genome size", "GENOME");
 
@@ -35,8 +36,8 @@ Genome::Genome() {
 	ancestor = NULL;
 	ID = registerGenome();
 	birthDate = Global::update;
-	data["ID"] = to_string(ID);
-	data["birthDate"] = to_string(birthDate);
+	dataMap.Set("ID", ID);
+	dataMap.Set("birthDate", birthDate);
 }
 
 Genome::Genome(Genome* from) {
@@ -46,8 +47,8 @@ Genome::Genome(Genome* from) {
 	copyGenome(from);
 	ID = registerGenome();
 	birthDate = Global::update;
-	data["ID"] = to_string(ID);
-	data["birthDate"] = to_string(birthDate);
+	dataMap.Set("ID", ID);
+	dataMap.Set("birthDate", birthDate);
 }
 
 Genome::~Genome() {
@@ -160,7 +161,6 @@ void Genome::saveToFile(FILE *F) {
 	fprintf(F, "\n");
 }
 
-
 /*
  * Given a genome and a key(to data that has been saved into "dataMap"
  * return a list of the value for key for genome and all genomes ancestors ordered oldest first
@@ -169,7 +169,7 @@ vector<string> Genome::GetLODItem(string key) {
 	vector<string> list;
 	Genome* G = this;
 	while (G != NULL) {
-		list.insert(list.begin(), Data::Get(key,G->data));
+		list.insert(list.begin(), G->dataMap.Get(key));
 		G = G->ancestor;
 	}
 	return list;
@@ -209,3 +209,64 @@ Genome* Genome::getMostRecentCommonAncestor() {
 	}
 	return this; // a currently active genome will have referenceCounter = 1 but may be the Most Recent Common Ancestor
 }
+
+/*
+ * Save the data from dataMap and genomes for one genomes ("from") LOD from the last save until the last convergance
+ * this function assumes
+ * a) all of the fields in dataMap that genomes will be writting to have been created
+ * b) all genomes have the same fields
+ * if a) and or b) are not true, the function will still work, but the output will be mislabeled garbage
+ *
+ * if requireConvergance then data will not be output for times were the LOD has not yet converged
+ * else set current agent as MRCA and output all data (used for early termination) - THIS CAN ONLY BE DONE ONE TIME
+ * !!!! AFTER requireConvergance = 0 has been run for a file name IT'S filesLastUpdate IS NOT ACCURATE !!!!
+ */
+void Genome::saveDataOnLOD(string fileName, vector<string> keys, int requireConvergance = 1) {
+	//string local_DataFileName = "OUTPUT" + to_string(Global::repNumber) + "/" + Global::DataFileName;
+	//string local_GenomeFileName = "OUTPUT" + to_string(Global::repNumber) + "/" + Global::GenomeFileName;
+
+	if (Global::filesNextUpdate.find(fileName) == Global::filesNextUpdate.end()) { // if file has not be initialized yet
+		Global::filesLastUpdate[fileName] = -1; // it's never output anything
+		Global::filesNextUpdate[fileName] = nextInSeq("needs to be string with seq for this fileName", -1);
+	}
+
+	vector<Genome*> LOD = getLOD(); // get line of decent
+	Genome* MRCA;
+	if (requireConvergance) {				// if we require convergance
+		MRCA = getMostRecentCommonAncestor();
+	} else {								// we don't care about covergance - use this guy!
+		MRCA = this->ancestor;
+	}
+
+	int outputTime = 0; // this update, relative to the last save update
+
+	// while we have not caught up with the current update
+	// and we have not passed the MRCA
+	// and we have not passed Global::updates (how long we wanted this to run)
+	cout << fileName << " " << outputTime << " " << Global::filesLastUpdate[fileName] << " " << outputTime + Global::filesLastUpdate[fileName] << "\n";
+	while ((outputTime + Global::filesLastUpdate[fileName] <= Global::update) && (LOD[outputTime] != MRCA)
+			&& (outputTime + Global::filesLastUpdate[fileName] <= Global::updates)) {
+		if ((outputTime + Global::filesLastUpdate[fileName]) == Global::filesNextUpdate[fileName]) {
+			// write data to DATAFILE if this is a dataInterval
+			LOD[outputTime]->dataMap.writeToFile(fileName, keys);
+			Global::filesNextUpdate[fileName] = nextInSeq("needs to be string with seq for this fileName",
+					outputTime + Global::filesLastUpdate[fileName]);
+		}
+		outputTime++;
+	}
+	Global::filesLastUpdate[fileName]+=outputTime;
+	cout << fileName << "   " << Global::filesLastUpdate[fileName] << "\n";
+
+}
+
+void Genome::saveDataOnLOD(string fileName) {
+	saveDataOnLOD(fileName, { }, 1);
+}
+
+void Genome::saveDataOnLOD(string fileName, vector<string> keys) {
+	saveDataOnLOD(fileName, keys, 1);
+}
+void Genome::saveDataOnLOD(string fileName, int requireConvergance = 1) {
+	saveDataOnLOD(fileName, { }, requireConvergance);
+}
+

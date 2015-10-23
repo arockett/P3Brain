@@ -14,7 +14,6 @@
 #include <vector>
 
 #include "Agent.h"
-#include "Data.h"
 
 using namespace std;
 
