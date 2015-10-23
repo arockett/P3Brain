@@ -61,7 +61,7 @@ public:
 
 	string Get(const string& key); // retrieve the string from a dataMap with "key"
 	void writeToFile(const string& fileName, const vector<string>& keys); // write from this DataMap to fileName the data associated with keys
-	vector<string> GetKeys();
+	vector<string> getKeys();
 	void Clear();
 };
 

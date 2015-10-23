@@ -16,9 +16,19 @@
 #include <string>
 #include <vector>
 
-//#include "Genome.h"
-
 using namespace std;
+
+class FileTracker {
+public :
+	static map<string,int> filesNextUpdate; // for each filename, when is it's next update?
+	static map<string,int> filesLastUpdate; // for each filename, when was it last pruned?
+	static map<string,vector<string>> fileColumns; // names of columns for each file
+	static map<string,int> fileUpdateIntervals; // how often does this file write?
+
+	static int savedUpTo(int testUpdate); // returns true if all files next save is > "testUpdate" i.e. have we saved all the data?
+	static void initFile(string fileName, vector<string> keys, int interval);
+	static bool exists(string fileName);
+};
 
 class Global {
 public:
@@ -39,10 +49,6 @@ public:
 	// non configurable values (not set directly by config methods)
 	static int update;  // the current "time"
 	static set<int> inUseGateTypes; // this is global - a list of the start codeons for gates being used
-	static map<string,int> filesNextUpdate; // for each filename, when was it last updated?
-	static map<string,int> filesLastUpdate; // for each filename, when was it last updated?
-
-	static int savedUpTo(int testUpdate); // returns true if all files next save is > "testUpdate" i.e. have we saved all the data?
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Global__) */

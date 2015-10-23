@@ -15,6 +15,8 @@
 #include "../Utilities/Utilities.h"
 
 int Genome::genomeIDCounter = 0;
+Genome* Genome::MRCA;
+
 
 int& Genome::initialGenomeSize = Parameters::register_parameter("genomeSizeInitial", 5000, "starting size for genomes",
 		"GENOME");
@@ -221,52 +223,39 @@ Genome* Genome::getMostRecentCommonAncestor() {
  * else set current agent as MRCA and output all data (used for early termination) - THIS CAN ONLY BE DONE ONE TIME
  * !!!! AFTER requireConvergance = 0 has been run for a file name IT'S filesLastUpdate IS NOT ACCURATE !!!!
  */
-void Genome::saveDataOnLOD(string fileName, vector<string> keys, int requireConvergance = 1) {
-	//string local_DataFileName = "OUTPUT" + to_string(Global::repNumber) + "/" + Global::DataFileName;
-	//string local_GenomeFileName = "OUTPUT" + to_string(Global::repNumber) + "/" + Global::GenomeFileName;
+void Genome::saveDataOnLOD(string fileName, int flush) {
 
-	if (Global::filesNextUpdate.find(fileName) == Global::filesNextUpdate.end()) { // if file has not be initialized yet
-		Global::filesLastUpdate[fileName] = -1; // it's never output anything
-		Global::filesNextUpdate[fileName] = nextInSeq("needs to be string with seq for this fileName", -1);
+	if (FileTracker::exists(fileName) == false) { // if file has not be initialized yet
+		cout << "  saveDataOnLOD() :: \"" << fileName << "\" was not initialized. I better do that now!!";
+		FileTracker::initFile(fileName, dataMap.getKeys(), Global::dataInterval);
 	}
 
-	vector<Genome*> LOD = getLOD(); // get line of decent
-	Genome* MRCA;
-	if (requireConvergance) {				// if we require convergance
-		MRCA = getMostRecentCommonAncestor();
-	} else {								// we don't care about covergance - use this guy!
-		MRCA = this->ancestor;
+	vector<Genome*> LOD = getLOD(); 		// get line of decent
+	Genome* effective_MRCA;
+	if (flush) {							// if flush then we don't care about convergance
+		effective_MRCA = this->ancestor; 	// this assumes that a population was created, but not tested at the end of the evolution loop!
+	} else {								// find the convergance point in the LOD.
+		effective_MRCA = MRCA;
 	}
 
-	int outputTime = 0; // this update, relative to the last save update
+	int outputTime = 0; // this update, relative to the last save update, I.e. oldest genome on LOD is now LOD[0]
 
 	// while we have not caught up with the current update
 	// and we have not passed the MRCA
 	// and we have not passed Global::updates (how long we wanted this to run)
-	cout << fileName << " " << outputTime << " " << Global::filesLastUpdate[fileName] << " " << outputTime + Global::filesLastUpdate[fileName] << "\n";
-	while ((outputTime + Global::filesLastUpdate[fileName] <= Global::update) && (LOD[outputTime] != MRCA)
-			&& (outputTime + Global::filesLastUpdate[fileName] <= Global::updates)) {
-		if ((outputTime + Global::filesLastUpdate[fileName]) == Global::filesNextUpdate[fileName]) {
-			// write data to DATAFILE if this is a dataInterval
-			LOD[outputTime]->dataMap.writeToFile(fileName, keys);
-			Global::filesNextUpdate[fileName] = nextInSeq("needs to be string with seq for this fileName",
-					outputTime + Global::filesLastUpdate[fileName]);
+	while ((outputTime + FileTracker::filesLastUpdate[fileName] <= Global::update) && (LOD[outputTime] != effective_MRCA)
+			&& (outputTime + FileTracker::filesLastUpdate[fileName] <= Global::updates)) {
+		if ((outputTime + FileTracker::filesLastUpdate[fileName]) == FileTracker::filesNextUpdate[fileName]) {
+			// write data to file if this is a dataInterval
+			LOD[outputTime]->dataMap.writeToFile(fileName, FileTracker::fileColumns[fileName]);
+			FileTracker::filesNextUpdate[fileName] = nextInStepList(FileTracker::fileUpdateIntervals[fileName],
+					outputTime + FileTracker::filesLastUpdate[fileName]);
 		}
 		outputTime++;
 	}
-	Global::filesLastUpdate[fileName]+=outputTime;
-	cout << fileName << "   " << Global::filesLastUpdate[fileName] << "\n";
-
+	FileTracker::filesLastUpdate[fileName] += outputTime;
 }
 
-void Genome::saveDataOnLOD(string fileName) {
-	saveDataOnLOD(fileName, { }, 1);
+void Genome::flushDataOnLOD(string fileName) {
+	Genome::saveDataOnLOD(fileName, 1);
 }
-
-void Genome::saveDataOnLOD(string fileName, vector<string> keys) {
-	saveDataOnLOD(fileName, keys, 1);
-}
-void Genome::saveDataOnLOD(string fileName, int requireConvergance = 1) {
-	saveDataOnLOD(fileName, { }, requireConvergance);
-}
-

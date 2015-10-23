@@ -19,7 +19,7 @@ string DataMap::Get(const string& key) {
 	return data[key];
 }
 
-void DataMap::writeToFile(const string& fileName, const vector<string>& keys = { }) {
+void DataMap::writeToFile(const string& fileName, const vector<string>& keys) {
 	string headerStr = "";
 	string dataStr = "";
 	if (keys.size() > 0) {
@@ -45,13 +45,11 @@ void DataMap::writeToFile(const string& fileName, const vector<string>& keys = {
 	FileManager::writeToFile(fileName, dataStr, headerStr); // write the data to file!
 }
 
-vector<string> DataMap::GetKeys() {
+vector<string> DataMap::getKeys() {
 	vector<string> keys;
 	for (auto element : data) {
-		cout << element.first << " ";
 		keys.push_back(element.first);
 	}
-	cout << "\n";
 	return (keys);
 }
 
