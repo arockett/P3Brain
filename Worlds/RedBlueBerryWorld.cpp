@@ -216,6 +216,7 @@ double RedBlueBerryWorld::testIndividual(Agent *agent, bool analyse) {
 			score += foodRewards[grid[xp][yp] - 1]; // you ate a food... good for you!
 			lastFood = grid[xp][yp]; // remember the last food eaten
 			eaten[grid[xp][yp] - 1]++; // track the number of each berry eaten
+			agent->genome->dataMap.Append("foodList",grid[xp][yp]);
 			grid[xp][yp] = 0; // clear this location
 		}
 		if ((output2 == 0) || (allowMoveAndEat == 1)) { // if we did not eat or we allow moving and eating in the same world update
@@ -258,6 +259,9 @@ double RedBlueBerryWorld::testIndividual(Agent *agent, bool analyse) {
 	}
 	if (score < 0.0) {
 		score = 0.0;
+	}
+	if (!agent->genome->dataMap.fieldExists("foodList")){
+			agent->genome->dataMap.Append("foodList",0);
 	}
 	agent->genome->dataMap.Set("switches", switched);
 	int total_eaten = 0;

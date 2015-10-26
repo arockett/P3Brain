@@ -44,12 +44,13 @@ public:
 	void Append(const string& key, const Type& value) {
 		// is this value in the DataMap already?
 		if (data.find(key) == data.end()) { // if this key is not already in the DataMap
-			data[key] = "[" + mkString(value) + "]";
+			data[key] = "\"[" + mkString(value) + "]\"";
 		} else { // the key already exists
-			if (data[key][0] == '[') { // if this key is already associated with a list
+			if ((data[key][0] == '\"') && (data[key][1] = '[')) { // if this key is already associated with a list
 				string workingString = data[key];
-				workingString.pop_back(); // strip off trailing ']'
-				workingString = workingString + "," + mkString(value) + "]"; // add ",value]"
+				workingString.pop_back(); // strip off trailing ']"'
+				workingString.pop_back(); // strip off trailing ']"'
+				workingString = workingString + "," + mkString(value) + "]\""; // add ",value]"
 				data[key] = workingString; // put new list back in DataMap
 			} else { // this key exists, but the associated element is not a list
 				cout
@@ -60,6 +61,8 @@ public:
 	}
 
 	string Get(const string& key); // retrieve the string from a dataMap with "key"
+	bool fieldExists(const string& key); // return true if a data map contains "key"
+
 	void writeToFile(const string& fileName, const vector<string>& keys); // write from this DataMap to fileName the data associated with keys
 	vector<string> getKeys();
 	void Clear();

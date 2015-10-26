@@ -19,6 +19,10 @@ string DataMap::Get(const string& key) {
 	return data[key];
 }
 
+bool DataMap::fieldExists(const string& key) {
+	return (data.find(key)!=data.end());
+}
+
 void DataMap::writeToFile(const string& fileName, const vector<string>& keys) {
 	string headerStr = "";
 	string dataStr = "";
