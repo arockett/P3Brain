@@ -60,8 +60,8 @@ public:
 	virtual vector<Genome*> getLOD();
 	virtual Genome* getMostRecentCommonAncestor();
 
-	virtual void saveDataOnLOD(string fileName, int flush = 0); // for genome, save to file data for this genome and it's LOD
-	virtual void flushDataOnLOD(string fileName); // used at the end of a run to save data newer then the MRCA / convergance point
+	virtual void saveDataOnLOD(int flush = 0); // for genome, save to file data for this genome and it's LOD
+	virtual void flushDataOnLOD(); // used at the end of a run to save data newer then the MRCA / convergance point
 
 };
 

@@ -42,22 +42,7 @@ Agent::Agent(Genome* startGenome, int _nrOfBrainStates) { //this is a constructo
 	}
 
 	inOutReMap();
-	/*
-	 for (auto gate : gates) {
-	 cout << "remapped inputs: ";
-	 for (int x = 0; x < gate->inputs.size(); x++) {
-	 cout << gate->inputs[x] << " ";
-	 }
-	 cout << "\n";
-	 cout << "remapped outputs: ";
-	 for (int x = 0; x < gate->outputs.size(); x++) {
-	 cout << gate->outputs[x] << " ";
-	 }
-	 cout << "\n";
-	 }
-	 */
-	//cout << "leaving agent contructor\n";
-
+	genome->dataMap.Set("gates",gates.size());
 }
 
 Agent::~Agent() {

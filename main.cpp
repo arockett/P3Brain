@@ -58,8 +58,8 @@ int main(int argc, const char * argv[]) {
 //	const char * DirCommand = makeDirCommand.c_str();
 //	system(DirCommand);
 
-	FileTracker::initFile("data.dat", {"update","score","food1","food2","switches"},10);
-	FileTracker::initFile("history.dat", {"update","birthDate","ID"},25);
+	//Global::files["world.csv"] = {"update","score","food1","food2","switches"};
+	//Global::files["history.csv"] = {"update","birthDate","ID"};
 
 	// setup population
 	vector<Genome*> population, newPopulation;
@@ -67,6 +67,7 @@ int main(int argc, const char * argv[]) {
 	// a progenitor must exist - that is, one ancestor genome
 	// this genome is evaluated to populate the dataMap
 	Genome* progenitor = new Genome();
+	progenitor->birthDate=-1;
 	Genome::MRCA = progenitor;
 	progenitor->sites.resize(1);
 	Agent *progenitorAgent = new Agent(progenitor,Agent::defaultNrOfBrainStates);
@@ -83,7 +84,9 @@ int main(int argc, const char * argv[]) {
 
 	// evolution loop
 	Global::update = 0;
-	while ((FileTracker::savedUpTo(Global::updates)==false) && (Global::update <= (Global::updates + Global::terminateAfter))) {
+	while ((Global::nextDataWrite <= Global::updates) &&
+			(Global::nextGenomeWrite <= Global::updates) &&
+			(Global::update <= (Global::updates + Global::terminateAfter))) {
 		// translate all genomes to agents
 		vector<Agent*> agents;
 		for (int i = 0; i < Global::popSize; i++) {
@@ -104,15 +107,14 @@ int main(int argc, const char * argv[]) {
 		// write data to file and prune LOD every pruneInterval
 		if (Global::update % Global::pruneInterval == 0) {
 			Genome::MRCA = population[0]->getMostRecentCommonAncestor();
-			population[0]->saveDataOnLOD("data.dat"); // write out data and genomes
-			population[0]->saveDataOnLOD("history.dat");
-
+			population[0]->saveDataOnLOD(); // write out data and genomes
 			// data and genomes have now been written out up till the MRCA
 			// so all data and genomes from before the MRCA can be deleted
 			if (Genome::MRCA->ancestor != NULL) {
 				Genome::MRCA->ancestor->kill();
 				Genome::MRCA->ancestor=NULL; // MRCA is now the oldest genome!
 			}
+			Global::lastPrune = Genome::MRCA->birthDate; // this will hold the time of the oldest genome in RAM
 
 		}
 
@@ -129,10 +131,7 @@ int main(int argc, const char * argv[]) {
 	}
 
 	cout << "Finished Evolution Loop... force file writes\n";
-	population[0]->flushDataOnLOD("data.dat");
-	population[0]->flushDataOnLOD("history.dat");
-	population[0]->flushDataOnLOD("endTest.dat");
-
+	population[0]->flushDataOnLOD();
 
 	Genome * MRCA = population[0]->getMostRecentCommonAncestor();
 

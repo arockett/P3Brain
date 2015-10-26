@@ -29,42 +29,9 @@ string& Global::GenomeFileName = Parameters::register_parameter("genomeFileName"
 int& Global::bitsPerBrainAddress = Parameters::register_parameter("bitsPerBrainAddress", 10,
 		"how many bits are evaluated to determine the brain addresses", "AGENT");
 
+map<string,vector<string>> Global::files; // list of files in use with their meta data
 
-map<string,int> FileTracker::filesNextUpdate; // for each filename, when is it's next update?
-map<string,int> FileTracker::filesLastUpdate; // for each filename, when was it last pruned?
-map<string,vector<string>> FileTracker::fileColumns; // names of columns for each file
-map<string,int> FileTracker::fileUpdateIntervals; // how often does this file write?
+int Global::lastPrune = 0; // last time Genome was Pruned
 
-
-// returns true if all files next save is > "testUpdate" i.e. have we saved all the data?
-int FileTracker::savedUpTo(int testUpdate) {
-	if (filesNextUpdate.size() == 0) { // there are no files being tracked
-		cout << "  In FileTracker::savedUpTo() : Warning... No files have been Initialized yet (this may indicate a problem...)\n";
-		return false;
-	}
-	int savedUpTo = testUpdate + 1;
-	for (auto i : filesNextUpdate) {
-		savedUpTo = (i.second < savedUpTo) ? i.second : savedUpTo;
-	}
-	return (savedUpTo == testUpdate + 1);
-}
-
-void FileTracker::initFile(string fileName, vector<string> keys, int interval) {
-	if (exists(fileName) == false) { // if file has not be initialized yet
-		cout << "  Initializing file : \"" << fileName << "\".\n";
-		filesLastUpdate[fileName] = -1; // it's never output anything
-		filesNextUpdate[fileName] = nextInStepList(interval, filesLastUpdate[fileName]); // returns 0 - here for future Seq object
-		fileUpdateIntervals[fileName] = interval;
-		fileColumns[fileName] = keys;
-	} else {
-		cout << "  In FileTracker::initFile() :: ERROR! Attempt to initialize file \"" << fileName << "\" more then once failed.\n  Exiting!\n";
-		exit(1);
-	}
-}
-
-bool FileTracker::exists(string fileName){
-	if (filesNextUpdate.find(fileName) == filesNextUpdate.end()) {
-		return false;
-	}
-	return true;
-}
+int Global::nextDataWrite; // next time data files will be written to disk
+int Global::nextGenomeWrite; // next time a genome file will be written to genome.csv

@@ -17,7 +17,6 @@
 int Genome::genomeIDCounter = 0;
 Genome* Genome::MRCA;
 
-
 int& Genome::initialGenomeSize = Parameters::register_parameter("genomeSizeInitial", 5000, "starting size for genomes",
 		"GENOME");
 double& Genome::pointMutationRate = Parameters::register_parameter("pointMutationRate", 0.005, "per site mutation rate",
@@ -223,39 +222,46 @@ Genome* Genome::getMostRecentCommonAncestor() {
  * else set current agent as MRCA and output all data (used for early termination) - THIS CAN ONLY BE DONE ONE TIME
  * !!!! AFTER requireConvergance = 0 has been run for a file name IT'S filesLastUpdate IS NOT ACCURATE !!!!
  */
-void Genome::saveDataOnLOD(string fileName, int flush) {
+void Genome::saveDataOnLOD(int flush) {
 
-	if (FileTracker::exists(fileName) == false) { // if file has not be initialized yet
-		cout << "  saveDataOnLOD() :: \"" << fileName << "\" was not initialized. I better do that now!!";
-		FileTracker::initFile(fileName, dataMap.getKeys(), Global::dataInterval);
+	if (Global::files.find("data.csv") == Global::files.end()) { // if file has not be initialized yet
+		cout << "  saveDataOnLOD() :: \"data.csv\" is being initialized\n";
+		Global::files["data.csv"] = dataMap.getKeys();
 	}
+
 
 	vector<Genome*> LOD = getLOD(); 		// get line of decent
 	Genome* effective_MRCA;
 	if (flush) {							// if flush then we don't care about convergance
-		effective_MRCA = this->ancestor; 	// this assumes that a population was created, but not tested at the end of the evolution loop!
+		effective_MRCA = this->ancestor; // this assumes that a population was created, but not tested at the end of the evolution loop!
 	} else {								// find the convergance point in the LOD.
 		effective_MRCA = MRCA;
 	}
 
-	int outputTime = 0; // this update, relative to the last save update, I.e. oldest genome on LOD is now LOD[0]
 
-	// while we have not caught up with the current update
-	// and we have not passed the MRCA
-	// and we have not passed Global::updates (how long we wanted this to run)
-	while ((outputTime + FileTracker::filesLastUpdate[fileName] <= Global::update) && (LOD[outputTime] != effective_MRCA)
-			&& (outputTime + FileTracker::filesLastUpdate[fileName] <= Global::updates)) {
-		if ((outputTime + FileTracker::filesLastUpdate[fileName]) == FileTracker::filesNextUpdate[fileName]) {
-			// write data to file if this is a dataInterval
-			LOD[outputTime]->dataMap.writeToFile(fileName, FileTracker::fileColumns[fileName]);
-			FileTracker::filesNextUpdate[fileName] = nextInStepList(FileTracker::fileUpdateIntervals[fileName],
-					outputTime + FileTracker::filesLastUpdate[fileName]);
+	while ((effective_MRCA->birthDate > Global::nextDataWrite) && (Global::nextDataWrite <= Global::updates)) { // if there is convergence before the next data interval
+		for (auto file : Global::files) {
+			LOD[Global::nextDataWrite - Global::lastPrune]->dataMap.writeToFile(file.first, file.second);
 		}
-		outputTime++;
+		Global::nextDataWrite += Global::dataInterval;
 	}
-	FileTracker::filesLastUpdate[fileName] += outputTime;
+
+	while ((effective_MRCA->birthDate > Global::nextGenomeWrite) && (Global::nextGenomeWrite <= Global::updates)) { // if there is convergence before the next data interval
+		string dataString;
+		if (LOD[Global::nextGenomeWrite - Global::lastPrune]->sites.size() > 0) {
+			for (auto site : LOD[Global::nextGenomeWrite - Global::lastPrune]->sites) {
+				dataString += mkString((int) site) + FileManager::separator;
+			}
+			dataString.pop_back(); // remove extra separator at end
+		}
+		dataString = mkString(Global::nextGenomeWrite) + FileManager::separator + "\"[" + dataString + "]\"";
+		FileManager::writeToFile("genome.csv", dataString, "update,genome");
+		Global::nextGenomeWrite += Global::genomeInterval;
+	}
+
 }
 
-void Genome::flushDataOnLOD(string fileName) {
-	Genome::saveDataOnLOD(fileName, 1);
+void Genome::flushDataOnLOD() {
+	cout << "Flushing remaining data to files!\n";
+	Genome::saveDataOnLOD(1);
 }
