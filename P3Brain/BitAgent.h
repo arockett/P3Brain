@@ -18,11 +18,21 @@
 class BitAgent : public Agent
 {
 public:
+    enum Decoder {
+        FixedInput,
+        FixedLogic,
+        Hypercube
+    };
+
     BitAgent();
-    BitAgent(const vector<bool>& genome);
+    BitAgent( const vector<bool>& startGenome, int numInputStates, Decoder decoder = FixedInput, int gateComplexity = 2, int cubeDimension = 8 );
     virtual ~BitAgent();
 
 private:
     shared_ptr<vector<bool>> genome;
+
+    void DecodeFixedInputGenome( const vector<bool>&, int, int );
+    void DecodeFixedLogicGenome( const vector<bool>&, int, int );
+    void DecodeHypercubeGenome( const vector<bool>&, int, int, int );
 };
 

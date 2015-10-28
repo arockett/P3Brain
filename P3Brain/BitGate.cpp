@@ -25,6 +25,7 @@ BitGate::~BitGate()
 
 void BitGate::update( double *states, double *nextStates )
 {
+    // TODO: make this more flexible for different number of inputs
     int outIndex = 0;
     if( (bool)states[I[0]] )
     {
