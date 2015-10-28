@@ -60,6 +60,7 @@ int main(int argc, const char * argv[]) {
 	Data::setDefaultParameter("skipGate", Data::makeDefaultDouble("skipGate"), 0.0);
 	Data::setDefaultParameter("voidOutput", Data::makeDefaultDouble("voidOutput"), 0.0);
 	
+	
 	Data::UseCommandLineParameters(argc,argv);
 	
 	//setup Gates
@@ -71,7 +72,6 @@ int main(int argc, const char * argv[]) {
 	if(gateFlags[3]) Gate::AddGate(45,[](Genome* genome,int pos) {return new GPGate(genome,pos);});
 	if(gateFlags[4]) Gate::AddGate(46,[](Genome* genome,int pos) {return new Thresholdgate(genome,pos);});
 	if(gateFlags[5]) Gate::AddGate(47,[](Genome* genome,int pos) {return new FixedEpsilonGate(genome,pos);});
-	
 	
 	//printf("Here!\n");
 	//exit(0);

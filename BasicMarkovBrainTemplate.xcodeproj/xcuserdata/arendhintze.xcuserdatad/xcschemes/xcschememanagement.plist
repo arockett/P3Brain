@@ -9,15 +9,30 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
+		<key>BitBrain.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>9</integer>
+		</dict>
 		<key>DecisionMaker.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>7</integer>
 		</dict>
+		<key>DummyTestExample.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>11</integer>
+		</dict>
 		<key>Hidato.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>5</integer>
+		</dict>
+		<key>HourGlass.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>10</integer>
 		</dict>
 		<key>MadBotAI.xcscheme</key>
 		<dict>
@@ -39,6 +54,11 @@
 			<key>orderHint</key>
 			<integer>3</integer>
 		</dict>
+		<key>ValueJudgementBrainSize.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>8</integer>
+		</dict>
 		<key>phiFBlearner.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -47,12 +67,27 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>48E57B6C1BA2528400E630CC</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>C028CD261B4B0B15003DD7E4</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
 		<key>C028CD361B4B1977003DD7E4</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>C03E15981B9E138B007D4E8E</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>C0472A291B68D59B005F17FF</key>
 		<dict>
 			<key>primary</key>
 			<true/>
@@ -78,6 +113,11 @@
 			<true/>
 		</dict>
 		<key>C0CE1E2C1B45DDDC00F0002E</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>C0EB0E3C1BB9B88D00EEC5A0</key>
 		<dict>
 			<key>primary</key>
 			<true/>

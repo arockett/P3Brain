@@ -61,7 +61,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "updates 10000 repeats 100 thinkTime 100"
+            argument = "updates 100 repeats 100 thinkTime 100 alpha -1.0"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

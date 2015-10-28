@@ -40,6 +40,7 @@ private:
 	int targetX,targetY,startX,startY;
 	map<int,map<int,vector<int>>> phiDataCollector;
 public:
+	
 	fbLearnWorld();
 	vector<double> evaluateFitness(vector<Agent*> agents,bool analyse);
 	double testIndividual(Agent *agent,bool analyse);
