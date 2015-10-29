@@ -12,3 +12,6 @@ gmon.out
 __pycache__
 *.pyc
 *~
+
+*.csv
+*.cfg
