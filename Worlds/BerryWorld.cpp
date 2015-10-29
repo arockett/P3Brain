@@ -1,5 +1,5 @@
 //
-//  RedBlueBerryWorld.cpp
+//  BerryWorld.cpp
 //  BasicMarkovBrainTemplate
 //
 //  Created by Arend Hintze on 6/15/15.
@@ -8,56 +8,59 @@
 
 #include <stdlib.h>     // for atoi()
 
-#include "RedBlueBerryWorld.h"
+#include "BerryWorld.h"
 
 #include "../Utilities/Random.h"
+#include "../Utilities/Utilities.h"
 
 /* *** implementation of the World *** */
 
-double& RedBlueBerryWorld::TSK = Parameters::register_parameter("RBW_taskSwitchingCost", 1.4,
-		"cost to change food sources", "WORLD - RED BLUE");
-int& RedBlueBerryWorld::foodSourceTypes = Parameters::register_parameter("RBW_foodSourceTypes", 2,
-		"number of types of food", "WORLD - RED BLUE");
-double& RedBlueBerryWorld::rewardForFood1 = Parameters::register_parameter("RBW_rewardForFood1", 1.0,
-		"reward for eating a Food1", "WORLD - RED BLUE");
-double& RedBlueBerryWorld::rewardForFood2 = Parameters::register_parameter("RBW_rewardForFood2", 1.0,
-		"reward for eating a Food2", "WORLD - RED BLUE");
-double& RedBlueBerryWorld::rewardForFood3 = Parameters::register_parameter("RBW_rewardForFood3", 1.0,
-		"reward for eating a Food3", "WORLD - RED BLUE");
-double& RedBlueBerryWorld::rewardForFood4 = Parameters::register_parameter("RBW_rewardForFood4", 1.0,
-		"reward for eating a Food4", "WORLD - RED BLUE");
-double& RedBlueBerryWorld::rewardForFood5 = Parameters::register_parameter("RBW_rewardForFood5", 1.0,
-		"reward for eating a Food5", "WORLD - RED BLUE");
-double& RedBlueBerryWorld::rewardForFood6 = Parameters::register_parameter("RBW_rewardForFood6", 1.0,
-		"reward for eating a Food6", "WORLD - RED BLUE");
-double& RedBlueBerryWorld::rewardForFood7 = Parameters::register_parameter("RBW_rewardForFood7", 1.0,
-		"reward for eating a Food7", "WORLD - RED BLUE");
-double& RedBlueBerryWorld::rewardForFood8 = Parameters::register_parameter("RBW_rewardForFood8", 1.0,
-		"reward for eating a Food8", "WORLD - RED BLUE");
+double& BerryWorld::TSK = Parameters::register_parameter("BERRY_taskSwitchingCost", 1.4,
+		"cost to change food sources", "WORLD - BERRY");
+int& BerryWorld::worldUpdates = Parameters::register_parameter("BERRY_WorldUpdates", 400,
+		"amount of time an agent is tested", "WORLD - BERRY");
 
-int& RedBlueBerryWorld::xDim = Parameters::register_parameter("RBW_WorldX", 8, "world X size", "WORLD - RED BLUE");
-int& RedBlueBerryWorld::yDim = Parameters::register_parameter("RBW_WorldY", 8, "world Y size", "WORLD - RED BLUE");
-bool& RedBlueBerryWorld::borderWalls = Parameters::register_parameter("RBW_makeBorderWalls", true,
-		"if true world will have a bounding wall", "WORLD - RED BLUE");
-int& RedBlueBerryWorld::randomWalls = Parameters::register_parameter("RBW_makeRandomWalls", 0,
-		"add this many walls to the world", "WORLD - RED BLUE");
+int& BerryWorld::foodSourceTypes = Parameters::register_parameter("BERRY_foodSourceTypes", 2,
+		"number of types of food", "WORLD - BERRY");
+double& BerryWorld::rewardForFood1 = Parameters::register_parameter("BERRY_rewardForFood1", 1.0,
+		"reward for eating a Food1", "WORLD - BERRY");
+double& BerryWorld::rewardForFood2 = Parameters::register_parameter("BERRY_rewardForFood2", 1.0,
+		"reward for eating a Food2", "WORLD - BERRY");
+double& BerryWorld::rewardForFood3 = Parameters::register_parameter("BERRY_rewardForFood3", 1.0,
+		"reward for eating a Food3", "WORLD - BERRY");
+double& BerryWorld::rewardForFood4 = Parameters::register_parameter("BERRY_rewardForFood4", 1.0,
+		"reward for eating a Food4", "WORLD - BERRY");
+double& BerryWorld::rewardForFood5 = Parameters::register_parameter("BERRY_rewardForFood5", 1.0,
+		"reward for eating a Food5", "WORLD - BERRY");
+double& BerryWorld::rewardForFood6 = Parameters::register_parameter("BERRY_rewardForFood6", 1.0,
+		"reward for eating a Food6", "WORLD - BERRY");
+double& BerryWorld::rewardForFood7 = Parameters::register_parameter("BERRY_rewardForFood7", 1.0,
+		"reward for eating a Food7", "WORLD - BERRY");
+double& BerryWorld::rewardForFood8 = Parameters::register_parameter("BERRY_rewardForFood8", 1.0,
+		"reward for eating a Food8", "WORLD - BERRY");
 
-bool& RedBlueBerryWorld::clearOutputs = Parameters::register_parameter("RBW_clearOutputs", false,
-		"if true outputs will be cleared on each world update", "WORLD - RED BLUE");
+int& BerryWorld::xDim = Parameters::register_parameter("BERRY_WorldX", 8, "world X size", "WORLD - BERRY");
+int& BerryWorld::yDim = Parameters::register_parameter("BERRY_WorldY", 8, "world Y size", "WORLD - BERRY");
+bool& BerryWorld::borderWalls = Parameters::register_parameter("BERRY_makeBorderWalls", true,
+		"if true world will have a bounding wall", "WORLD - BERRY");
+int& BerryWorld::randomWalls = Parameters::register_parameter("BERRY_makeRandomWalls", 0,
+		"add this many walls to the world", "WORLD - BERRY");
 
-bool& RedBlueBerryWorld::allowMoveAndEat = Parameters::register_parameter("RBW_allowMoveAndEat", false,
-		"if true, the agent can move and eat in the same world update", "WORLD - RED BLUE");
+bool& BerryWorld::clearOutputs = Parameters::register_parameter("BERRY_clearOutputs", false,
+		"if true outputs will be cleared on each world update", "WORLD - BERRY");
 
-bool& RedBlueBerryWorld::senseDown = Parameters::register_parameter("RBW_senseDown", true,
-		"if true, Agent can sense what it's standing on", "WORLD - RED BLUE");
-bool& RedBlueBerryWorld::senseFront = Parameters::register_parameter("RBW_senseFront", true,
-		"if true, Agent can sense what's in front of it", "WORLD - RED BLUE");
-bool& RedBlueBerryWorld::senseFrontSides = Parameters::register_parameter("RBW_senseFrontSides", true,
-		"if true, Agent can sense what's in front to the left and right of it", "WORLD - RED BLUE");
-bool& RedBlueBerryWorld::senseWalls = Parameters::register_parameter("RBW_senseWalls", true,
-		"if true, Agent can sense Walls", "WORLD - RED BLUE");
+bool& BerryWorld::allowMoveAndEat = Parameters::register_parameter("BERRY_allowMoveAndEat", false,
+		"if true, the agent can move and eat in the same world update", "WORLD - BERRY");
+bool& BerryWorld::senseDown = Parameters::register_parameter("BERRY_senseDown", true,
+		"if true, Agent can sense what it's standing on", "WORLD - BERRY");
+bool& BerryWorld::senseFront = Parameters::register_parameter("BERRY_senseFront", true,
+		"if true, Agent can sense what's in front of it", "WORLD - BERRY");
+bool& BerryWorld::senseFrontSides = Parameters::register_parameter("BERRY_senseFrontSides", true,
+		"if true, Agent can sense what's in front to the left and right of it", "WORLD - BERRY");
+bool& BerryWorld::senseWalls = Parameters::register_parameter("BERRY_senseWalls", true,
+		"if true, Agent can sense Walls", "WORLD - BERRY");
 
-RedBlueBerryWorld::RedBlueBerryWorld() {
+BerryWorld::BerryWorld() {
 	senseWalls = senseWalls & (borderWalls | (randomWalls > 0)); // if there are no walls, there is no need to sense them!
 
 	outputStatesCount = 3; // number of brain states used for output, 2 for move, 1 for eat
@@ -77,7 +80,7 @@ RedBlueBerryWorld::RedBlueBerryWorld() {
 			<< inputStatesCount << " to " << inputStatesCount + outputStatesCount - 1 << "\n";
 }
 
-double RedBlueBerryWorld::testIndividual(Agent *agent, bool analyse) {
+double BerryWorld::testIndividual(Agent *agent, bool analyse) {
 	int grid[xDim][yDim];
 	int i, j;
 	int xp = xDim / 2, yp = yDim / 2, dir = Random::getInt(7); //xp and yp are x and y positions. agent starts at center of grid and with a random rotation
@@ -136,7 +139,7 @@ double RedBlueBerryWorld::testIndividual(Agent *agent, bool analyse) {
 
 	int here, leftFront, front, rightFront;
 
-	for (int t = 0; t < 400; t++) { //run agent for t brain updates
+	for (int t = 0; t < worldUpdates; t++) { //run agent for "worldUpdates" brain updates
 
 		here = grid[xp][yp]; // where the agent is standing
 		front = grid[loopMod((xp + xm[dir]), (xDim))][loopMod((yp + ym[dir]), (yDim))];
@@ -209,7 +212,7 @@ double RedBlueBerryWorld::testIndividual(Agent *agent, bool analyse) {
 		if ((output2 == 1) && (grid[xp][yp] != EMPTY)) { // eat food here (if there is food here)
 			if (lastFood != -1) { // if some food has already been eaten
 				if (lastFood != grid[xp][yp]) { // if this food is different then the last food eaten
-					score -= RedBlueBerryWorld::TSK; // pay the task switch cost
+					score -= BerryWorld::TSK; // pay the task switch cost
 					switched++;
 				}
 			}
@@ -240,8 +243,8 @@ double RedBlueBerryWorld::testIndividual(Agent *agent, bool analyse) {
 				break;
 			}
 		}
-//		Data::Add(xp, "x"+to_string(t), agent->genome);
-//		Data::Add(yp, "y"+to_string(t), agent->genome);
+//		Data::Add(xp, "x"+mkString(t), agent->genome);
+//		Data::Add(yp, "y"+mkString(t), agent->genome);
 
 		/* uncommnet to print test output
 		 for(int x=0;x<xDim;x++){
@@ -267,7 +270,7 @@ double RedBlueBerryWorld::testIndividual(Agent *agent, bool analyse) {
 	int total_eaten = 0;
 	for (int i = 0; i < foodSourceTypes; i++) {
 		total_eaten += eaten[i];
-		string temp_name = "food" + to_string(i + 1);
+		string temp_name = "food" + mkString(i + 1);
 		agent->genome->dataMap.Set(temp_name, eaten[i]);
 	}
 	agent->genome->dataMap.Set("total",total_eaten);

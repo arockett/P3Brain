@@ -1,6 +1,6 @@
 //
 //  main.cpp
-//  Red Berry Blue Berry World
+//
 //
 //  Created by Arend Hintze on 5/29/15.
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
@@ -20,8 +20,9 @@
 #include "Utilities/Parameters.h"
 #include "Utilities/Random.h"
 #include "Utilities/Data.h"
+#include "Utilities/Utilities.h"
 
-#include "Worlds/RedBlueBerryWorld.h"
+#include "Worlds/BerryWorld.h"
 
 
 using namespace std;
@@ -49,17 +50,19 @@ int main(int argc, const char * argv[]) {
 	//Optimizer *optimizer = (Optimizer*) new GA();
 	Optimizer *optimizer = (Optimizer*) new Tournament();
 
-	World *world = (World*) new RedBlueBerryWorld(); //new World();
+	World *world = (World*) new BerryWorld(); //new World();
 
 
 
 	// Make the output directory for this rep
-//	string makeDirCommand = "mkdir OUTPUT" + to_string(Global::repNumber);
+//	string makeDirCommand = "mkdir OUTPUT" + mkString(Global::repNumber);
 //	const char * DirCommand = makeDirCommand.c_str();
 //	system(DirCommand);
 
-	//Global::files["world.csv"] = {"update","score","food1","food2","switches"};
-	//Global::files["history.csv"] = {"update","birthDate","ID"};
+	// To add extra output files, add something like this:
+	//   Global::files[file_name] = {list of elements to save from a DataMap};
+	//   eg: Global::files["world.csv"] = {"update","score","food1","food2","switches"};
+
 
 	// setup population
 	vector<Genome*> population, newPopulation;
@@ -103,7 +106,6 @@ int main(int argc, const char * argv[]) {
 
 		// remove agent pointers (which are pointing to null, since the agents were deleted)
 		agents.clear();
-
 		// write data to file and prune LOD every pruneInterval
 		if (Global::update % Global::pruneInterval == 0) {
 			Genome::MRCA = population[0]->getMostRecentCommonAncestor();
@@ -138,6 +140,7 @@ int main(int argc, const char * argv[]) {
 	Agent *A = new Agent(MRCA, Agent::defaultNrOfBrainStates);
 	printf("MRCA - born on: %d\n", MRCA->birthDate);
 	printf("%s\n", A->gateList().c_str());
+
 
 	return 0;
 }

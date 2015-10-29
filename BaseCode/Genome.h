@@ -53,7 +53,7 @@ public:
 	virtual void applyMutations(double mutationRate);
 	virtual Genome* makeMutatedOffspring(double mutationRate);
 	virtual void makePointMutation();
-	virtual void saveToFile(FILE *F);
+	//virtual void saveToFile(FILE *F);
 	virtual void kill();
 
 	virtual vector<string> GetLODItem(string key);
@@ -63,6 +63,9 @@ public:
 	virtual void saveDataOnLOD(int flush = 0); // for genome, save to file data for this genome and it's LOD
 	virtual void flushDataOnLOD(); // used at the end of a run to save data newer then the MRCA / convergance point
 
+	void advanceIndex(int& genomeIndex, int distance = 1){
+		genomeIndex = (genomeIndex + distance) % (int)sites.size();
+	}
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Genome__) */

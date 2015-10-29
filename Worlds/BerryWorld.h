@@ -1,13 +1,13 @@
 //
-//  RedBlueBerryWorld.h
+//  BerryWorld.h
 //  BasicMarkovBrainTemplate
 //
 //  Created by Arend Hintze on 6/15/15.
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
 //
 
-#ifndef __BasicMarkovBrainTemplate__RedBlueBerryWorld__
-#define __BasicMarkovBrainTemplate__RedBlueBerryWorld__
+#ifndef __BasicMarkovBrainTemplate__BerryWorld__
+#define __BasicMarkovBrainTemplate__BerryWorld__
 
 #include <iostream>
 #include <fstream>
@@ -27,7 +27,7 @@ using namespace std;
 
 class MadBotAI;
 
-class RedBlueBerryWorld: public World{
+class BerryWorld: public World{
 public:
 	const int xm[8] = { 0, 1, 1, 1, 0, -1, -1, -1 }; //these are directions
 	const int ym[8] = { -1, -1, 0, 1, 1, 1, 0, -1 };
@@ -38,7 +38,7 @@ public:
 	const int WALL = 9;
 
 	static double& TSK;
-
+	static int& worldUpdates;
 	static int& foodSourceTypes;
 	static double& rewardForFood1;
 	static double& rewardForFood2;
@@ -69,8 +69,8 @@ public:
 
 
 public:
-	RedBlueBerryWorld();
+	BerryWorld();
 
 };
 
-#endif /* defined(__BasicMarkovBrainTemplate__RedBlueBerryWorld__) */
+#endif /* defined(__BasicMarkovBrainTemplate__BerryWorld__) */

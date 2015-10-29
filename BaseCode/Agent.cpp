@@ -113,6 +113,7 @@ string Agent::gateList() {
 	string S = "";
 	for (size_t i = 0; i < gates.size(); i++) {
 		S = S + gates[i]->description();
+		S = S + gates[i]->getCodingRegions();
 	}
 	return S;
 }

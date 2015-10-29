@@ -23,6 +23,12 @@
 
 using namespace std;
 
+#define START_CODE 0
+#define IN_COUNT_CODE 10
+#define IN_ADDRESS_CODE 11
+#define OUT_COUNT_CODE 20
+#define OUT_ADDRESS_CODE 21
+#define DATA_CODE 30
 
 class Gate {  //conventional probabilistic gate
 public:
@@ -46,20 +52,27 @@ public:
 	Gate();
 	Gate(Genome *genome, int startCodonAt);
 
+	void movePastStartCodeon(int& genomeIndex, Genome* genome) {
+		codingRegions[genomeIndex] = START_CODE;
+		genome->advanceIndex(genomeIndex);
+		codingRegions[genomeIndex] = START_CODE;
+		genome->advanceIndex(genomeIndex);
+	}
+
 	/*
 	 * gets an address with Agent::bitsPerBrainAddress bits
 	 * reads the required number of sites and then trims the leading bits.
 	 * if bitsPerBrainAddress = 10 and the next two sites were 14 (00001110) and 25(00011001)
 	 * the result would be 0000111000011001 masked with 0000001111111111 = 0000001000011001 or 537
 	 */
-	int getIOAddress(int& genome_index, const Genome *genome) {
+	int getIOAddress(int& genomeIndex, Genome* genome) {
 		int bitCount;
-		int address = (int) genome->sites[genome_index]; // grab a byte from the genome
-		genome_index = (genome_index + 1) % genome->sites.size(); // advance the genome_index
+		int address = (int) genome->sites[genomeIndex]; // grab a byte from the genome
+		genome->advanceIndex(genomeIndex); // advance the genome_index
 
 		for (bitCount = 8; Global::bitsPerBrainAddress > bitCount; bitCount += 8) { // now, one site (8 bits) at a time, add sites to the address, until we have enough bits
-			address = (address << 8) | (int) genome->sites[genome_index]; // shift the current value 8 bits left and add the next site
-			genome_index = (genome_index + 1) % genome->sites.size(); // advance the genome_index
+			address = (address << 8) | (int) genome->sites[genomeIndex]; // shift the current value 8 bits left and add the next site
+			genome->advanceIndex(genomeIndex); // advance the genome_index
 		}
 		int bitMask = 0;
 		for (bitCount = 0; bitCount < Global::bitsPerBrainAddress; bitCount++) { // create the bit mask - this is used to trim off unwanted leading bits from the address
@@ -72,27 +85,80 @@ public:
 	 * Gets "howMany" addresses, advances the genome_index buy "howManyMax" addresses and updates "codingRegions" with the addresses being used.
 	 */
 	void getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, int& genome_index,
-			const Genome* genome, map<int, int>& codingRegions) {
+			Genome* genome, int codeNumber) {
 		int lastLocation = genome_index; //make a note of where were are now so we can get codingRegions later
 		for (auto i = 0; i < howMany; i++) { // for the number of addresses we need
 			addresses[i] = getIOAddress(genome_index, genome); // get an address
 		}
 		while (lastLocation < genome_index) { // fill in codingRegions between lastLocation and currLocation
-			codingRegions[lastLocation] = 1;  // with 1 (connections)
+			codingRegions[lastLocation] = codeNumber;  // with 10 (inputs) or 11 (outputs) (connections)
 			lastLocation++;
 		}
-		genome_index += ((ceil(((double) Global::bitsPerBrainAddress) / 8.0)) * (howManyMax-howMany));
+		genome_index += ((ceil(((double) Global::bitsPerBrainAddress) / 8.0)) * (howManyMax - howMany));
 		// move the genome_index ahead to account not only the addresses we need, but the total number of possible addresses
 	}
 
 	/*
-	 * a shortcut for getSomeBrainAddresses() when you need to inputs, outputs and want to set them to this Agents inputs and outputs
+	 * given a genome and a genomeIndex:
+	 * pull out the number a number of inputs, number of outputs and then that many inputs and outputs
+	 * if number of inputs or outputs is less then the max possible inputs or outputs skip the unused sites in the genome
+	 * there can not be more then 255 inputs or outputs without additional support (to read more sites to generate these numbers)
 	 */
-	void getInputsAndOutputs(const int& insCount, const int& outsCount, const int& insMaxCount, const int& outsMaxCount,
-			int& genome_index, const Genome* genome, map<int, int>& codingRegions) { // (#in, #out, max#in, max#out,currentIndexInGenome,genome,codingRegions)
-		getSomeBrainAddresses(insCount, insMaxCount, inputs, genome_index, genome, codingRegions);
-		getSomeBrainAddresses(outsCount, outsMaxCount, outputs, genome_index, genome, codingRegions);
+	void getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, int& genomeIndex, Genome* genome) { // (max#in, max#out,currentIndexInGenome,genome,codingRegions)
+
+		codingRegions[genomeIndex] = IN_COUNT_CODE;
+		int numInputs = insRange[0] + (genome->sites[genomeIndex] & (insRange[1] - 1));
+		genome->advanceIndex(genomeIndex);
+		codingRegions[genomeIndex] = OUT_COUNT_CODE;
+		int numOutputs = outsRange[0] + (genome->sites[genomeIndex++] & (outsRange[1] - 1));
+		genome->advanceIndex(genomeIndex);
+
+		inputs.resize(numInputs);
+		outputs.resize(numOutputs);
+		if (insRange[1] > 0) {
+			getSomeBrainAddresses(numInputs, insRange[1], inputs, genomeIndex, genome, 11);
+		}
+		if (outsRange[1] > 0) {
+			getSomeBrainAddresses(numOutputs, outsRange[1], outputs, genomeIndex, genome, 21);
+		}
 	}
+
+	/*
+	 * build a table of size range[0],range[1] which is the upper left subset of a table rangeMax[0],rangeMax[1]
+	 * the table rangeMax[0],rangeMax[0] would be filled with values from the genome (filling each row before going to the next column
+	 * This table is assigned to the gates table field.
+	 * set codingRegions for each used genome site value = DATA_CODE; (may need to add more support for this later!)
+	 */
+	void getTableFromGenome(vector<int> range, vector<int> rangeMax, int& genomeIndex, Genome* genome) {
+		int x,y;
+		int Y = range[0];
+		int X = range[1];
+		int maxY = rangeMax[0];
+		int maxX = rangeMax[1];
+
+		//void getTableFromGenome({numInputs,NumOutputs},{4,4},genomeIndex);
+
+		table.resize(Y); // set the number of rows in the table
+
+		for ( y = 0; y < (Y); y++) {
+			table[y].resize(X); // set the number of columns in this row
+			for ( x = 0; x < X; x++) {
+				table[y][x] = (double) (genome->sites[genomeIndex]);
+				codingRegions[genomeIndex] = DATA_CODE;
+				genome->advanceIndex(genomeIndex);
+			}
+			for (; x < maxX; x++) {
+				genome->advanceIndex(genomeIndex); // advance genomeIndex to account for unused entries in the max sized table for this row
+			}
+		}
+		for ( y = 0; y < (Y); y++) {
+			for ( x = 0; x < maxY; x++) {
+				genome->advanceIndex(genomeIndex); // advancegenomeIndexk to account for extra rows in the max sized table
+			}
+		}
+	}
+
+
 
 	virtual ~Gate();
 
@@ -103,6 +169,9 @@ public:
 	virtual void resetGate(void);
 	virtual vector<int> getIns();
 	virtual vector<int> getOuts();
+
+	virtual string getCodingRegions(); // display the codingRegions
+
 };
 
 class DeterministicGate: public Gate {

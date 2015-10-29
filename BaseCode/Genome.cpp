@@ -136,6 +136,7 @@ void Genome::fillRandom() {
 	for (size_t i = 0; i < sites.size(); i++) { // fill al sites with random values 0->255
 		//WAS sites[i] = (unsigned char) rand() & 255;
 		sites[i] = (unsigned char) Random::getIndex(256);
+		//sites[i] = (unsigned char) 2; // uncomment to test genome with fixed number
 	}
 	for (int codon = 42; codon < 50; codon++) { // place gate start codeons
 		for (int i = 0; i < 4; i++) {
@@ -156,11 +157,11 @@ void Genome::makePointMutation() {
 	sites[Random::getIndex(sites.size())] = (unsigned char) Random::getIndex(256);
 }
 
-void Genome::saveToFile(FILE *F) {
-	for (size_t i = 0; i < sites.size(); i++)
-		fprintf(F, "	%i", sites[i]);
-	fprintf(F, "\n");
-}
+//void Genome::saveToFile(FILE *F) {
+//	for (size_t i = 0; i < sites.size(); i++)
+//		fprintf(F, "	%i", sites[i]);
+//	fprintf(F, "\n");
+//}
 
 /*
  * Given a genome and a key(to data that has been saved into "dataMap"
@@ -225,8 +226,8 @@ Genome* Genome::getMostRecentCommonAncestor() {
 void Genome::saveDataOnLOD(int flush) {
 
 	if (Global::files.find("data.csv") == Global::files.end()) { // if file has not be initialized yet
-		cout << "  saveDataOnLOD() :: \"data.csv\" is being initialized\n";
-		Global::files["data.csv"] = dataMap.getKeys();
+		//cout << "  saveDataOnLOD() :: \""<< Global::DataFileName <<"\" is being initialized\n";
+		Global::files[Global::DataFileName] = dataMap.getKeys();
 	}
 
 
@@ -240,22 +241,22 @@ void Genome::saveDataOnLOD(int flush) {
 
 
 	while ((effective_MRCA->birthDate > Global::nextDataWrite) && (Global::nextDataWrite <= Global::updates)) { // if there is convergence before the next data interval
-		for (auto file : Global::files) {
-			LOD[Global::nextDataWrite - Global::lastPrune]->dataMap.writeToFile(file.first, file.second);
+		for (auto file : Global::files) { // for each file in files
+			LOD[Global::nextDataWrite - Global::lastPrune]->dataMap.writeToFile(file.first, file.second); // append new data to the file
 		}
 		Global::nextDataWrite += Global::dataInterval;
 	}
 
 	while ((effective_MRCA->birthDate > Global::nextGenomeWrite) && (Global::nextGenomeWrite <= Global::updates)) { // if there is convergence before the next data interval
 		string dataString;
-		if (LOD[Global::nextGenomeWrite - Global::lastPrune]->sites.size() > 0) {
+		if (LOD[Global::nextGenomeWrite - Global::lastPrune]->sites.size() > 0) { // convert the genome into a string of int
 			for (auto site : LOD[Global::nextGenomeWrite - Global::lastPrune]->sites) {
 				dataString += mkString((int) site) + FileManager::separator;
 			}
 			dataString.pop_back(); // remove extra separator at end
 		}
-		dataString = mkString(Global::nextGenomeWrite) + FileManager::separator + "\"[" + dataString + "]\"";
-		FileManager::writeToFile("genome.csv", dataString, "update,genome");
+		dataString = mkString(Global::nextGenomeWrite) + FileManager::separator + "\"[" + dataString + "]\""; // add write update and padding to genome string
+		FileManager::writeToFile(Global::GenomeFileName, dataString, "update,genome"); // write data to file
 		Global::nextGenomeWrite += Global::genomeInterval;
 	}
 

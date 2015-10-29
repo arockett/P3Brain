@@ -2,7 +2,6 @@
 #include "../Utilities/Parameters.h"
 #include "../Utilities/Utilities.h"
 
-
 //global variables that should be accessible to all
 int Global::update = 0;
 set<int> Global::inUseGateTypes;
@@ -16,9 +15,9 @@ int& Global::terminateAfter = Parameters::register_parameter("terminateAfter", 2
 		"if evolution is still running this many updates after updates, stop running and use population[0] for LOD",
 		"GLOBAL");
 int& Global::popSize = Parameters::register_parameter("popSize", 100, "number of genomes in the populaiton", "GLOBAL");
-int& Global::dataInterval = Parameters::register_parameter("dataInterval", 1, "How often to write to data file",
+int& Global::dataInterval = Parameters::register_parameter("dataInterval", 10, "How often to write to data file",
 		"DATA");
-int& Global::genomeInterval = Parameters::register_parameter("genomeInterval", 1, "How often to write genome file",
+int& Global::genomeInterval = Parameters::register_parameter("genomeInterval", 50, "How often to write genome file",
 		"DATA");
 int& Global::pruneInterval = Parameters::register_parameter("pruneInterval", dataInterval,
 		"How often to attempt to prune LOD and actually write out to files", "DATA");
@@ -29,7 +28,7 @@ string& Global::GenomeFileName = Parameters::register_parameter("genomeFileName"
 int& Global::bitsPerBrainAddress = Parameters::register_parameter("bitsPerBrainAddress", 10,
 		"how many bits are evaluated to determine the brain addresses", "AGENT");
 
-map<string,vector<string>> Global::files; // list of files in use with their meta data
+map<string, vector<string>> Global::files; // list of files in use with their meta data
 
 int Global::lastPrune = 0; // last time Genome was Pruned
 

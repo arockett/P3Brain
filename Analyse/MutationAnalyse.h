@@ -20,7 +20,7 @@
 #include "../BaseCode/Agent.h"
 #include "../BaseCode/Genome.h"
 #include "../BaseCode/World.h"
-#include "../Worlds/RedBlueBerryWorld.h"
+#include "../Worlds/BerryWorld.h"
 #include "../Utilities/Data.h"
 
 
