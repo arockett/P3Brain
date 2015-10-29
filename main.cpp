@@ -38,11 +38,10 @@ int main(int argc, const char * argv[]) {
 	Gate::setupGates(); // determines which gate types will be in use.
 
 	if (Global::seedRandom) {
-		Random::seed();
-		Random::seedAlt();
+	  random_device rd;
+		Random::get_common_generator().seed(rd());
 	} else {
-		Random::seed(Global::repNumber);
-		Random::seedAlt(Global::repNumber+1);
+	  Random::get_common_generator().seed(Global::repNumber);
 	}
 
 

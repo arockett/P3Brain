@@ -1,133 +1,64 @@
-/*
- * Random.h
- *
- *  Created on: Oct 6, 2015
- *      Author: cliff
- */
+// This file provides a wrapper around C++11's style of generating random
+// numbers. We provide a "common" number generator so the entire code
+// base can work with a global seed if they want, as well as some
+// utility functions for getting common number types easily.
 
 #ifndef __BasicMarkovBrainTemplate__Random__
 #define __BasicMarkovBrainTemplate__Random__
 
-#include <chrono> // including to generate random seeds
-#include <iostream>
 #include <random>
 
+namespace Random {
 using namespace std;
+using generator=mt19937;
 
-/*
- * the Random class is a static class used to generate randomness
- * All functions in Random have 2 versions, the Main version and the Alt version
- * The Alt version exists in case a random number is needed without changing the Main output
- *
- * seed() & seedAlt()
- * set a new seed, if no argument is given, a random value is generated for the seed
- *
- * getDouble(...) & getDoubleAlt(...)
- * getInt(...) & getIntAlt(...)
- * with 2 parameters  : return a random number in the range of "first parameter" to "second parameter"
- * with 1 parameter   : or 0 to "first parameter"
- *
- * getIndex(...)&getIndexAlt(...)
- * Like getInt(...) but does not include the upper bound
- *
- * getBinomial(samples, probability) & getBinomialAlt(samples, probability)
- * returns number of successes on "sample" trials with "probability"
- *
- * P(prob) & PAlt(probability)
- * generates a value between 0 and 1 and returns true if it is < "probability"
- */
-class Random {
-	static mt19937 mainRandEng;
-	static mt19937 altRandEng;
-	static int RandSeed;
+// Gives you access to the random number generator in general use
+inline generator& get_common_generator() {
+  // to seed, do get_common_generator().seed(value);
+  static generator common;
+  return common;
+}
 
-public:
+// result = Random::getDouble(7.2, 9.5);
+// result is in [7.2, 9.5)
+inline double getDouble(const double lower, const double upper, generator& gen=get_common_generator()) {
+  return uniform_real_distribution<double>(lower, upper)(gen);
+}
 
-	inline static void seed(const int& new_seed = RandSeed++) {
-		mainRandEng.seed(new_seed);
-	}
-	inline static void seedAlt(const int& new_seed = RandSeed++) {
-		altRandEng.seed(new_seed);
-	}
+// result = Random::getDouble(9.5);
+// result is in [0, 9.5)
+inline double getDouble(const double upper, generator& gen=get_common_generator()) {
+  return getDouble(0, upper, gen);
+}
 
-//////////////////////////////////// getDOUBLE ////////////////////////////////////
+// result = Random::getInt(7, 9);
+// result is in [7, 9]
+inline int getInt(const int lower, const int upper, generator& gen=get_common_generator()) {
+  return uniform_int_distribution<int>(lower, upper)(gen);
+}
 
-	/*
-	 * getDouble() gets a uniform distributed random double in range "val1" to "val2"
-	 */
-	inline static double getDouble(const double& val1, const double& val2) {
-		uniform_real_distribution<double> dist(val1, val2);
-		return dist(mainRandEng);
-	}
-	inline static double getDouble(const double& val2) {
-		return getDouble(0, val2);
-	}
+// result = Random::getInt(9);
+// result is in [0, 9]
+inline int getInt(const int upper, generator& gen=get_common_generator()) {
+  return getInt(0, upper, gen);
+}
 
-	inline static double getDoubleAlt(const double& val1, const double& val2) {
-		uniform_real_distribution<double> dist(val1, val2);
-		return dist(altRandEng);
-	}
-	inline static double getDoubleAlt(const double& val2) {
-		return getDoubleAlt(0, val2);
-	}
+// Returns a random valid index of a container which has "container_size" elements.
+inline int getIndex(const int container_size, generator& gen=get_common_generator()) {
+  return getInt(0, container_size-1, gen);
+}
 
-//////////////////////////////////// getInt ////////////////////////////////////
+// Returns how many successes you get by doing "tests" number of trials
+// with "probability" of success
+inline static int getBinomial(const int& tests, const double& probability, generator& gen=get_common_generator()) {
+  return binomial_distribution<>(tests, probability)(gen);
+}
 
-	/*
-	 * getDouble() gets a uniform distributed random double in range "val1" to "val2"
-	 */
-	inline static int getInt(const int& val1, const int& val2) {
-		uniform_int_distribution<int> dist(val1, val2);
-		return dist(mainRandEng);
-	}
-	inline static int getInt(const int& val2) {
-		return getInt(0, val2);
-	}
+// Returns true with "probability" probability
+inline static bool P(const double& probability, generator& gen=get_common_generator()) {
+  return bernoulli_distribution(probability)(gen);
+}
 
-	inline static int getIntAlt(const double& val1, const double& val2) {
-		uniform_int_distribution<int> dist(val1, val2);
-		return dist(altRandEng);
-	}
-	inline static int getIntAlt(const double& val2) {
-		return getIntAlt(0, val2);
-	}
-
-//////////////////////////////////// getIndex ////////////////////////////////////
-
-	inline static int getIndex(const int& val1, const int& val2) {
-		return getInt(val1, val2 - 1);
-	}
-	inline static int getIndex(const int& val2) {
-		return getInt(0, val2 - 1);
-	}
-
-	inline static int getIndexAlt(const int& val1, const int& val2) {
-		return getIntAlt(val1, val2 - 1);
-	}
-	inline static int getIndexAlt(const int& val2) {
-		return getIntAlt(0, val2 - 1);
-	}
-
-//////////////////////////////////// binomial distribution ////////////////////////////////////
-
-	inline static int getBinomial(const int& tests, const double& prob) {
-		binomial_distribution<> dist(tests, prob);
-		return dist(mainRandEng);
-	}
-	inline static int getBinomialAlt(const int& tests, const double& prob) {
-		binomial_distribution<> dist(tests, prob);
-		return dist(altRandEng);
-	}
-
-//////////////////////////////////// P ////////////////////////////////////
-
-	inline static bool P(const double& testVal) {
-		return (testVal > getDouble(1));
-	}
-	inline static bool PAlt(const double& testVal) {
-		return (testVal > getDoubleAlt(1));
-	}
-
-};
+}
 
 #endif // __BasicMarkovBrainTemplate__Random__
