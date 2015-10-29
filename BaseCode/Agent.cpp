@@ -22,9 +22,6 @@ double& Agent::skipGate = Parameters::register_parameter("skipGate", 0.0, "chanc
 bool& Agent::serialProcessing = Parameters::register_parameter("serialProcessing", false,
 		"sets agents to overwrite... right?", "AGENT");
 
-Agent::Agent() {
-}
-
 Agent::Agent(Genome* startGenome, int _nrOfBrainStates) { //this is a constructor. it is run whenever a new agent is created.
 	//cout << "in agent contructor\n";
 	nrOfBrainStates = _nrOfBrainStates;
@@ -43,9 +40,6 @@ Agent::Agent(Genome* startGenome, int _nrOfBrainStates) { //this is a constructo
 
 	inOutReMap();
 	genome->dataMap.Set("gates",gates.size());
-}
-
-Agent::~Agent() {
 }
 
 void Agent::resetBrain() {

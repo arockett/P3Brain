@@ -14,7 +14,7 @@
 #include "../Utilities/Random.h"
 #include "../Utilities/Utilities.h"
 
-#define VOIDOUTPUT 1
+#define VOIDOUTPUT 0
 
 bool& Gate::usingProbGate = Parameters::register_parameter("probGate", false,
 		"set to true to enable probabilistic gates", "GATE TYPES");
@@ -47,31 +47,28 @@ void Gate::setupGates() {
 		Gate::AddGate(i, NULL);
 	}
 	if (usingProbGate) {
-		AddGate(42, [](Genome* genome,int pos) {shared_ptr<Gate> newGate(new Gate(genome,pos)); return newGate;});
+		AddGate(42, [](Genome* genome,int pos) {return make_shared<Gate>(genome,pos);});
 		Global::inUseGateTypes.insert(42);
 	}
 	if (usingDetGate) {
-		AddGate(43,
-				[](Genome* genome,int pos) {shared_ptr<DeterministicGate> newGate(new DeterministicGate(genome,pos)); return newGate;});
+		//AddGate(43, [](Genome* genome,int pos) {return make_shared<DeterministicGate>(genome,pos);});
+		AddGate(43, [](Genome* genome,int pos) {return make_shared<FixedEpsilonGate>(genome,pos);});
 		Global::inUseGateTypes.insert(43);
 	}
 	if (usingFBGate) {
-		AddGate(44,
-				[](Genome* genome,int pos) {shared_ptr<FeedbackGate> newGate(new FeedbackGate(genome,pos)); return newGate;});
+		AddGate(44, [](Genome* genome,int pos) {return make_shared<FeedbackGate>(genome,pos);});
 		Global::inUseGateTypes.insert(44);
 	}
 	if (usingGPGate) {
-		AddGate(45, [](Genome* genome,int pos) {shared_ptr<GPGate> newGate(new GPGate(genome,pos)); return newGate;});
+		AddGate(45, [](Genome* genome,int pos) {return make_shared<GPGate>(genome,pos);});
 		Global::inUseGateTypes.insert(45);
 	}
 	if (usingThGate) {
-		AddGate(46,
-				[](Genome* genome,int pos) {shared_ptr<Thresholdgate> newGate(new Thresholdgate(genome,pos)); return newGate;});
+		AddGate(46, [](Genome* genome,int pos) {return make_shared<Thresholdgate>(genome,pos);});
 		Global::inUseGateTypes.insert(46);
 	}
 	if (usingEpsiGate) {
-		AddGate(47,
-				[](Genome* genome,int pos) {shared_ptr<FixedEpsilonGate> newGate(new FixedEpsilonGate(genome,pos)); return newGate;});
+		AddGate(47, [](Genome* genome,int pos) {return make_shared<FixedEpsilonGate>(genome,pos);});
 		Global::inUseGateTypes.insert(47);
 	}
 }
@@ -83,8 +80,6 @@ void Gate::AddGate(int ID, function<shared_ptr<Gate>(Genome*, int)> theFunction)
 }
 
 /* *** Gate implementation *** */
-Gate::Gate() {
-}
 
 Gate::Gate(Genome *genome, int genomeIndex) {
 	int i, j;
@@ -103,7 +98,6 @@ Gate::Gate(Genome *genome, int genomeIndex) {
 
 	genome->advanceIndex(genomeIndex, 16);
 
-
 	// get a table filled with values from the genome that has
 	// rows = (the number of possible combinations of input values) and columns = (the number of possible combinations of output values)
 	getTableFromGenome( { 1 << numInputs, 1 << numOutputs }, { 16, 16 }, genomeIndex, genome);
@@ -112,8 +106,8 @@ Gate::Gate(Genome *genome, int genomeIndex) {
 	for (i = 0; i < (1 << numInputs); i++) { //for each row (each possible input bit string)
 		// first sum the row
 		double S = 0;
-		for (j = 0; j < (1 << numOutputs); j++){
-			S+=table[i][j];
+		for (j = 0; j < (1 << numOutputs); j++) {
+			S += table[i][j];
 		}
 		// now normalize the row
 		if (S == 0.0) { //if all the inputs on this row are 0, then give them all a probability of 1/(2^(number of outputs))
@@ -127,7 +121,110 @@ Gate::Gate(Genome *genome, int genomeIndex) {
 
 }
 
-Gate::~Gate() {
+void Gate::movePastStartCodeon(int& genomeIndex, Genome* genome) {
+	codingRegions[genomeIndex] = START_CODE;
+	genome->advanceIndex(genomeIndex);
+	codingRegions[genomeIndex] = START_CODE;
+	genome->advanceIndex(genomeIndex);
+}
+
+/*
+ * gets an address with Agent::bitsPerBrainAddress bits
+ * reads the required number of sites and then trims the leading bits.
+ * if bitsPerBrainAddress = 10 and the next two sites were 14 (00001110) and 25(00011001)
+ * the result would be 0000111000011001 masked with 0000001111111111 = 0000001000011001 or 537
+ */
+int Gate::getIOAddress(int& genomeIndex, Genome* genome) {
+	int bitCount;
+	int address = (int) genome->sites[genomeIndex]; // grab a byte from the genome
+	genome->advanceIndex(genomeIndex); // advance the genome_index
+
+	for (bitCount = 8; Global::bitsPerBrainAddress > bitCount; bitCount += 8) { // now, one site (8 bits) at a time, add sites to the address, until we have enough bits
+		address = (address << 8) | (int) genome->sites[genomeIndex]; // shift the current value 8 bits left and add the next site
+		genome->advanceIndex(genomeIndex); // advance the genome_index
+	}
+	int bitMask = 0;
+	for (bitCount = 0; bitCount < Global::bitsPerBrainAddress; bitCount++) { // create the bit mask - this is used to trim off unwanted leading bits from the address
+		bitMask = (bitMask << 1) | 1;
+	}
+	return address & bitMask; // trim the address with the bitMask
+}
+
+/*
+ * Gets "howMany" addresses, advances the genome_index buy "howManyMax" addresses and updates "codingRegions" with the addresses being used.
+ */
+void Gate::getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, int& genome_index,
+		Genome* genome, int codeNumber) {
+	int lastLocation = genome_index; //make a note of where were are now so we can get codingRegions later
+	for (auto i = 0; i < howMany; i++) { // for the number of addresses we need
+		addresses[i] = getIOAddress(genome_index, genome); // get an address
+	}
+	while (lastLocation < genome_index) { // fill in codingRegions between lastLocation and currLocation
+		codingRegions[lastLocation] = codeNumber;  // with 10 (inputs) or 11 (outputs) (connections)
+		lastLocation++;
+	}
+	genome_index += ((ceil(((double) Global::bitsPerBrainAddress) / 8.0)) * (howManyMax - howMany));
+	// move the genome_index ahead to account not only the addresses we need, but the total number of possible addresses
+}
+
+/*
+ * given a genome and a genomeIndex:
+ * pull out the number a number of inputs, number of outputs and then that many inputs and outputs
+ * if number of inputs or outputs is less then the max possible inputs or outputs skip the unused sites in the genome
+ * there can not be more then 255 inputs or outputs without additional support (to read more sites to generate these numbers)
+ */
+void Gate::getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, int& genomeIndex, Genome* genome) { // (max#in, max#out,currentIndexInGenome,genome,codingRegions)
+
+	codingRegions[genomeIndex] = IN_COUNT_CODE;
+	int numInputs = insRange[0] + (genome->sites[genomeIndex] & (insRange[1] - 1));
+	genome->advanceIndex(genomeIndex);
+	codingRegions[genomeIndex] = OUT_COUNT_CODE;
+	int numOutputs = outsRange[0] + (genome->sites[genomeIndex++] & (outsRange[1] - 1));
+	genome->advanceIndex(genomeIndex);
+
+	inputs.resize(numInputs);
+	outputs.resize(numOutputs);
+	if (insRange[1] > 0) {
+		getSomeBrainAddresses(numInputs, insRange[1], inputs, genomeIndex, genome, 11);
+	}
+	if (outsRange[1] > 0) {
+		getSomeBrainAddresses(numOutputs, outsRange[1], outputs, genomeIndex, genome, 21);
+	}
+}
+
+/*
+ * build a table of size range[0],range[1] which is the upper left subset of a table rangeMax[0],rangeMax[1]
+ * the table rangeMax[0],rangeMax[0] would be filled with values from the genome (filling each row before going to the next column
+ * This table is assigned to the gates table field.
+ * set codingRegions for each used genome site value = DATA_CODE; (may need to add more support for this later!)
+ */
+void Gate::getTableFromGenome(vector<int> range, vector<int> rangeMax, int& genomeIndex, Genome* genome) {
+	int x, y;
+	int Y = range[0];
+	int X = range[1];
+	int maxY = rangeMax[0];
+	int maxX = rangeMax[1];
+
+	//void getTableFromGenome({numInputs,NumOutputs},{4,4},genomeIndex);
+
+	table.resize(Y); // set the number of rows in the table
+
+	for (y = 0; y < (Y); y++) {
+		table[y].resize(X); // set the number of columns in this row
+		for (x = 0; x < X; x++) {
+			table[y][x] = (double) (genome->sites[genomeIndex]);
+			codingRegions[genomeIndex] = DATA_CODE;
+			genome->advanceIndex(genomeIndex);
+		}
+		for (; x < maxX; x++) {
+			genome->advanceIndex(genomeIndex); // advance genomeIndex to account for unused entries in the max sized table for this row
+		}
+	}
+	for (y = 0; y < (Y); y++) {
+		for (x = 0; x < maxY; x++) {
+			genome->advanceIndex(genomeIndex); // advancegenomeIndexk to account for extra rows in the max sized table
+		}
+	}
 }
 
 void Gate::update(vector<double> & states, vector<double> & nextStates) { //this translates the input bits of the current states to the output bits of the next states
@@ -193,10 +290,8 @@ string Gate::getCodingRegions() {
 }
 
 /* *** Determistic Gate Implementation *** */
-DeterministicGate::DeterministicGate() {
-}
 
-DeterministicGate::DeterministicGate(Genome *genome, int genomeIndex) { //all this looks exactly the same as
+DeterministicGate::DeterministicGate(Genome *genome, int genomeIndex) {
 	inputs.clear();
 	outputs.clear();
 	int numOutputs, numInputs;
@@ -219,7 +314,10 @@ DeterministicGate::DeterministicGate(Genome *genome, int genomeIndex) { //all th
 	// convert the table contents to bits
 	for (int i = 0; i < (1 << numInputs); i++) {
 		for (int o = 0; o < numOutputs; o++) {
-			table[i][0] = (double) ((int) table[i][0] & 1); // convert even to 0 and odd to 1
+			table[i][0] = (int) table[i][0] & 1; // convert even to 0 and odd to 1
+			//if (table[i][0] == 0) cout << table[i][0] << " "; // uncomment for light show! //
+			//else cout << "  ";								// uncomment for light show! //
+
 		}
 	}
 }
@@ -235,9 +333,6 @@ void DeterministicGate::setupForBits(int* Ins, int nrOfIns, int Out, int logic) 
 		table[i].resize(1);
 		table[i][0] = (logic >> i) & 1;
 	}
-}
-
-DeterministicGate::~DeterministicGate() {
 }
 
 void DeterministicGate::update(vector<double> & states, vector<double> & nextStates) {
@@ -269,10 +364,6 @@ union intToFloatBitByBit {
 	int I;
 	float F;
 };
-
-GPGate::GPGate() {
-
-}
 
 GPGate::GPGate(Genome *genome, int genomeIndex) {
 	int i;
@@ -306,10 +397,6 @@ GPGate::GPGate(Genome *genome, int genomeIndex) {
 		}
 		myValues.push_back(V.F);
 	}
-}
-
-GPGate::~GPGate() {
-
 }
 
 void GPGate::update(vector<double> & states, vector<double> & nextStates) {
@@ -382,10 +469,6 @@ string GPGate::description() {
 
 /* *** Feedback Gate *** */
 bool FeedbackGate::feedbackON = true;
-
-FeedbackGate::FeedbackGate() {
-
-}
 
 FeedbackGate::FeedbackGate(Genome *genome, int startCodonAt) {
 
@@ -460,9 +543,6 @@ FeedbackGate::FeedbackGate(Genome *genome, int startCodonAt) {
 	chosenInNeg.clear();
 	chosenOutPos.clear();
 	chosenOutNeg.clear();
-}
-FeedbackGate::~FeedbackGate() {
-
 }
 
 void FeedbackGate::update(vector<double> & states, vector<double> & nextStates) {
@@ -559,8 +639,6 @@ vector<int> FeedbackGate::getIns() {
 }
 
 /* *** Threshold Gate *** */
-Thresholdgate::Thresholdgate() {
-}
 
 Thresholdgate::Thresholdgate(Genome *genome, int startCodonAt) {
 	int i, k;
@@ -603,10 +681,6 @@ Thresholdgate::Thresholdgate(Genome *genome, int startCodonAt) {
 	threshold = genome->sites[(k + i + 1) % genome->sites.size()];
 }
 
-Thresholdgate::~Thresholdgate() {
-
-}
-
 void Thresholdgate::update(vector<double> & states, vector<double> & nextStates) {
 	int theCount = 0;
 	for (size_t i = 1; i < inputs.size(); i++)
@@ -625,40 +699,12 @@ string Thresholdgate::description() {
 /* *** Fixed Epison Gate *** */
 /* this gate behaves like a deterministic gate with a constant externally set error */
 
-FixedEpsilonGate::FixedEpsilonGate() {
-}
-
-FixedEpsilonGate::FixedEpsilonGate(Genome *genome, int genomeIndex) {
+FixedEpsilonGate::FixedEpsilonGate(Genome *genome, int genomeIndex) :
+					DeterministicGate(genome, genomeIndex){ // use DeterministicGate constructor to build set up everything (including a table of 0s and 1s)
 	epsilon = FixedEpsilonGateP; // in case you want to have different epsilon for different gates (who am I to judge?)
-	int i, j, k;
-	inputs.clear();
-	outputs.clear();
-	int _xDim, _yDim;
-	//int numOutputs, numInputs;
-	codingRegions.clear();
 
-	//move past the first to sites (start codeon)
-	movePastStartCodeon(genomeIndex, genome);
-
-	// get numInputs inputs and numOutputs outputs, advance k (genomeIndex) as if we had gotten 4 of each and record this in codingRegions
-	getInputsAndOutputs( { 1, 4 }, { 1, 4 }, genomeIndex, genome); // (insRange, outsRange,currentIndexInGenome,genome,codingRegions)
-	_yDim = inputs.size();
-	_xDim = outputs.size();
-
-	genome->advanceIndex(genomeIndex, 16); //move forward 16 spaces in genome
-	k = genomeIndex;
-	//get all the values into the table
-	table.resize(1 << _yDim); //there are 2^number of inputs rows
-	for (i = 0; i < (1 << _yDim); i++) {
-		table[i].resize(_xDim); //there are (number of outputs) spaces per row
-		for (j = 0; j < _xDim; j++) {
-			table[i][j] = 1.0 * (double) (genome->sites[(k + j + (_xDim * i)) % genome->sites.size()] & 1);
-			codingRegions[(k + j + (_xDim * i)) % genome->sites.size()] = DATA_CODE;
-			//cout << "The above index is part of the data table\n";
-		}
-	}
-	//now to the specifics of this gate
-	defaultOutput.clear(); //clear the vector<int>
+	// now to the specifics of this gate - we convert the table to a list of numbers (i.e. bitstrings) so we can do fast comparisons in the update
+	defaultOutput.clear(); // clear the defaultOutput vector... the list of bitstrings
 	for (size_t i = 0; i < table.size(); i++) { //for every row of the table (which is 2^inputs)
 		int D = 0;
 		for (size_t j = 0; j < table[i].size(); j++) { //for every space in the row
@@ -667,10 +713,6 @@ FixedEpsilonGate::FixedEpsilonGate(Genome *genome, int genomeIndex) {
 		}
 		defaultOutput.push_back(D); //add D (which is a bitstring of length [2^outputs]) to defaultOutput. defaultoutputs is now of length (2^number of inputs)
 	}
-}
-
-FixedEpsilonGate::~FixedEpsilonGate() {
-
 }
 
 void FixedEpsilonGate::update(vector<double> & states, vector<double> & nextStates) {
@@ -682,9 +724,9 @@ void FixedEpsilonGate::update(vector<double> & states, vector<double> & nextStat
 		//do a random output excluding the one otherwise given
 		int output = 0;
 		do {
-			// WAS output = rand() & (table.size() - 1); //pick a bitstring (random row in the table)
-			output = Random::getIndex(table.size()); //pick a bitstring (random row in the table)
-		} while (output == defaultOutput[input]); //if you pick the a bit string which happens to match the correct output, pick again
+			// WAS output = rand() & (table.size() - 1);
+			output = Random::getIndex(table.size()); // pick a bitstring (with the correct number of bits) i.e. one bit for each output
+		} while (output == defaultOutput[input]); // if you happen to pick the a bit string which happens to match the correct output, pick again
 		for (size_t i = 0; i < outputs.size(); i++) {
 			nextStates[outputs[i]] += 1.0 * (double) ((output >> i) & 1);
 		}

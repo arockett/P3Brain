@@ -51,9 +51,9 @@ public:
 	vector<double> states;
 	vector<double> nextStates;
 
-	Agent();
+	Agent() = default;
 	Agent(Genome *startGenome, int _nrOfStates);
-	virtual ~Agent();
+	virtual ~Agent() = default;
 
 	void inOutReMap();
 

@@ -26,8 +26,8 @@ public:
 
 public:
 	double maxFitness;
-	Optimizer();
-	virtual ~Optimizer();
+	Optimizer() = default;
+	virtual ~Optimizer() = default;
 	virtual vector<Genome*> makeNextGeneration(vector<Genome*> population,vector<double> W);
 };
 

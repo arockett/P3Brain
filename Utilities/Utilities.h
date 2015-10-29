@@ -12,34 +12,29 @@
 
 using namespace std;
 
+/*
+ * return x % y were (-1 % y) = (y - 1)
+ */
 inline int loopMod(int x, int y) {
-	x += (y * (abs(x / y) + 1));
+	x += (y * (abs(x / y) + 1)); // this adds a number of 'y's to 'x' so as to insure that 'x' is greater then 0. the numer of 'y's is not important.
 	return x % y;
 }
 
-inline int Bit(double d) { // returns 1 if "d" is greater than 0, else return 0
+/*
+ * returns 1 if "d" is greater than 0, else return 0
+ */
+inline int Bit(double d) {
 	return (d > 0.0);
 }
 
+/*
+ * convert anything to a string using a string stream
+ */
 template<typename Type>
 inline string mkString(Type value) {
 	std::ostringstream oss;
 	oss << value;
 	return oss.str();
-}
-
-inline int isInStepList(int step, int value) {
-	if (value % step == 0) {
-		return true;
-	}
-	return false;
-}
-
-inline int nextInStepList(int step, int lastValue) {
-	if (lastValue < 0) {
-		return 0;
-	}
-	return (((lastValue / step) * step) + step);
 }
 
 #endif // __BasicMarkovBrainTemplate__Utilities__

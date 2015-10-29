@@ -21,12 +21,6 @@ int& Optimizer::elitism = Parameters::register_parameter("elitism", -1,
 int& Optimizer::tournamentSize = Parameters::register_parameter("tournamentSize", 2,
 		"how many challenger genomes to consider when doing Tournament selection?", "OPTIMIZER");
 
-Optimizer::Optimizer() {
-}
-
-Optimizer::~Optimizer() {
-}
-
 vector<Genome*> Optimizer::makeNextGeneration(vector<Genome*> population, vector<double> W) {
 	vector<Genome*> nextGeneration;
 	//We make a copy and nothing else
