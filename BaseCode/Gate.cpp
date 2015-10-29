@@ -103,21 +103,19 @@ Gate::Gate(Genome *genome, int genomeIndex) {
 
 	genome->advanceIndex(genomeIndex, 16);
 
-	//k = genomeIndex;
 
-	//getTableFromGenome( { 1 << numInputs, 1 << numOutputs }, { 16, 16 }, genomeIndex, genome);
+	// get a table filled with values from the genome that has
+	// rows = (the number of possible combinations of input values) and columns = (the number of possible combinations of output values)
+	getTableFromGenome( { 1 << numInputs, 1 << numOutputs }, { 16, 16 }, genomeIndex, genome);
 
-	table.resize(1 << numInputs); //table is a vector of vectors of doubles. this resizes the first level vector to 2^(number of inputs).
-	for (i = 0; i < (1 << numInputs); i++) { //for each input bit string...
-		table[i].resize(1 << numOutputs); //resize the second level vectors to 2^(number of outputs)
-		double S = 0.0; // S keeps track of the total of all values in this row (so they can be Normalized later)
-		for (j = 0; j < (1 << numOutputs); j++) {
-			table[i][j] = (double) genome->sites[(genomeIndex + j + ((16) * i)) % genome->sites.size()]; //fills each spot in the table with values from the genome
-			S += table[i][j]; // add the value at this location to S
-			codingRegions[(genomeIndex + j + ((16) * i)) % genome->sites.size()] = DATA_CODE;
+	//normalize each row
+	for (i = 0; i < (1 << numInputs); i++) { //for each row (each possible input bit string)
+		// first sum the row
+		double S = 0;
+		for (j = 0; j < (1 << numOutputs); j++){
+			S+=table[i][j];
 		}
-
-		//normalize the row
+		// now normalize the row
 		if (S == 0.0) { //if all the inputs on this row are 0, then give them all a probability of 1/(2^(number of outputs))
 			for (j = 0; j < (1 << numOutputs); j++)
 				table[i][j] = 1.0 / (double) (1 << numOutputs);
@@ -214,7 +212,8 @@ DeterministicGate::DeterministicGate(Genome *genome, int genomeIndex) { //all th
 
 	genome->advanceIndex(genomeIndex, 16); //move forward 16 spaces in genome
 
-	// get a table that is (number of possible bit strings from inputs) by (number of outputs)
+	// get a table filled with values from the genome that has
+	// rows = (the number of possible combinations of input values) and columns = (the number of output values)
 	getTableFromGenome( { (1 << numInputs), numOutputs }, { 4, 4 }, genomeIndex, genome);
 
 	// convert the table contents to bits
@@ -561,7 +560,6 @@ vector<int> FeedbackGate::getIns() {
 
 /* *** Threshold Gate *** */
 Thresholdgate::Thresholdgate() {
-
 }
 
 Thresholdgate::Thresholdgate(Genome *genome, int startCodonAt) {
@@ -627,12 +625,11 @@ string Thresholdgate::description() {
 /* *** Fixed Epison Gate *** */
 /* this gate behaves like a deterministic gate with a constant externally set error */
 
-//double FixedEpsilonGate::epsilon = 0.0;
 FixedEpsilonGate::FixedEpsilonGate() {
-	epsilon = FixedEpsilonGateP; // in case you want to have different epsilon for different gates (who am I to judge?)
 }
 
 FixedEpsilonGate::FixedEpsilonGate(Genome *genome, int genomeIndex) {
+	epsilon = FixedEpsilonGateP; // in case you want to have different epsilon for different gates (who am I to judge?)
 	int i, j, k;
 	inputs.clear();
 	outputs.clear();
@@ -656,7 +653,7 @@ FixedEpsilonGate::FixedEpsilonGate(Genome *genome, int genomeIndex) {
 		table[i].resize(_xDim); //there are (number of outputs) spaces per row
 		for (j = 0; j < _xDim; j++) {
 			table[i][j] = 1.0 * (double) (genome->sites[(k + j + (_xDim * i)) % genome->sites.size()] & 1);
-			codingRegions[(k + j + (_xDim * i)) % genome->sites.size()] = 2;
+			codingRegions[(k + j + (_xDim * i)) % genome->sites.size()] = DATA_CODE;
 			//cout << "The above index is part of the data table\n";
 		}
 	}
@@ -700,6 +697,6 @@ void FixedEpsilonGate::update(vector<double> & states, vector<double> & nextStat
 }
 
 string FixedEpsilonGate::description() {
-	return "Fixed Epsilon " + mkString(epsilon) + " " + Gate::description();
+	return "Fixed Epsilon " + mkString(epsilon) + "\n " + Gate::description();
 }
 
