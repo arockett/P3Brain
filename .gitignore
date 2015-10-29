@@ -1,0 +1,14 @@
+work
+build
+.project
+.cproject
+.settings
+.pydevproject
+gmon.out
+
+*.o
+*.d
+
+__pycache__
+*.pyc
+*~
