@@ -28,12 +28,11 @@ bool& Gate::usingThGate = Parameters::register_parameter("thGate", false, "set t
 		"GATE TYPES");
 bool& Gate::usingEpsiGate = Parameters::register_parameter("epsiGate", false, "set to true to enable epsilon gates",
 		"GATE TYPES");
+bool& Gate::usingVoidGate = Parameters::register_parameter("voidGate", false, "set to true to enable void gates",
+		"GATE TYPES");
 
-#if VOIDOUTPUT==1
 double& Gate::voidOutPut = Parameters::register_parameter("voidOutput", 0.0,
 		"chance that an output from a determinstic gate will be set to 0", "GATES");
-#endif // VOIDOUTPUT
-
 double& Gate::FixedEpsilonGateP = Parameters::register_parameter("FixedEpsilonGateProb", 0.05,
 		"chance that an output from a FixedEpsilonGate gate will be randomized", "GATES");
 
@@ -70,6 +69,11 @@ void Gate::setupGates() {
 		AddGate(47, [](Genome* genome,int pos) {return make_shared<FixedEpsilonGate>(genome,pos);});
 		Global::inUseGateTypes.insert(47);
 	}
+	if (usingVoidGate) {
+		AddGate(48, [](Genome* genome,int pos) {return make_shared<VoidGate>(genome,pos);});
+		Global::inUseGateTypes.insert(47);
+	}
+
 }
 
 /* *** some c++ 11 magic to speed up translation from genome to gates *** */
@@ -78,47 +82,7 @@ void Gate::AddGate(int ID, function<shared_ptr<Gate>(Genome*, int)> theFunction)
 	makeGate[ID] = theFunction;
 }
 
-/* *** Gate implementation *** */
-
-Gate::Gate(Genome *genome, int genomeIndex) {
-	int i, j;
-	inputs.clear();
-	outputs.clear();
-	int numOutputs, numInputs;
-	codingRegions.clear();
-
-	//move past the first to sites (start codeon)
-	movePastStartCodeon(genomeIndex, genome);
-
-	// get numInputs inputs and numOutputs outputs, advance k (genomeIndex) as if we had gotten 4 of each and record this in codingRegions
-	getInputsAndOutputs( { 1, 4 }, { 1, 4 }, genomeIndex, genome); // (insRange, outsRange,currentIndexInGenome,genome,codingRegions)
-	numInputs = inputs.size();
-	numOutputs = outputs.size();
-
-	genome->advanceIndex(genomeIndex, 16);
-
-	// get a table filled with values from the genome that has
-	// rows = (the number of possible combinations of input values) and columns = (the number of possible combinations of output values)
-	getTableFromGenome( { 1 << numInputs, 1 << numOutputs }, { 16, 16 }, genomeIndex, genome);
-
-	//normalize each row
-	for (i = 0; i < (1 << numInputs); i++) { //for each row (each possible input bit string)
-		// first sum the row
-		double S = 0;
-		for (j = 0; j < (1 << numOutputs); j++) {
-			S += table[i][j];
-		}
-		// now normalize the row
-		if (S == 0.0) { //if all the inputs on this row are 0, then give them all a probability of 1/(2^(number of outputs))
-			for (j = 0; j < (1 << numOutputs); j++)
-				table[i][j] = 1.0 / (double) (1 << numOutputs);
-		} else { //otherwise divide all values in a row by the sum of the row
-			for (j = 0; j < (1 << numOutputs); j++)
-				table[i][j] /= S;
-		}
-	}
-
-}
+/* *** General tools for All Gates *** */
 
 void Gate::movePastStartCodeon(int& genomeIndex, Genome* genome) {
 	codingRegions[genomeIndex] = START_CODE;
@@ -234,7 +198,7 @@ void Gate::getTableFromGenome(vector<int> range, vector<int> rangeMax, int& geno
  * etc... hopefully you see the pattern
  * This, btw, will maintain output consistency for these lower values even if a gate gains or loses inputs.
  */
-int Gate::getIndexFromInputs(vector<double> & states){
+int Gate::getIndexFromInputs(vector<double> & states) {
 	int index = 0;
 
 	for (int i = (int) inputs.size() - 1; i >= 0; i--) {
@@ -243,16 +207,59 @@ int Gate::getIndexFromInputs(vector<double> & states){
 	return index;
 }
 
+/* *** Gate implementation *** */
+
+Gate::Gate(Genome *genome, int genomeIndex) {
+	int i, j;
+	inputs.clear();
+	outputs.clear();
+	int numOutputs, numInputs;
+	codingRegions.clear();
+
+	//move past the first to sites (start codeon)
+	movePastStartCodeon(genomeIndex, genome);
+
+	// get numInputs inputs and numOutputs outputs, advance k (genomeIndex) as if we had gotten 4 of each and record this in codingRegions
+	getInputsAndOutputs( { 1, 4 }, { 1, 4 }, genomeIndex, genome); // (insRange, outsRange,currentIndexInGenome,genome,codingRegions)
+	numInputs = inputs.size();
+	numOutputs = outputs.size();
+
+	genome->advanceIndex(genomeIndex, 16);
+
+	// get a table filled with values from the genome that has
+	// rows = (the number of possible combinations of input values) and columns = (the number of possible combinations of output values)
+	getTableFromGenome( { 1 << numInputs, 1 << numOutputs }, { 16, 16 }, genomeIndex, genome);
+
+	//normalize each row
+	for (i = 0; i < (1 << numInputs); i++) { //for each row (each possible input bit string)
+		// first sum the row
+		double S = 0;
+		for (j = 0; j < (1 << numOutputs); j++) {
+			S += table[i][j];
+		}
+		// now normalize the row
+		if (S == 0.0) { //if all the inputs on this row are 0, then give them all a probability of 1/(2^(number of outputs))
+			for (j = 0; j < (1 << numOutputs); j++)
+				table[i][j] = 1.0 / (double) (1 << numOutputs);
+		} else { //otherwise divide all values in a row by the sum of the row
+			for (j = 0; j < (1 << numOutputs); j++)
+				table[i][j] /= S;
+		}
+	}
+
+}
+
 void Gate::update(vector<double> & states, vector<double> & nextStates) { //this translates the input bits of the current states to the output bits of the next states
 	int input = getIndexFromInputs(states); // converts the input values into an index
-	int output = 0;
-	double r = Random::getDouble(1); //r is a random double between 0 and 1
-	while (r > table[input][output]) { //this goes across the probability table in row (input) and subtracts each value from r until r is less than a value it reaches
-		r -= table[input][output];
-		output++;
+	int outputColumn = 0;
+	double r = Random::getDouble(1); // r will determine with set of outputs will be chosen
+	while (r > table[input][outputColumn]) {
+		r -= table[input][outputColumn]; // this goes across the probability table in row for the given input and subtracts each
+								   // value in the table from r until r is less than a value it reaches
+		outputColumn++; // we have not found the correct output so move to the next output
 	}
-	for (size_t i = 0; i < outputs.size(); i++) //for each number in vector output...
-		nextStates[outputs[i]] += 1.0 * ((output >> i) & 1); //carries the output selected by r into the output of nextStates
+	for (size_t i = 0; i < outputs.size(); i++) //for each output...
+		nextStates[outputs[i]] += 1.0 * ((outputColumn >> i) & 1); // convert output (the column number) to bits and pack into next states
 }
 
 string Gate::description() {
@@ -351,16 +358,8 @@ void DeterministicGate::setupForBits(int* Ins, int nrOfIns, int Out, int logic) 
 
 void DeterministicGate::update(vector<double> & states, vector<double> & nextStates) {
 	int input = getIndexFromInputs(states); // converts the input values into an index
-	vector<double> outputRow = table[input];
-#if VOIDOUTPUT==1
-	//if(*Data::parameterDouble["voidOutput"]>0){
-	if (Random::P(Gate::voidOutPut)) {
-		outputRow[Random::getIndex(outputs.size())] = 0; // pick one output randomly and set it to 0
-	}
-	//}
-#endif // VOIDOUTPUT
 	for (size_t i = 0; i < outputs.size(); i++) {
-		nextStates[outputs[i]] += outputRow[i];
+		nextStates[outputs[i]] += table[input][i];
 	}
 }
 
@@ -708,10 +707,10 @@ string Thresholdgate::description() {
 }
 
 /* *** Fixed Epison Gate *** */
-/* this gate behaves like a deterministic gate with a constant externally set error */
+/* this gate behaves like a deterministic gate with a constant externally set error which may cause the outputs to scramble */
 
 FixedEpsilonGate::FixedEpsilonGate(Genome *genome, int genomeIndex) :
-					DeterministicGate(genome, genomeIndex){ // use DeterministicGate constructor to build set up everything (including a table of 0s and 1s)
+		DeterministicGate(genome, genomeIndex) { // use DeterministicGate constructor to build set up everything (including a table of 0s and 1s)
 	epsilon = FixedEpsilonGateP; // in case you want to have different epsilon for different gates (who am I to judge?)
 
 	// now to the specifics of this gate - we convert the table to a list of numbers (i.e. bitstrings) so we can do fast comparisons in the update
@@ -747,5 +746,29 @@ void FixedEpsilonGate::update(vector<double> & states, vector<double> & nextStat
 
 string FixedEpsilonGate::description() {
 	return "Fixed Epsilon " + mkString(epsilon) + "\n " + Gate::description();
+}
+
+/* *** VoidGate *** */
+/* this gate behaves like a deterministic gate with a constant externally set error which may set a single output to 0 */
+
+VoidGate::VoidGate(Genome *genome, int genomeIndex) :
+		DeterministicGate(genome, genomeIndex) { // use DeterministicGate constructor to build set up everything (including a table of 0s and 1s)
+	epsilon = voidOutPut; // in case you want to have different epsilon for different gates (who am I to judge?)
+}
+
+void VoidGate::update(vector<double> & states, vector<double> & nextStates) {
+	int input = getIndexFromInputs(states); // converts the input values into an index
+	vector<double> outputRow = table[input];
+
+	if (Random::P(epsilon)) {
+		outputRow[Random::getIndex(outputs.size())] = 0; // pick one output randomly and set it to 0
+	}
+	for (size_t i = 0; i < outputs.size(); i++) {
+		nextStates[outputs[i]] += outputRow[i];
+	}
+}
+
+string VoidGate::description() {
+	return "Void Gate " + mkString(epsilon) + "\n " + Gate::description();
 }
 

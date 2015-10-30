@@ -38,6 +38,8 @@ public:
 	static bool& usingGPGate;
 	static bool& usingThGate;
 	static bool& usingEpsiGate;
+	static bool& usingVoidGate;
+
 	static double& voidOutPut;
 	static double& FixedEpsilonGateP;
 
@@ -136,22 +138,19 @@ public:
 	double epsilon;
 	FixedEpsilonGate() = default;
 	FixedEpsilonGate(Genome *genome, int startCodonAt);
-//	{
-//		epsilon = FixedEpsilonGateP; // in case you want to have different epsilon for different gates (who am I to judge?)
-//
-//		// now to the specifics of this gate - we convert the table to a list of numbers (i.e. bitstrings) so we can do fast comparisons in the update
-//		defaultOutput.clear(); // clear the defaultOutput vector... the list of bitstrings
-//		for (size_t i = 0; i < table.size(); i++) { //for every row of the table (which is 2^inputs)
-//			int D = 0;
-//			for (size_t j = 0; j < table[i].size(); j++) { //for every space in the row
-//				D |= (Bit(table[i][j]) << j); //translate the value in that space to a bit (0 or 1), then bitshift it [position in row] times, then take D, bit-or it with that number,
-//				//and make that the new D
-//			}
-//			defaultOutput.push_back(D); //add D (which is a bitstring of length [2^outputs]) to defaultOutput. defaultoutputs is now of length (2^number of inputs)
-//		}
-//
-//	}
 	virtual ~FixedEpsilonGate() = default;
+	virtual void update(vector<double> & states, vector<double> & nextStates);
+	virtual string description();
+};
+
+class VoidGate: public DeterministicGate {
+private:
+public:
+	vector<int> defaultOutput;
+	double epsilon;
+	VoidGate() = default;
+	VoidGate(Genome *genome, int startCodonAt);
+	virtual ~VoidGate() = default;
 	virtual void update(vector<double> & states, vector<double> & nextStates);
 	virtual string description();
 };
