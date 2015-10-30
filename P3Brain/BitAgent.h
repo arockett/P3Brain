@@ -25,7 +25,7 @@ public:
     };
 
     BitAgent();
-    BitAgent( const vector<bool>& startGenome, int numInputStates, Decoder decoder = FixedInput, int gateComplexity = 2, int cubeDimension = 8 );
+    BitAgent( const vector<bool>& startGenome, int numInputStates, Decoder decoder = FixedInput, int gateComplexity = 2 );
     virtual ~BitAgent();
 
 private:
@@ -33,6 +33,6 @@ private:
 
     void DecodeFixedInputGenome( const vector<bool>&, int, int );
     void DecodeFixedLogicGenome( const vector<bool>&, int, int );
-    void DecodeHypercubeGenome( const vector<bool>&, int, int, int );
+    void DecodeHypercubeGenome( const vector<bool>&, int, int );
 };
 
