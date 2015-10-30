@@ -58,6 +58,7 @@ public:
 			Genome* genome, int codeNumber);
 	void getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, int& genomeIndex, Genome* genome);
 	void getTableFromGenome(vector<int> range, vector<int> rangeMax, int& genomeIndex, Genome* genome);
+	int getIndexFromInputs(vector<double> & states);
 	virtual ~Gate() = default;
 
 	virtual void update(vector<double> & states, vector<double> & nextStates);

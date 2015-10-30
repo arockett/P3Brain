@@ -51,8 +51,7 @@ void Gate::setupGates() {
 		Global::inUseGateTypes.insert(42);
 	}
 	if (usingDetGate) {
-		//AddGate(43, [](Genome* genome,int pos) {return make_shared<DeterministicGate>(genome,pos);});
-		AddGate(43, [](Genome* genome,int pos) {return make_shared<FixedEpsilonGate>(genome,pos);});
+		AddGate(43, [](Genome* genome,int pos) {return make_shared<DeterministicGate>(genome,pos);});
 		Global::inUseGateTypes.insert(43);
 	}
 	if (usingFBGate) {
@@ -227,12 +226,27 @@ void Gate::getTableFromGenome(vector<int> range, vector<int> rangeMax, int& geno
 	}
 }
 
-void Gate::update(vector<double> & states, vector<double> & nextStates) { //this translates the input bits of the current states to the output bits of the next states
-	int input = 0, output = 0;
-	double r = Random::getDouble(1); //r is a random double between 0 and 1
-	for (int i = (int) inputs.size() - 1; i >= 0; i--) { //for everything in vector inputs...
-		input = (input << 1) + Bit(states[inputs[i]]); //stores the current states in bitstring input with bitshifting. it will now be a bitstring of length (inputs)
+/*
+ * convert the inputs to an index by reading them one at a time and bitshifting the result
+ * the first input is read last so that 1, 10 , 100 (etc.) all return 1. (01)
+ * and 01, 010, 0100 (etc.) all return 2 (10)
+ * and 11, 110, 1100 (etc.) all return 3 (11)
+ * etc... hopefully you see the pattern
+ * This, btw, will maintain output consistency for these lower values even if a gate gains or loses inputs.
+ */
+int Gate::getIndexFromInputs(vector<double> & states){
+	int index = 0;
+
+	for (int i = (int) inputs.size() - 1; i >= 0; i--) {
+		index = (index << 1) + Bit(states[inputs[i]]);
 	}
+	return index;
+}
+
+void Gate::update(vector<double> & states, vector<double> & nextStates) { //this translates the input bits of the current states to the output bits of the next states
+	int input = getIndexFromInputs(states); // converts the input values into an index
+	int output = 0;
+	double r = Random::getDouble(1); //r is a random double between 0 and 1
 	while (r > table[input][output]) { //this goes across the probability table in row (input) and subtracts each value from r until r is less than a value it reaches
 		r -= table[input][output];
 		output++;
@@ -336,10 +350,7 @@ void DeterministicGate::setupForBits(int* Ins, int nrOfIns, int Out, int logic) 
 }
 
 void DeterministicGate::update(vector<double> & states, vector<double> & nextStates) {
-	int input = 0;
-	for (int i = (int) inputs.size() - 1; i >= 0; i--) {
-		input = (input << 1) + Bit(states[inputs[i]]); //stores current input states in bit string "input" with last input having greatest signifigence
-	}
+	int input = getIndexFromInputs(states); // converts the input values into an index
 	vector<double> outputRow = table[input];
 #if VOIDOUTPUT==1
 	//if(*Data::parameterDouble["voidOutput"]>0){
@@ -716,15 +727,11 @@ FixedEpsilonGate::FixedEpsilonGate(Genome *genome, int genomeIndex) :
 }
 
 void FixedEpsilonGate::update(vector<double> & states, vector<double> & nextStates) {
-	int input = 0; //input is the correct bitstring of outputs of the gate
-	for (size_t i = 0; i < inputs.size(); i++) { // for every index in the input (I) vector
-		input = (input << 1) + Bit(states[inputs[i]]); // stores current states in bitstring input
-	}
+	int input = getIndexFromInputs(states); // converts the input values into an index
 	if (Random::P(epsilon)) { //if there will be an error
 		//do a random output excluding the one otherwise given
 		int output = 0;
 		do {
-			// WAS output = rand() & (table.size() - 1);
 			output = Random::getIndex(table.size()); // pick a bitstring (with the correct number of bits) i.e. one bit for each output
 		} while (output == defaultOutput[input]); // if you happen to pick the a bit string which happens to match the correct output, pick again
 		for (size_t i = 0; i < outputs.size(); i++) {
