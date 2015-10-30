@@ -7,10 +7,7 @@
 
 #include "LogicalWorld.h"
 
-unsigned input1( unsigned );
-unsigned input2( unsigned );
-unsigned input3( unsigned );
-unsigned input4( unsigned );
+#include "Tools.h"
 
 
 LogicalWorld::LogicalWorld( const vector<Logic>& outputLogics )
@@ -66,7 +63,7 @@ double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
     }
     for( int i = 0; i < logic.size(); i++ )
     {
-        if( agent->states[agent->nrOfBrainStates - (logic.size() - i)] == (double)input1(logic[i]) )
+        if( agent->states[agent->nrOfBrainStates - ( logic.size() - i )] == (double)getBit( logic[i], 3 ) )
             fitness += fitnessIncrement;
     }
 
@@ -82,7 +79,7 @@ double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
     }
     for( int i = 0; i < logic.size(); i++ )
     {
-        if( agent->states[agent->nrOfBrainStates - ( logic.size() - i )] == (double)input2( logic[i] ) )
+        if( agent->states[agent->nrOfBrainStates - ( logic.size() - i )] == (double)getBit( logic[i], 2 ) )
             fitness += fitnessIncrement;
     }
     
@@ -98,7 +95,7 @@ double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
     }
     for( int i = 0; i < logic.size(); i++ )
     {
-        if( agent->states[agent->nrOfBrainStates - ( logic.size() - i )] == (double)input3( logic[i] ) )
+        if( agent->states[agent->nrOfBrainStates - ( logic.size() - i )] == (double)getBit( logic[i], 1 ) )
             fitness += fitnessIncrement;
     }
 
@@ -114,32 +111,9 @@ double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
     }
     for( int i = 0; i < logic.size(); i++ )
     {
-        if( agent->states[agent->nrOfBrainStates - ( logic.size() - i )] == (double)input4( logic[i] ) )
+        if( agent->states[agent->nrOfBrainStates - ( logic.size() - i )] == (double)getBit( logic[i], 0 ) )
             fitness += fitnessIncrement;
     }
 
     return fitness;
-}
-
-/*
- * Some utility functions
- */
-unsigned input1( unsigned l )
-{
-    return ( l & 8 ) >> 3;
-}
-
-unsigned input2( unsigned l )
-{
-    return ( l & 4 ) >> 2;
-}
-
-unsigned input3( unsigned l )
-{
-    return ( l & 2 ) >> 1;
-}
-
-unsigned input4( unsigned l )
-{
-    return l & 1;
 }
