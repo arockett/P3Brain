@@ -46,7 +46,7 @@ vector<double> LogicalWorld::evaluateFitness(vector<Agent*> agents, bool analyse
 double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
     // If there aren't enough non-input nodes to check then return 0 fitness
     // because the bit string is not long enough
-    if( logic.size() > agent->nrOfStates - 2 )
+    if( logic.size() > agent->nrOfBrainStates - 2 )
         return 0.0;
 
     double fitness = 0.0;
@@ -58,7 +58,7 @@ double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
     agent->resetBrain();
     agent->states[0] = 0.0;
     agent->states[1] = 0.0;
-    for( int i = 0; i < agent->nrOfStates - 2; i++ )
+    for( int i = 0; i < agent->nrOfBrainStates - 2; i++ )
     {
         agent->states[0] = 0.0;
         agent->states[1] = 0.0;
@@ -66,7 +66,7 @@ double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
     }
     for( int i = 0; i < logic.size(); i++ )
     {
-        if( agent->states[agent->nrOfStates - (logic.size() - i)] == (double)input1(logic[i]) )
+        if( agent->states[agent->nrOfBrainStates - (logic.size() - i)] == (double)input1(logic[i]) )
             fitness += fitnessIncrement;
     }
 
@@ -74,7 +74,7 @@ double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
     agent->resetBrain();
     agent->states[0] = 0.0;
     agent->states[1] = 1.0;
-    for( int i = 0; i < agent->nrOfStates - 2; i++ )
+    for( int i = 0; i < agent->nrOfBrainStates - 2; i++ )
     {
         agent->states[0] = 0.0;
         agent->states[1] = 1.0;
@@ -82,7 +82,7 @@ double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
     }
     for( int i = 0; i < logic.size(); i++ )
     {
-        if( agent->states[agent->nrOfStates - ( logic.size() - i )] == (double)input2( logic[i] ) )
+        if( agent->states[agent->nrOfBrainStates - ( logic.size() - i )] == (double)input2( logic[i] ) )
             fitness += fitnessIncrement;
     }
     
@@ -90,7 +90,7 @@ double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
     agent->resetBrain();
     agent->states[0] = 1.0;
     agent->states[1] = 0.0;
-    for( int i = 0; i < agent->nrOfStates - 2; i++ )
+    for( int i = 0; i < agent->nrOfBrainStates - 2; i++ )
     {
         agent->states[0] = 1.0;
         agent->states[1] = 0.0;
@@ -98,7 +98,7 @@ double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
     }
     for( int i = 0; i < logic.size(); i++ )
     {
-        if( agent->states[agent->nrOfStates - ( logic.size() - i )] == (double)input3( logic[i] ) )
+        if( agent->states[agent->nrOfBrainStates - ( logic.size() - i )] == (double)input3( logic[i] ) )
             fitness += fitnessIncrement;
     }
 
@@ -106,7 +106,7 @@ double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
     agent->resetBrain();
     agent->states[0] = 1.0;
     agent->states[1] = 1.0;
-    for( int i = 0; i < agent->nrOfStates - 2; i++ )
+    for( int i = 0; i < agent->nrOfBrainStates - 2; i++ )
     {
         agent->states[0] = 1.0;
         agent->states[1] = 1.0;
@@ -114,7 +114,7 @@ double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
     }
     for( int i = 0; i < logic.size(); i++ )
     {
-        if( agent->states[agent->nrOfStates - ( logic.size() - i )] == (double)input4( logic[i] ) )
+        if( agent->states[agent->nrOfBrainStates - ( logic.size() - i )] == (double)input4( logic[i] ) )
             fitness += fitnessIncrement;
     }
 

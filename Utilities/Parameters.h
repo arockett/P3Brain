@@ -198,7 +198,7 @@ public:
 			// Only set the configuration if no argument given
 			if (it != key_value.end()) {
 				bool success = load_value(it->second, pair.second.variable);
-				if (not success) {
+				if (!success) {
 					throw std::invalid_argument(
 							"Bad configuration option for '" + it->first + "' given: " + it->second);
 				}

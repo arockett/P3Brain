@@ -15,7 +15,7 @@ public:
     BitGate(const vector<int>& ins, int out, const vector<bool>& logic);
     virtual ~BitGate();
 
-    void update( double *states, double *nextStates ) override;
+    void update( vector<double>& states, vector<double>& nextStates ) override;
 
 private:
     int gateIndex;

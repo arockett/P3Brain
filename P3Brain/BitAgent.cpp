@@ -18,10 +18,6 @@ BitAgent::BitAgent()
 
 BitAgent::BitAgent( const vector<bool>& startGenome, int numInputStates, BitAgent::Decoder decoder, int gateComplexity, int cubeDimension)
 {
-    // Must still initialize the nodeMap even though BitAgent doesn't
-    // need to use it since the destructor of Agent calls delete on nodeMap
-    nodeMap = new int[1];
-
     switch( decoder )
     {
     case FixedInput:
@@ -50,14 +46,14 @@ void BitAgent::DecodeFixedInputGenome( const vector<bool>& genome, int numInputS
     int logicSize = pow( 2.0, gateIns );
     float numGates = ( genome.size() / logicSize );
     assert(fmod(numGates, 1) == 0);
-    nrOfStates = numGates + numInputStates;
+    nrOfBrainStates = numGates + numInputStates;
 
-    states = new double[nrOfStates];
-    nextStates = new double[nrOfStates];
+    states.resize(nrOfBrainStates);
+    nextStates.resize(nrOfBrainStates);
 
     this->genome = make_shared<vector<bool>>( genome );
     gates.clear();
-    for( int i = numInputStates; i < nrOfStates; i++ )
+    for( int i = numInputStates; i < nrOfBrainStates; i++ )
     {
         vector<bool> gateBits;
         for( int j = 0; j < logicSize; j++ )
@@ -71,7 +67,7 @@ void BitAgent::DecodeFixedInputGenome( const vector<bool>& genome, int numInputS
             inStates.push_back( i - j );
         }
 
-        gates.push_back( new BitGate( inStates, i, gateBits ) );
+        gates.push_back( shared_ptr<Gate>( new BitGate( inStates, i, gateBits ) ) );
     }
 }
 
@@ -92,13 +88,13 @@ void BitAgent::DecodeHypercubeGenome( const vector<bool>& genome, int numInputSt
 
     int numGates = 0; // TODO: calculate gate size
 
-    nrOfStates = numGates + numInputStates;
-    states = new double[nrOfStates];
-    nextStates = new double[nrOfStates];
+    nrOfBrainStates = numGates + numInputStates;
+    states.resize(nrOfBrainStates);
+    nextStates.resize(nrOfBrainStates);
 
     this->genome = make_shared<vector<bool>>( genome );
     gates.clear();
-    for( int i = numInputStates; i < nrOfStates; i++ )
+    for( int i = numInputStates; i < nrOfBrainStates; i++ )
     {
         vector<bool> gateBits;
         // TODO: Fill gateBits
@@ -106,6 +102,6 @@ void BitAgent::DecodeHypercubeGenome( const vector<bool>& genome, int numInputSt
         vector<int> inStates;
         // TODO: Fill inStates
 
-        gates.push_back( new BitGate( inStates, i, gateBits ) );
+        gates.push_back( shared_ptr<Gate>( new BitGate(inStates, i, gateBits) ) );
     }
 }

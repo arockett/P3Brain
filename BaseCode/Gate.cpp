@@ -45,6 +45,7 @@ void Gate::setupGates() {
 	for (int i = 0; i < 256; i++) {
 		Gate::AddGate(i, nullptr);
 	}
+
 	if (usingProbGate) {
 		AddGate(42, [](Genome* genome,int pos) {return make_shared<Gate>(genome,pos);});
 		Global::inUseGateTypes.insert(42);

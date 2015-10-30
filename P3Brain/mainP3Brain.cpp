@@ -146,7 +146,5 @@ int main( int argc, char * argv[] )
         meta.close();
     }
 
-    cin.ignore();
-
     return 0;
 }
