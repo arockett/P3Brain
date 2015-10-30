@@ -27,6 +27,21 @@
 
 using namespace std;
 
+
+
+void writeRealTimeFiles (vector<Genome*> population, vector<double> W) {// write Ave and Dominant files NOW!
+// write out Ave
+
+	DataMap AveValues;
+	for (auto genome : population){
+
+	}
+// write out Dominant
+
+}
+
+
+
 int main(int argc, const char * argv[]) {
 	//setupParameters(argc, argv); // read command line and config file and set up parameters
 
@@ -108,6 +123,7 @@ int main(int argc, const char * argv[]) {
 		agents.clear();
 		// write data to file and prune LOD every pruneInterval
 		if (Global::update % Global::pruneInterval == 0) {
+			writeRealTimeFiles(population,W);
 			Genome::MRCA = population[0]->getMostRecentCommonAncestor();
 			population[0]->saveDataOnLOD(); // write out data and genomes
 			// data and genomes have now been written out up till the MRCA

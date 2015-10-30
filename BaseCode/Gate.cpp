@@ -259,7 +259,8 @@ void Gate::update(vector<double> & states, vector<double> & nextStates) { //this
 		outputColumn++; // we have not found the correct output so move to the next output
 	}
 	for (size_t i = 0; i < outputs.size(); i++) //for each output...
-		nextStates[outputs[i]] += 1.0 * ((outputColumn >> i) & 1); // convert output (the column number) to bits and pack into next states
+		nextStates[outputs[i]] += 1.0 * ((outputColumn >> (outputs.size()-1-i)) & 1); // convert output (the column number) to bits and pack into next states
+																						// but always put the last bit in the first input (to maintain consistancy)
 }
 
 string Gate::description() {

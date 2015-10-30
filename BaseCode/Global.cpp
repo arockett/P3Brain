@@ -23,6 +23,12 @@ string& Global::DataFileName = Parameters::register_parameter("dataFileName", (s
 		"name of genome file (stores genomes for line of decent)", "DATA");
 string& Global::GenomeFileName = Parameters::register_parameter("genomeFileName", (string) "genome.csv",
 		"name of data file (stores data i.e. scores", "DATA");
+
+string& Global::AveFileName = Parameters::register_parameter("aveFileName", (string) "ave.csv",
+		"name of the Averages file (averages for all agents when file is written to)", "DATA");
+string& Global::DominantFileName = Parameters::register_parameter("dominantFileName", (string) "dominant.csv",
+		"name of the Dominant file (all stats for best genome when file is written to)", "DATA");
+
 int& Global::bitsPerBrainAddress = Parameters::register_parameter("bitsPerBrainAddress", 10,
 		"how many bits are evaluated to determine the brain addresses", "AGENT");
 
@@ -34,3 +40,4 @@ int Global::lastPrune = 0; // last time Genome was Pruned
 int Global::nextDataWrite = 0; // next time data files will be written to disk
 int Global::nextGenomeWrite = 0; // next time a genome file will be written to genome.csv
 map<string,vector<string>> Global::files; // list of files in use with their meta data
+vector<string> Global::DefaultAveFileColumns = {"update","ID","score"};

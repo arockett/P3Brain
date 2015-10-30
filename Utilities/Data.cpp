@@ -24,24 +24,25 @@ bool DataMap::fieldExists(const string& key) {
 }
 
 void DataMap::writeToFile(const string& fileName, const vector<string>& keys) {
+
 	string headerStr = "";
 	string dataStr = "";
-	if (keys.size() > 0) {
+	if (keys.size() > 0) { // if we keys is not empty
 		for (auto i : keys) {
 			headerStr = headerStr + FileManager::separator + i; // make the header string from keys
 			dataStr = dataStr + FileManager::separator + data[i]; // make the data string from data[keys]
 		}
 		headerStr.erase(headerStr.begin()); // clip off the leading separator
 		dataStr.erase(dataStr.begin()); // clip off the leading separator
-	} else { // if there are no elements in keys
-		for (auto i : data) {
-			headerStr = headerStr + FileManager::separator + i.first; // get the elements from the elements in this DataMap
-			dataStr = dataStr + FileManager::separator + i.second; // get the values from the DataMap
+	} else { // if keys is empty
+		for (auto i : data) { // for every element in data...
+			headerStr = headerStr + FileManager::separator + i.first; // make the header string from all of the keys in data
+			dataStr = dataStr + FileManager::separator + i.second; // make the data string from all of the data
 		}
-		if (headerStr.size() > 0) { // if there are any elements in the strings...
+		if (headerStr.size() > 0) { // if the header string is not empty
 			headerStr.erase(headerStr.begin()); // clip off the leading separator
 			dataStr.erase(dataStr.begin()); // clip off the leading separator
-		} else { // if there are no elements in the strings, print a warning!
+		} else { // if the header string is empty, print a warning!
 			cout << "  In DataMap::writeToFile(): This DataMap contains no keys. Writing a blank line to file: "
 					<< fileName << "\n";
 		}
