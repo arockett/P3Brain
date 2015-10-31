@@ -8,6 +8,7 @@
 #ifndef __BasicMarkovBrainTemplate__Utilities__
 #define __BasicMarkovBrainTemplate__Utilities__
 
+#include <algorithm>
 #include <sstream>
 
 using namespace std;
@@ -35,6 +36,16 @@ inline string mkString(Type value) {
 	std::ostringstream oss;
 	oss << value;
 	return oss.str();
+}
+
+/*
+ * getBestInVector(vector<T> vec)
+ * given W (a list of scores), return the index of the highest score
+ * if more then one genome has max score, return the first one.
+ */
+template<typename Type>
+inline int findGreatestInVector(vector<Type> vec) {
+		return distance(vec.begin(), max_element (vec.begin(),vec.end()));
 }
 
 #endif // __BasicMarkovBrainTemplate__Utilities__

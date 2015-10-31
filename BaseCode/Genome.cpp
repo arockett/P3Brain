@@ -234,20 +234,19 @@ void Genome::saveDataOnLOD(int flush) {
 	vector<Genome*> LOD = getLOD(); 		// get line of decent
 	Genome* effective_MRCA;
 	if (flush) {							// if flush then we don't care about convergance
-		effective_MRCA = this->ancestor; // this assumes that a population was created, but not tested at the end of the evolution loop!
+		effective_MRCA = ancestor; // this assumes that a population was created, but not tested at the end of the evolution loop!
 	} else {								// find the convergance point in the LOD.
 		effective_MRCA = MRCA;
 	}
 
-
-	while ((effective_MRCA->birthDate > Global::nextDataWrite) && (Global::nextDataWrite <= Global::updates)) { // if there is convergence before the next data interval
+	while ((effective_MRCA->birthDate >= Global::nextDataWrite) && (Global::nextDataWrite <= Global::updates)) { // if there is convergence before the next data interval
 		for (auto file : Global::files) { // for each file in files
 			LOD[Global::nextDataWrite - Global::lastPrune]->dataMap.writeToFile(file.first, file.second); // append new data to the file
 		}
 		Global::nextDataWrite += Global::dataInterval;
 	}
 
-	while ((effective_MRCA->birthDate > Global::nextGenomeWrite) && (Global::nextGenomeWrite <= Global::updates)) { // if there is convergence before the next data interval
+	while ((effective_MRCA->birthDate >= Global::nextGenomeWrite) && (Global::nextGenomeWrite <= Global::updates)) { // if there is convergence before the next data interval
 		string dataString;
 		if (LOD[Global::nextGenomeWrite - Global::lastPrune]->sites.size() > 0) { // convert the genome into a string of int
 			for (auto site : LOD[Global::nextGenomeWrite - Global::lastPrune]->sites) {

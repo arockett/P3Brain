@@ -38,8 +38,9 @@ Agent::Agent(Genome* startGenome, int _nrOfBrainStates) { //this is a constructo
 		}
 	}
 
-	inOutReMap();
-	genome->dataMap.Set("gates",gates.size());
+	inOutReMap(); // map ins and outs from genome values to brain states
+	genome->dataMap.Set("gates",gates.size()); // track number of gates
+	genome->dataMap.Set("genomeSize",genome->sites.size()); // track length of genome
 }
 
 void Agent::resetBrain() {
