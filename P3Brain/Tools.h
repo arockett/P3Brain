@@ -8,6 +8,8 @@
 * date: 10/30/2015
 ******************************************************************************/
 
+#include <vector>
+
 
 /****************************
  * Some utility functions
@@ -17,30 +19,14 @@
  * Treate a vector of booleans as a representation of a bit string and 
  * return the unsigned integer representation of that bit string
  */
-unsigned boolStringToInt( const vector<bool>& boolStr )
-{
-    unsigned value = 0;
-    for( auto place : boolStr )
-    {
-        value <<= 1;
-        if( place ) value |= 1;
-    }
-    return value;
-}
+unsigned boolStringToInt( const std::vector<bool>& boolStr );
 
 /**
  * Flip the bit at a given position in the number (starting with 0 as the rightmost bit)
  */
-unsigned flipBit( unsigned n, int pos )
-{
-    unsigned mask = 1 << pos;
-    return n ^ mask;
-}
+unsigned flipBit( unsigned n, int pos );
 
 /**
  * Return the bit at a given position in the number (starting with 0 as the rightmost bit)
  */
-unsigned getBit( unsigned n, int pos )
-{
-    return ( n & (unsigned)pow(2.0, pos) ) >> pos;
-}
+unsigned getBit( unsigned n, int pos );

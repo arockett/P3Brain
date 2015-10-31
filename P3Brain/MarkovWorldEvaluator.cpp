@@ -26,10 +26,7 @@
 MarkovWorld::MarkovWorld(Configuration& config, int run_number)
 {
     vector<LogicalWorld::Logic> args = {
-        LogicalWorld::Logic::XOR,
-        LogicalWorld::Logic::NAND,
-        LogicalWorld::Logic::NXOR,
-        LogicalWorld::Logic::TRUE
+        LogicalWorld::Logic::XOR
     };
 
     trainingGround = shared_ptr<World>( new LogicalWorld( args ) );
@@ -44,7 +41,7 @@ MarkovWorld::MarkovWorld(Configuration& config, int run_number)
 */
 float MarkovWorld::evaluate(const vector<bool>& solution)
 {
-    BitAgent agent = BitAgent(solution, 2, BitAgent::FixedInput, 2);
+    BitAgent agent = BitAgent(solution, 2, BitAgent::Hypercube, 2);
 
     return trainingGround->testIndividual(&agent, false);
 }

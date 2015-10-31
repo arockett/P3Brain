@@ -9,7 +9,9 @@
 
 #include <cmath>
 #include <cassert>
+
 #include "BitGate.h"
+#include "Tools.h"
 
 
 // Define a custom assert function that prints out a message if the assert fails
@@ -76,13 +78,13 @@ void BitAgent::DecodeFixedInputGenome( const vector<bool>& genome, int numInputS
             inStates.push_back( i - j );
         }
 
-        vector<bool> gateBits;
+        vector<bool> gateLogic;
         for( int j = 0; j < logicSize; j++ )
         {
-            gateBits.push_back( genome[( i - numInputStates ) * logicSize + j] );
+            gateLogic.push_back( genome[( i - numInputStates ) * logicSize + j] );
         }
 
-        gates.push_back( shared_ptr<Gate>( new BitGate( inStates, i, gateBits ) ) );
+        gates.push_back( shared_ptr<Gate>( new BitGate( inStates, i, gateLogic ) ) );
     }
 }
 
@@ -122,8 +124,8 @@ void BitAgent::DecodeHypercubeGenome( const vector<bool>& genome, int numInputSt
     int gateEncodingSize = gateIns * inputEncodingSize + gateLogicEncodingSize;
     double numGates = (double)genome.size() / (double)gateEncodingSize;
     ASSERT( numGates == pow( 2.0, cubeDimension ) - numInputStates,
-        "Invalid P3 bit string length. Based on the number of input states and gate complexity, length should be"
-        << (pow( 2.0, cubeDimension ) - numInputStates) * gateEncodingSize );
+        "Invalid P3 bit string length. Based on the number of input states and gate complexity, length should be "
+        << ( pow( 2.0, cubeDimension ) - numInputStates ) * gateEncodingSize << "." );
 
 
     /********************************************************
@@ -138,11 +140,22 @@ void BitAgent::DecodeHypercubeGenome( const vector<bool>& genome, int numInputSt
     for( int i = numInputStates; i < nrOfBrainStates; i++ )
     {
         vector<int> inStates;
-        // TODO: Fill inStates
+        for( int k = 0; k < gateIns; k++ )
+        {
+            vector<bool> inNumber;
+            for( int j = 0; j < inputEncodingSize; j++ )
+            {
+                inNumber.push_back( genome[( ( i - numInputStates ) * gateEncodingSize ) + ( k*inputEncodingSize ) + j] );
+            }
+            inStates.push_back( flipBit(i, boolStringToInt( inNumber )) );
+        }
 
-        vector<bool> gateBits;
-        // TODO: Fill gateBits
+        vector<bool> gateLogic;
+        for( int j = 0; j < gateLogicEncodingSize; j++ )
+        {
+            gateLogic.push_back( genome[( ( i - numInputStates ) * gateEncodingSize ) + ( gateIns*inputEncodingSize ) + j] );
+        }
 
-        gates.push_back( shared_ptr<Gate>( new BitGate(inStates, i, gateBits) ) );
+        gates.push_back( shared_ptr<Gate>( new BitGate(inStates, i, gateLogic) ) );
     }
 }
