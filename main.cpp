@@ -59,11 +59,10 @@ int main(int argc, const char * argv[]) {
 	Gate::setupGates(); // determines which gate types will be in use.
 
 	if (Global::seedRandom) {
-		Random::seed();
-		Random::seedAlt();
+	  random_device rd;
+		Random::getCommonGenerator().seed(rd());
 	} else {
-		Random::seed(Global::repNumber);
-		Random::seedAlt(Global::repNumber + 1);
+	  Random::getCommonGenerator().seed(Global::repNumber);
 	}
 
 	//Optimizer *optimizer = (Optimizer*) new GA();
