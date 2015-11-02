@@ -2,7 +2,6 @@
 #include "../Utilities/Parameters.h"
 #include "../Utilities/Utilities.h"
 
-
 //global variables that should be accessible to all
 int& Global::repNumber = Parameters::register_parameter("repNumber", 101,
 		"Replicate ID and seed (if seedWithPID not set true)", "GLOBAL");
@@ -39,5 +38,5 @@ int Global::lastPrune = 0; // last time Genome was Pruned
 
 int Global::nextDataWrite = 0; // next time data files will be written to disk
 int Global::nextGenomeWrite = 0; // next time a genome file will be written to genome.csv
-map<string,vector<string>> Global::files; // list of files in use with their meta data
-vector<string> Global::DefaultAveFileColumns = {"update","score","ID","genomeSize","gates"};
+map<string, vector<string>> Global::files; // list of files in use with their meta data
+vector<string> Global::DefaultAveFileColumns = { "update", "score", "ID", "genomeSize", "gates" };

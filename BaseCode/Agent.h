@@ -69,7 +69,7 @@ public:
 
 public:
 	inline void setState(const int& state, const double& value) {
-		if (state < (int)states.size()) {
+		if (state < (int) states.size()) {
 			states[state] = value;
 		} else {
 			cout << "Writing to invalid brain state - this brain needs more states!\nExiting\n";
@@ -77,7 +77,7 @@ public:
 		}
 	}
 	inline double getState(const int& state) {
-		if (state < (int)states.size()) {
+		if (state < (int) states.size()) {
 			return states[state];
 		} else {
 			cout << "Reading from invalid brain state - this brain needs more states!\nExiting\n";

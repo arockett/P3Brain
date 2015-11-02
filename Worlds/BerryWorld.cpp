@@ -15,13 +15,13 @@
 
 /* *** implementation of the World *** */
 
-double& BerryWorld::TSK = Parameters::register_parameter("BERRY_taskSwitchingCost", 1.4,
-		"cost to change food sources", "WORLD - BERRY");
+double& BerryWorld::TSK = Parameters::register_parameter("BERRY_taskSwitchingCost", 1.4, "cost to change food sources",
+		"WORLD - BERRY");
 int& BerryWorld::worldUpdates = Parameters::register_parameter("BERRY_WorldUpdates", 400,
 		"amount of time an agent is tested", "WORLD - BERRY");
 
-int& BerryWorld::foodSourceTypes = Parameters::register_parameter("BERRY_foodSourceTypes", 2,
-		"number of types of food", "WORLD - BERRY");
+int& BerryWorld::foodSourceTypes = Parameters::register_parameter("BERRY_foodSourceTypes", 2, "number of types of food",
+		"WORLD - BERRY");
 double& BerryWorld::rewardForFood1 = Parameters::register_parameter("BERRY_rewardForFood1", 1.0,
 		"reward for eating a Food1", "WORLD - BERRY");
 double& BerryWorld::rewardForFood2 = Parameters::register_parameter("BERRY_rewardForFood2", 1.0,
@@ -219,7 +219,7 @@ double BerryWorld::testIndividual(Agent *agent, bool analyse) {
 			score += foodRewards[grid[xp][yp] - 1]; // you ate a food... good for you!
 			lastFood = grid[xp][yp]; // remember the last food eaten
 			eaten[grid[xp][yp] - 1]++; // track the number of each berry eaten
-			agent->genome->dataMap.Append("foodList",grid[xp][yp]);
+			agent->genome->dataMap.Append("foodList", grid[xp][yp]);
 			grid[xp][yp] = 0; // clear this location
 		}
 		if ((output2 == 0) || (allowMoveAndEat == 1)) { // if we did not eat or we allow moving and eating in the same world update
@@ -263,8 +263,8 @@ double BerryWorld::testIndividual(Agent *agent, bool analyse) {
 	if (score < 0.0) {
 		score = 0.0;
 	}
-	if (!agent->genome->dataMap.fieldExists("foodList")){
-			agent->genome->dataMap.Append("foodList",0);
+	if (!agent->genome->dataMap.fieldExists("foodList")) {
+		agent->genome->dataMap.Append("foodList", 0);
 	}
 	agent->genome->dataMap.Set("switches", switched);
 	int total_eaten = 0;
@@ -273,8 +273,8 @@ double BerryWorld::testIndividual(Agent *agent, bool analyse) {
 		string temp_name = "food" + to_string(i + 1);
 		agent->genome->dataMap.Set(temp_name, eaten[i]);
 	}
-	agent->genome->dataMap.Set("total",total_eaten);
-	agent->genome->dataMap.Set("score",score);
+	agent->genome->dataMap.Set("total", total_eaten);
+	agent->genome->dataMap.Set("score", score);
 	if (analyse) {
 		agent->genome->dataMap.Set("phi", Analyse::computeAtomicPhi(stateCollector, agent->nrOfBrainStates));
 	}

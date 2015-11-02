@@ -19,7 +19,7 @@
 
 using namespace std;
 
-class Optimizer{
+class Optimizer {
 public:
 	static int& elitism;
 	static int& tournamentSize;
@@ -28,21 +28,21 @@ public:
 	double maxFitness;
 	Optimizer() = default;
 	virtual ~Optimizer() = default;
-	virtual vector<Genome*> makeNextGeneration(vector<Genome*> population,vector<double> W);
+	virtual vector<Genome*> makeNextGeneration(vector<Genome*> population, vector<double> W);
 };
 
-class GA:Optimizer{
+class GA: Optimizer {
 public:
-	virtual vector<Genome*> makeNextGeneration(vector<Genome*> population,vector<double> W);
+	virtual vector<Genome*> makeNextGeneration(vector<Genome*> population, vector<double> W);
 };
 
-class P3:Optimizer{
-	
+class P3: Optimizer {
+
 };
 
-class Tournament:Optimizer{
+class Tournament: Optimizer {
 public:
-	virtual vector<Genome*> makeNextGeneration(vector<Genome*> population,vector<double> W);
+	virtual vector<Genome*> makeNextGeneration(vector<Genome*> population, vector<double> W);
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Optimizer__) */

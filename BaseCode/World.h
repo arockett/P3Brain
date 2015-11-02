@@ -17,34 +17,34 @@
 
 using namespace std;
 
-class World{
+class World {
 public:
 	static int& repeats;
 
 public:
 	World();
 	virtual ~World();
-	virtual vector<double> evaluateFitness(vector<Agent*> agents,bool analyse);
-	virtual double testIndividual(Agent *agent,bool analyse);
+	virtual vector<double> evaluateFitness(vector<Agent*> agents, bool analyse);
+	virtual double testIndividual(Agent *agent, bool analyse);
 };
 
-class ExampleWorld: public World{
+class ExampleWorld: public World {
 public:
 	ExampleWorld();
 	~ExampleWorld();
-	virtual vector<double> evaluateFitness(vector<Agent*> agents,bool analyse);
-	double testIndividual(Agent *agent,bool analyse);
+	virtual vector<double> evaluateFitness(vector<Agent*> agents, bool analyse);
+	double testIndividual(Agent *agent, bool analyse);
 };
 
-class MultiThreadWorld: public World{
+class MultiThreadWorld: public World {
 private:
 	int nthreads;
 public:
 //	void threadedEvaluateFitness(int chunkBegin, int chunkEnd, const vector<Agent*>& agents, int& evaluations);
-	
-    MultiThreadWorld();
-   ~ MultiThreadWorld();
-	virtual vector<double> evaluateFitness(vector<Agent*> agents,bool analyse);
-	static void staticTestIndividual(Agent *agent,bool analyse);
+
+	MultiThreadWorld();
+	~ MultiThreadWorld();
+	virtual vector<double> evaluateFitness(vector<Agent*> agents, bool analyse);
+	static void staticTestIndividual(Agent *agent, bool analyse);
 };
 #endif /* defined(__BasicMarkovBrainTemplate__World__) */

@@ -31,15 +31,15 @@ Agent::Agent(Genome* startGenome, int _nrOfBrainStates) { //this is a constructo
 	for (size_t i = 0; i < genome->sites.size() - 1; i++) {
 		const int S = genome->sites[i];
 		if ((S + genome->sites[i + 1]) == 256) {
-			if (Gate::makeGate[S] != NULL) {
+			if (Gate::makeGate[S] != nullptr) {
 				gates.push_back(Gate::makeGate[S](genome, i));
 			}
 		}
 	}
 
 	inOutReMap(); // map ins and outs from genome values to brain states
-	genome->dataMap.Set("gates",gates.size()); // track number of gates
-	genome->dataMap.Set("genomeSize",genome->sites.size()); // track length of genome
+	genome->dataMap.Set("gates", gates.size()); // track number of gates
+	genome->dataMap.Set("genomeSize", genome->sites.size()); // track length of genome
 }
 
 void Agent::resetBrain() {

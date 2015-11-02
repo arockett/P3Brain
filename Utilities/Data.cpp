@@ -20,7 +20,7 @@ string DataMap::Get(const string& key) {
 }
 
 bool DataMap::fieldExists(const string& key) {
-	return (data.find(key)!=data.end());
+	return (data.find(key) != data.end());
 }
 
 void DataMap::writeToFile(const string& fileName, const vector<string>& keys) {
@@ -58,7 +58,7 @@ vector<string> DataMap::getKeys() {
 	return (keys);
 }
 
-void DataMap::Clear(){
+void DataMap::Clear() {
 	data.clear();
 }
 
@@ -73,7 +73,7 @@ void FileManager::writeToFile(const string& fileName, const string& data, const 
 			FILE << header << "\n";
 		}
 	}
-	if (fileClosed){
+	if (fileClosed) {
 		FILE.open(fileName, ios::out | ios::app); // open file in append mode
 	}
 	FILE << data << "\n";

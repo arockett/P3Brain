@@ -36,15 +36,17 @@ vector<double> MutationAnalyse::evalAgentNTimes(Agent* testAgent, World* world, 
 vector<set<int>> MutationAnalyse::getPossibleStartCodons(Genome* genome) {
 	vector<set<int>> possStartCodons;
 	possStartCodons.resize(2); //vector[0] is the list of first-position start codons (e.g. 42), vector[1] is the second-position start codons
-	for (int genomeSearcher = 0; genomeSearcher < (int)genome->sites.size(); genomeSearcher++) { //for every spot in the genome
+	for (int genomeSearcher = 0; genomeSearcher < (int) genome->sites.size(); genomeSearcher++) { //for every spot in the genome
 		for (auto gateType : Global::inUseGateTypes) {
 			if (genome->sites[genomeSearcher] == gateType) { //if a nucleotide is one of these numbers
-				if (genome->sites[(genomeSearcher + 1)%genome->sites.size()] != (256 - genome->sites[genomeSearcher])) { //if this is not already a gate
+				if (genome->sites[(genomeSearcher + 1) % genome->sites.size()]
+						!= (256 - genome->sites[genomeSearcher])) { //if this is not already a gate
 					possStartCodons[0].insert(genomeSearcher);
 				}
 			}
 			if (genome->sites[genomeSearcher] == 256 - gateType) { //FOR LOOKING FOR A CERTAIN GATE: CHANGE THIS NUMBER RIGHT HERE
-				if (genome->sites[(genomeSearcher - 1)%genome->sites.size()] != 256 - (genome->sites[genomeSearcher])) {
+				if (genome->sites[(genomeSearcher - 1) % genome->sites.size()]
+						!= 256 - (genome->sites[genomeSearcher])) {
 					possStartCodons[1].insert(genomeSearcher);
 				}
 			}
@@ -99,7 +101,7 @@ void MutationAnalyse::evalPossibleAgents(Genome* genome, int brainStates, World 
 	//these loops check to make sure identified start codons are not already in agentCodingRegions
 	for (auto position : possStartCodons[0]) {
 		int testSite = position + 1;
-		if (testSite == (int)testGenome->sites.size()) {
+		if (testSite == (int) testGenome->sites.size()) {
 			testSite = 0;
 		}
 		if (agentCodingReg.find(testSite) != agentCodingReg.end()) { //if the site after this site is in the list of coding regions
@@ -239,8 +241,8 @@ void MutationAnalyse::test_point_mutations_and_output(int gen, Genome* tester, b
 		string ave_File_Name = outputDirectory_Name + "/AvesPerVar" + "_g" + string(buffer2) + "_MED_dat.py";
 		ofstream AVE_FILE;
 		AVE_FILE.open(ave_File_Name.c_str());
-		AVE_FILE << "genomeSize = " << ((Genome*) subject)->sites.size() << "\n" << "wildTypeFit = " << avgWTF
-				<< "\n" << "numGates = " << subAgent->numGates() << "\n" << "data = [";
+		AVE_FILE << "genomeSize = " << ((Genome*) subject)->sites.size() << "\n" << "wildTypeFit = " << avgWTF << "\n"
+				<< "numGates = " << subAgent->numGates() << "\n" << "data = [";
 		vector<double> varsPerSite;
 		for (auto site = avePerVarStructure.begin(); site != avePerVarStructure.end(); site++) {
 			varsPerSite = avePerVarStructure[site->first];
@@ -265,8 +267,8 @@ void MutationAnalyse::test_point_mutations_and_output(int gen, Genome* tester, b
 		string ave_File_Name = outputDirectory_Name + "/AllVars" + "_g" + string(buffer2) + "_MED_dat.py";
 		ofstream AVE_FILE;
 		AVE_FILE.open(ave_File_Name.c_str());
-		AVE_FILE << "genomeSize = " << ((Genome*) subject)->sites.size() << "\n" << "wildTypeFit = " << avgWTF
-				<< "\n" << "numGates = " << subAgent->numGates() << "\n" << "data = [";
+		AVE_FILE << "genomeSize = " << ((Genome*) subject)->sites.size() << "\n" << "wildTypeFit = " << avgWTF << "\n"
+				<< "numGates = " << subAgent->numGates() << "\n" << "data = [";
 		for (size_t i = 0; i < allVarStructure.size(); i++) {
 			AVE_FILE << allVarStructure[i] << ",";
 			if (i % 250 == 0) {
@@ -286,8 +288,8 @@ void MutationAnalyse::test_point_mutations_and_output(int gen, Genome* tester, b
 		string ave_File_Name = outputDirectory_Name + "/WildTypeDist" + "_g" + string(buffer2) + "_MED_dat.py";
 		ofstream AVE_FILE;
 		AVE_FILE.open(ave_File_Name.c_str());
-		AVE_FILE << "genomeSize = " << ((Genome*) subject)->sites.size() << "\n" << "wildTypeFit = " << avgWTF
-				<< "\n" << "numGates = " << subAgent->numGates() << "\n" << "data = [";
+		AVE_FILE << "genomeSize = " << ((Genome*) subject)->sites.size() << "\n" << "wildTypeFit = " << avgWTF << "\n"
+				<< "numGates = " << subAgent->numGates() << "\n" << "data = [";
 		for (size_t i = 0; i < rawWTF.size(); i++) {
 			AVE_FILE << rawWTF[i] << ",";
 			if (i % 250 == 0) {
