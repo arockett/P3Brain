@@ -45,7 +45,6 @@ public:
     MultiThreadWorld();
    ~ MultiThreadWorld();
 	virtual vector<double> evaluateFitness(vector<Agent*> agents,bool analyse);
-	//virtual double testIndividual(Agent *agent,bool analyse);
 	static void staticTestIndividual(Agent *agent,bool analyse);
 };
 #endif /* defined(__BasicMarkovBrainTemplate__World__) */

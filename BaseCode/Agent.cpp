@@ -23,7 +23,6 @@ bool& Agent::serialProcessing = Parameters::register_parameter("serialProcessing
 		"sets agents to overwrite... right?", "AGENT");
 
 Agent::Agent(Genome* startGenome, int _nrOfBrainStates) { //this is a constructor. it is run whenever a new agent is created.
-	//cout << "in agent contructor\n";
 	nrOfBrainStates = _nrOfBrainStates;
 	states.resize(nrOfBrainStates);
 	nextStates.resize(nrOfBrainStates);
@@ -65,7 +64,7 @@ void Agent::updateStates() {
 		nextStates[i] = 0.0;
 	}
 	for (size_t i = 0; i < gates.size(); i++) { //update each gate
-#if SKIPGATE==1
+#if SKIPGATE==1 // if SKIPGATE is enabled, there is a chance a gate will not update
 		if (!Random::P(Agent::skipGate)) {
 			gates[i]->update(states, nextStates);
 		}
@@ -75,17 +74,13 @@ void Agent::updateStates() {
 	}
 	for (int i = 0; i < nrOfBrainStates; i++) { //sets states for t+1 to states just updated in the last line
 		states[i] = nextStates[i];
-		//cout << states[i] << " ";
 	}
-	//cout << "\n";
 }
 
 void Agent::inOutReMap() { // remaps genome site values to valid brain state addresses
-	//cout << "in Agent::inOutReMap\n";
 	for (size_t i = 0; i < gates.size(); i++) {
 		gates[i]->applyNodeMap(defaultNodeMap, nrOfBrainStates);
 	}
-	//cout << "leaving Agent::inOutReMap\n";
 
 }
 
@@ -141,11 +136,6 @@ set<int> Agent::findCodingRegions(int mask) { //if mask=0, all coding regions ar
 			}
 		}
 	}
-	/*for(auto iterator = allCodingRegions.begin(); iterator != allCodingRegions.end(); iterator++){
-	 cout << *iterator << "(" << (int)genome->genome[*iterator] << ") ";
-	 }
-	 cout << "\n";
-	 */
 	return allCodingRegions;
 }
 

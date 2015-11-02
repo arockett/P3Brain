@@ -53,7 +53,6 @@ public:
 	virtual void applyMutations(double mutationRate);
 	virtual Genome* makeMutatedOffspring(double mutationRate);
 	virtual void makePointMutation();
-	//virtual void saveToFile(FILE *F);
 	virtual void kill();
 
 	virtual vector<string> GetLODItem(string key);

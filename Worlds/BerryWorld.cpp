@@ -270,7 +270,7 @@ double BerryWorld::testIndividual(Agent *agent, bool analyse) {
 	int total_eaten = 0;
 	for (int i = 0; i < foodSourceTypes; i++) {
 		total_eaten += eaten[i];
-		string temp_name = "food" + mkString(i + 1);
+		string temp_name = "food" + to_string(i + 1);
 		agent->genome->dataMap.Set(temp_name, eaten[i]);
 	}
 	agent->genome->dataMap.Set("total",total_eaten);

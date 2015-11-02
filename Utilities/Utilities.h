@@ -15,8 +15,9 @@ using namespace std;
 
 /*
  * return x % y were (-1 % y) = (y - 1)
+ * (-2 % y) = (y - 2), etc.
  */
-int loopMod(const int numerator, const int denominator) {
+inline int loopMod(const int numerator, const int denominator) {
   return ((numerator % denominator) + denominator) % denominator;
 }
 /*
@@ -26,14 +27,21 @@ inline int Bit(double d) {
 	return (d > 0.0);
 }
 
+///*
+// * convert anything to a string using a string stream
+// */
+//template<typename Type>
+//inline string mkString(Type value) {
+//	std::ostringstream oss;
+//	oss << value;
+//	return oss.str();
+//}
+
 /*
- * convert anything to a string using a string stream
+ * this is here so we can use to string and it will work even if we give it a string as input
  */
-template<typename Type>
-inline string mkString(Type value) {
-	std::ostringstream oss;
-	oss << value;
-	return oss.str();
+inline string to_string(string str){
+	return(str);
 }
 
 /*

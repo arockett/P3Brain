@@ -33,7 +33,7 @@ public:
 	 */
 	template<typename Type>
 	void Set(const string& key, const Type& value) { // sets a value in a DataMap with "key"
-		data[key] = mkString(value);
+		data[key] = to_string(value);
 	}
 
 	/*
@@ -44,13 +44,13 @@ public:
 	void Append(const string& key, const Type& value) {
 		// is this value in the DataMap already?
 		if (data.find(key) == data.end()) { // if this key is not already in the DataMap
-			data[key] = "\"[" + mkString(value) + "]\"";
+			data[key] = "\"[" + to_string(value) + "]\"";
 		} else { // the key already exists
 			if ((data[key][0] == '\"') && (data[key][1] = '[')) { // if this key is already associated with a list
 				string workingString = data[key];
 				workingString.pop_back(); // strip off trailing ']"'
 				workingString.pop_back(); // strip off trailing ']"'
-				workingString = workingString + "," + mkString(value) + "]\""; // add ",value]"
+				workingString = workingString + "," + to_string(value) + "]\""; // add ",value]"
 				data[key] = workingString; // put new list back in DataMap
 			} else { // this key exists, but the associated element is not a list
 				cout

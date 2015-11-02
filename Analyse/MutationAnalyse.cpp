@@ -5,34 +5,8 @@
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
 //
 
-/*
-#include <stdlib.h>
-#include <vector>
-#include <iostream>
-#include <fstream>
-#include <algorithm>
-
-#include "sites.h"
-#include "World.h"
-#include "Data.h"
-#include "Agent.h"
-//#include "RedBlueBerryWorld.h"
-//#include "CountWorld.h"
- */
 #include "MutationAnalyse.h"
-/*
-#include "Random.h"
-#include <time.h>
 
-#include <sys/types.h>
-#include <sys/stat.h>
-
-#ifdef _WIN32
-#include <process.h>
-#else
-#include <unistd.h>
-#endif
-*/
 using namespace std;
 
 /*

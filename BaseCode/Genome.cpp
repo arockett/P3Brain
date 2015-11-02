@@ -39,6 +39,7 @@ Genome::Genome() {
 	birthDate = Global::update;
 	dataMap.Set("ID", ID);
 	dataMap.Set("birthDate", birthDate);
+	dataMap.Set("update", Global::update);
 }
 
 Genome::Genome(Genome* from) {
@@ -50,6 +51,7 @@ Genome::Genome(Genome* from) {
 	birthDate = Global::update;
 	dataMap.Set("ID", ID);
 	dataMap.Set("birthDate", birthDate);
+	dataMap.Set("update", Global::update);
 }
 
 Genome::~Genome() {
@@ -76,21 +78,14 @@ void Genome::applyMutations(double mutationRate) {
 		int nucleotides = (int) sites.size();
 		int i, s, o, w;
 		vector<unsigned char> buffer;
-		//WAS default_random_engine generator;
-		//WAS binomial_distribution<int> distribution(nucleotides,mutationRate);
-		//WAS int localMutations= distribution(generator);
 		int localMutations = Random::getBinomial(nucleotides, mutationRate);
 		for (i = 0; i < localMutations; i++) {
-			//WAS sites[rand() % nucleotides] = rand() & 255;
 			sites[Random::getIndex(nucleotides)] = Random::getIndex(256);
 		}
-		//if ((((double) rand() / (double) RAND_MAX) < Genome::insertionDeletionP) && (sites.size() < MaxGenomeSize)) {
 		int numInsertions = Random::getBinomial((int) sites.size(), (Genome::insertionRate / 1000));
 		while (numInsertions > 0) {
-			//if (Random::getBinomial((int) sites.size(),Genome::insertionDeletionP/1000) && ((int) sites.size() < 20000)) {
 			if ((int) nucleotides < maxGenomeSize) {
 				//duplication
-				//WAS w = 128 + rand() % (512 - 128);
 				w = 128 + Random::getIndex(512 - 128);	// w is between 128 and 512 (size of the chunk to be duplicated)
 				if (w >= nucleotides) { // if w is >= the size of the genome, make w smaller!
 					w = nucleotides - 1;
@@ -108,7 +103,6 @@ void Genome::applyMutations(double mutationRate) {
 		int numDels = Random::getBinomial(nucleotides, (Genome::deletionRate / 1000));
 		while (numDels > 0) {
 
-			//if (Random::P(Genome::insertionDeletionP) && (nucleotides > 1000)) {
 			if (nucleotides > minGenomeSize) {
 				//deletion
 				w = 128 + Random::getIndex(512 - 128); //  w is between 128 and 255 (size of the chunk to be deleted)
@@ -134,7 +128,6 @@ void Genome::kill() {
 void Genome::fillRandom() {
 	sites.resize(Genome::initialGenomeSize);
 	for (size_t i = 0; i < sites.size(); i++) { // fill al sites with random values 0->255
-		//WAS sites[i] = (unsigned char) rand() & 255;
 		sites[i] = (unsigned char) Random::getIndex(256);
 		//sites[i] = (unsigned char) 2; // uncomment to test genome with fixed number
 	}
@@ -156,12 +149,6 @@ Genome* Genome::makeMutatedOffspring(double mutationRate) {
 void Genome::makePointMutation() {
 	sites[Random::getIndex(sites.size())] = (unsigned char) Random::getIndex(256);
 }
-
-//void Genome::saveToFile(FILE *F) {
-//	for (size_t i = 0; i < sites.size(); i++)
-//		fprintf(F, "	%i", sites[i]);
-//	fprintf(F, "\n");
-//}
 
 /*
  * Given a genome and a key(to data that has been saved into "dataMap"
@@ -185,7 +172,6 @@ vector<Genome*> Genome::getLOD() {
 	vector<Genome*> list;
 	Genome * G = this;
 	while (G != NULL) { // which G has an ancestor
-		//printf("IN getLOD - %i %i\n",G->ID,G->referenceCounter);
 		list.insert(list.begin(), G); // add that ancestor to the front of the LOD list
 		G = G->ancestor; // move to the ancestor
 	}
@@ -205,7 +191,6 @@ vector<Genome*> Genome::getLOD() {
 Genome* Genome::getMostRecentCommonAncestor() {
 	vector<Genome*> LOD = this->getLOD(); // get line of decent from "from"
 	for (auto G : LOD) { // starting at the oldest ancestor, moving to the youngest
-		//printf("IN getMRCA - %i %i\n",G->ID,G->referenceCounter);
 		if (G->referenceCounter > 1) // the first (oldest) ancestor with more then one surviving offspring is the oldest
 			return G;
 	}
@@ -226,7 +211,6 @@ Genome* Genome::getMostRecentCommonAncestor() {
 void Genome::saveDataOnLOD(int flush) {
 
 	if (Global::files.find("data.csv") == Global::files.end()) { // if file has not be initialized yet
-		//cout << "  saveDataOnLOD() :: \""<< Global::DataFileName <<"\" is being initialized\n";
 		Global::files[Global::DataFileName] = dataMap.getKeys();
 	}
 
@@ -250,11 +234,11 @@ void Genome::saveDataOnLOD(int flush) {
 		string dataString;
 		if (LOD[Global::nextGenomeWrite - Global::lastPrune]->sites.size() > 0) { // convert the genome into a string of int
 			for (auto site : LOD[Global::nextGenomeWrite - Global::lastPrune]->sites) {
-				dataString += mkString((int) site) + FileManager::separator;
+				dataString += to_string((int) site) + FileManager::separator;
 			}
 			dataString.pop_back(); // remove extra separator at end
 		}
-		dataString = mkString(Global::nextGenomeWrite) + FileManager::separator + "\"[" + dataString + "]\""; // add write update and padding to genome string
+		dataString = to_string(Global::nextGenomeWrite) + FileManager::separator + "\"[" + dataString + "]\""; // add write update and padding to genome string
 		FileManager::writeToFile(Global::GenomeFileName, dataString, "update,genome"); // write data to file
 		Global::nextGenomeWrite += Global::genomeInterval;
 	}
