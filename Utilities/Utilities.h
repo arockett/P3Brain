@@ -16,7 +16,7 @@ using namespace std;
 /*
  * return x % y were (-1 % y) = (y - 1)
  */
-int loopMod(const int numerator, const int denominator) {
+inline int loopMod(const int numerator, const int denominator) {
   return ((numerator % denominator) + denominator) % denominator;
 }
 /*
