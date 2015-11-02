@@ -19,7 +19,8 @@ int& Optimizer::elitism = Parameters::register_parameter("elitism", 0,
 		"The highest scoring agent will be included in the next generation this many times (0 = no elitism)?",
 		"OPTIMIZER");
 int& Optimizer::tournamentSize = Parameters::register_parameter("tournamentSize", 2,
-		"how many genomes to consider when doing Tournament selection? 1 will result in random selection.", "OPTIMIZER");
+		"how many genomes to consider when doing Tournament selection? 1 will result in random selection.",
+		"OPTIMIZER");
 
 /*
  * Optimizer::makeNextGeneration(vector<Genome*> population, vector<double> W)
@@ -68,8 +69,6 @@ vector<Genome*> GA::makeNextGeneration(vector<Genome*> population, vector<double
 	return nextGeneration;
 }
 
-
-
 /*
  * Tournament::makeNextGeneration(vector<Genome*> population, vector<double> W)
  * create a new generation one genome at a time
@@ -93,7 +92,7 @@ vector<Genome*> Tournament::makeNextGeneration(vector<Genome*> population, vecto
 			winner = best;
 		} else {
 			winner = Random::getIndex(population.size());
-			for (int i = 0; i < Optimizer::tournamentSize-1; i++) {
+			for (int i = 0; i < Optimizer::tournamentSize - 1; i++) {
 				challanger = Random::getIndex(population.size());
 				if (W[challanger] > W[winner]) {
 					winner = challanger;

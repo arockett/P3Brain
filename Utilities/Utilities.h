@@ -18,7 +18,7 @@ using namespace std;
  * (-2 % y) = (y - 2), etc.
  */
 inline int loopMod(const int numerator, const int denominator) {
-  return ((numerator % denominator) + denominator) % denominator;
+	return ((numerator % denominator) + denominator) % denominator;
 }
 /*
  * returns 1 if "d" is greater than 0, else return 0
@@ -40,8 +40,8 @@ inline int Bit(double d) {
 /*
  * this is here so we can use to string and it will work even if we give it a string as input
  */
-inline string to_string(string str){
-	return(str);
+inline string to_string(string str) {
+	return (str);
 }
 
 /*
@@ -51,7 +51,7 @@ inline string to_string(string str){
  */
 template<typename Type>
 inline int findGreatestInVector(vector<Type> vec) {
-		return distance(vec.begin(), max_element (vec.begin(),vec.end()));
+	return distance(vec.begin(), max_element(vec.begin(), vec.end()));
 }
 
 #endif // __BasicMarkovBrainTemplate__Utilities__

@@ -34,7 +34,7 @@ int& Genome::maxGenomeSize = Parameters::register_parameter("GenomeSizeMax", 200
 
 Genome::Genome() {
 	referenceCounter = 1;
-	ancestor = NULL;
+	ancestor = nullptr;
 	ID = registerGenome();
 	birthDate = Global::update;
 	dataMap.Set("ID", ID);
@@ -55,7 +55,7 @@ Genome::Genome(Genome* from) {
 }
 
 Genome::~Genome() {
-	if (ancestor != NULL) {
+	if (ancestor != nullptr) {
 		ancestor->kill();
 	}
 }
@@ -157,7 +157,7 @@ void Genome::makePointMutation() {
 vector<string> Genome::GetLODItem(string key) {
 	vector<string> list;
 	Genome* G = this;
-	while (G != NULL) {
+	while (G != nullptr) {
 		list.insert(list.begin(), G->dataMap.Get(key));
 		G = G->ancestor;
 	}
@@ -171,7 +171,7 @@ vector<string> Genome::GetLODItem(string key) {
 vector<Genome*> Genome::getLOD() {
 	vector<Genome*> list;
 	Genome * G = this;
-	while (G != NULL) { // which G has an ancestor
+	while (G != nullptr) { // which G has an ancestor
 		list.insert(list.begin(), G); // add that ancestor to the front of the LOD list
 		G = G->ancestor; // move to the ancestor
 	}
@@ -213,7 +213,6 @@ void Genome::saveDataOnLOD(int flush) {
 	if (Global::files.find("data.csv") == Global::files.end()) { // if file has not be initialized yet
 		Global::files[Global::DataFileName] = dataMap.getKeys();
 	}
-
 
 	vector<Genome*> LOD = getLOD(); 		// get line of decent
 	Genome* effective_MRCA;

@@ -17,10 +17,9 @@
 
 using namespace std;
 
-
 class Data;
 
-class Genome : public enable_shared_from_this<Genome>{
+class Genome: public enable_shared_from_this<Genome> {
 private:
 	static int genomeIDCounter; // used to issue unique ids to Genomes
 	int registerGenome(); // get a Genome_id (uses genomeIDCounter)
@@ -35,7 +34,6 @@ public:
 	static int& minGenomeSize;
 	static int& maxGenomeSize;
 
-
 public:
 	int ID;
 	int birthDate;
@@ -47,7 +45,7 @@ public:
 	Genome();
 	Genome(Genome* from);
 	virtual ~Genome();
-	
+
 	virtual void fillRandom();
 	virtual void copyGenome(Genome* from);
 	virtual void applyMutations(double mutationRate);
@@ -62,8 +60,8 @@ public:
 	virtual void saveDataOnLOD(int flush = 0); // for genome, save to file data for this genome and it's LOD
 	virtual void flushDataOnLOD(); // used at the end of a run to save data newer then the MRCA / convergance point
 
-	void advanceIndex(int& genomeIndex, int distance = 1){
-		genomeIndex = (genomeIndex + distance) % (int)sites.size();
+	void advanceIndex(int& genomeIndex, int distance = 1) {
+		genomeIndex = (genomeIndex + distance) % (int) sites.size();
 	}
 };
 

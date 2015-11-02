@@ -28,7 +28,7 @@ using namespace std;
 
 void writeRealTimeFiles(vector<Genome*> population, vector<double> W) { // write Ave and Dominant files NOW!
 // write out Ave
-	double aveValue,temp;
+	double aveValue, temp;
 	DataMap AveMap;
 	for (auto key : Global::DefaultAveFileColumns) {
 		aveValue = 0;
@@ -38,9 +38,9 @@ void writeRealTimeFiles(vector<Genome*> population, vector<double> W) { // write
 			aveValue += temp;
 		}
 		aveValue /= population.size();
-		AveMap.Set(key,aveValue);
+		AveMap.Set(key, aveValue);
 	}
-	AveMap.writeToFile(Global::AveFileName,Global::DefaultAveFileColumns);
+	AveMap.writeToFile(Global::AveFileName, Global::DefaultAveFileColumns);
 
 	// write out Dominant
 	int best = findGreatestInVector(W);
@@ -59,10 +59,10 @@ int main(int argc, const char * argv[]) {
 	Gate::setupGates(); // determines which gate types will be in use.
 
 	if (Global::seedRandom) {
-	  random_device rd;
+		random_device rd;
 		Random::getCommonGenerator().seed(rd());
 	} else {
-	  Random::getCommonGenerator().seed(Global::repNumber);
+		Random::getCommonGenerator().seed(Global::repNumber);
 	}
 
 	//Optimizer *optimizer = (Optimizer*) new GA();
@@ -128,9 +128,9 @@ int main(int argc, const char * argv[]) {
 			population[0]->saveDataOnLOD(); // write out data and genomes
 			// data and genomes have now been written out up till the MRCA
 			// so all data and genomes from before the MRCA can be deleted
-			if (Genome::MRCA->ancestor != NULL) { // if the MRCA is not the oldest in the LOD...
+			if (Genome::MRCA->ancestor != nullptr) { // if the MRCA is not the oldest in the LOD...
 				Genome::MRCA->ancestor->kill(); // kill MRCAs parent (and as a result all ancestors)
-				Genome::MRCA->ancestor = NULL; // MRCA is now the oldest genome in LOD!
+				Genome::MRCA->ancestor = nullptr; // MRCA is now the oldest genome in LOD!
 			}
 			Global::lastPrune = Genome::MRCA->birthDate; // this will hold the time of the oldest genome in RAM
 		}

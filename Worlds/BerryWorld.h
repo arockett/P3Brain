@@ -22,12 +22,11 @@
 #include "../Utilities/Parameters.h"
 #include "../Utilities/Utilities.h"
 
-
 using namespace std;
 
 class MadBotAI;
 
-class BerryWorld: public World{
+class BerryWorld: public World {
 public:
 	const int xm[8] = { 0, 1, 1, 1, 0, -1, -1, -1 }; //these are directions
 	const int ym[8] = { -1, -1, 0, 1, 1, 1, 0, -1 };
@@ -64,9 +63,7 @@ public:
 
 	int inputStatesCount = 0;
 	int outputStatesCount = 0;
-	double testIndividual(Agent *agent,bool analyse);
-
-
+	double testIndividual(Agent *agent, bool analyse);
 
 public:
 	BerryWorld();

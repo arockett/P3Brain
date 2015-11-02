@@ -43,7 +43,7 @@ double& Gate::FixedEpsilonGateP = Parameters::register_parameter("FixedEpsilonGa
  */
 void Gate::setupGates() {
 	for (int i = 0; i < 256; i++) {
-		Gate::AddGate(i, NULL);
+		Gate::AddGate(i, nullptr);
 	}
 	if (usingProbGate) {
 		AddGate(42, [](Genome* genome,int pos) {return make_shared<Gate>(genome,pos);});
@@ -253,12 +253,12 @@ void Gate::update(vector<double> & states, vector<double> & nextStates) { //this
 	double r = Random::getDouble(1); // r will determine with set of outputs will be chosen
 	while (r > table[input][outputColumn]) {
 		r -= table[input][outputColumn]; // this goes across the probability table in row for the given input and subtracts each
-								   // value in the table from r until r is less than a value it reaches
+		// value in the table from r until r is less than a value it reaches
 		outputColumn++; // we have not found the correct output so move to the next output
 	}
 	for (size_t i = 0; i < outputs.size(); i++) //for each output...
-		nextStates[outputs[i]] += 1.0 * ((outputColumn >> (outputs.size()-1-i)) & 1); // convert output (the column number) to bits and pack into next states
-																						// but always put the last bit in the first input (to maintain consistancy)
+		nextStates[outputs[i]] += 1.0 * ((outputColumn >> (outputs.size() - 1 - i)) & 1); // convert output (the column number) to bits and pack into next states
+																						  // but always put the last bit in the first input (to maintain consistancy)
 }
 
 string Gate::description() {
