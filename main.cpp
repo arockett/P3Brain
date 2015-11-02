@@ -39,9 +39,9 @@ int main(int argc, const char * argv[]) {
 
 	if (Global::seedRandom) {
 	  random_device rd;
-		Random::get_common_generator().seed(rd());
+		Random::getCommonGenerator().seed(rd());
 	} else {
-	  Random::get_common_generator().seed(Global::repNumber);
+	  Random::getCommonGenerator().seed(Global::repNumber);
 	}
 
 
