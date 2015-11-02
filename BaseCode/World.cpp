@@ -27,8 +27,12 @@ World::~World(){
 vector<double> World::evaluateFitness(vector<Agent*> agents,bool analyse){
 	vector<double> W;
 	for(size_t i=0;i<agents.size();i++){
-		agents[i]->genome->dataMap.Set("update",Global::update);
-		W.push_back(testIndividual(agents[i],analyse));
+		double w=0.0;
+		for(int r=0;r<World::repeats;r++){
+			w+=testIndividual(agents[i],analyse);
+		}
+        W.push_back(w/(double)World::repeats);
+//		W.push_back(pow(w,1.0/(double)World::repeats)); // change to this line if you want geometic mean?
 	}
 	return W;
 }
@@ -52,7 +56,7 @@ vector<double> ExampleWorld::evaluateFitness(vector<Agent*> agents,bool analyse)
 			w+=testIndividual(agents[i],analyse);
 		}
         W.push_back(w/(double)World::repeats);
-//		W.push_back(pow(w,1.0/(double)World::repeats));
+//		W.push_back(pow(w,1.0/(double)World::repeats)); // Arend, What does this mean?
 	}
 	return W;
 }

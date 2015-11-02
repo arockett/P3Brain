@@ -23,7 +23,6 @@ bool& Agent::serialProcessing = Parameters::register_parameter("serialProcessing
 		"sets agents to overwrite... right?", "AGENT");
 
 Agent::Agent(Genome* startGenome, int _nrOfBrainStates) { //this is a constructor. it is run whenever a new agent is created.
-	//cout << "in agent contructor\n";
 	nrOfBrainStates = _nrOfBrainStates;
 	states.resize(nrOfBrainStates);
 	nextStates.resize(nrOfBrainStates);

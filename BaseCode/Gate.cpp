@@ -168,8 +168,6 @@ void Gate::getTableFromGenome(vector<int> range, vector<int> rangeMax, int& geno
 	int maxY = rangeMax[0];
 	int maxX = rangeMax[1];
 
-	//void getTableFromGenome({numInputs,NumOutputs},{4,4},genomeIndex);
-
 	table.resize(Y); // set the number of rows in the table
 
 	for (y = 0; y < (Y); y++) {
@@ -267,11 +265,11 @@ string Gate::description() {
 	string S = "Gate\n";
 	S = S + "IN:";
 	for (size_t i = 0; i < inputs.size(); i++)
-		S = S + " " + mkString(inputs[i]);
+		S = S + " " + to_string(inputs[i]);
 	S = S + "\n";
 	S = S + "OUT:";
 	for (size_t i = 0; i < outputs.size(); i++)
-		S = S + " " + mkString(outputs[i]);
+		S = S + " " + to_string(outputs[i]);
 	S = S + "\n";
 	return S;
 }
@@ -305,7 +303,7 @@ vector<int> Gate::getOuts() {
 string Gate::getCodingRegions() {
 	string S = "";
 	for (auto site : codingRegions) {
-		S = S + mkString(site.first) + ":" + mkString(site.second) + "  ";
+		S = S + to_string(site.first) + ":" + to_string(site.second) + "  ";
 	}
 	S += "\n";
 	return S;
@@ -386,8 +384,7 @@ GPGate::GPGate(Genome *genome, int genomeIndex) {
 	movePastStartCodeon(genomeIndex, genome);
 
 	// get numInputs inputs and numOutputs outputs, advance k (genomeIndex) as if we had gotten 4 of each and record this in codingRegions
-	getInputsAndOutputs( { 0, 0 }, { 1, 4 }, genomeIndex, genome); // (insRange, outsRange,currentIndexInGenome,genome,codingRegions)
-	//numInputs = inputs.size();
+	getInputsAndOutputs( { 1, 4 }, { 1, 4 }, genomeIndex, genome); // (insRange, outsRange,currentIndexInGenome,genome,codingRegions)
 	numOutputs = outputs.size();
 
 	genome->advanceIndex(genomeIndex, 16);
@@ -475,7 +472,7 @@ void GPGate::update(vector<double> & states, vector<double> & nextStates) {
 
 string GPGate::description() {
 	string gateTypeName[8] = { "+", "-", "*", "/", "Sin", "Cos", "Log", "Exp" };
-	return "Genetic Programing " + gateTypeName[myGateType] + "\n" + Gate::description();
+	return "Genetic Programming " + gateTypeName[myGateType] + "\n" + Gate::description();
 }
 
 /* *** Feedback Gate *** */
@@ -621,7 +618,7 @@ void FeedbackGate::update(vector<double> & states, vector<double> & nextStates) 
 }
 
 string FeedbackGate::description() {
-	string S = "pos node:" + mkString((int) posFBNode) + "\n neg node:" + mkString((int) negFBNode);
+	string S = "pos node:" + to_string((int) posFBNode) + "\n neg node:" + to_string((int) negFBNode);
 	return "Feedback Gate\n " + S + "\n" + Gate::description();
 }
 
@@ -704,7 +701,7 @@ void Thresholdgate::update(vector<double> & states, vector<double> & nextStates)
 }
 
 string Thresholdgate::description() {
-	return "ThresholdgateGate: " + mkString(threshold) + "\n" + Gate::description();;
+	return "ThresholdgateGate: " + to_string(threshold) + "\n" + Gate::description();;
 }
 
 /* *** Fixed Epison Gate *** */
@@ -746,7 +743,7 @@ void FixedEpsilonGate::update(vector<double> & states, vector<double> & nextStat
 }
 
 string FixedEpsilonGate::description() {
-	return "Fixed Epsilon " + mkString(epsilon) + "\n " + Gate::description();
+	return "Fixed Epsilon " + to_string(epsilon) + "\n " + Gate::description();
 }
 
 /* *** VoidGate *** */
@@ -770,6 +767,6 @@ void VoidGate::update(vector<double> & states, vector<double> & nextStates) {
 }
 
 string VoidGate::description() {
-	return "Void Gate " + mkString(epsilon) + "\n " + Gate::description();
+	return "Void Gate " + to_string(epsilon) + "\n " + Gate::description();
 }
 
