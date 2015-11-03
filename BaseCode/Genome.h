@@ -38,7 +38,7 @@ public:
 	virtual void fillRandom();
 	virtual void copyGenome(Genome* from);
 	virtual void applyMutations(double mutationRate);
-	virtual Genome* makeMutatedOffspring(double mutationRate);
+	virtual Genome* makeMutatedGenome(double mutationRate);
 	virtual void makePointMutation();
 
 	void advanceIndex(int& genomeIndex, int distance = 1) {

@@ -98,7 +98,7 @@ void Genome::fillRandom() {
 	}
 }
 
-Genome* Genome::makeMutatedOffspring(double mutationRate) {
+Genome* Genome::makeMutatedGenome(double mutationRate) {
 	Genome* G = new Genome(this);
 	G->applyMutations(mutationRate);
 	return G;

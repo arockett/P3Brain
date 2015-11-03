@@ -70,8 +70,7 @@ vector<Organism*> GA::makeNextGeneration(vector<Organism*> population) {
 				who = Random::getIndex(population.size()); // otherwise, just pick a random genome from population
 			}
 		}
-		Organism* newOrg = new Organism(population[who],population[who]->genome->makeMutatedOffspring(Genome::pointMutationRate));
-		nextGeneration.push_back(newOrg);
+		nextGeneration.push_back(population[who]->makeMutatedOffspring(Genome::pointMutationRate));
 	}
 	return nextGeneration;
 }
@@ -95,8 +94,7 @@ vector<Organism*> Tournament::makeNextGeneration(vector<Organism*> population) {
 
 	for (int i = 0; i < Optimizer::elitism; i++) { // first, if elitism > 0, add this many copies of best to the next generation
 		if (nextGeneration.size() < population.size()) {
-			Organism* newOrg = new Organism(population[best],population[best]->genome->makeMutatedOffspring(Genome::pointMutationRate));
-			nextGeneration.push_back(newOrg);
+			nextGeneration.push_back(population[best]->makeMutatedOffspring(Genome::pointMutationRate));
 		}
 	}
 	while (nextGeneration.size() < population.size()) {
@@ -111,8 +109,7 @@ vector<Organism*> Tournament::makeNextGeneration(vector<Organism*> population) {
 					winner = challanger;
 				}
 			}
-			Organism* newOrg = new Organism(population[winner],population[winner]->genome->makeMutatedOffspring(Genome::pointMutationRate));
-			nextGeneration.push_back(newOrg);
+			nextGeneration.push_back(population[best]->makeMutatedOffspring(Genome::pointMutationRate));
 		}
 	}
 	return nextGeneration;
