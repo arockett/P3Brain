@@ -34,6 +34,7 @@ public:
 	static string& AveFileName; // name of the Averages file (ave for all agents when file is written to)
 	static string& DominantFileName; // name of the Dominant file (all stats for best agent when file is writtne to)
 
+	static bool& outputMethodB; // output surviving populations after delay as apposed to MethodA LOD
 	static int& bitsPerBrainAddress; // how many bits are evaluated to determine the brain addresses.
 									 // i.e. ceil(bitsPerBrainAddress/8) = number of genome sites used
 	//////////

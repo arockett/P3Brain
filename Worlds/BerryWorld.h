@@ -63,7 +63,7 @@ public:
 
 	int inputStatesCount = 0;
 	int outputStatesCount = 0;
-	double testIndividual(Agent *agent, bool analyse);
+	double testIndividual(Organism *org, bool analyse);
 
 public:
 	BerryWorld();

@@ -80,7 +80,7 @@ BerryWorld::BerryWorld() {
 			<< inputStatesCount << " to " << inputStatesCount + outputStatesCount - 1 << "\n";
 }
 
-double BerryWorld::testIndividual(Agent *agent, bool analyse) {
+double BerryWorld::testIndividual(Organism *org, bool analyse) {
 	int grid[xDim][yDim];
 	int i, j;
 	int xp = xDim / 2, yp = yDim / 2, dir = Random::getInt(7); //xp and yp are x and y positions. agent starts at center of grid and with a random rotation
@@ -132,7 +132,7 @@ double BerryWorld::testIndividual(Agent *agent, bool analyse) {
 		grid[Random::getIndex(xDim)][Random::getIndex(yDim)] = WALL;
 	}
 
-	agent->resetBrain();
+	org->agent->resetBrain();
 
 	int output1 = 0;
 	int output2 = 0;
@@ -151,63 +151,63 @@ double BerryWorld::testIndividual(Agent *agent, bool analyse) {
 		if (senseWalls) {
 			if (senseDown) {
 				for (int i = 0; i < foodSourceTypes; i++) { // fill first states with food values at here location
-					agent->setState(statesAssignmentCounter++, (here == i + 1));
+					org->agent->setState(statesAssignmentCounter++, (here == i + 1));
 				}
 			}
 			if (senseFront) {
 				for (int i = 0; i < foodSourceTypes; i++) { // fill first states with food values at front location
-					agent->setState(statesAssignmentCounter++, (front == i + 1));
+					org->agent->setState(statesAssignmentCounter++, (front == i + 1));
 				}
-				agent->setState(statesAssignmentCounter++, (front == WALL));
+				org->agent->setState(statesAssignmentCounter++, (front == WALL));
 			}
 			if (senseFrontSides) {
 				for (int i = 0; i < foodSourceTypes; i++) { // fill first states with food values at front location
-					agent->setState(statesAssignmentCounter++, (leftFront == i + 1));
-					agent->setState(statesAssignmentCounter++, (rightFront == i + 1));
+					org->agent->setState(statesAssignmentCounter++, (leftFront == i + 1));
+					org->agent->setState(statesAssignmentCounter++, (rightFront == i + 1));
 				}
-				agent->setState(statesAssignmentCounter++, (leftFront == WALL));
-				agent->setState(statesAssignmentCounter++, (rightFront == WALL));
+				org->agent->setState(statesAssignmentCounter++, (leftFront == WALL));
+				org->agent->setState(statesAssignmentCounter++, (rightFront == WALL));
 			}
 		} else { // don't sense walls
 			if (senseDown) {
 				for (int i = 0; i < foodSourceTypes; i++) { // fill first states with food values at here location
-					agent->setState(statesAssignmentCounter++, (here == i + 1));
+					org->agent->setState(statesAssignmentCounter++, (here == i + 1));
 				}
 			}
 			if (senseFront) {
 				for (int i = 0; i < foodSourceTypes; i++) { // fill first states with food values at front location
-					agent->setState(statesAssignmentCounter++, (front == i + 1));
+					org->agent->setState(statesAssignmentCounter++, (front == i + 1));
 				}
 			}
 			if (senseFrontSides) {
 				for (int i = 0; i < foodSourceTypes; i++) { // fill first states with food values at front location
-					agent->setState(statesAssignmentCounter++, (leftFront == i + 1));
-					agent->setState(statesAssignmentCounter++, (rightFront == i + 1));
+					org->agent->setState(statesAssignmentCounter++, (leftFront == i + 1));
+					org->agent->setState(statesAssignmentCounter++, (rightFront == i + 1));
 				}
 			}
 		}
 
 		if (clearOutputs) {
-			agent->setState(inputStatesCount, 0.0);
-			agent->setState(inputStatesCount + 1, 0.0);
-			agent->setState(inputStatesCount + 2, 0.0);
+			org->agent->setState(inputStatesCount, 0.0);
+			org->agent->setState(inputStatesCount + 1, 0.0);
+			org->agent->setState(inputStatesCount + 2, 0.0);
 		}
 
 		if (analyse) { // gather some data before and after running update
 			int S = 0;
 			for (int i = 0; i < inputStatesCount; i++)
-				S = (S << 1) + Bit(agent->states[i]);
-			agent->updateStates();
-			for (int i = inputStatesCount + outputStatesCount; i < agent->nrOfBrainStates; i++)
-				S = (S << 1) + Bit(agent->states[i]);
+				S = (S << 1) + Bit(org->agent->states[i]);
+			org->agent->updateStates();
+			for (int i = inputStatesCount + outputStatesCount; i < org->agent->nrOfBrainStates; i++)
+				S = (S << 1) + Bit(org->agent->states[i]);
 			stateCollector.push_back(S);
 		} else {
-			agent->updateStates(); // just run the update!
+			org->agent->updateStates(); // just run the update!
 		}
 
 		// set output values
-		output1 = Bit(agent->getState(inputStatesCount)) + (Bit(agent->getState(inputStatesCount + 1)) << 1);
-		output2 = Bit(agent->getState(inputStatesCount + 2));
+		output1 = Bit(org->agent->getState(inputStatesCount)) + (Bit(org->agent->getState(inputStatesCount + 1)) << 1);
+		output2 = Bit(org->agent->getState(inputStatesCount + 2));
 
 		if ((output2 == 1) && (grid[xp][yp] != EMPTY)) { // eat food here (if there is food here)
 			if (lastFood != -1) { // if some food has already been eaten
@@ -219,7 +219,7 @@ double BerryWorld::testIndividual(Agent *agent, bool analyse) {
 			score += foodRewards[grid[xp][yp] - 1]; // you ate a food... good for you!
 			lastFood = grid[xp][yp]; // remember the last food eaten
 			eaten[grid[xp][yp] - 1]++; // track the number of each berry eaten
-			agent->genome->dataMap.Append("foodList", grid[xp][yp]);
+			org->dataMap[Global::update].Append("foodList", grid[xp][yp]);
 			grid[xp][yp] = 0; // clear this location
 		}
 		if ((output2 == 0) || (allowMoveAndEat == 1)) { // if we did not eat or we allow moving and eating in the same world update
@@ -243,8 +243,8 @@ double BerryWorld::testIndividual(Agent *agent, bool analyse) {
 				break;
 			}
 		}
-//		Data::Add(xp, "x"+mkString(t), agent->genome);
-//		Data::Add(yp, "y"+mkString(t), agent->genome);
+//		Data::Add(xp, "x"+mkString(t), org->agent->genome);
+//		Data::Add(yp, "y"+mkString(t), org->agent->genome);
 
 		/* uncommnet to print test output
 		 for(int x=0;x<xDim;x++){
@@ -263,20 +263,24 @@ double BerryWorld::testIndividual(Agent *agent, bool analyse) {
 	if (score < 0.0) {
 		score = 0.0;
 	}
-	if (!agent->genome->dataMap.fieldExists("foodList")) {
-		agent->genome->dataMap.Append("foodList", 0);
+	if (!org->dataMap[Global::update].fieldExists("foodList")) {
+		org->dataMap[Global::update].Append("foodList", 0);
 	}
-	agent->genome->dataMap.Set("switches", switched);
+	org->dataMap[Global::update].Set("switches", switched);
 	int total_eaten = 0;
 	for (int i = 0; i < foodSourceTypes; i++) {
 		total_eaten += eaten[i];
 		string temp_name = "food" + to_string(i + 1);
-		agent->genome->dataMap.Set(temp_name, eaten[i]);
+		org->dataMap[Global::update].Set(temp_name, eaten[i]);
 	}
-	agent->genome->dataMap.Set("total", total_eaten);
-	agent->genome->dataMap.Set("score", score);
-	if (analyse) {
-		agent->genome->dataMap.Set("phi", Analyse::computeAtomicPhi(stateCollector, agent->nrOfBrainStates));
-	}
+	org->dataMap[Global::update].Set("total", total_eaten);
+	org->dataMap[Global::update].Set("score", score);
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//	if (analyse) {
+//		org->dataMap[Global::update].Set("phi", Analyse::computeAtomicPhi(stateCollector, org->agent->nrOfBrainStates));
+//	}
 	return score;
 }

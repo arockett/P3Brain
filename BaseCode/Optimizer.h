@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "Genome.h"
+#include "Organism.h"
 
 #include "../Utilities/Parameters.h"
 
@@ -28,12 +29,12 @@ public:
 	double maxFitness;
 	Optimizer() = default;
 	virtual ~Optimizer() = default;
-	virtual vector<Genome*> makeNextGeneration(vector<Genome*> population, vector<double> W);
+	virtual vector<Organism*> makeNextGeneration(vector<Organism*> population);
 };
 
 class GA: Optimizer {
 public:
-	virtual vector<Genome*> makeNextGeneration(vector<Genome*> population, vector<double> W);
+	virtual vector<Organism*> makeNextGeneration(vector<Organism*> population);
 };
 
 class P3: Optimizer {
@@ -42,7 +43,7 @@ class P3: Optimizer {
 
 class Tournament: Optimizer {
 public:
-	virtual vector<Genome*> makeNextGeneration(vector<Genome*> population, vector<double> W);
+	virtual vector<Organism*> makeNextGeneration(vector<Organism*> population);
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Optimizer__) */

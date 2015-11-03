@@ -27,11 +27,12 @@ int& Optimizer::tournamentSize = Parameters::register_parameter("tournamentSize"
  * place holder function, copies population to make new population
  * no selection and no mutation
  */
-vector<Genome*> Optimizer::makeNextGeneration(vector<Genome*> population, vector<double> W) {
-	vector<Genome*> nextGeneration;
+vector<Organism*> Optimizer::makeNextGeneration(vector<Organism*> population) {
+	vector<Organism*> nextGeneration;
 
 	for (size_t i = 0; i < population.size(); i++) {
-		nextGeneration.push_back(new Genome(population[i]));
+		Organism* newOrg = new Organism(population[i],population[i]->genome);
+		nextGeneration.push_back(newOrg);
 	}
 	return nextGeneration;
 }
@@ -44,8 +45,13 @@ vector<Genome*> Optimizer::makeNextGeneration(vector<Genome*> population, vector
  * to the next generation and mutate the copy. If it is too low, keep drawing genomes till you get one
  * which is good enough.
  */
-vector<Genome*> GA::makeNextGeneration(vector<Genome*> population, vector<double> W) {
-	vector<Genome*> nextGeneration;
+vector<Organism*> GA::makeNextGeneration(vector<Organism*> population) {
+	vector<Organism*> nextGeneration;
+
+    vector<double> W;
+	for (auto org : population){
+    	W.push_back(org->score);
+    }
 
 	int best = findGreatestInVector(W);
 	maxFitness = W[best];
@@ -64,7 +70,8 @@ vector<Genome*> GA::makeNextGeneration(vector<Genome*> population, vector<double
 				who = Random::getIndex(population.size()); // otherwise, just pick a random genome from population
 			}
 		}
-		nextGeneration.push_back(population[who]->makeMutatedOffspring(Genome::pointMutationRate));
+		Organism* newOrg = new Organism(population[who],population[who]->genome->makeMutatedOffspring(Genome::pointMutationRate));
+		nextGeneration.push_back(newOrg);
 	}
 	return nextGeneration;
 }
@@ -75,15 +82,21 @@ vector<Genome*> GA::makeNextGeneration(vector<Genome*> population, vector<double
  * for each next population genome, randomly select (with replacement) n genomes (where n = Optimizer::tournamentSize)
  * copy to the next generation and mutate the copy.
  */
-vector<Genome*> Tournament::makeNextGeneration(vector<Genome*> population, vector<double> W) {
-	vector<Genome*> nextGeneration;
+vector<Organism*> Tournament::makeNextGeneration(vector<Organism*> population) {
+	vector<Organism*> nextGeneration;
 
-	int best = findGreatestInVector(W);
-	maxFitness = W[best];
+    vector<double> Scores;
+	for (auto org : population){
+    	Scores.push_back(org->score);
+    }
+
+	int best = findGreatestInVector(Scores);
+	maxFitness = Scores[best];
 
 	for (int i = 0; i < Optimizer::elitism; i++) { // first, if elitism > 0, add this many copies of best to the next generation
 		if (nextGeneration.size() < population.size()) {
-			nextGeneration.push_back(population[best]->makeMutatedOffspring(Genome::pointMutationRate));
+			Organism* newOrg = new Organism(population[best],population[best]->genome->makeMutatedOffspring(Genome::pointMutationRate));
+			nextGeneration.push_back(newOrg);
 		}
 	}
 	while (nextGeneration.size() < population.size()) {
@@ -94,11 +107,12 @@ vector<Genome*> Tournament::makeNextGeneration(vector<Genome*> population, vecto
 			winner = Random::getIndex(population.size());
 			for (int i = 0; i < Optimizer::tournamentSize - 1; i++) {
 				challanger = Random::getIndex(population.size());
-				if (W[challanger] > W[winner]) {
+				if (Scores[challanger] > Scores[winner]) {
 					winner = challanger;
 				}
 			}
-			nextGeneration.push_back(population[winner]->makeMutatedOffspring(Genome::pointMutationRate));
+			Organism* newOrg = new Organism(population[winner],population[winner]->genome->makeMutatedOffspring(Genome::pointMutationRate));
+			nextGeneration.push_back(newOrg);
 		}
 	}
 	return nextGeneration;

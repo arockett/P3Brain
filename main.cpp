@@ -15,6 +15,7 @@
 #include "BaseCode/Genome.h"
 #include "BaseCode/Global.h"
 #include "BaseCode/Optimizer.h"
+#include "BaseCode/Organism.h"
 #include "BaseCode/World.h"
 
 #include "Utilities/Parameters.h"
@@ -26,14 +27,14 @@
 
 using namespace std;
 
-void writeRealTimeFiles(vector<Genome*> population, vector<double> W) { // write Ave and Dominant files NOW!
+void writeRealTimeFiles(vector<Organism*> population) { // write Ave and Dominant files NOW!
 // write out Ave
 	double aveValue, temp;
 	DataMap AveMap;
 	for (auto key : Global::DefaultAveFileColumns) {
 		aveValue = 0;
 		for (auto genome : population) {
-			stringstream ss(genome->dataMap.Get(key));
+			stringstream ss(genome->dataMap[Global::update].Get(key));
 			ss >> temp;
 			aveValue += temp;
 		}
@@ -43,8 +44,13 @@ void writeRealTimeFiles(vector<Genome*> population, vector<double> W) { // write
 	AveMap.writeToFile(Global::AveFileName, Global::DefaultAveFileColumns);
 
 	// write out Dominant
-	int best = findGreatestInVector(W);
-	population[best]->dataMap.writeToFile(Global::DominantFileName);
+	vector<double> Scores;
+	for (auto org : population) {
+		Scores.push_back(org->score);
+	}
+
+	int best = findGreatestInVector(Scores);
+	population[best]->dataMap[Global::update].writeToFile(Global::DominantFileName);
 }
 
 int main(int argc, const char * argv[]) {
@@ -80,68 +86,62 @@ int main(int argc, const char * argv[]) {
 	//   eg: Global::files["world.csv"] = {"update","score","food1","food2","switches"};
 
 	// setup population
-	vector<Genome*> population, newPopulation;
-	vector<double> W;
+	vector<Organism*> population, newPopulation;
 	// a progenitor must exist - that is, one ancestor genome
 	// this genome is evaluated to populate the dataMap
-	Genome* progenitor = new Genome();
-	progenitor->birthDate = -1;
-	Genome::MRCA = progenitor;
-	progenitor->sites.resize(1);
-	Agent *progenitorAgent = new Agent(progenitor, Agent::defaultNrOfBrainStates);
-	world->testIndividual(progenitorAgent, false);
-	delete progenitorAgent;
+
+	Global::update = -1;
+
+	Organism* progenitor = new Organism();
+	Organism::MRCA = progenitor;
+	progenitor->genome->sites.resize(1);
+
+	Global::update = 0;
+
 	for (int i = 0; i < Global::popSize; i++) {
-		Genome *G = new Genome();
-		G->fillRandom();
-		G->ancestor = progenitor;
-		progenitor->referenceCounter++;
-		population.push_back(G);
+		Genome* genome = new Genome();
+		genome->fillRandom();
+		Organism *org = new Organism(progenitor, genome);
+		org->parent = progenitor;
+		population.push_back(org);
 	}
 	progenitor->kill();
 
 	// evolution loop
-	Global::update = 0;
 	while ((Global::nextDataWrite <= Global::updates) && (Global::nextGenomeWrite <= Global::updates)
 			&& (Global::update <= (Global::updates + Global::terminateAfter))) {
-		// translate all genomes to agents
-		vector<Agent*> agents;
-		for (int i = 0; i < Global::popSize; i++) {
-			agents.push_back(new Agent(population[i], Agent::defaultNrOfBrainStates));
-		}
 
 		// evaluate each organism in the population using a World
-		W = world->evaluateFitness(agents, false);
+		world->evaluateFitness(population, false);
 
-		// delete all agents
-		for (int i = 0; i < Global::popSize; i++) {
-			delete agents[i];
+		// add static dataMap data to dynamicDataMap
+		for (auto org : population) {
+			vector<string> mapList = org->staticDataMap.getKeys();
+			for (auto dataName : mapList) {
+				org->dataMap[Global::update].Set(dataName, org->staticDataMap.Get(dataName));
+			}
 		}
-
-		// remove agent pointers (which are pointing to null, since the agents were deleted)
-		agents.clear();
-
 		// write data to file and prune LOD every pruneInterval
 		if (Global::update % Global::pruneInterval == 0) {
-			writeRealTimeFiles(population, W); // write to dominant and average files
-			Genome::MRCA = population[0]->getMostRecentCommonAncestor();
+			writeRealTimeFiles(population); // write to dominant and average files
+			Organism::MRCA = population[0]->getMostRecentCommonAncestor();
 			population[0]->saveDataOnLOD(); // write out data and genomes
 			// data and genomes have now been written out up till the MRCA
 			// so all data and genomes from before the MRCA can be deleted
-			if (Genome::MRCA->ancestor != nullptr) { // if the MRCA is not the oldest in the LOD...
-				Genome::MRCA->ancestor->kill(); // kill MRCAs parent (and as a result all ancestors)
-				Genome::MRCA->ancestor = nullptr; // MRCA is now the oldest genome in LOD!
+			if (Organism::MRCA->parent != nullptr) { // if the MRCA is not the oldest in the LOD...
+				Organism::MRCA->parent->kill(); // kill MRCAs parent (and as a result all ancestors)
+				Organism::MRCA->parent = nullptr; // MRCA is now the oldest genome in LOD!
 			}
-			Global::lastPrune = Genome::MRCA->birthDate; // this will hold the time of the oldest genome in RAM
+			Global::lastPrune = Organism::MRCA->birthDate; // this will hold the time of the oldest genome in RAM
 		}
 
 		Global::update++;
 
 		//make next generation using an optimizer
-		newPopulation = optimizer->makeNextGeneration(population, W);
+		newPopulation = optimizer->makeNextGeneration(population);
 		cout << "update: " << Global::update - 1 << "   maxFitness: " << optimizer->maxFitness << "\n";
 		for (size_t i = 0; i < population.size(); i++) {
-			population[i]->kill(); // this deletes the genome if it has no offspring
+			population[i]->kill(); // this deletes the organism if it has no offspring
 			population[i] = newPopulation[i];
 		}
 		newPopulation.clear();
@@ -149,11 +149,10 @@ int main(int argc, const char * argv[]) {
 	cout << "Finished Evolution Loop... force file writes\n";
 	population[0]->flushDataOnLOD();
 
-	Genome * MRCA = population[0]->getMostRecentCommonAncestor();
+	Organism * FinalMRCA = population[0]->getMostRecentCommonAncestor();
 
-	Agent *A = new Agent(MRCA, Agent::defaultNrOfBrainStates);
-	printf("MRCA - born on: %d\n", MRCA->birthDate);
-	printf("%s\n", A->gateList().c_str());
+	printf("MRCA - born on: %d\n", FinalMRCA->birthDate);
+	printf("%s\n", FinalMRCA->agent->gateList().c_str());
 
 	return 0;
 }

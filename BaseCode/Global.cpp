@@ -28,6 +28,9 @@ string& Global::AveFileName = Parameters::register_parameter("aveFileName", (str
 string& Global::DominantFileName = Parameters::register_parameter("dominantFileName", (string) "dominant.csv",
 		"name of the Dominant file (all stats for best genome when file is written to)", "DATA");
 
+bool& Global::outputMethodB = Parameters::register_parameter("outputMethodB", false,
+		"output surviving populations after delay as apposed to MethodA LOD", "GLOBAL");
+
 int& Global::bitsPerBrainAddress = Parameters::register_parameter("bitsPerBrainAddress", 10,
 		"how many bits are evaluated to determine the brain addresses", "AGENT");
 
