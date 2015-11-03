@@ -50,7 +50,7 @@ void BitAgent::DecodeFixedInputGenome( const vector<bool>& genome, int numInputS
 
     // How many gates does this genome size encode for? Assert that it is
     // a multiple of the number of bits needed to store one gate logic table
-    float numGates = ( genome.size() / logicSize );
+    float numGates = (float)genome.size() / (float)logicSize;
     ASSERT(fmod(numGates, 1) == 0,
         "Invalid P3 bit string length. With " << gateIns <<
         "gate inputs, the length must be a multiple of " << logicSize << "." );
@@ -62,6 +62,10 @@ void BitAgent::DecodeFixedInputGenome( const vector<bool>& genome, int numInputS
 
     this->genome = make_shared<vector<bool>>( genome );
     gates.clear();
+
+    // Assert that there are enough input nodes for the given # of gate ins
+    ASSERT( numInputStates >= gateIns,
+        "Invalid gate complexity. The number of gate inputs must be no more than the number of inpute nodes." );
 
     // Starting with the first index after the input nodes, create each gate
     for( int i = numInputStates; i < nrOfBrainStates; i++ )
@@ -124,7 +128,7 @@ void BitAgent::DecodeHypercubeGenome( const vector<bool>& genome, int numInputSt
 
     // Find the total number of gates that can be represented by the given genome
     // and assert that it is the correct number
-    double numGates = (double)genome.size() / (double)gateEncodingSize;
+    float numGates = (float)genome.size() / (float)gateEncodingSize;
     ASSERT( fmod( numGates, 1 ) == 0 && numGates == (pow( 2.0, cubeDimension ) - numInputStates),
         "Invalid P3 bit string length. Based on the number of input states and gate complexity, length should be "
         << ( pow( 2.0, cubeDimension ) - numInputStates ) * gateEncodingSize << "." );
