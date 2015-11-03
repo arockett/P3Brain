@@ -11,6 +11,21 @@
 #include <vector>
 
 
+// Define a custom assert function that prints out a message if the assert fails
+#ifndef NDEBUG
+#   define ASSERT(condition, message) \
+    do { \
+        if (!(condition)) { \
+            cerr << "Assertion '" #condition "' failed in " << __FILE__ \
+                 << " line " << __LINE__ << ": " << message << endl; \
+            exit(EXIT_FAILURE); \
+        } \
+    } while (false)
+#else
+#   define ASSERT(condition, message) do { assert(condition); } while (false)
+#endif
+
+
 /****************************
  * Some utility functions
  ****************************/

@@ -14,21 +14,6 @@
 #include "Tools.h"
 
 
-// Define a custom assert function that prints out a message if the assert fails
-#ifndef NDEBUG
-#   define ASSERT(condition, message) \
-    do { \
-        if (!(condition)) { \
-            cerr << "Assertion '" #condition "' failed in " << __FILE__ \
-                 << " line " << __LINE__ << ": " << message << endl; \
-            exit(EXIT_FAILURE); \
-        } \
-    } while (false)
-#else
-#   define ASSERT(condition, message) do {} while (false)
-#endif
-
-
 BitAgent::BitAgent()
 {
 }
@@ -60,24 +45,36 @@ BitAgent::~BitAgent()
 
 void BitAgent::DecodeFixedInputGenome( const vector<bool>& genome, int numInputStates, int gateIns )
 {
+    // Calculate the number of bits needed to represent a gate with the given # of ins
     int logicSize = pow( 2.0, gateIns );
-    float numGates = ( genome.size() / logicSize );
-    assert(fmod(numGates, 1) == 0);
-    nrOfBrainStates = numGates + numInputStates;
 
+    // How many gates does this genome size encode for? Assert that it is
+    // a multiple of the number of bits needed to store one gate logic table
+    float numGates = ( genome.size() / logicSize );
+    ASSERT(fmod(numGates, 1) == 0,
+        "Invalid P3 bit string length. With " << gateIns <<
+        "gate inputs, the length must be a multiple of " << logicSize << "." );
+
+    // How many states will be in this brain?
+    nrOfBrainStates = numGates + numInputStates;
     states.resize(nrOfBrainStates);
     nextStates.resize(nrOfBrainStates);
 
     this->genome = make_shared<vector<bool>>( genome );
     gates.clear();
+
+    // Starting with the first index after the input nodes, create each gate
     for( int i = numInputStates; i < nrOfBrainStates; i++ )
     {
+        // Hard code the input indices to x previous nodes where x is 
+        // the number of gate inputs
         vector<int> inStates;
         for( int j = gateIns; j > 0; j-- )
         {
             inStates.push_back( i - j );
         }
 
+        // Get the gate logic table from the genome
         vector<bool> gateLogic;
         for( int j = 0; j < logicSize; j++ )
         {
@@ -121,9 +118,14 @@ void BitAgent::DecodeHypercubeGenome( const vector<bool>& genome, int numInputSt
     // Calculate number of bits needed to encode each gate input
     int inputEncodingSize = log2( cubeDimension );
 
+    // Use the number of bits per input and number of bits for gate logic to calculate
+    // the total number of bits needed to represent a gate
     int gateEncodingSize = gateIns * inputEncodingSize + gateLogicEncodingSize;
+
+    // Find the total number of gates that can be represented by the given genome
+    // and assert that it is the correct number
     double numGates = (double)genome.size() / (double)gateEncodingSize;
-    ASSERT( numGates == pow( 2.0, cubeDimension ) - numInputStates,
+    ASSERT( fmod( numGates, 1 ) == 0 && numGates == (pow( 2.0, cubeDimension ) - numInputStates),
         "Invalid P3 bit string length. Based on the number of input states and gate complexity, length should be "
         << ( pow( 2.0, cubeDimension ) - numInputStates ) * gateEncodingSize << "." );
 
@@ -131,14 +133,19 @@ void BitAgent::DecodeHypercubeGenome( const vector<bool>& genome, int numInputSt
     /********************************************************
     * Decode the genome bit string
     ********************************************************/
+
+    // How many states will be in this brain?
     nrOfBrainStates = numGates + numInputStates;
     states.resize(nrOfBrainStates);
     nextStates.resize(nrOfBrainStates);
 
     this->genome = make_shared<vector<bool>>( genome );
     gates.clear();
+
+    // Starting with the first index after the input nodes, create each gate
     for( int i = numInputStates; i < nrOfBrainStates; i++ )
     {
+        // Set the input indices
         vector<int> inStates;
         for( int k = 0; k < gateIns; k++ )
         {
@@ -150,12 +157,15 @@ void BitAgent::DecodeHypercubeGenome( const vector<bool>& genome, int numInputSt
             inStates.push_back( flipBit(i, boolStringToInt( inNumber )) );
         }
 
+        // Get the gate logic
         vector<bool> gateLogic;
         for( int j = 0; j < gateLogicEncodingSize; j++ )
         {
             gateLogic.push_back( genome[( ( i - numInputStates ) * gateEncodingSize ) + ( gateIns*inputEncodingSize ) + j] );
         }
 
+        // inStates will hold the index of each input to the gate, possible input indices
+        // are any adjacent nodes (gates) to i if all brain states were connected in a hypercube
         gates.push_back( shared_ptr<Gate>( new BitGate(inStates, i, gateLogic) ) );
     }
 }
