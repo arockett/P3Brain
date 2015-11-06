@@ -46,5 +46,5 @@ float MarkovWorld::evaluate(const vector<bool>& solution)
 {
     BitAgent agent = BitAgent(solution, 11, BitAgent::Hypercube, 2);
 
-    return trainingGround->testIndividual(&agent, false);
+    return (float)trainingGround->testIndividual(&agent, false);
 }

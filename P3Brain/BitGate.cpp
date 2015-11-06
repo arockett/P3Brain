@@ -45,7 +45,7 @@ void BitGate::update( vector<double>& states, vector<double>& nextStates )
     //              If there are four inputs and the second input to be
     //              processed is a 1 (true), then add 4 to the outIndex
     //              because it's in the 4's place
-    for( int i = 0; i < inputs.size(); i++ )
+    for( unsigned i = 0; i < inputs.size(); i++ )
     {
         if( (bool)states[inputs[i]] )
         {

@@ -62,7 +62,7 @@ void BitAgent::DecodeFixedInputGenome( const vector<bool>& genome, int numInputS
     // TODO Layer the fixed gate inputs so that each Brain Input state can be accessed by a gate
 
     // Calculate the number of bits needed to represent a gate with the given # of ins
-    int logicSize = pow( 2.0, gateIns );
+    int logicSize = (int)pow( 2.0, gateIns );
 
     // How many gates does this genome size encode for? Assert that it is
     // a multiple of the number of bits needed to store one gate logic table
@@ -72,7 +72,7 @@ void BitAgent::DecodeFixedInputGenome( const vector<bool>& genome, int numInputS
         "gate inputs, the length must be a multiple of " << logicSize << "." );
 
     // How many states will be in this brain?
-    nrOfBrainStates = numGates + numInputStates;
+    nrOfBrainStates = (int)numGates + numInputStates;
     states.resize(nrOfBrainStates);
     nextStates.resize(nrOfBrainStates);
 
@@ -117,26 +117,26 @@ void BitAgent::DecodeHypercubeGenome( const vector<bool>& genome, int numInputSt
      ********************************************************/
     
     // Calculate number of bits needed for gate logic
-    int gateLogicEncodingSize = pow( 2.0, gateIns );
+    int gateLogicEncodingSize = (int)pow( 2.0, gateIns );
 
     //
     // Calculate cube dimension necessary for given number of input states
     //
     // Minimum dimension possible
-    int cubeDimension = ceil( log2( numInputStates ) ) + 1;
+    int cubeDimension = (int)ceil( log2( numInputStates ) ) + 1;
     // If the minimum dimension is not a power of 2, make it the next power of 2 greater
     // than the minimum possible dimension. If the hypercube dimension is not a power
     // of 2, the bits encoding each gate input will be underutilized.
-    if( log2( cubeDimension ) / 1.0 != 0.0 )
+    if( fmod( log2( cubeDimension ), 1 ) != 0 )
     {
-        cubeDimension = pow(2.0, ceil( log2( cubeDimension ) ));
+        cubeDimension = (int)pow(2.0, ceil( log2( cubeDimension ) ));
     }
 
     ASSERT( gateIns <= cubeDimension, "Too many gate inputs. For " << numInputStates
         << " you should have <= " << cubeDimension << " inputs per gate." );
 
     // Calculate number of bits needed to encode each gate input
-    int inputEncodingSize = log2( cubeDimension );
+    int inputEncodingSize = (int)log2( cubeDimension );
 
     // Use the number of bits per input and number of bits for gate logic to calculate
     // the total number of bits needed to represent a gate
@@ -155,7 +155,7 @@ void BitAgent::DecodeHypercubeGenome( const vector<bool>& genome, int numInputSt
     ********************************************************/
 
     // How many states will be in this brain?
-    nrOfBrainStates = numGates + numInputStates;
+    nrOfBrainStates = (int)numGates + numInputStates;
     states.resize(nrOfBrainStates);
     nextStates.resize(nrOfBrainStates);
 

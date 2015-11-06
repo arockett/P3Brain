@@ -35,7 +35,7 @@ LogicalWorld::~LogicalWorld()
 
 vector<double> LogicalWorld::evaluateFitness(vector<Agent*> agents, bool analyse) {
     vector<double> fitnesses;
-    for (int i = 0; i<agents.size(); i++)
+    for (unsigned i = 0; i < agents.size(); i++)
         fitnesses.push_back(testIndividual(agents[i], analyse));
     return fitnesses;
 }
@@ -43,7 +43,7 @@ vector<double> LogicalWorld::evaluateFitness(vector<Agent*> agents, bool analyse
 double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
     // If there aren't enough non-input nodes to check then return 0 fitness
     // because the bit string is not long enough
-    if( logic.size() > agent->nrOfBrainStates - 2 )
+    if( (int)logic.size() > agent->nrOfBrainStates - 2 )
         return 0.0;
 
     double fitness = 0.0;
@@ -61,7 +61,7 @@ double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
         agent->states[1] = 0.0;
         agent->updateStates();
     }
-    for( int i = 0; i < logic.size(); i++ )
+    for( unsigned i = 0; i < logic.size(); i++ )
     {
         if( agent->states[agent->nrOfBrainStates - ( logic.size() - i )] == (double)getBit( logic[i], 3 ) )
             fitness += fitnessIncrement;
@@ -77,7 +77,7 @@ double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
         agent->states[1] = 1.0;
         agent->updateStates();
     }
-    for( int i = 0; i < logic.size(); i++ )
+    for( unsigned i = 0; i < logic.size(); i++ )
     {
         if( agent->states[agent->nrOfBrainStates - ( logic.size() - i )] == (double)getBit( logic[i], 2 ) )
             fitness += fitnessIncrement;
@@ -93,7 +93,7 @@ double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
         agent->states[1] = 0.0;
         agent->updateStates();
     }
-    for( int i = 0; i < logic.size(); i++ )
+    for( unsigned i = 0; i < logic.size(); i++ )
     {
         if( agent->states[agent->nrOfBrainStates - ( logic.size() - i )] == (double)getBit( logic[i], 1 ) )
             fitness += fitnessIncrement;
@@ -109,7 +109,7 @@ double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
         agent->states[1] = 1.0;
         agent->updateStates();
     }
-    for( int i = 0; i < logic.size(); i++ )
+    for( unsigned i = 0; i < logic.size(); i++ )
     {
         if( agent->states[agent->nrOfBrainStates - ( logic.size() - i )] == (double)getBit( logic[i], 0 ) )
             fitness += fitnessIncrement;
