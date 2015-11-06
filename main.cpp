@@ -83,14 +83,9 @@ int main(int argc, const char * argv[]) {
 	vector<Genome*> population, newPopulation;
 	vector<double> W;
 	// a progenitor must exist - that is, one ancestor genome
-	// this genome is evaluated to populate the dataMap
 	Genome* progenitor = new Genome();
 	progenitor->birthDate = -1;
 	Genome::MRCA = progenitor;
-	progenitor->sites.resize(1);
-	Agent *progenitorAgent = new Agent(progenitor, Agent::defaultNrOfBrainStates);
-	world->testIndividual(progenitorAgent, false);
-	delete progenitorAgent;
 	for (int i = 0; i < Global::popSize; i++) {
 		Genome *G = new Genome();
 		G->fillRandom();
