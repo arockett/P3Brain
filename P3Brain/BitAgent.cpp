@@ -20,6 +20,8 @@ BitAgent::BitAgent()
 
 BitAgent::BitAgent( const vector<bool>& startGenome, int numInputStates, BitAgent::Decoder decoder, int gateComplexity)
 {
+    this->genome = &SingletonGenome::getInstance();
+
     switch( decoder )
     {
     case FixedInput:
@@ -60,7 +62,6 @@ void BitAgent::DecodeFixedInputGenome( const vector<bool>& genome, int numInputS
     states.resize(nrOfBrainStates);
     nextStates.resize(nrOfBrainStates);
 
-    this->genome = make_shared<vector<bool>>( genome );
     gates.clear();
 
     // Assert that there are enough input nodes for the given # of gate ins
@@ -143,7 +144,6 @@ void BitAgent::DecodeHypercubeGenome( const vector<bool>& genome, int numInputSt
     states.resize(nrOfBrainStates);
     nextStates.resize(nrOfBrainStates);
 
-    this->genome = make_shared<vector<bool>>( genome );
     gates.clear();
 
     // Starting with the first index after the input nodes, create each gate

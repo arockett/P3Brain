@@ -29,8 +29,6 @@ public:
     virtual ~BitAgent();
 
 private:
-    shared_ptr<vector<bool>> genome;
-
     void DecodeFixedInputGenome( const vector<bool>&, int, int );
     void DecodeFixedLogicGenome( const vector<bool>&, int, int );
     void DecodeHypercubeGenome( const vector<bool>&, int, int );
