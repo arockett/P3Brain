@@ -39,8 +39,8 @@ double& BerryWorld::rewardForFood7 = Parameters::register_parameter("BERRY_rewar
 double& BerryWorld::rewardForFood8 = Parameters::register_parameter("BERRY_rewardForFood8", 1.0,
 		"reward for eating a Food8", "WORLD - BERRY");
 
-int& BerryWorld::xDim = Parameters::register_parameter("BERRY_WorldX", 8, "world X size", "WORLD - BERRY");
-int& BerryWorld::yDim = Parameters::register_parameter("BERRY_WorldY", 8, "world Y size", "WORLD - BERRY");
+int& BerryWorld::worldColumns = Parameters::register_parameter("BERRY_WorldX", 8, "world X size", "WORLD - BERRY");
+int& BerryWorld::worldRows = Parameters::register_parameter("BERRY_WorldY", 8, "world Y size", "WORLD - BERRY");
 bool& BerryWorld::borderWalls = Parameters::register_parameter("BERRY_makeBorderWalls", true,
 		"if true world will have a bounding wall", "WORLD - BERRY");
 int& BerryWorld::randomWalls = Parameters::register_parameter("BERRY_makeRandomWalls", 0,
@@ -63,27 +63,28 @@ bool& BerryWorld::senseWalls = Parameters::register_parameter("BERRY_senseWalls"
 BerryWorld::BerryWorld() {
 	senseWalls = senseWalls & (borderWalls | (randomWalls > 0)); // if there are no walls, there is no need to sense them!
 
-	outputStatesCount = 3; // number of brain states used for output, 2 for move, 1 for eat
+	inputStatesCount = (senseDown * foodSourceTypes) + (senseFront * (foodSourceTypes + senseWalls))
+			+ (2 * (senseFrontSides * (foodSourceTypes + senseWalls)));
+	// this calculates the number of inputs that will be needed.
+	// sense down does not include walls (agents can't stand on a wall)
 
-	if (senseWalls) {
-		inputStatesCount = (senseDown * foodSourceTypes) + ((senseFront * foodSourceTypes) + senseWalls)
-				+ (2 * ((senseFrontSides * foodSourceTypes) + senseWalls));
-		// sense down does not include walls (can't stand on a wall (yet!) * types of food
-		// senseFront * types of food + wall, same for senseFrontSides, but there are 2
-	} else { // no border walls
-		inputStatesCount = (senseDown * foodSourceTypes) + (senseFront * foodSourceTypes)
-				+ (2 * (senseFrontSides * foodSourceTypes));
-		// sense down * types of food, same for senseFront, same for senseFrontSides, but there are 2
-	}
+	outputStatesCount = 3; // number of brain states used for output, 2 for move, 1 for eat
 
 	cout << "  World using following BrainSates:\n    Inputs: 0 to " << inputStatesCount - 1 << "\n    Outputs: "
 			<< inputStatesCount << " to " << inputStatesCount + outputStatesCount - 1 << "\n";
 }
 
 double BerryWorld::testIndividual(Agent *agent, bool analyse) {
-	int grid[xDim][yDim];
-	int i, j;
-	int xp = xDim / 2, yp = yDim / 2, dir = Random::getInt(7); //xp and yp are x and y positions. agent starts at center of grid and with a random rotation
+	vector<vector<int>> grid;
+	grid.resize(worldRows);
+	for (int rowCount = 0; rowCount < worldRows; rowCount++) {
+		grid[rowCount].resize(worldColumns);
+	}
+
+	// agent starts in the center of the world, facing in a random direction.
+	int currentColumn = worldColumns / 2; // column being occupied by agent
+	int currentRow = worldRows / 2; // row being occupied by agent
+	int facing = Random::getInt(7); // direction the agent is facing
 
 	int switched = 0;
 	int statesAssignmentCounter;
@@ -107,29 +108,28 @@ double BerryWorld::testIndividual(Agent *agent, bool analyse) {
 	eaten.resize(foodSourceTypes);
 
 	if (borderWalls) {
-		for (i = 1; i < xDim - 1; i++)
-			for (j = 1; j < yDim - 1; j++) { //as you go across the x and y directions in grid...
-				grid[i][j] = Random::getInt(1, foodSourceTypes); // plant red or blue food
+		for (int row = 1; row < worldRows - 1; row++)
+			for (int column = 1; column < worldColumns - 1; column++) { //as you go across the x and y directions in grid...
+				grid[row][column] = Random::getInt(1, foodSourceTypes); // plant red or blue food
 			}
-		for (i = 0; i < xDim; i++) { //makes horizontal walls
-			grid[i][0] = WALL;
-			grid[i][yDim - 1] = WALL;
+		for (int column = 0; column < worldColumns; column++) { //makes horizontal walls
+			grid[0][column] = WALL;
+			grid[worldRows - 1][column] = WALL;
 		}
-		for (j = 0; j < yDim; j++) { //makes vertical walls
-			grid[0][j] = WALL;
-			grid[xDim - 1][j] = WALL;
+		for (int row = 0; row < worldRows; row++) { //makes vertical walls
+			grid[row][0] = WALL;
+			grid[row][worldColumns - 1] = WALL;
 		}
 
 	} else { // no border walls
-		for (i = 0; i < xDim; i++) {
-			for (j = 0; j < yDim; j++) { //as you go across the x and y directions in grid...
-				grid[i][j] = Random::getInt(1, foodSourceTypes); // plant red or blue food
+		for (int row = 0; row < worldRows; row++) {
+			for (int column = 0; column < worldColumns; column++) { //as you go across the x and y directions in grid...
+				grid[row][column] = Random::getInt(1, foodSourceTypes); // plant red or blue food
 			}
 		}
 	}
-
 	for (int i = 0; i < randomWalls; i++) { // add walls
-		grid[Random::getIndex(xDim)][Random::getIndex(yDim)] = WALL;
+		grid[Random::getIndex(worldRows)][Random::getIndex(worldColumns)] = WALL;
 	}
 
 	agent->resetBrain();
@@ -141,10 +141,13 @@ double BerryWorld::testIndividual(Agent *agent, bool analyse) {
 
 	for (int t = 0; t < worldUpdates; t++) { //run agent for "worldUpdates" brain updates
 
-		here = grid[xp][yp]; // where the agent is standing
-		front = grid[loopMod((xp + xm[dir]), (xDim))][loopMod((yp + ym[dir]), (yDim))];
-		leftFront = grid[loopMod((xp + xm[(dir - 1) & 7]), (xDim))][loopMod((yp + ym[(dir - 1) & 7]), (yDim))];
-		rightFront = grid[loopMod((xp + xm[(dir + 1) & 7]), (xDim))][loopMod((yp + ym[(dir + 1) & 7]), (yDim))];
+		here = grid[currentColumn][currentRow]; // where the agent is standing
+		front = grid[loopMod((currentColumn + xm[facing]), (worldColumns))][loopMod((currentRow + ym[facing]),
+				(worldRows))];
+		leftFront = grid[loopMod((currentColumn + xm[(facing - 1) & 7]), (worldColumns))][loopMod(
+				(currentRow + ym[(facing - 1) & 7]), (worldRows))];
+		rightFront = grid[loopMod((currentColumn + xm[(facing + 1) & 7]), (worldColumns))][loopMod(
+				(currentRow + ym[(facing + 1) & 7]), (worldRows))];
 
 		statesAssignmentCounter = 0;
 
@@ -209,42 +212,41 @@ double BerryWorld::testIndividual(Agent *agent, bool analyse) {
 		output1 = Bit(agent->getState(inputStatesCount)) + (Bit(agent->getState(inputStatesCount + 1)) << 1);
 		output2 = Bit(agent->getState(inputStatesCount + 2));
 
-		if ((output2 == 1) && (grid[xp][yp] != EMPTY)) { // eat food here (if there is food here)
+		if ((output2 == 1) && (grid[currentColumn][currentRow] != EMPTY)) { // eat food here (if there is food here)
 			if (lastFood != -1) { // if some food has already been eaten
-				if (lastFood != grid[xp][yp]) { // if this food is different then the last food eaten
+				if (lastFood != grid[currentColumn][currentRow]) { // if this food is different then the last food eaten
 					score -= BerryWorld::TSK; // pay the task switch cost
 					switched++;
 				}
 			}
-			score += foodRewards[grid[xp][yp] - 1]; // you ate a food... good for you!
-			lastFood = grid[xp][yp]; // remember the last food eaten
-			eaten[grid[xp][yp] - 1]++; // track the number of each berry eaten
-			agent->genome->dataMap.Append("foodList", grid[xp][yp]);
-			grid[xp][yp] = 0; // clear this location
+			score += foodRewards[grid[currentColumn][currentRow] - 1]; // you ate a food... good for you!
+			lastFood = grid[currentColumn][currentRow]; // remember the last food eaten
+			eaten[grid[currentColumn][currentRow] - 1]++; // track the number of each berry eaten
+			agent->genome->dataMap.Append("foodList", grid[currentColumn][currentRow]);
+			grid[currentColumn][currentRow] = 0; // clear this location
 		}
 		if ((output2 == 0) || (allowMoveAndEat == 1)) { // if we did not eat or we allow moving and eating in the same world update
 			switch (output1) {
 			case 0: //nothing
 				break;
 			case 1: //turn left
-				dir = (dir - 1) & 7;
+				facing = (facing - 1) & 7;
 				break;
 			case 2: //turn right
-				dir = (dir + 1) & 7;
+				facing = (facing + 1) & 7;
 				break;
 			case 3: //move forward
-				if (grid[loopMod((xp + xm[dir]), (xDim))][loopMod((yp + ym[dir]), (yDim))] != WALL) { // if the proposed move is not a wall
-					if (grid[xp][yp] == EMPTY) { // if the current location is empty
-						grid[xp][yp] = Random::getInt(1, foodSourceTypes); // plant a red or blue food
+				if (grid[loopMod((currentColumn + xm[facing]), (worldColumns))][loopMod((currentRow + ym[facing]),
+						(worldRows))] != WALL) { // if the proposed move is not a wall
+					if (grid[currentColumn][currentRow] == EMPTY) { // if the current location is empty
+						grid[currentColumn][currentRow] = Random::getInt(1, foodSourceTypes); // plant a red or blue food
 					}
-					xp = loopMod((xp + xm[dir]), xDim); // move to the new X
-					yp = loopMod((yp + ym[dir]), yDim); // move to the new Y
+					currentColumn = loopMod((currentColumn + xm[facing]), worldColumns); // move to the new X
+					currentRow = loopMod((currentRow + ym[facing]), worldRows); // move to the new Y
 				}
 				break;
 			}
 		}
-//		Data::Add(xp, "x"+mkString(t), agent->genome);
-//		Data::Add(yp, "y"+mkString(t), agent->genome);
 
 		/* uncommnet to print test output
 		 for(int x=0;x<xDim;x++){

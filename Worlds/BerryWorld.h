@@ -13,7 +13,6 @@
 #include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 #include "../BaseCode/Agent.h"
 #include "../BaseCode/Genome.h"
@@ -30,7 +29,8 @@ class BerryWorld: public World {
 public:
 	const int xm[8] = { 0, 1, 1, 1, 0, -1, -1, -1 }; //these are directions
 	const int ym[8] = { -1, -1, 0, 1, 1, 1, 0, -1 };
-
+	//const pair<int, int> facingOffset[8] = { { 0, -1 }, { 1, -1 }, { 1, 0 }, { 1, 1 }, { 0, 1 }, { -1, 1 }, { -1, 0 },
+	//		{ -1, -1 } };
 	const int EMPTY = 0;
 	const int RED = 1;
 	const int BLUE = 2;
@@ -48,8 +48,8 @@ public:
 	static double& rewardForFood7;
 	static double& rewardForFood8;
 
-	static int& xDim;
-	static int& yDim;
+	static int& worldColumns;
+	static int& worldRows;
 	static bool& borderWalls;
 	static int& randomWalls;
 

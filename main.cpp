@@ -86,7 +86,6 @@ int main(int argc, const char * argv[]) {
 	Genome* progenitor = new Genome();
 	progenitor->birthDate = -1;
 	Genome::MRCA = progenitor;
-	progenitor->sites.resize(1);
 	for (int i = 0; i < Global::popSize; i++) {
 		Genome *G = new Genome();
 		G->fillRandom();
