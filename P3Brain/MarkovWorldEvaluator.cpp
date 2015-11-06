@@ -18,6 +18,7 @@
 
 #include "BitAgent.h"
 #include "LogicalWorld.h"
+#include "BerryWorld.h"
 
 /*
 * Make sure you set trainingGround to an instance of the World you
@@ -25,11 +26,13 @@
 */
 MarkovWorld::MarkovWorld(Configuration& config, int run_number)
 {
+    /*
     vector<LogicalWorld::Logic> args = {
-        LogicalWorld::Logic::XOR
+        LogicalWorld::Logic::XOR,
+        LogicalWorld::Logic::NAND
     };
-
-    trainingGround = shared_ptr<World>( new LogicalWorld( args ) );
+    */
+    trainingGround = shared_ptr<World>( new BerryWorld );
 }
 
 /*
@@ -41,7 +44,7 @@ MarkovWorld::MarkovWorld(Configuration& config, int run_number)
 */
 float MarkovWorld::evaluate(const vector<bool>& solution)
 {
-    BitAgent agent = BitAgent(solution, 2, BitAgent::Hypercube, 2);
+    BitAgent agent = BitAgent(solution, 11, BitAgent::Hypercube, 2);
 
     return trainingGround->testIndividual(&agent, false);
 }
