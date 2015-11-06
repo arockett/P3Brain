@@ -19,6 +19,7 @@ class BitAgent : public Agent
 {
 public:
     enum Decoder {
+        Unstructured,
         FixedInput,
         FixedLogic,
         Hypercube
@@ -29,6 +30,7 @@ public:
     virtual ~BitAgent();
 
 private:
+    void DecodeUnstructuredGenome( const vector<bool>&, int, int );
     void DecodeFixedInputGenome( const vector<bool>&, int, int );
     void DecodeFixedLogicGenome( const vector<bool>&, int, int );
     void DecodeHypercubeGenome( const vector<bool>&, int, int );

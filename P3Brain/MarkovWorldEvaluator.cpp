@@ -32,7 +32,7 @@ MarkovWorld::MarkovWorld(Configuration& config, int run_number)
         LogicalWorld::Logic::NAND
     };
     */
-    trainingGround = shared_ptr<World>( new BerryWorld );
+    trainingGround = shared_ptr<World>( new BerryWorld() );
 }
 
 /*

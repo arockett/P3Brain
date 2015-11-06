@@ -24,6 +24,9 @@ BitAgent::BitAgent( const vector<bool>& startGenome, int numInputStates, BitAgen
 
     switch( decoder )
     {
+    case Unstructured:
+        DecodeUnstructuredGenome( startGenome, numInputStates, gateComplexity );
+        break;
     case FixedInput:
         DecodeFixedInputGenome( startGenome, numInputStates, gateComplexity );
         break;
@@ -32,6 +35,10 @@ BitAgent::BitAgent( const vector<bool>& startGenome, int numInputStates, BitAgen
         break;
     case Hypercube:
         DecodeHypercubeGenome( startGenome, numInputStates, gateComplexity );
+        break;
+    default:
+        // This should never happen
+        ASSERT( false, "Something went wrong while choosing a Decoder type in BitAgent constructor." );
         break;
     }
 }
@@ -45,8 +52,15 @@ BitAgent::~BitAgent()
  *************************   Decoders ****************************
  */
 
+void BitAgent::DecodeUnstructuredGenome( const vector<bool>& genome, int numInputStates, int gateIns )
+{
+    // TODO Implement unstructured genome decoder where gates have variable logic and no limitations on where they get input
+}
+
 void BitAgent::DecodeFixedInputGenome( const vector<bool>& genome, int numInputStates, int gateIns )
 {
+    // TODO Layer the fixed gate inputs so that each Brain Input state can be accessed by a gate
+
     // Calculate the number of bits needed to represent a gate with the given # of ins
     int logicSize = pow( 2.0, gateIns );
 
@@ -92,11 +106,12 @@ void BitAgent::DecodeFixedInputGenome( const vector<bool>& genome, int numInputS
 
 void BitAgent::DecodeFixedLogicGenome( const vector<bool>& genome, int numInputStates, int gateIns)
 {
-    // NOT IMPLEMENTED
+    // TODO Implement Fixed Logic Decoder using XOR gates (functionally complete)
 }
 
 void BitAgent::DecodeHypercubeGenome( const vector<bool>& genome, int numInputStates, int gateIns )
 {
+    // TODO Allow innefficient cube dimensions in order to decrease the genome length?
     /********************************************************
      * Check the genome size to ensure it's the right length
      ********************************************************/
