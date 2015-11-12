@@ -8,6 +8,9 @@
 * date: 10/30/2015
 ******************************************************************************/
 
+#ifndef TOOLS_H_
+#define TOOLS_H_
+
 #include <vector>
 #include <cassert>
 
@@ -68,3 +71,6 @@ unsigned flipBit( unsigned n, int pos );
  * Return the bit at a given position in the number (starting with 0 as the rightmost bit)
  */
 unsigned getBit( unsigned n, int pos );
+
+
+#endif /* TOOLS_H_ */

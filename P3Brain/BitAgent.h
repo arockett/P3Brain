@@ -6,6 +6,9 @@
 * date: 10/15/2015
 ******************************************************************************/
 
+#ifndef BITAGENT_H_
+#define BITAGENT_H_
+
 #include "Agent.h"
 
 #include <memory>
@@ -36,3 +39,4 @@ private:
     void DecodeHypercubeGenome( const vector<bool>&, int, int );
 };
 
+#endif /* BITAGENT_H_ */

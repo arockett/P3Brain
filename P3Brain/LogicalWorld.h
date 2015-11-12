@@ -6,6 +6,9 @@
 * date: 10/15/2015
 ******************************************************************************/
 
+#ifndef LOGICALWORLD_H_
+#define LOGICALWORLD_H_
+
 #include "World.h"
 
 class LogicalWorld : public World
@@ -41,3 +44,4 @@ private:
     double fitnessIncrement;
 };
 
+#endif /* LOGICALWORLD_H_ */

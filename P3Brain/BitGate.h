@@ -6,6 +6,9 @@
 * date: 10/15/2015
 ******************************************************************************/
 
+#ifndef BITGATE_H_
+#define BITGATE_H_
+
 #include "Gate.h"
 
 class BitGate : public Gate
@@ -22,3 +25,4 @@ private:
     vector<bool> logic;
 };
 
+#endif /* BITGATE_H_ */
