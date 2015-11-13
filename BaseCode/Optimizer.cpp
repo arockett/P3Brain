@@ -16,11 +16,9 @@
 using namespace std;
 
 int& Optimizer::elitism = Parameters::register_parameter("elitism", 0,
-		"The highest scoring agent will be included in the next generation this many times (0 = no elitism)?",
-		"OPTIMIZER");
+        "The highest scoring brain will be included in the next generation this many times (0 = no elitism)?", "OPTIMIZER");
 int& Optimizer::tournamentSize = Parameters::register_parameter("tournamentSize", 2,
-		"how many genomes to consider when doing Tournament selection? 1 will result in random selection.",
-		"OPTIMIZER");
+        "how many genomes to consider when doing Tournament selection? 1 will result in random selection.", "OPTIMIZER");
 
 /*
  * Optimizer::makeNextGeneration(vector<Genome*> population, vector<double> W)
@@ -28,13 +26,13 @@ int& Optimizer::tournamentSize = Parameters::register_parameter("tournamentSize"
  * no selection and no mutation
  */
 vector<Organism*> Optimizer::makeNextGeneration(vector<Organism*> population) {
-	vector<Organism*> nextGeneration;
+    vector<Organism*> nextGeneration;
 
-	for (size_t i = 0; i < population.size(); i++) {
-		Organism* newOrg = new Organism(population[i],population[i]->genome);
-		nextGeneration.push_back(newOrg);
-	}
-	return nextGeneration;
+    for (size_t i = 0; i < population.size(); i++) {
+        Organism* newOrg = new Organism(population[i], population[i]->genome);
+        nextGeneration.push_back(newOrg);
+    }
+    return nextGeneration;
 }
 
 /*
@@ -46,33 +44,33 @@ vector<Organism*> Optimizer::makeNextGeneration(vector<Organism*> population) {
  * which is good enough.
  */
 vector<Organism*> GA::makeNextGeneration(vector<Organism*> population) {
-	vector<Organism*> nextGeneration;
+    vector<Organism*> nextGeneration;
 
     vector<double> W;
-	for (auto org : population){
-    	W.push_back(org->score);
+    for (auto org : population) {
+        W.push_back(org->score);
     }
 
-	int best = findGreatestInVector(W);
-	maxFitness = W[best];
+    int best = findGreatestInVector(W);
+    maxFitness = W[best];
 
-	//now to roulette wheel selection:
-	while (nextGeneration.size() < population.size()) {
-		int who;
-		if ((int) nextGeneration.size() < Optimizer::elitism) {
-			who = best;
-		} else {
-			if (maxFitness > 0.0) {	// if anyone has fitness > 0
-				do {
-					who = Random::getIndex(population.size()); //keep choosing a random genome from population until we get one that's good enough
-				} while (pow(1.05, Random::getDouble(1)) > pow(1.05, (W[who] / maxFitness)));
-			} else {
-				who = Random::getIndex(population.size()); // otherwise, just pick a random genome from population
-			}
-		}
-		nextGeneration.push_back(population[who]->makeMutatedOffspring(Genome::pointMutationRate));
-	}
-	return nextGeneration;
+    //now to roulette wheel selection:
+    while (nextGeneration.size() < population.size()) {
+        int who;
+        if ((int) nextGeneration.size() < Optimizer::elitism) {
+            who = best;
+        } else {
+            if (maxFitness > 0.0) {	// if anyone has fitness > 0
+                do {
+                    who = Random::getIndex(population.size()); //keep choosing a random genome from population until we get one that's good enough
+                } while (pow(1.05, Random::getDouble(1)) > pow(1.05, (W[who] / maxFitness)));
+            } else {
+                who = Random::getIndex(population.size()); // otherwise, just pick a random genome from population
+            }
+        }
+        nextGeneration.push_back(population[who]->makeMutatedOffspring(Genome::pointMutationRate));
+    }
+    return nextGeneration;
 }
 
 /*
@@ -82,36 +80,31 @@ vector<Organism*> GA::makeNextGeneration(vector<Organism*> population) {
  * copy to the next generation and mutate the copy.
  */
 vector<Organism*> Tournament::makeNextGeneration(vector<Organism*> population) {
-	vector<Organism*> nextGeneration;
+    vector<Organism*> nextGeneration;
 
     vector<double> Scores;
-	for (auto org : population){
-    	Scores.push_back(org->score);
+    for (auto org : population) {
+        Scores.push_back(org->score);
     }
 
-	int best = findGreatestInVector(Scores);
-	maxFitness = Scores[best];
+    int best = findGreatestInVector(Scores);
+    maxFitness = Scores[best];
 
-	for (int i = 0; i < Optimizer::elitism; i++) { // first, if elitism > 0, add this many copies of best to the next generation
-		if (nextGeneration.size() < population.size()) {
-			nextGeneration.push_back(population[best]->makeMutatedOffspring(Genome::pointMutationRate));
-		}
-	}
-	while (nextGeneration.size() < population.size()) {
-		int winner, challanger;
-		if ((int) nextGeneration.size() < Optimizer::elitism) {
-			winner = best;
-		} else {
-			winner = Random::getIndex(population.size());
-			for (int i = 0; i < Optimizer::tournamentSize - 1; i++) {
-				challanger = Random::getIndex(population.size());
-				if (Scores[challanger] > Scores[winner]) {
-					winner = challanger;
-				}
-			}
-			nextGeneration.push_back(population[best]->makeMutatedOffspring(Genome::pointMutationRate));
-		}
-	}
-	return nextGeneration;
+    while (nextGeneration.size() < population.size()) {
+        int winner, challanger;
+        if ((int) nextGeneration.size() < Optimizer::elitism) {
+            winner = best;
+        } else {
+            winner = Random::getIndex(population.size());
+            for (int i = 0; i < Optimizer::tournamentSize - 1; i++) {
+                challanger = Random::getIndex(population.size());
+                if (Scores[challanger] > Scores[winner]) {
+                    winner = challanger;
+                }
+            }
+        }
+        nextGeneration.push_back(population[winner]->makeMutatedOffspring(Genome::pointMutationRate));
+    }
+    return nextGeneration;
 }
 

@@ -32,127 +32,131 @@ using namespace std;
 
 class Gate {  //conventional probabilistic gate
 public:
-	static bool& usingProbGate;
-	static bool& usingDetGate;
-	static bool& usingFBGate;
-	static bool& usingGPGate;
-	static bool& usingThGate;
-	static bool& usingEpsiGate;
-	static bool& usingVoidGate;
+    static bool& usingProbGate;
+    static bool& usingDetGate;
+    static bool& usingFBGate;
+    static bool& usingGPGate;
+    static bool& usingThGate;
+    static bool& usingEpsiGate;
+    static bool& usingVoidGate;
 
-	static double& voidOutPut;
-	static double& FixedEpsilonGateP;
+    static double& voidOutPut;
+    static double& FixedEpsilonGateP;
 
 public:
-	static void setupGates();
-	static function<shared_ptr<Gate>(Genome*, int)> makeGate[256];
-	vector<int> inputs;
-	vector<int> outputs;
-	vector<vector<double>> table;
-	map<int, int> codingRegions; //indicates coding regions. maps genome index to usage of nucleotide in gate. 0=start codon. 1=wiring(defines # of inputs and outputs and what they are). 2=gate specific information
+    static void setupGates();
+    static function<shared_ptr<Gate>(Genome*, int)> makeGate[256];
+    vector<int> inputs;
+    vector<int> outputs;
+    vector<vector<double>> table;
+    map<int, int> codingRegions; //indicates coding regions. maps genome index to usage of nucleotide in gate. 0=start codon. 1=wiring(defines # of inputs and outputs and what they are). 2=gate specific information
 
-	Gate() = default;
-	Gate(Genome *genome, int startCodonAt);
+    Gate() = default;
+    Gate(Genome *genome, int startCodonAt);
 
-	void movePastStartCodeon(int& genomeIndex, Genome* genome);
-	int getIOAddress(int& genomeIndex, Genome* genome);
-	void getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, int& genome_index,
-			Genome* genome, int codeNumber);
-	void getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, int& genomeIndex, Genome* genome);
-	void getTableFromGenome(vector<int> range, vector<int> rangeMax, int& genomeIndex, Genome* genome);
-	int getIndexFromInputs(vector<double> & states);
-	virtual ~Gate() = default;
+    void movePastStartCodeon(int& genomeIndex, Genome* genome);
+    int getIOAddress(int& genomeIndex, Genome* genome);
+    void getSomeBrainAddresses(const int& howMany, const int& howManyMax,
+            vector<int>& addresses, int& genome_index, Genome* genome,
+            int codeNumber);
+    void getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange,
+            int& genomeIndex, Genome* genome);
+    void getTableFromGenome(vector<int> range, vector<int> rangeMax,
+            int& genomeIndex, Genome* genome);
+    int getIndexFromInputs(vector<double> & states);
+    virtual ~Gate() = default;
 
-	virtual void update(vector<double> & states, vector<double> & nextStates);
-	virtual string description();
-	virtual void applyNodeMap(vector<int> nodeMap, int maxNodes);
-	static void AddGate(int ID, function<shared_ptr<Gate>(Genome*, int)> theFunction);
-	virtual void resetGate(void);
-	virtual vector<int> getIns();
-	virtual vector<int> getOuts();
+    virtual void update(vector<double> & states, vector<double> & nextStates);
+    virtual string description();
+    virtual void applyNodeMap(vector<int> nodeMap, int maxNodes);
+    static void AddGate(int ID,
+            function<shared_ptr<Gate>(Genome*, int)> theFunction);
+    virtual void resetGate(void);
+    virtual vector<int> getIns();
+    virtual vector<int> getOuts();
 
-	virtual string getCodingRegions(); // display the codingRegions
+    virtual string getCodingRegions(); // display the codingRegions
 
 };
 
 class DeterministicGate: public Gate {
 public:
-	DeterministicGate() = default;
-	DeterministicGate(Genome *genome, int startCodonAt);
-	virtual ~DeterministicGate() = default;
-	virtual void update(vector<double> & states, vector<double> & nextStates);
-	virtual string description();
+    DeterministicGate() = default;
+    DeterministicGate(Genome *genome, int startCodonAt);
+    virtual ~DeterministicGate() = default;
+    virtual void update(vector<double> & states, vector<double> & nextStates);
+    virtual string description();
 
-	void setupForBits(int* Ins, int nrOfIns, int Out, int logic);
+    void setupForBits(int* Ins, int nrOfIns, int Out, int logic);
 
-	//double voidOutput;
+    //double voidOutput;
 };
 
 /* ***** ADVANCED IMPLEMENTATION! - ENTER ON OWN RISK ***** */
 class FeedbackGate: public Gate {
 private:
-	vector<vector<double>> originalTable;
-	unsigned char posFBNode, negFBNode;
-	unsigned char nrPos, nrNeg;
-	vector<double> posLevelOfFB, negLevelOfFB;
-	deque<unsigned char> chosenInPos, chosenInNeg, chosenOutPos, chosenOutNeg;
+    vector<vector<double>> originalTable;
+    unsigned char posFBNode, negFBNode;
+    unsigned char nrPos, nrNeg;
+    vector<double> posLevelOfFB, negLevelOfFB;
+    deque<unsigned char> chosenInPos, chosenInNeg, chosenOutPos, chosenOutNeg;
 public:
-	static bool feedbackON;
-	FeedbackGate() = default;
-	FeedbackGate(Genome *genome, int startCodonAt);
-	virtual ~FeedbackGate() = default;
-	virtual void update(vector<double> & states, vector<double> & nextStates);
-	virtual string description();
-	virtual void applyNodeMap(vector<int> nodeMap, int maxNodes);
-	virtual void resetGate(void);
-	virtual vector<int> getIns();
+    static bool feedbackON;
+    FeedbackGate() = default;
+    FeedbackGate(Genome *genome, int startCodonAt);
+    virtual ~FeedbackGate() = default;
+    virtual void update(vector<double> & states, vector<double> & nextStates);
+    virtual string description();
+    virtual void applyNodeMap(vector<int> nodeMap, int maxNodes);
+    virtual void resetGate(void);
+    virtual vector<int> getIns();
 };
 
 class GPGate: public Gate {
 private:
-	int myGateType;											//<link> stores the kind of GP operation (Add, Sub, Mult...)
-	vector<double> myValues;								//<link>
+    int myGateType;	//<link> stores the kind of GP operation (Add, Sub, Mult...)
+    vector<double> myValues;								//<link>
 public:
-	GPGate() = default;
-	GPGate(Genome *genome, int startCodonAt);
-	virtual ~GPGate() = default;
-	virtual void update(vector<double> & states, vector<double> & nextStates);
-	virtual string description();
+    GPGate() = default;
+    GPGate(Genome *genome, int startCodonAt);
+    virtual ~GPGate() = default;
+    virtual void update(vector<double> & states, vector<double> & nextStates);
+    virtual string description();
 };
 
 class Thresholdgate: public Gate {
 private:
-	int threshold;
+    int threshold;
 public:
-	Thresholdgate() = default;
-	Thresholdgate(Genome *genome, int startCodonAt);
-	virtual ~Thresholdgate() = default;
-	virtual void update(vector<double> & states, vector<double> & nextStates);
-	virtual string description();
+    Thresholdgate() = default;
+    Thresholdgate(Genome *genome, int startCodonAt);
+    virtual ~Thresholdgate() = default;
+    virtual void update(vector<double> & states, vector<double> & nextStates);
+    virtual string description();
 };
 
 class FixedEpsilonGate: public DeterministicGate {
 private:
 public:
-	vector<int> defaultOutput;
-	double epsilon;
-	FixedEpsilonGate() = default;
-	FixedEpsilonGate(Genome *genome, int startCodonAt);
-	virtual ~FixedEpsilonGate() = default;
-	virtual void update(vector<double> & states, vector<double> & nextStates);
-	virtual string description();
+    vector<int> defaultOutput;
+    double epsilon;
+    FixedEpsilonGate() = default;
+    FixedEpsilonGate(Genome *genome, int startCodonAt);
+    virtual ~FixedEpsilonGate() = default;
+    virtual void update(vector<double> & states, vector<double> & nextStates);
+    virtual string description();
 };
 
 class VoidGate: public DeterministicGate {
 private:
 public:
-	vector<int> defaultOutput;
-	double epsilon;
-	VoidGate() = default;
-	VoidGate(Genome *genome, int startCodonAt);
-	virtual ~VoidGate() = default;
-	virtual void update(vector<double> & states, vector<double> & nextStates);
-	virtual string description();
+    vector<int> defaultOutput;
+    double epsilon;
+    VoidGate() = default;
+    VoidGate(Genome *genome, int startCodonAt);
+    virtual ~VoidGate() = default;
+    virtual void update(vector<double> & states, vector<double> & nextStates);
+    virtual string description();
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Gate__) */

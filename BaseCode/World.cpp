@@ -14,8 +14,8 @@
 #include "../Utilities/Utilities.h"
 #include "../Utilities/Data.h"
 
-int& World::repeats = Parameters::register_parameter("repeats", 1, "Number of times to test each Genome per generation",
-		"WORLD");
+int& World::repeats = Parameters::register_parameter("repeats", 1,
+        "Number of times to test each Genome per generation", "WORLD");
 
 World::World() {
 }
@@ -24,20 +24,21 @@ World::~World() {
 }
 
 void World::evaluateFitness(vector<Organism*> population, bool analyse) {
-	vector<double> W;
-	for (size_t i = 0; i < population.size(); i++) {
-		double scoreTotal = 0.0;
-		for (int r = 0; r < World::repeats; r++) {
-			scoreTotal += testIndividual(population[i], analyse);
-		}
-		population[i]->score = (scoreTotal / (double) World::repeats);
-		population[i]->dataMap[Global::update].Set("score",population[i]->score);
-		population[i]->dataMap[Global::update].Set("update",Global::update);
-	}
+    vector<double> W;
+    for (size_t i = 0; i < population.size(); i++) {
+        double scoreTotal = 0.0;
+        for (int r = 0; r < World::repeats; r++) {
+            scoreTotal += testIndividual(population[i], analyse);
+        }
+        population[i]->score = (scoreTotal / (double) World::repeats);
+        population[i]->dataMap.Set("score",
+                population[i]->score);
+        population[i]->dataMap.Set("update", Global::update);
+    }
 }
 
 double World::testIndividual(Organism *org, bool analyse) {
-	return 1.0;
+    return 1.0;
 }
 
 ///* *** Example World Implementation *** */
@@ -46,12 +47,12 @@ double World::testIndividual(Organism *org, bool analyse) {
 //ExampleWorld::~ExampleWorld() {
 //}
 //
-//vector<double> ExampleWorld::evaluateFitness(vector<Agent*> agents, bool analyse) {
+//vector<double> ExampleWorld::evaluateFitness(vector<Agent*> brains, bool analyse) {
 //	vector<double> W;
-//	for (size_t i = 0; i < agents.size(); i++) {
+//	for (size_t i = 0; i < brains.size(); i++) {
 //		double w = 0.0;
 //		for (int r = 0; r < World::repeats; r++) {
-//			w += testIndividual(agents[i], analyse);
+//			w += testIndividual(brains[i], analyse);
 //		}
 //		W.push_back(w / (double) World::repeats);
 ////		W.push_back(pow(w,1.0/(double)World::repeats)); // Arend, What does this mean?
@@ -59,24 +60,24 @@ double World::testIndividual(Organism *org, bool analyse) {
 //	return W;
 //}
 //
-//double ExampleWorld::testIndividual(Agent *agent, bool analyse) {
+//double ExampleWorld::testIndividual(Agent *brain, bool analyse) {
 //	double fitness = 0.0;
-//	agent->resetBrain();
+//	brain->resetBrain();
 //	for (int t = 0; t < 100; t++) {
 //		int I[8];
 //		for (int i = 0; i < 3; i++) {
 //			I[i] = Random::getInt(1);
-//			agent->states[i] = (double) I[i];
+//			brain->states[i] = (double) I[i];
 //		}
 //
-//		agent->updateStates();
+//		brain->updateStates();
 //		for (int i = 0; i < 3; i++) {
-//			if (Bit(agent->states[8 + i]) == (int) I[i]) {
+//			if (Bit(brain->states[8 + i]) == (int) I[i]) {
 //				fitness += 1.0;
 //			}
 //		}
 //	}
-//	agent->genome->dataMap.Set("W", fitness);
+//	brain->genome->dataMap.Set("W", fitness);
 //
 //	return fitness;
 //}
@@ -86,14 +87,14 @@ double World::testIndividual(Organism *org, bool analyse) {
 ///* if you want to use this functionality you need to include pThreads
 // and derive your world from this class! Don't overload evaluate Fitness,
 // use the Replicates variable to run multiple replicates for each
-// agent if necessary */
+// brain if necessary */
 //
 ///*
-// void threadedEvaluateFitness(int chunkBegin, int chunkEnd, const vector<Agent*>& agents, Game& game, int& evaluations){
+// void threadedEvaluateFitness(int chunkBegin, int chunkEnd, const vector<Agent*>& brains, Game& game, int& evaluations){
 // for (int chunk_index=chunkBegin; chunk_index<chunkEnd; chunk_index++) {
 // for (int replicate_i=0; replicate_i < World::repeats; replicate_i++) {
-// game.executeAgent(agents[chunk_index]);
-// agents[chunk_index]->fitnesses.push_back(agents[chunk_index]->fitness);
+// game.executeAgent(brains[chunk_index]);
+// brains[chunk_index]->fitnesses.push_back(brains[chunk_index]->fitness);
 // }
 // }
 // }
@@ -108,38 +109,38 @@ double World::testIndividual(Organism *org, bool analyse) {
 //
 //}
 //
-//void threadedEvaluateFitness(int chunkBegin, int chunkEnd, const vector<Agent*>& agents, int& evaluations) {
+//void threadedEvaluateFitness(int chunkBegin, int chunkEnd, const vector<Agent*>& brains, int& evaluations) {
 //	for (int chunk_index = chunkBegin; chunk_index < chunkEnd; chunk_index++) {
-//		MultiThreadWorld::staticTestIndividual(agents[chunk_index], false);
+//		MultiThreadWorld::staticTestIndividual(brains[chunk_index], false);
 //	}
 //}
 //
-//vector<double> MultiThreadWorld::evaluateFitness(vector<Agent*> agents, bool analyse) {
+//vector<double> MultiThreadWorld::evaluateFitness(vector<Agent*> brains, bool analyse) {
 //	vector<thread> threads;
 //	vector<double> W;
 //	threads.clear();
-//	int chunksize = (int) agents.size() / nthreads;
+//	int chunksize = (int) brains.size() / nthreads;
 //	for (int threadid = 0; threadid < nthreads; threadid++)
 //		threads.push_back(
-//				thread(threadedEvaluateFitness, chunksize * threadid, chunksize * threadid + chunksize, ref(agents),
+//				thread(threadedEvaluateFitness, chunksize * threadid, chunksize * threadid + chunksize, ref(brains),
 //						ref(World::repeats)));
 //
-//	if (agents.size() % nthreads != 0) { // take care of any uneven division of workload
+//	if (brains.size() % nthreads != 0) { // take care of any uneven division of workload
 //		threads.push_back(
-//				thread(threadedEvaluateFitness, nthreads * chunksize, agents.size(), ref(agents), ref(World::repeats)));
+//				thread(threadedEvaluateFitness, nthreads * chunksize, brains.size(), ref(brains), ref(World::repeats)));
 //	}
 //	for (thread& t : threads)
 //		t.join(); // wait for all threads to finish
-//	for (size_t i = 0; i < agents.size(); i++) {
+//	for (size_t i = 0; i < brains.size(); i++) {
 //		double thisW;
-//		std::stringstream ss(agents[i]->genome->dataMap.Get("W"));
+//		std::stringstream ss(brains[i]->genome->dataMap.Get("W"));
 //		ss >> thisW; // use a string stream to convert string to double
 //		W.push_back(thisW);
 //	}
 //	return W;
 //}
 //
-//void MultiThreadWorld::staticTestIndividual(Agent *agent, bool analyse) {
-//	agent->genome->dataMap.Set("W", Random::getDouble(1));
+//void MultiThreadWorld::staticTestIndividual(Agent *brain, bool analyse) {
+//	brain->genome->dataMap.Set("W", Random::getDouble(1));
 //}
 

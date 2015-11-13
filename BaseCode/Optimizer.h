@@ -22,19 +22,19 @@ using namespace std;
 
 class Optimizer {
 public:
-	static int& elitism;
-	static int& tournamentSize;
+    static int& elitism;
+    static int& tournamentSize;
 
 public:
-	double maxFitness;
-	Optimizer() = default;
-	virtual ~Optimizer() = default;
-	virtual vector<Organism*> makeNextGeneration(vector<Organism*> population);
+    double maxFitness;
+    Optimizer() = default;
+    virtual ~Optimizer() = default;
+    virtual vector<Organism*> makeNextGeneration(vector<Organism*> population);
 };
 
 class GA: Optimizer {
 public:
-	virtual vector<Organism*> makeNextGeneration(vector<Organism*> population);
+    virtual vector<Organism*> makeNextGeneration(vector<Organism*> population);
 };
 
 class P3: Optimizer {
@@ -43,7 +43,7 @@ class P3: Optimizer {
 
 class Tournament: Optimizer {
 public:
-	virtual vector<Organism*> makeNextGeneration(vector<Organism*> population);
+    virtual vector<Organism*> makeNextGeneration(vector<Organism*> population);
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Optimizer__) */
