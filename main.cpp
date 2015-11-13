@@ -93,6 +93,7 @@ int main(int argc, const char * argv[]) {
 
     map<int, int> howManyTracking; // maps update to number of writes are set on that update.
                                    // If genome or data are following, value = 1, if both, value = 2
+    map<int, int> orgTrackingCounts; // keeps track of number of tracks on each org
 
     // a progenitor must exist - that is, one ancestor genome
     // this genome is evaluated to populate the dataMap
@@ -119,9 +120,9 @@ int main(int argc, const char * argv[]) {
     // evolution loop
 
     int outputMethod = 1;
-    int realTerminateAfter = (outputMethod==0)?(Global::terminateAfter):Global::intervalDelay; // if the output method is SSwD override terminateAfter
+    int realTerminateAfter = (outputMethod == 0) ? (Global::terminateAfter) : Global::intervalDelay; // if the output method is SSwD override terminateAfter
 
-    while ((Global::nextDataWrite <= Global::updates) && (Global::nextGenomeWrite <= Global::updates)
+    while (((Global::nextDataWrite <= Global::updates) || (Global::nextGenomeWrite <= Global::updates))
             && (Global::update <= (Global::updates + realTerminateAfter))) {
 
         // evaluate each organism in the population using a World
@@ -147,48 +148,56 @@ int main(int argc, const char * argv[]) {
             }
         }
         if (outputMethod == 1) { // SSwD (SnapShot with Delay)
-            writeRealTimeFiles(population); // write to dominant and average files
+            if (Global::update % Global::pruneInterval == 0) {
+                writeRealTimeFiles(population); // write to dominant and average files
+            }
 
+            ////// TRACKER CLEANUP
             // first, see if we can do any cleanup.
             // check each checkPointTracker[] to see if anyone can be deleted.
-            //      for each update in checkPointTracker[] check each org for RefConter == 1 (i.e. only being tracked by tracker)
-            //      if yes, kill parents, kill self, remove from checkPointTracker
-            ////// TRACKER CLEANUP
+            //      for each update in checkPointTracker[] check each org for RefConter == orgTrackingCounts(org->ID) (i.e. only being tracked by tracker)
+            //      if yes, unfollow org and erase org from checkPointTracker and orgTrackingCounts
+
             vector<int> trackedCheckPoints; // will hold a sorted list of the times for all the checkpoints
-            for (auto checkPoint : checkPointTracker) {
+
+            for (auto checkPoint : checkPointTracker) { // fill in and then sort trackedCheckPoints
                 if (checkPoint.second.empty()) { // if a population in the tracker is empty is means someone deleted something they should not have! There must always be (atleast) one!
                     cout << "checkPoint time: " << checkPoint.first << "\n";
                     cout << " A checkPoint population is empty. This is very bad! LOD is broken! Exiting!\n";
                     exit(1);
                 }
-                // first, extract all the keys
-                trackedCheckPoints.push_back(checkPoint.first);
+                trackedCheckPoints.push_back(checkPoint.first); // extract the keys
                 cout << "found key / checkpoint: " << checkPoint.first << " \n";
             }
             sort(trackedCheckPoints.begin(), trackedCheckPoints.end());
 
+
             for (int i = (int) trackedCheckPoints.size() - 1; i >= 0; i--) {
                 set<Organism*> curr_checkPoint = checkPointTracker[trackedCheckPoints[i]];
                 for (auto org : curr_checkPoint) {
-                    cout << "tracking this many: " << howManyTracking[trackedCheckPoints[i]] << "  -|-  ID: " << org->ID << " has " << org->referenceCounter
+                    cout << "tracking this many: " << howManyTracking[trackedCheckPoints[i]] << "  ID: " << org->ID << " has " << org->referenceCounter
                             << " refs\n";
-                    if ((howManyTracking[trackedCheckPoints[i]] > org->referenceCounter)) {
-                        cout << howManyTracking[trackedCheckPoints[i]] << "  -||-  " << org->referenceCounter << "\n";
+                    if (orgTrackingCounts[org->ID] > org->referenceCounter) {
+                        cout << orgTrackingCounts[org->ID] << "  -||-  " << org->referenceCounter << "\n";
                         cout << " A checkPoint organism has too few refereneces! This is very bad! LOD is broken! Exiting!\n";
                         exit(1);
                     }
-                    if ((howManyTracking[trackedCheckPoints[i]] == org->referenceCounter)) { // if only the tracker is looking at this organism it can be deleted
+                    if ((orgTrackingCounts[org->ID] == org->referenceCounter)) { // if only the tracker is looking at this organism it can be deleted
                         for (int j = 0; j < howManyTracking[trackedCheckPoints[i]]; j++) {
-                            org->unFollow(); // unfollow for each traker type (genome and data) looking at it
+                            org->unFollow(); // unfollow for each tracker (genome and/or data for all tracked checkpoints)
+                            orgTrackingCounts.erase(org->ID); // this org is being deleted we don't need to keep its tracking count
                         }
-                        checkPointTracker[trackedCheckPoints[i]].erase(org); // erase the pointer from the tracker (all neat and tidy now)
-                        cout << "just erased org " << org->ID << " from checkPointTracker[" << trackedCheckPoints[i] << "]  i : " << i << "\n";
+                        for (int j = i; j >= 0; j--) {
+                            checkPointTracker[trackedCheckPoints[j]].erase(org); // erase the pointer from all trackers older then this one (all neat and tidy now) - this is a bit of a nuke from orbit, but it's the only way to be sure.
+                                                                                 // may want to run another check to see how many checkpoints org is actually listed in.
+                            cout << "just erased org " << org->ID << " from checkPointTracker[" << trackedCheckPoints[j] << "]  j : " << j << "\n";
+                        }
                     }
                 }
 
                 ///////// test!
                 for (auto org : checkPointTracker[trackedCheckPoints[i]]) {
-                    cout << howManyTracking[trackedCheckPoints[i]] << "  -|--|-  keep ID: " << org->ID << " with " << org->referenceCounter << " refs\n";
+                    cout << howManyTracking[trackedCheckPoints[i]] << "  -|--|-  keep ID: " << org->ID << " with " << org->referenceCounter << " refs and " << orgTrackingCounts.erase(org->ID) << " tracks\n";
                 }
                 ////////
 
@@ -196,19 +205,14 @@ int main(int argc, const char * argv[]) {
 
             ///// ADDING TO THE TRACKER
             if (Global::update == Global::nextGenomeCheckPoint || Global::update == Global::nextDataCheckPoint) { // if we are at a data or genome interval...
-                                                                                                                  // we need to make a checkpoint of the current state
+                                                                                                                  // we need to make a checkpoint of the current population
                 for (auto org : population) { // add the current population to checkPointTracker
                     checkPointTracker[Global::update].insert(org);
-//                    for (auto parent : org->parents) {
-//                        if (parent != nullptr) { // check that parent is not a nullptr (should not be!)
-//                            parent->unFollow(); // this org no longer cares about it's parents (sad but true) - if parent is being followed elsewhere they will persist (if not unFollow will delete them)
-//                        }
-//                    }
-//                    org->parents.clear(); // we can now empty the parents list for this org.
                     org->checkPointDataMap[Global::update] = org->dataMap; // back up state of dataMap
 
                     if (Global::update == Global::nextGenomeCheckPoint) { // if this is a genome interval, add genomeAncestors to snapshot dataMap
                         org->addFollow(); // this org is now also being followed by tracker also - for it's genome
+                        orgTrackingCounts[org->ID]++; // add a tracker
                         cout << "---|||---\n";
                         for (auto ancestor : org->genomeAncestors) {
                             cout << "genomeAncestor: " << ancestor << "\n";
@@ -222,6 +226,7 @@ int main(int argc, const char * argv[]) {
 
                     if (Global::update == Global::nextDataCheckPoint) { // if this is a data interval, add dataAncestors to snapshot dataMap
                         org->addFollow(); // this org is now also being followed by tracker also - for it's data
+                        orgTrackingCounts[org->ID]++; // add a tracker
                         for (auto ancestor : org->dataAncestors) {
                             cout << "in org(" << org->ID << ")->checkPointDataMap[" << Global::update << "] appending dataAncestor: " << ancestor << "\n";
                             org->checkPointDataMap[Global::update].Append("dataAncestors", ancestor);
@@ -254,15 +259,18 @@ int main(int argc, const char * argv[]) {
 
                 string dataString;
                 for (auto org : checkPointTracker[Global::nextGenomeWrite]) {
-                    dataString = to_string(Global::nextGenomeWrite) + FileManager::separator
+                    dataString = to_string(org->ID) + FileManager::separator
                             + org->checkPointDataMap[Global::nextGenomeWrite].Get("genomeAncestors") + FileManager::separator + "\"["
                             + org->genome->convert_to_string() + "]\"";
                     // add interval update, genome ancestors, and genome with padding to string
-                    FileManager::writeToFile(genomeFileName, dataString, "update,genomeAncestors,genome"); // write data to file
-                    org->unFollow(); // tracker is no longer following this org (for it's genome). If this was the only thing tracking, the org is deleted. If not, keepGenomeCheckPoint will become true and we know not to delete it.
+                    FileManager::writeToFile(genomeFileName, dataString, "ID,genomeAncestors,genome"); // write data to file
+                    org->unFollow(); // tracker is no longer following this org (for it's genome). If this was the only thing tracking, the org is deleted and this checkpoint will be deleted automaticly below.
+                    // we could check here if anyone else is tracking this checkpoint (howManyTracking would = 1). if not, we could checkPointDataMap.erase(Global::nextGenomeWrite) and maybe the genome and brain also.
+                    orgTrackingCounts[org->ID]--; // one less tracker looking at this org
+
                 }
                 howManyTracking[Global::nextGenomeWrite]--;  // tacker is no longer interested in the genomes at this checkpoint
-                if (howManyTracking[Global::nextGenomeWrite] == 0) { // no one is looking at this checkpoint - delete it!
+                if (howManyTracking[Global::nextGenomeWrite] == 0) { // no one is looking at this checkpoint - all of it's orgs have been unFollowed - delete it!
                     checkPointTracker.erase(Global::nextGenomeWrite);
                     howManyTracking.erase(Global::nextGenomeWrite);
                     cout << "erasing checkPoint and howmany for time: " << Global::nextGenomeWrite << "\n";
@@ -287,15 +295,18 @@ int main(int argc, const char * argv[]) {
                 // write out data for all orgs in checkPointTracker[Global::nextGenomeWrite] to "genome_" + to_string(Global::nextGenomeWrite) + ".csv"
                 for (auto org : checkPointTracker[Global::nextDataWrite]) {
                     org->checkPointDataMap[Global::nextDataWrite].writeToFile(dataFileName, Global::files["data"]); // append new data to the file
-                    org->unFollow(); // tracker is no longer following this org (for it's data). If this was the only thing tracking, the org is deleted. If not, keepDataCheckPoint will become true and we know not to delete it.
-                }
+                    org->unFollow(); // tracker is no longer following this org (for it's data). If this was the only thing tracking, the org is deleted and this checkpoint will be deleted automaticly below.
+                    // we could check here if anyone else is tracking this checkpoint (howManyTracking would = 1). if not, we could checkPointDataMap.erase(Global::nextGenomeWrite) and maybe the genome and brain also.
+                    orgTrackingCounts[org->ID]--; // one less tracker looking at this org
+               }
                 howManyTracking[Global::nextDataWrite]--; // tacker is no longer interested in the data at this checkpoint
-                if (howManyTracking[Global::nextDataWrite] == 0) { // no one is looking at this checkpoint - delete it!
+                if (howManyTracking[Global::nextDataWrite] == 0) { // no one is looking at this checkpoint - all of it's orgs have been unFollowed - delete it!
                     checkPointTracker.erase(Global::nextDataWrite);
                     howManyTracking.erase(Global::nextDataWrite);
                     cout << "erasing checkPoint and howmany for time: " << Global::nextDataWrite << "\n";
                     for (auto iter : howManyTracking) {
-                        cout << "just wrote data for " << Global::nextDataWrite << "   future data write at: " << iter.first << " there are " << iter.second << " trackers interested in this checkpoint\n";
+                        cout << "just wrote data for " << Global::nextDataWrite << "   future data write at: " << iter.first << " there are " << iter.second
+                                << " trackers interested in this checkpoint\n";
                     }
                 }
                 Global::nextDataWrite += Global::dataInterval; // we are done with this interval, get ready for the next one.
