@@ -66,6 +66,7 @@ public:
     vector<Organism*> getLOD();
     virtual Organism* getMostRecentCommonAncestor();
     virtual Organism* makeMutatedOffspring(double pointMutationRate);
+    virtual Organism* makeMutatedOffspring(double pointMutationRate, Organism* parent2);
 
     virtual void saveDataOnLOD(int flush = 0); // for Organism, save to file data for this genome and it's LOD
     virtual void flushDataOnLOD(); // used at the end of a run to save data newer then the MRCA / convergance point

@@ -46,4 +46,9 @@ public:
     virtual vector<Organism*> makeNextGeneration(vector<Organism*> population);
 };
 
+class Tournament2: Optimizer {
+public:
+    virtual vector<Organism*> makeNextGeneration(vector<Organism*> population);
+};
+
 #endif /* defined(__BasicMarkovBrainTemplate__Optimizer__) */

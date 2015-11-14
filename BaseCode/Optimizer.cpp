@@ -108,3 +108,43 @@ vector<Organism*> Tournament::makeNextGeneration(vector<Organism*> population) {
     return nextGeneration;
 }
 
+vector<Organism*> Tournament2::makeNextGeneration(vector<Organism*> population) {
+    vector<Organism*> nextGeneration;
+
+    vector<double> Scores;
+    for (auto org : population) {
+        Scores.push_back(org->score);
+    }
+
+    int best = findGreatestInVector(Scores);
+    maxFitness = Scores[best];
+
+    while (nextGeneration.size() < population.size()) {
+        int winner, winner2, challanger;
+        if ((int) nextGeneration.size() < Optimizer::elitism) {
+            winner = best;
+        } else {
+            winner = Random::getIndex(population.size());
+            for (int i = 0; i < Optimizer::tournamentSize - 1; i++) {
+                challanger = Random::getIndex(population.size());
+                if (Scores[challanger] > Scores[winner]) {
+                    winner = challanger;
+                }
+            }
+        }
+        winner2 = winner;
+        while (winner2 == winner) {
+            winner2 = Random::getIndex(population.size());
+            for (int i = 0; i < Optimizer::tournamentSize - 1; i++) {
+                challanger = Random::getIndex(population.size());
+                if (Scores[challanger] > Scores[winner2]) {
+                    winner2 = challanger;
+                }
+            }
+        }
+
+        nextGeneration.push_back(population[winner]->makeMutatedOffspring(Genome::pointMutationRate, population[winner2]));
+    }
+    return nextGeneration;
+}
+

@@ -81,7 +81,7 @@ Organism::Organism(Organism* from, Genome* _genome) {
     ID = registerOrganism();
     alive = true;
     parents.insert(from); // add this parent to the parents set
-    from->referenceCounter++; // tell each parent that they have a child looking at them
+    from->addFollow(); // tell each parent that they have a child looking at them
     for (auto ancestorID : from->genomeAncestors) {
         genomeAncestors.insert(ancestorID); // union all parents genomeAncestors into this organisms genomeAncestor set.
     }
@@ -105,11 +105,11 @@ Organism::Organism(Organism* from, Genome* _genome) {
  */
 Organism::Organism(const vector<Organism*>& from, Genome* _genome) {
     genome = _genome;
-    brain = from[0]->brain; //->makeBrainFromGenome(_genome); // for now, just return parent[0] brain.
+    brain = from[0]->brain->makeBrainFromGenome(genome); // for now, just return parent[0] brain.
     referenceCounter = 1; // it is self referencing
     for (auto i = 0; i < (int) from.size(); i++) {
         parents.insert(from[i]); // add this parent to the parents set
-        from[i]->referenceCounter++; // tell each parent that they have a child looking at them
+        from[i]->addFollow(); // tell each parent that they have a child looking at them
         for (auto ancestorID : from[i]->genomeAncestors) {
             genomeAncestors.insert(ancestorID); // union all parents genomeAncestors into this organisms genomeAncestor set.
         }
@@ -176,7 +176,14 @@ void Organism::kill() {
 Organism* Organism::makeMutatedOffspring(double pointMutationRate) {
     Organism* newOrg = new Organism(this, genome->makeMutatedGenome(Genome::pointMutationRate));
     return newOrg;
+}
 
+Organism* Organism::makeMutatedOffspring(double pointMutationRate,Organism* parent2) {
+    vector<Organism*> _parents = {this,parent2};
+    //cout << "PARENTS SIZE: " << _parents.size() << "\n";
+    //cout << "IDs: " << _parents[0]->ID << " : : " << _parents[1]->ID << "\n";
+    Organism* newOrg = new Organism(_parents, genome->makeMutatedGenome(Genome::pointMutationRate));
+    return newOrg;
 }
 
 /*
