@@ -78,7 +78,7 @@ public:
     static set<string> dataFilesCreated; // list of files, this allows us to track if headers must be written
     static const char separator = ',';
     void static writeToFile(const string& fileName, const string& data,
-            const string& header); //fileName, data, header - used when you want to output formatted data (i.e. genomes)
+            const string& header  = ""); //fileName, data, header - used when you want to output formatted data (i.e. genomes)
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Data__) */

@@ -32,6 +32,7 @@ private:
 
 public:
     static Organism* MRCA;
+    int gender; // generally 0=female, 1=male, *=?
 
 public:
     Genome* genome;
@@ -51,7 +52,8 @@ public:
     map<int, DataMap> checkPointDataMap; // Used only with SnapShot with Delay (SSwD) stores contents of dataMap when an ouput interval is reached so that
                                          // after the delay we have the correct data for the given time. key is 'update'.
     Organism(); // make an empty organism
-    Organism(Genome* _genome); // make a parentless organism with a genome, and an undefined brain
+    Organism(Genome* _genome); // make a parentless organism with a genome, and a nullptr to brain
+    Organism(Genome* _genome, Brain* _brain); // make a parentless organism with a genome, and a brain
     Organism(Organism* from, Genome* _genome); // make an organism with one parent, a genome and a brain determined from the parents brain type.
     Organism(const vector<Organism*>& from, Genome* _genome); // make a organism with many parents, a genome, and a brain determined from the parents brain type.
 

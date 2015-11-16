@@ -77,7 +77,7 @@ void DataMap::Clear() {
 }
 
 void FileManager::writeToFile(const string& fileName, const string& data,
-        const string& header = "") {
+        const string& header) {
     ofstream FILE;
     bool fileClosed = true;
     if (FileManager::dataFilesCreated.find(fileName)
@@ -95,3 +95,10 @@ void FileManager::writeToFile(const string& fileName, const string& data,
     FILE << data << "\n";
     FILE.close();
 }
+
+
+
+///////////////////////////////////////
+// need to add support for output prefix directory
+// need to add support for population file name prefixes
+///////////////////////////////////////

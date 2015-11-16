@@ -6,6 +6,7 @@
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
 //
 
+#include <algorithm>
 #include <math.h>
 #include <stdlib.h>     // for atoi
 
@@ -25,14 +26,17 @@ int& Optimizer::tournamentSize = Parameters::register_parameter("tournamentSize"
  * place holder function, copies population to make new population
  * no selection and no mutation
  */
-vector<Organism*> Optimizer::makeNextGeneration(vector<Organism*> population) {
-    vector<Organism*> nextGeneration;
+void Optimizer::makeNextGeneration(vector<Organism*> &population) {
+    vector<Organism*> nextPopulation;
 
     for (size_t i = 0; i < population.size(); i++) {
         Organism* newOrg = new Organism(population[i], population[i]->genome);
-        nextGeneration.push_back(newOrg);
+        nextPopulation.push_back(newOrg);
     }
-    return nextGeneration;
+    for (size_t i = 0; i < population.size(); i++) {
+        population[i]->kill(); // set org.alive = 0 and delete the organism if it has no offspring
+    }
+    population = nextPopulation;
 }
 
 /*
@@ -43,8 +47,8 @@ vector<Organism*> Optimizer::makeNextGeneration(vector<Organism*> population) {
  * to the next generation and mutate the copy. If it is too low, keep drawing genomes till you get one
  * which is good enough.
  */
-vector<Organism*> GA::makeNextGeneration(vector<Organism*> population) {
-    vector<Organism*> nextGeneration;
+void GA::makeNextGeneration(vector<Organism*> &population) {
+    vector<Organism*> nextPopulation;
 
     vector<double> W;
     for (auto org : population) {
@@ -55,9 +59,9 @@ vector<Organism*> GA::makeNextGeneration(vector<Organism*> population) {
     maxFitness = W[best];
 
     //now to roulette wheel selection:
-    while (nextGeneration.size() < population.size()) {
+    while (nextPopulation.size() < population.size()) {
         int who;
-        if ((int) nextGeneration.size() < Optimizer::elitism) {
+        if ((int) nextPopulation.size() < Optimizer::elitism) {
             who = best;
         } else {
             if (maxFitness > 0.0) {	// if anyone has fitness > 0
@@ -68,9 +72,12 @@ vector<Organism*> GA::makeNextGeneration(vector<Organism*> population) {
                 who = Random::getIndex(population.size()); // otherwise, just pick a random genome from population
             }
         }
-        nextGeneration.push_back(population[who]->makeMutatedOffspring(Genome::pointMutationRate));
+        nextPopulation.push_back(population[who]->makeMutatedOffspring(Genome::pointMutationRate));
     }
-    return nextGeneration;
+    for (size_t i = 0; i < population.size(); i++) {
+        population[i]->kill(); // set org.alive = 0 and delete the organism if it has no offspring
+    }
+    population = nextPopulation;
 }
 
 /*
@@ -79,8 +86,8 @@ vector<Organism*> GA::makeNextGeneration(vector<Organism*> population) {
  * for each next population genome, randomly select (with replacement) n genomes (where n = Optimizer::tournamentSize)
  * copy to the next generation and mutate the copy.
  */
-vector<Organism*> Tournament::makeNextGeneration(vector<Organism*> population) {
-    vector<Organism*> nextGeneration;
+void Tournament::makeNextGeneration(vector<Organism*> &population) {
+    vector<Organism*> nextPopulation;
 
     vector<double> Scores;
     for (auto org : population) {
@@ -90,9 +97,9 @@ vector<Organism*> Tournament::makeNextGeneration(vector<Organism*> population) {
     int best = findGreatestInVector(Scores);
     maxFitness = Scores[best];
 
-    while (nextGeneration.size() < population.size()) {
+    while (nextPopulation.size() < population.size()) {
         int winner, challanger;
-        if ((int) nextGeneration.size() < Optimizer::elitism) {
+        if ((int) nextPopulation.size() < Optimizer::elitism) {
             winner = best;
         } else {
             winner = Random::getIndex(population.size());
@@ -103,13 +110,19 @@ vector<Organism*> Tournament::makeNextGeneration(vector<Organism*> population) {
                 }
             }
         }
-        nextGeneration.push_back(population[winner]->makeMutatedOffspring(Genome::pointMutationRate));
+        nextPopulation.push_back(population[winner]->makeMutatedOffspring(Genome::pointMutationRate));
     }
-    return nextGeneration;
+    for (size_t i = 0; i < population.size(); i++) {
+        population[i]->kill(); // set org.alive = 0 and delete the organism if it has no offspring
+    }
+    population = nextPopulation;
 }
 
-vector<Organism*> Tournament2::makeNextGeneration(vector<Organism*> population) {
-    vector<Organism*> nextGeneration;
+void Tournament2::makeNextGeneration(vector<Organism*> &population) {
+    vector<Organism*> nextPopulation;
+    int p1, p2; // parent1 and 2
+    int challanger; // used when picking best of
+    double surviveChance = .05;
 
     vector<double> Scores;
     for (auto org : population) {
@@ -119,32 +132,96 @@ vector<Organism*> Tournament2::makeNextGeneration(vector<Organism*> population) 
     int best = findGreatestInVector(Scores);
     maxFitness = Scores[best];
 
-    while (nextGeneration.size() < population.size()) {
-        int winner, winner2, challanger;
-        if ((int) nextGeneration.size() < Optimizer::elitism) {
-            winner = best;
-        } else {
-            winner = Random::getIndex(population.size());
+    while (nextPopulation.size() < population.size()) {
+        // chance for each pick that this org survives to the next population
+
+        if ((int) nextPopulation.size() < Optimizer::elitism) { // if next population has less members then elitism, then p1 is best.
+            p1 = best;
+        } else { // otherwise, p1 is the best of 5 random picks
+            p1 = Random::getIndex(population.size());
             for (int i = 0; i < Optimizer::tournamentSize - 1; i++) {
                 challanger = Random::getIndex(population.size());
-                if (Scores[challanger] > Scores[winner]) {
-                    winner = challanger;
-                }
-            }
-        }
-        winner2 = winner;
-        while (winner2 == winner) {
-            winner2 = Random::getIndex(population.size());
-            for (int i = 0; i < Optimizer::tournamentSize - 1; i++) {
-                challanger = Random::getIndex(population.size());
-                if (Scores[challanger] > Scores[winner2]) {
-                    winner2 = challanger;
+                if (Scores[challanger] > Scores[p1]) {
+                    p1 = challanger;
                 }
             }
         }
 
-        nextGeneration.push_back(population[winner]->makeMutatedOffspring(Genome::pointMutationRate, population[winner2]));
+        if (Random::P(surviveChance)) { // if this org survives
+            if (find(nextPopulation.begin(), nextPopulation.end(), population[p1]) == nextPopulation.end()) { // if they have not already survived
+                nextPopulation.push_back(population[p1]); // push them to the next population
+                population[p1]->addFollow(); // add a follow since they are in a new population
+            }
+        } else {
+            p2 = p1; // make these the same to prime the while loop
+            while ((p1 == p2) || (population[p1]->gender == population[p2]->gender)) { // keep picking until you have 2 diffrent parents with 2 diffrent genders
+                p2 = Random::getIndex(population.size());
+                for (int i = 0; i < Optimizer::tournamentSize - 1; i++) {
+                    challanger = Random::getIndex(population.size());
+                    if (Scores[challanger] > Scores[p2]) {
+                        p2 = challanger;
+                    }
+                }
+            }
+            nextPopulation.push_back(population[p1]->makeMutatedOffspring(Genome::pointMutationRate, population[p2]));
+        }
     }
-    return nextGeneration;
+    for (size_t i = 0; i < population.size(); i++) {
+        population[i]->unFollow();
+    }
+    population = nextPopulation;
 }
 
+//****************************************************************************
+//* code below this line is for testing - it will be deleted at some point.
+//****************************************************************************
+//
+/*
+ * creates new populations which demonstrate a speciation effet and has organisms that live for multiple generations.
+ */
+//vector<Organism*> Tournament2::makeNextGeneration(vector<Organism*> population) {
+//    vector<Organism*> nextGeneration;
+//
+//    nextGeneration.push_back(population[0]);
+//    population[0]->addFollow();
+//
+//    nextGeneration.push_back(population[4]);
+//    population[4]->addFollow();
+//
+//    while (nextGeneration.size() < population.size()) {
+//
+//
+//        int winner, winner2;
+//        winner = (nextGeneration.size() < 5) ? Random::getInt(0, 4): Random::getInt(5, 9);
+//
+//        int start = 25;
+//        int end = 50;
+//
+//        winner2 = winner;
+//        while (winner2 == winner) {
+//            winner2 = Random::getInt(0, 9);
+//            double P = 1;
+//            if (Global::update > start && Global::update < end) {
+//                P = ((double)Global::update - (double)start) / (double)(end-start);
+//                if (Random::P(P)) {
+//                    if (winner <= 4) {
+//                        winner2 = Random::getInt(0, 4);
+//                    } else {
+//                        winner2 = Random::getInt(5, 9);
+//                    }
+//                }
+//            }
+//
+//            if (Global::update > end) {
+//                if (winner <= 4) {
+//                    winner2 = Random::getInt(0, 4);
+//                } else {
+//                    winner2 = Random::getInt(5, 9);
+//                }
+//            }
+//        }
+//
+//        nextGeneration.push_back(population[winner]->makeMutatedOffspring(Genome::pointMutationRate, population[winner2]));
+//    }
+//    return nextGeneration;
+//}

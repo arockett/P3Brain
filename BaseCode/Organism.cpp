@@ -42,6 +42,7 @@ Organism::Organism() {
     referenceCounter = 1; // it is self referencing
     ID = registerOrganism();
     alive = true;
+    gender = 0; // by default all orgs are female.
     genomeAncestors.insert(ID); // it is it's own Ancestor for genome tracking purposes
     dataAncestors.insert(ID); // it is it's own Ancestor for data tracking purposes
     birthDate = Global::update; // happy birthday!
@@ -60,6 +61,23 @@ Organism::Organism(Genome* _genome) {
     referenceCounter = 1; // it is self referencing
     ID = registerOrganism();
     alive = true;
+    gender = 0; // by default all orgs are female.
+    genomeAncestors.insert(ID); // it is it's own Ancestor for genome tracking purposes
+    dataAncestors.insert(ID); // it is it's own Ancestor for data tracking purposes
+    birthDate = Global::update; // happy birthday!
+    dataMap.Set("ID", ID);
+    dataMap.Set("alive", alive);
+    dataMap.Set("birthDate", birthDate);
+    dataMap.SetMany(genome->getStats());
+}
+
+Organism::Organism(Genome* _genome, Brain* _brain) {
+    genome = _genome;
+    brain = _brain;
+    referenceCounter = 1; // it is self referencing
+    ID = registerOrganism();
+    alive = true;
+    gender = 0; // by default all orgs are female.
     genomeAncestors.insert(ID); // it is it's own Ancestor for genome tracking purposes
     dataAncestors.insert(ID); // it is it's own Ancestor for data tracking purposes
     birthDate = Global::update; // happy birthday!
@@ -80,6 +98,7 @@ Organism::Organism(Organism* from, Genome* _genome) {
     referenceCounter = 1; // it is self referencing
     ID = registerOrganism();
     alive = true;
+    gender = 0; // by default all orgs are female.
     parents.insert(from); // add this parent to the parents set
     from->addFollow(); // tell each parent that they have a child looking at them
     for (auto ancestorID : from->genomeAncestors) {
@@ -119,6 +138,7 @@ Organism::Organism(const vector<Organism*>& from, Genome* _genome) {
     }
     ID = registerOrganism();
     alive = true;
+    gender = 0; // by default all orgs are female.
     birthDate = Global::update; // happy birthday!
     dataMap.Set("ID", ID);
     dataMap.Set("alive", alive);
@@ -132,8 +152,8 @@ Organism::~Organism() {
     delete brain;
     for (auto parent : parents) {
         if (parent != nullptr) {
-            parent->kill(); // this will tell parents that this child is dead (so they will decrement their referenceCounter and deconstruct if needed).
-                            // the "parents" set is then cleaned up by this destructor.
+            parent->unFollow(); // this will tell parents that this child is dead (so they will decrement their referenceCounter and deconstruct if needed).
+                                // the "parents" set is then cleaned up by this destructor.
         }
     }
 }
@@ -169,7 +189,7 @@ void Organism::addFollow() {
  */
 void Organism::kill() {
     alive = false;
-    dataMap.Set("alive", alive);
+    //dataMap.Set("alive", alive);
     unFollow();
 }
 
@@ -178,11 +198,12 @@ Organism* Organism::makeMutatedOffspring(double pointMutationRate) {
     return newOrg;
 }
 
-Organism* Organism::makeMutatedOffspring(double pointMutationRate,Organism* parent2) {
-    vector<Organism*> _parents = {this,parent2};
+Organism* Organism::makeMutatedOffspring(double pointMutationRate, Organism* parent2) {
+    vector<Organism*> _parents = { this, parent2 };
     //cout << "PARENTS SIZE: " << _parents.size() << "\n";
     //cout << "IDs: " << _parents[0]->ID << " : : " << _parents[1]->ID << "\n";
     Organism* newOrg = new Organism(_parents, genome->makeMutatedGenome(Genome::pointMutationRate));
+    newOrg->gender = (Random::getInt(0, 1)) ? this->gender : parent2->gender; // assign a random gender to the new org
     return newOrg;
 }
 
