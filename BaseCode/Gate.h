@@ -30,7 +30,7 @@ using namespace std;
 #define OUT_ADDRESS_CODE 21
 #define DATA_CODE 30
 
-class Gate {  //conventional probabilistic gate
+class Gate { // abstact class
 public:
     static bool& usingProbGate;
     static bool& usingDetGate;
@@ -43,51 +43,97 @@ public:
     static double& voidOutPut;
     static double& FixedEpsilonGateP;
 
-public:
+    static void AddGate(int ID, function<shared_ptr<Gate>(Genome*, int)> theFunction);
     static void setupGates();
     static function<shared_ptr<Gate>(Genome*, int)> makeGate[256];
+
+    Gate();
+    virtual ~Gate();
+
     vector<int> inputs;
     vector<int> outputs;
-    vector<vector<double>> table;
+
     map<int, int> codingRegions; //indicates coding regions. maps genome index to usage of nucleotide in gate. 0=start codon. 1=wiring(defines # of inputs and outputs and what they are). 2=gate specific information
 
-    Gate() = default;
-    Gate(Genome *genome, int startCodonAt);
+    // functions used in genome translation
+    void movePastStartCodeon(int& genomeIndex, Genome* genome); // simply addvances genomeIndex by the size of a start codeon (2)
+    int getIOAddress(int& genomeIndex, Genome* genome); // extracts one brain state value address from a genome
+    void getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, int& genome_index, Genome* genome, int codeNumber); // extracts many brain state value addresses from a genome
+    void getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, int& genomeIndex, Genome* genome); // extracts the input and output brain state value addresses for this gate
 
-    void movePastStartCodeon(int& genomeIndex, Genome* genome);
-    int getIOAddress(int& genomeIndex, Genome* genome);
-    void getSomeBrainAddresses(const int& howMany, const int& howManyMax,
-            vector<int>& addresses, int& genome_index, Genome* genome,
-            int codeNumber);
-    void getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange,
-            int& genomeIndex, Genome* genome);
-    void getTableFromGenome(vector<int> range, vector<int> rangeMax,
-            int& genomeIndex, Genome* genome);
-    int getIndexFromInputs(vector<double> & states);
-    virtual ~Gate() = default;
+    int getIndexFromInputs(vector<double> & states); // used during update to convert gate input into table indexes
+
+    /*
+     * build a table of size range[0],range[1] which is the upper left subset of a table rangeMax[0],rangeMax[1]
+     * the table rangeMax[0],rangeMax[0] would be filled with values from the genome (filling each row before going to the next column
+     * This table is assigned to the gates table field.
+     * set codingRegions for each used genome site value = DATA_CODE; (may need to add more support for this later!)
+     */
+    template<typename Type>
+    void getTableFromGenome(vector<int> range, vector<int> rangeMax, int& genomeIndex, Genome* genome, vector<vector<Type>> &table) {
+        int x, y;
+        int Y = range[0];
+        int X = range[1];
+        int maxY = rangeMax[0];
+        int maxX = rangeMax[1];
+
+        table.resize(Y); // set the number of rows in the table
+
+        for (y = 0; y < (Y); y++) {
+            table[y].resize(X); // set the number of columns in this row
+            for (x = 0; x < X; x++) {
+                table[y][x] = (Type) (genome->sites[genomeIndex]);
+                codingRegions[genomeIndex] = DATA_CODE;
+                genome->advanceIndex(genomeIndex);
+            }
+            for (; x < maxX; x++) {
+                genome->advanceIndex(genomeIndex); // advance genomeIndex to account for unused entries in the max sized table for this row
+            }
+        }
+        cout << "Y: " << Y << " maxY: " << maxY << " index: " << genomeIndex << "\n";
+        genome->advanceIndex(genomeIndex, (maxY - Y) * maxX); // advance genomeIndex to account for extra rows in the max sized table
+        cout << "Y: " << Y << " maxY: " << maxY << " index: " << genomeIndex << "\n";
+    }
+
+    virtual void applyNodeMap(vector<int> nodeMap, int maxNodes); // converts genome values into brain state value addresses
+    virtual void resetGate(void); // this is empty here. Some gates so not need to reset, they can use this method.
+    virtual vector<int> getIns(); // returns a vector of int with the adress for this gates input brain state value addresses
+    virtual vector<int> getOuts(); // returns a vector of int with the adress for this gates onput brain state value addresses
+    virtual string getCodingRegions(); // return a string with the codingRegions
+
+    // functions which must be provided with each gate
+    virtual void update(vector<double> & states, vector<double> & nextStates) = 0; // the function is empty, and must be provided in any derived gates
+    virtual string description() = 0; // returns a description of the gate. This method can be used in derived gates description method
+
+};
+
+class ProbabilisticGate: public Gate { //conventional probabilistic gate
+public:
+    vector<vector<double>> table;
+
+    ProbabilisticGate() = default;
+    ProbabilisticGate(Genome *genome, int startCodonAt);
+
+    virtual ~ProbabilisticGate() = default;
 
     virtual void update(vector<double> & states, vector<double> & nextStates);
-    virtual string description();
-    virtual void applyNodeMap(vector<int> nodeMap, int maxNodes);
-    static void AddGate(int ID,
-            function<shared_ptr<Gate>(Genome*, int)> theFunction);
-    virtual void resetGate(void);
-    virtual vector<int> getIns();
-    virtual vector<int> getOuts();
 
-    virtual string getCodingRegions(); // display the codingRegions
+    virtual string description();
 
 };
 
 class DeterministicGate: public Gate {
 public:
+    vector<vector<int>> table;
+
     DeterministicGate() = default;
     DeterministicGate(Genome *genome, int startCodonAt);
     virtual ~DeterministicGate() = default;
     virtual void update(vector<double> & states, vector<double> & nextStates);
-    virtual string description();
 
     void setupForBits(int* Ins, int nrOfIns, int Out, int logic);
+
+    virtual string description();
 
     //double voidOutput;
 };
@@ -95,6 +141,7 @@ public:
 /* ***** ADVANCED IMPLEMENTATION! - ENTER ON OWN RISK ***** */
 class FeedbackGate: public Gate {
 private:
+    vector<vector<double>> table;
     vector<vector<double>> originalTable;
     unsigned char posFBNode, negFBNode;
     unsigned char nrPos, nrNeg;

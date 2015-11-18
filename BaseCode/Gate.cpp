@@ -39,6 +39,19 @@ double& Gate::FixedEpsilonGateP = Parameters::register_parameter(
         "chance that an output from a FixedEpsilonGate gate will be randomized",
         "GATES");
 
+
+//////////////////////////////////////////
+// required code to support abstract class
+Gate::Gate() {
+}
+Gate::~Gate() {
+}
+void Gate::update(vector<double> & states, vector<double> & nextStates) {
+}
+// required code to support abstract class
+//////////////////////////////////////////
+
+
 /*
  * setupGates() populates Gate::makeGate (a structure containing functions) with the constructors for various types of gates.
  * there are 256 possible gates identified each by a pair of codons (n followed by 256-n)
@@ -50,7 +63,7 @@ void Gate::setupGates() {
     }
     if (usingProbGate) {
         AddGate(42,
-                [](Genome* genome,int pos) {return make_shared<Gate>(genome,pos);});
+                [](Genome* genome,int pos) {return make_shared<ProbabilisticGate>(genome,pos);});
         Global::inUseGateTypes.insert(42);
     }
     if (usingDetGate) {
@@ -174,40 +187,19 @@ void Gate::getInputsAndOutputs(const vector<int> insRange,
 }
 
 /*
- * build a table of size range[0],range[1] which is the upper left subset of a table rangeMax[0],rangeMax[1]
- * the table rangeMax[0],rangeMax[0] would be filled with values from the genome (filling each row before going to the next column
- * This table is assigned to the gates table field.
- * set codingRegions for each used genome site value = DATA_CODE; (may need to add more support for this later!)
+ * converts values attained from genome for inputs and outputs to vaild brain state ids
+ * uses nodeMap to accomplish the remaping
  */
-void Gate::getTableFromGenome(vector<int> range, vector<int> rangeMax,
-        int& genomeIndex, Genome* genome) {
-    int x, y;
-    int Y = range[0];
-    int X = range[1];
-    int maxY = rangeMax[0];
-    int maxX = rangeMax[1];
-
-    table.resize(Y); // set the number of rows in the table
-
-    for (y = 0; y < (Y); y++) {
-        table[y].resize(X); // set the number of columns in this row
-        for (x = 0; x < X; x++) {
-            table[y][x] = (double) (genome->sites[genomeIndex]);
-            codingRegions[genomeIndex] = DATA_CODE;
-            genome->advanceIndex(genomeIndex);
-        }
-        for (; x < maxX; x++) {
-            genome->advanceIndex(genomeIndex); // advance genomeIndex to account for unused entries in the max sized table for this row
-        }
+void Gate::applyNodeMap(vector<int> nodeMap, int maxNodes) {
+    for (size_t i = 0; i < inputs.size(); i++) {
+        inputs[i] = nodeMap[inputs[i]] % maxNodes;
     }
-    for (y = 0; y < (Y); y++) {
-        for (x = 0; x < maxY; x++) {
-            genome->advanceIndex(genomeIndex); // advancegenomeIndexk to account for extra rows in the max sized table
-        }
+    for (size_t i = 0; i < outputs.size(); i++) {
+        outputs[i] = nodeMap[outputs[i]] % maxNodes;
     }
 }
 
-/*
+/* useful function if you need to look up values from a table during update.
  * convert the inputs to an index by reading them one at a time and bitshifting the result
  * the first input is read last so that 1, 10 , 100 (etc.) all return 1. (01)
  * and 01, 010, 0100 (etc.) all return 2 (10)
@@ -222,90 +214,6 @@ int Gate::getIndexFromInputs(vector<double> & states) {
         index = (index << 1) + Bit(states[inputs[i]]);
     }
     return index;
-}
-
-/* *** Gate implementation *** */
-
-Gate::Gate(Genome *genome, int genomeIndex) {
-    int i, j;
-    inputs.clear();
-    outputs.clear();
-    int numOutputs, numInputs;
-    codingRegions.clear();
-
-    //move past the first to sites (start codeon)
-    movePastStartCodeon(genomeIndex, genome);
-
-    // get numInputs inputs and numOutputs outputs, advance k (genomeIndex) as if we had gotten 4 of each and record this in codingRegions
-    getInputsAndOutputs( { 1, 4 }, { 1, 4 }, genomeIndex, genome); // (insRange, outsRange,currentIndexInGenome,genome,codingRegions)
-    numInputs = inputs.size();
-    numOutputs = outputs.size();
-
-    genome->advanceIndex(genomeIndex, 16);
-
-    // get a table filled with values from the genome that has
-    // rows = (the number of possible combinations of input values) and columns = (the number of possible combinations of output values)
-    getTableFromGenome( { 1 << numInputs, 1 << numOutputs }, { 16, 16 },
-            genomeIndex, genome);
-
-    //normalize each row
-    for (i = 0; i < (1 << numInputs); i++) { //for each row (each possible input bit string)
-        // first sum the row
-        double S = 0;
-        for (j = 0; j < (1 << numOutputs); j++) {
-            S += table[i][j];
-        }
-        // now normalize the row
-        if (S == 0.0) { //if all the inputs on this row are 0, then give them all a probability of 1/(2^(number of outputs))
-            for (j = 0; j < (1 << numOutputs); j++)
-                table[i][j] = 1.0 / (double) (1 << numOutputs);
-        } else { //otherwise divide all values in a row by the sum of the row
-            for (j = 0; j < (1 << numOutputs); j++)
-                table[i][j] /= S;
-        }
-    }
-
-}
-
-void Gate::update(vector<double> & states, vector<double> & nextStates) { //this translates the input bits of the current states to the output bits of the next states
-    int input = getIndexFromInputs(states); // converts the input values into an index
-    int outputColumn = 0;
-    double r = Random::getDouble(1); // r will determine with set of outputs will be chosen
-    while (r > table[input][outputColumn]) {
-        r -= table[input][outputColumn]; // this goes across the probability table in row for the given input and subtracts each
-        // value in the table from r until r is less than a value it reaches
-        outputColumn++; // we have not found the correct output so move to the next output
-    }
-    for (size_t i = 0; i < outputs.size(); i++) //for each output...
-        nextStates[outputs[i]] += 1.0
-                * ((outputColumn >> (outputs.size() - 1 - i)) & 1); // convert output (the column number) to bits and pack into next states
-                                                                    // but always put the last bit in the first input (to maintain consistancy)
-}
-
-string Gate::description() {
-    string S = "Gate\n";
-    S = S + "IN:";
-    for (size_t i = 0; i < inputs.size(); i++)
-        S = S + " " + to_string(inputs[i]);
-    S = S + "\n";
-    S = S + "OUT:";
-    for (size_t i = 0; i < outputs.size(); i++)
-        S = S + " " + to_string(outputs[i]);
-    S = S + "\n";
-    return S;
-}
-
-/*
- * converts values attained from genome for inputs and outputs to vaild brain state ids
- * uses nodeMap to accomplish the remaping
- */
-void Gate::applyNodeMap(vector<int> nodeMap, int maxNodes) {
-    for (size_t i = 0; i < inputs.size(); i++) {
-        inputs[i] = nodeMap[inputs[i]] % maxNodes;
-    }
-    for (size_t i = 0; i < outputs.size(); i++) {
-        outputs[i] = nodeMap[outputs[i]] % maxNodes;
-    }
 }
 
 void Gate::resetGate(void) {
@@ -330,6 +238,83 @@ string Gate::getCodingRegions() {
     return S;
 }
 
+string Gate::description() {
+    string S = " Gate\n";
+    S = S + "IN:";
+    for (size_t i = 0; i < inputs.size(); i++)
+        S = S + " " + to_string(inputs[i]);
+    S = S + "\n";
+    S = S + "OUT:";
+    for (size_t i = 0; i < outputs.size(); i++)
+        S = S + " " + to_string(outputs[i]);
+    S = S + "\n";
+    S = S + getCodingRegions();
+    return S;
+}
+/* *** ProbilisticGate implementation *** */
+
+ProbabilisticGate::ProbabilisticGate(Genome *genome, int genomeIndex) {
+    int i, j;
+    inputs.clear();
+    outputs.clear();
+    int numOutputs, numInputs;
+    codingRegions.clear();
+
+    //move past the first to sites (start codeon)
+    movePastStartCodeon(genomeIndex, genome);
+
+    // get numInputs inputs and numOutputs outputs, advance k (genomeIndex) as if we had gotten 4 of each and record this in codingRegions
+    getInputsAndOutputs( { 1, 4 }, { 1, 4 }, genomeIndex, genome); // (insRange, outsRange,currentIndexInGenome,genome,codingRegions)
+    numInputs = inputs.size();
+    numOutputs = outputs.size();
+
+    genome->advanceIndex(genomeIndex, 16);
+
+    // get a table filled with values from the genome that has
+    // rows = (the number of possible combinations of input values) and columns = (the number of possible combinations of output values)
+    getTableFromGenome( { 1 << numInputs, 1 << numOutputs }, { 16, 16 },
+            genomeIndex, genome, table);
+
+    //normalize each row
+    for (i = 0; i < (1 << numInputs); i++) { //for each row (each possible input bit string)
+        // first sum the row
+        double S = 0;
+        for (j = 0; j < (1 << numOutputs); j++) {
+            S += table[i][j];
+        }
+        // now normalize the row
+        if (S == 0.0) { //if all the inputs on this row are 0, then give them all a probability of 1/(2^(number of outputs))
+            for (j = 0; j < (1 << numOutputs); j++)
+                table[i][j] = 1.0 / (double) (1 << numOutputs);
+        } else { //otherwise divide all values in a row by the sum of the row
+            for (j = 0; j < (1 << numOutputs); j++)
+                table[i][j] /= S;
+        }
+    }
+
+}
+
+void ProbabilisticGate::update(vector<double> & states, vector<double> & nextStates) { //this translates the input bits of the current states to the output bits of the next states
+    int input = getIndexFromInputs(states); // converts the input values into an index
+    int outputColumn = 0;
+    double r = Random::getDouble(1); // r will determine with set of outputs will be chosen
+    while (r > table[input][outputColumn]) {
+        r -= table[input][outputColumn]; // this goes across the probability table in row for the given input and subtracts each
+        // value in the table from r until r is less than a value it reaches
+        outputColumn++; // we have not found the correct output so move to the next output
+    }
+    for (size_t i = 0; i < outputs.size(); i++) //for each output...
+        nextStates[outputs[i]] += 1.0
+                * ((outputColumn >> (outputs.size() - 1 - i)) & 1); // convert output (the column number) to bits and pack into next states
+                                                                    // but always put the last bit in the first input (to maintain consistancy)
+}
+
+string ProbabilisticGate::description() {
+    string S = "ProbilisticGate"+ Gate::description();
+    return S;
+}
+
+
 /* *** Determistic Gate Implementation *** */
 
 DeterministicGate::DeterministicGate(Genome *genome, int genomeIndex) {
@@ -349,14 +334,14 @@ DeterministicGate::DeterministicGate(Genome *genome, int genomeIndex) {
     genome->advanceIndex(genomeIndex, 16); //move forward 16 spaces in genome
 
     // get a table filled with values from the genome that has
-    // rows = (the number of possible combinations of input values) and columns = (the number of output values)
-    getTableFromGenome( { (1 << numInputs), numOutputs }, { 4, 4 }, genomeIndex,
-            genome);
+    // numbr of rows = (the number of possible combinations of input values) and number of columns = (the number of output values)
+    getTableFromGenome( { (1 << numInputs), numOutputs }, { 1 << 4, 4 }, genomeIndex,
+            genome, table);
 
     // convert the table contents to bits
     for (int i = 0; i < (1 << numInputs); i++) {
         for (int o = 0; o < numOutputs; o++) {
-            table[i][0] = (int) table[i][0] & 1; // convert even to 0 and odd to 1
+            table[i][0] = table[i][0] & 1; // convert even to 0 and odd to 1
             //if (table[i][0] == 1) cout << "* "; // uncomment for light show! //
             //else cout << "  ";                  // uncomment for light show! //
 
@@ -792,7 +777,7 @@ VoidGate::VoidGate(Genome *genome, int genomeIndex) :
 
 void VoidGate::update(vector<double> & states, vector<double> & nextStates) {
     int input = getIndexFromInputs(states); // converts the input values into an index
-    vector<double> outputRow = table[input];
+    vector<int> outputRow = table[input];
 
     if (Random::P(epsilon)) {
         outputRow[Random::getIndex(outputs.size())] = 0; // pick one output randomly and set it to 0
