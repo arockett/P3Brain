@@ -48,8 +48,8 @@ public:
     static double& rewardForFood7;
     static double& rewardForFood8;
 
-    static int& xDim;
-    static int& yDim;
+    static int& worldColumns;
+    static int& worldRows;
     static bool& borderWalls;
     static int& randomWalls;
 

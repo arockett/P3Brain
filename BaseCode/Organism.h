@@ -11,11 +11,12 @@
 
 #include <stdlib.h>
 #include <vector>
+
+#include "Brain.h"
 #include "Genome.h"
 
 #include "../Utilities/Data.h"
 #include "../Utilities/Parameters.h"
-#include "Brain.h"
 
 using namespace std;
 
@@ -34,7 +35,6 @@ public:
     static Organism* MRCA;
     int gender; // generally 0=female, 1=male, *=?
 
-public:
     Genome* genome;
     Brain* brain;
 
@@ -45,12 +45,14 @@ public:
     set<int> dataAncestors; // list of the IDs of organisms in the last data files who are ancestors of this organism (i.e. all files saved on data interval)
 
     int ID;
-    int birthDate; // the time this organism was made
+    int timeOfBirth; // the time this organism was made
+    int timeOfDeath; // the time this organism stopped being alive (this organism may be stored for archival reasons)
+
     bool alive; // is this organism alive (1) or dead (0)
-    int referenceCounter; // how many living organisms are looking at this organism (including this organism while it's alive)
+    int referenceCounter; // how many offspring organisms are looking at this organism (including this organism while it's alive)
     DataMap dataMap; // holds all data (genome size, score, world data, etc.)
-    map<int, DataMap> checkPointDataMap; // Used only with SnapShot with Delay (SSwD) stores contents of dataMap when an ouput interval is reached so that
-                                         // after the delay we have the correct data for the given time. key is 'update'.
+    map<int, DataMap> snapShotDataMaps; // Used only with SnapShot with Delay (SSwD) stores contents of dataMap when an ouput interval is reached so that
+                                        // after the delay we have the correct data for the given time. key is 'update'.
     Organism(); // make an empty organism
     Organism(Genome* _genome); // make a parentless organism with a genome, and a nullptr to brain
     Organism(Genome* _genome, Brain* _brain); // make a parentless organism with a genome, and a brain
@@ -59,19 +61,16 @@ public:
 
     virtual ~Organism();
 
-    virtual void unFollow(); // this decrements referenceCounter and if referenceCounter = 0, deletes this
+    virtual void unFollow(); // this decrements referenceCounter and if referenceCounter = 0 & !alive, deletes this
     virtual void addFollow(); // this increments referenceCounter
 
-    virtual void kill(); // sets alive = 0 (on org and in dataMap) and calls deReference()
+    virtual void kill(); // sets alive = 0 (on org and in dataMap) and if referenceCounter = 0, deletes this
 
     virtual vector<string> GetLODItem(string key);
     vector<Organism*> getLOD();
     virtual Organism* getMostRecentCommonAncestor();
     virtual Organism* makeMutatedOffspring(double pointMutationRate);
     virtual Organism* makeMutatedOffspring(double pointMutationRate, Organism* parent2);
-
-    virtual void saveDataOnLOD(int flush = 0); // for Organism, save to file data for this genome and it's LOD
-    virtual void flushDataOnLOD(); // used at the end of a run to save data newer then the MRCA / convergance point
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Organism__) */

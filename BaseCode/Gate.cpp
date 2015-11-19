@@ -16,29 +16,16 @@
 
 #define VOIDOUTPUT 0
 
-bool& Gate::usingProbGate = Parameters::register_parameter("probGate", false,
-        "set to true to enable probabilistic gates", "GATE TYPES");
-bool& Gate::usingDetGate = Parameters::register_parameter("detGate", false,
-        "set to true to enable deterministic gates?", "GATE TYPES");
-bool& Gate::usingFBGate = Parameters::register_parameter("fbGate", false,
-        "set to true to enable feedback gates", "GATE TYPES");
-bool& Gate::usingGPGate = Parameters::register_parameter("gpGate", false,
-        "set to true to enable GP (what?) gates", "GATE TYPES");
-bool& Gate::usingThGate = Parameters::register_parameter("thGate", false,
-        "set to true to enable theta gates", "GATE TYPES");
-bool& Gate::usingEpsiGate = Parameters::register_parameter("epsiGate", false,
-        "set to true to enable epsilon gates", "GATE TYPES");
-bool& Gate::usingVoidGate = Parameters::register_parameter("voidGate", false,
-        "set to true to enable void gates", "GATE TYPES");
+bool& Gate::usingProbGate = Parameters::register_parameter("probGate", false, "set to true to enable probabilistic gates", "GATE TYPES");
+bool& Gate::usingDetGate = Parameters::register_parameter("detGate", false, "set to true to enable deterministic gates?", "GATE TYPES");
+bool& Gate::usingFBGate = Parameters::register_parameter("fbGate", false, "set to true to enable feedback gates", "GATE TYPES");
+bool& Gate::usingGPGate = Parameters::register_parameter("gpGate", false, "set to true to enable GP (what?) gates", "GATE TYPES");
+bool& Gate::usingThGate = Parameters::register_parameter("thGate", false, "set to true to enable theta gates", "GATE TYPES");
+bool& Gate::usingEpsiGate = Parameters::register_parameter("epsiGate", false, "set to true to enable epsilon gates", "GATE TYPES");
+bool& Gate::usingVoidGate = Parameters::register_parameter("voidGate", false, "set to true to enable void gates", "GATE TYPES");
 
-double& Gate::voidOutPut = Parameters::register_parameter("voidOutput", 0.0,
-        "chance that an output from a determinstic gate will be set to 0",
-        "GATES");
-double& Gate::FixedEpsilonGateP = Parameters::register_parameter(
-        "FixedEpsilonGateProb", 0.05,
-        "chance that an output from a FixedEpsilonGate gate will be randomized",
-        "GATES");
-
+double& Gate::voidOutPut = Parameters::register_parameter("voidOutput", 0.0, "chance that an output from a determinstic gate will be set to 0", "GATES");
+double& Gate::FixedEpsilonGateP = Parameters::register_parameter("FixedEpsilonGateProb", 0.05, "chance that an output from a FixedEpsilonGate gate will be randomized", "GATES");
 
 //////////////////////////////////////////
 // required code to support abstract class
@@ -51,7 +38,6 @@ void Gate::update(vector<double> & states, vector<double> & nextStates) {
 // required code to support abstract class
 //////////////////////////////////////////
 
-
 /*
  * setupGates() populates Gate::makeGate (a structure containing functions) with the constructors for various types of gates.
  * there are 256 possible gates identified each by a pair of codons (n followed by 256-n)
@@ -62,38 +48,31 @@ void Gate::setupGates() {
         Gate::AddGate(i, nullptr);
     }
     if (usingProbGate) {
-        AddGate(42,
-                [](Genome* genome,int pos) {return make_shared<ProbabilisticGate>(genome,pos);});
+        AddGate(42, [](Genome* genome,int pos) {return make_shared<ProbabilisticGate>(genome,pos);});
         Global::inUseGateTypes.insert(42);
     }
     if (usingDetGate) {
-        AddGate(43,
-                [](Genome* genome,int pos) {return make_shared<DeterministicGate>(genome,pos);});
+        AddGate(43, [](Genome* genome,int pos) {return make_shared<DeterministicGate>(genome,pos);});
         Global::inUseGateTypes.insert(43);
     }
     if (usingFBGate) {
-        AddGate(44,
-                [](Genome* genome,int pos) {return make_shared<FeedbackGate>(genome,pos);});
+        AddGate(44, [](Genome* genome,int pos) {return make_shared<FeedbackGate>(genome,pos);});
         Global::inUseGateTypes.insert(44);
     }
     if (usingGPGate) {
-        AddGate(45,
-                [](Genome* genome,int pos) {return make_shared<GPGate>(genome,pos);});
+        AddGate(45, [](Genome* genome,int pos) {return make_shared<GPGate>(genome,pos);});
         Global::inUseGateTypes.insert(45);
     }
     if (usingThGate) {
-        AddGate(46,
-                [](Genome* genome,int pos) {return make_shared<Thresholdgate>(genome,pos);});
+        AddGate(46, [](Genome* genome,int pos) {return make_shared<Thresholdgate>(genome,pos);});
         Global::inUseGateTypes.insert(46);
     }
     if (usingEpsiGate) {
-        AddGate(47,
-                [](Genome* genome,int pos) {return make_shared<FixedEpsilonGate>(genome,pos);});
+        AddGate(47, [](Genome* genome,int pos) {return make_shared<FixedEpsilonGate>(genome,pos);});
         Global::inUseGateTypes.insert(47);
     }
     if (usingVoidGate) {
-        AddGate(48,
-                [](Genome* genome,int pos) {return make_shared<VoidGate>(genome,pos);});
+        AddGate(48, [](Genome* genome,int pos) {return make_shared<VoidGate>(genome,pos);});
         Global::inUseGateTypes.insert(47);
     }
 
@@ -101,8 +80,7 @@ void Gate::setupGates() {
 
 /* *** some c++ 11 magic to speed up translation from genome to gates *** */
 function<shared_ptr<Gate>(Genome*, int)> Gate::makeGate[256];
-void Gate::AddGate(int ID,
-        function<shared_ptr<Gate>(Genome*, int)> theFunction) {
+void Gate::AddGate(int ID, function<shared_ptr<Gate>(Genome*, int)> theFunction) {
     makeGate[ID] = theFunction;
 }
 
@@ -140,9 +118,7 @@ int Gate::getIOAddress(int& genomeIndex, Genome* genome) {
 /*
  * Gets "howMany" addresses, advances the genome_index buy "howManyMax" addresses and updates "codingRegions" with the addresses being used.
  */
-void Gate::getSomeBrainAddresses(const int& howMany, const int& howManyMax,
-        vector<int>& addresses, int& genome_index, Genome* genome,
-        int codeNumber) {
+void Gate::getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, int& genome_index, Genome* genome, int codeNumber) {
     int lastLocation = genome_index; //make a note of where were are now so we can get codingRegions later
     for (auto i = 0; i < howMany; i++) { // for the number of addresses we need
         addresses[i] = getIOAddress(genome_index, genome); // get an address
@@ -151,8 +127,7 @@ void Gate::getSomeBrainAddresses(const int& howMany, const int& howManyMax,
         codingRegions[lastLocation] = codeNumber; // with 10 (inputs) or 11 (outputs) (connections)
         lastLocation++;
     }
-    genome_index += ((ceil(((double) Global::bitsPerBrainAddress) / 8.0))
-            * (howManyMax - howMany));
+    genome_index += ((ceil(((double) Global::bitsPerBrainAddress) / 8.0)) * (howManyMax - howMany));
     // move the genome_index ahead to account not only the addresses we need, but the total number of possible addresses
 }
 
@@ -162,27 +137,22 @@ void Gate::getSomeBrainAddresses(const int& howMany, const int& howManyMax,
  * if number of inputs or outputs is less then the max possible inputs or outputs skip the unused sites in the genome
  * there can not be more then 255 inputs or outputs without additional support (to read more sites to generate these numbers)
  */
-void Gate::getInputsAndOutputs(const vector<int> insRange,
-        vector<int> outsRange, int& genomeIndex, Genome* genome) { // (max#in, max#out,currentIndexInGenome,genome,codingRegions)
+void Gate::getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, int& genomeIndex, Genome* genome) { // (max#in, max#out,currentIndexInGenome,genome,codingRegions)
 
     codingRegions[genomeIndex] = IN_COUNT_CODE;
-    int numInputs = insRange[0]
-            + (genome->sites[genomeIndex] & (insRange[1] - 1));
+    int numInputs = insRange[0] + (genome->sites[genomeIndex] & (insRange[1] - 1));
     genome->advanceIndex(genomeIndex);
     codingRegions[genomeIndex] = OUT_COUNT_CODE;
-    int numOutputs = outsRange[0]
-            + (genome->sites[genomeIndex++] & (outsRange[1] - 1));
+    int numOutputs = outsRange[0] + (genome->sites[genomeIndex++] & (outsRange[1] - 1));
     genome->advanceIndex(genomeIndex);
 
     inputs.resize(numInputs);
     outputs.resize(numOutputs);
     if (insRange[1] > 0) {
-        getSomeBrainAddresses(numInputs, insRange[1], inputs, genomeIndex,
-                genome, 11);
+        getSomeBrainAddresses(numInputs, insRange[1], inputs, genomeIndex, genome, 11);
     }
     if (outsRange[1] > 0) {
-        getSomeBrainAddresses(numOutputs, outsRange[1], outputs, genomeIndex,
-                genome, 21);
+        getSomeBrainAddresses(numOutputs, outsRange[1], outputs, genomeIndex, genome, 21);
     }
 }
 
@@ -207,11 +177,11 @@ void Gate::applyNodeMap(vector<int> nodeMap, int maxNodes) {
  * etc... hopefully you see the pattern
  * This, btw, will maintain output consistency for these lower values even if a gate gains or loses inputs.
  */
-int Gate::getIndexFromInputs(vector<double> & states) {
+int Gate::getIndexFromInputs(vector<double> & brainState) {
     int index = 0;
 
     for (int i = (int) inputs.size() - 1; i >= 0; i--) {
-        index = (index << 1) + Bit(states[inputs[i]]);
+        index = (index << 1) + Bit(brainState[inputs[i]]);
     }
     return index;
 }
@@ -272,8 +242,7 @@ ProbabilisticGate::ProbabilisticGate(Genome *genome, int genomeIndex) {
 
     // get a table filled with values from the genome that has
     // rows = (the number of possible combinations of input values) and columns = (the number of possible combinations of output values)
-    getTableFromGenome( { 1 << numInputs, 1 << numOutputs }, { 16, 16 },
-            genomeIndex, genome, table);
+    getTableFromGenome( { 1 << numInputs, 1 << numOutputs }, { 16, 16 }, genomeIndex, genome, table);
 
     //normalize each row
     for (i = 0; i < (1 << numInputs); i++) { //for each row (each possible input bit string)
@@ -304,16 +273,14 @@ void ProbabilisticGate::update(vector<double> & states, vector<double> & nextSta
         outputColumn++; // we have not found the correct output so move to the next output
     }
     for (size_t i = 0; i < outputs.size(); i++) //for each output...
-        nextStates[outputs[i]] += 1.0
-                * ((outputColumn >> (outputs.size() - 1 - i)) & 1); // convert output (the column number) to bits and pack into next states
-                                                                    // but always put the last bit in the first input (to maintain consistancy)
+        nextStates[outputs[i]] += 1.0 * ((outputColumn >> (outputs.size() - 1 - i)) & 1); // convert output (the column number) to bits and pack into next states
+                                                                                          // but always put the last bit in the first input (to maintain consistancy)
 }
 
 string ProbabilisticGate::description() {
-    string S = "ProbilisticGate"+ Gate::description();
+    string S = "ProbilisticGate" + Gate::description();
     return S;
 }
-
 
 /* *** Determistic Gate Implementation *** */
 
@@ -335,8 +302,7 @@ DeterministicGate::DeterministicGate(Genome *genome, int genomeIndex) {
 
     // get a table filled with values from the genome that has
     // numbr of rows = (the number of possible combinations of input values) and number of columns = (the number of output values)
-    getTableFromGenome( { (1 << numInputs), numOutputs }, { 1 << 4, 4 }, genomeIndex,
-            genome, table);
+    getTableFromGenome( { (1 << numInputs), numOutputs }, { 1 << 4, 4 }, genomeIndex, genome, table);
 
     // convert the table contents to bits
     for (int i = 0; i < (1 << numInputs); i++) {
@@ -349,8 +315,7 @@ DeterministicGate::DeterministicGate(Genome *genome, int genomeIndex) {
     }
 }
 
-void DeterministicGate::setupForBits(int* Ins, int nrOfIns, int Out,
-        int logic) {
+void DeterministicGate::setupForBits(int* Ins, int nrOfIns, int Out, int logic) {
     inputs.resize(nrOfIns);
     for (int i = 0; i < nrOfIns; i++)
         inputs[i] = Ins[i];
@@ -363,8 +328,7 @@ void DeterministicGate::setupForBits(int* Ins, int nrOfIns, int Out,
     }
 }
 
-void DeterministicGate::update(vector<double> & states,
-        vector<double> & nextStates) {
+void DeterministicGate::update(vector<double> & states, vector<double> & nextStates) {
     int input = getIndexFromInputs(states); // converts the input values into an index
     for (size_t i = 0; i < outputs.size(); i++) {
         nextStates[outputs[i]] += table[input][i];
@@ -410,10 +374,7 @@ GPGate::GPGate(Genome *genome, int genomeIndex) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             codingRegions[genomeIndex] = DATA_CODE;
-            V.I =
-                    (V.I << (int) 8)
-                            + (int) genome->sites[(genomeIndex++)
-                                    % genome->sites.size()];
+            V.I = (V.I << (int) 8) + (int) genome->sites[(genomeIndex++) % genome->sites.size()];
         }
         myValues.push_back(V.F);
     }
@@ -484,8 +445,7 @@ void GPGate::update(vector<double> & states, vector<double> & nextStates) {
 
 string GPGate::description() {
     string gateTypeName[8] = { "+", "-", "*", "/", "Sin", "Cos", "Log", "Exp" };
-    return "Genetic Programming " + gateTypeName[myGateType] + "\n"
-            + Gate::description();
+    return "Genetic Programming " + gateTypeName[myGateType] + "\n" + Gate::description();
 }
 
 /* *** Feedback Gate *** */
@@ -532,11 +492,9 @@ FeedbackGate::FeedbackGate(Genome *genome, int startCodonAt) {
 
     //get the Feedback forces
     for (i = 0; i < nrPos; i++)
-        posLevelOfFB[i] = ((double) (1
-                + genome->sites[(k + 8 + i) % genome->sites.size()])) / 256.0;
+        posLevelOfFB[i] = ((double) (1 + genome->sites[(k + 8 + i) % genome->sites.size()])) / 256.0;
     for (i = 0; i < nrNeg; i++)
-        negLevelOfFB[i] = ((double) (1
-                + genome->sites[(k + 12 + i) % genome->sites.size()])) / 256.0;
+        negLevelOfFB[i] = ((double) (1 + genome->sites[(k + 12 + i) % genome->sites.size()])) / 256.0;
 
     k = k + 16;
     //get all the values into the table
@@ -547,8 +505,7 @@ FeedbackGate::FeedbackGate(Genome *genome, int startCodonAt) {
         originalTable[i].resize(1 << _xDim);
         double S = 0.0;
         for (j = 0; j < (1 << _xDim); j++) {
-            table[i][j] = (double) genome->sites[(k + j + ((1 << _xDim) * i))
-                    % genome->sites.size()];
+            table[i][j] = (double) genome->sites[(k + j + ((1 << _xDim) * i)) % genome->sites.size()];
             S += table[i][j];
         }
         //normalize the row
@@ -569,8 +526,7 @@ FeedbackGate::FeedbackGate(Genome *genome, int startCodonAt) {
     chosenOutNeg.clear();
 }
 
-void FeedbackGate::update(vector<double> & states,
-        vector<double> & nextStates) {
+void FeedbackGate::update(vector<double> & states, vector<double> & nextStates) {
     size_t i;
     double mod;
 
@@ -635,8 +591,7 @@ void FeedbackGate::update(vector<double> & states,
 }
 
 string FeedbackGate::description() {
-    string S = "pos node:" + to_string((int) posFBNode) + "\n neg node:"
-            + to_string((int) negFBNode);
+    string S = "pos node:" + to_string((int) posFBNode) + "\n neg node:" + to_string((int) negFBNode);
     return "Feedback Gate\n " + S + "\n" + Gate::description();
 }
 
@@ -707,8 +662,7 @@ Thresholdgate::Thresholdgate(Genome *genome, int startCodonAt) {
     threshold = genome->sites[(k + i + 1) % genome->sites.size()];
 }
 
-void Thresholdgate::update(vector<double> & states,
-        vector<double> & nextStates) {
+void Thresholdgate::update(vector<double> & states, vector<double> & nextStates) {
     int theCount = 0;
     for (size_t i = 1; i < inputs.size(); i++)
         theCount = (theCount << 1) + Bit(states[inputs[i]]);
@@ -720,8 +674,7 @@ void Thresholdgate::update(vector<double> & states,
 }
 
 string Thresholdgate::description() {
-    return "ThresholdgateGate: " + to_string(threshold) + "\n"
-            + Gate::description();;
+    return "ThresholdgateGate: " + to_string(threshold) + "\n" + Gate::description();;
 }
 
 /* *** Fixed Epison Gate *** */
@@ -743,8 +696,7 @@ FixedEpsilonGate::FixedEpsilonGate(Genome *genome, int genomeIndex) :
     }
 }
 
-void FixedEpsilonGate::update(vector<double> & states,
-        vector<double> & nextStates) {
+void FixedEpsilonGate::update(vector<double> & states, vector<double> & nextStates) {
     int input = getIndexFromInputs(states); // converts the input values into an index
     if (Random::P(epsilon)) { //if there will be an error
         //do a random output excluding the one otherwise given

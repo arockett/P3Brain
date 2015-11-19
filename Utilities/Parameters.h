@@ -32,8 +32,7 @@ unordered_map<string, Entry<T>>& registry() {
 class Parameters {
 public:
 
-    static unordered_map<string, string> readCommandLine(int argc,
-            const char** argv) {
+    static unordered_map<string, string> readCommandLine(int argc, const char** argv) {
         unordered_map<string, string> comand_line_list;
 
         cout << "  - loading Command Line.\n";
@@ -41,16 +40,13 @@ public:
         int argCount = argc;
         if ((argc & 1) == 0) {
             argCount = argc - 1;
-            cout
-                    << "  - Command Line: too many arguments on command line... ignoring last argument.\n";
+            cout << "  - Command Line: too many arguments on command line... ignoring last argument.\n";
         }
         for (int i = 1; i < argCount; i = i + 2) {
-            if (comand_line_list.find(string(argv[i]))
-                    == comand_line_list.end()) {
+            if (comand_line_list.find(string(argv[i])) == comand_line_list.end()) {
                 comand_line_list[string(argv[i])] = string(argv[i + 1]);
             } else {
-                cout << "  - \"" << string(argv[i])
-                        << "\" is defined more then once on the command line. Using first definition!\n";
+                cout << "  - \"" << string(argv[i]) << "\" is defined more then once on the command line. Using first definition!\n";
             }
         }
         cout << "\n";
@@ -60,18 +56,9 @@ public:
     static unordered_map<string, string> readConfigFile(string configFileName) {
         unordered_map<string, string> config_file_list;
         set<char> nameFirstLegalChars = { // characters that can be used as the first "letter" of a name
-                'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-                        'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
-                        'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
-                        'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-                        'U', 'V', 'W', 'X', 'Y', 'Z', '_' };
+                'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_' };
         set<char> nameLegalChars = { // characters that can be used in the body of a name
-                'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-                        'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
-                        'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
-                        'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-                        'U', 'V', 'W', 'X', 'Y', 'Z', '1', '2', '3', '4', '5',
-                        '6', '7', '8', '9', '0', '_', ':' };
+                'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '_', ':' };
         set<char> whiteSpaceChars = { ' ', '\t' };
 
         string line;
@@ -92,9 +79,7 @@ public:
                 parameterName = "";
                 parameterValue = "";
                 // move past any leading white space
-                while (index < line.length()
-                        && whiteSpaceChars.find(line[index])
-                                != whiteSpaceChars.end()) {
+                while (index < line.length() && whiteSpaceChars.find(line[index]) != whiteSpaceChars.end()) {
                     index++;
                 }
                 // comment can start before name, if it does, we are done with this line... move to end of line
@@ -102,9 +87,7 @@ public:
                     index = line.length();
                 }
                 // get name (must start with letter or "_")
-                if (index < line.length()
-                        && nameFirstLegalChars.find(line[index])
-                                != nameFirstLegalChars.end()) {
+                if (index < line.length() && nameFirstLegalChars.find(line[index]) != nameFirstLegalChars.end()) {
                     parameterName += line[index];
                     index++;
                 } else if (index < line.length()) { // if the first character on the line is not white space, # or a name start character
@@ -112,40 +95,28 @@ public:
                     index = line.length(); // move to end of line (this will create a error since there is a name, but no value)
                 }
                 // get rest of name
-                while (index < line.length()
-                        && nameLegalChars.find(line[index])
-                                != nameLegalChars.end()) {
+                while (index < line.length() && nameLegalChars.find(line[index]) != nameLegalChars.end()) {
                     parameterName += line[index];
                     index++;
                 }
                 // move past white space between name and "="
-                while (index < line.length()
-                        && whiteSpaceChars.find(line[index])
-                                != whiteSpaceChars.end()) {
+                while (index < line.length() && whiteSpaceChars.find(line[index]) != whiteSpaceChars.end()) {
                     index++;
                 }
                 // the next character must be "="
                 if (index < line.length() && line[index] == '=') {
                     index++;
                     // move past white space between "=" and value
-                    while (index < line.length()
-                            && whiteSpaceChars.find(line[index])
-                                    != whiteSpaceChars.end()) {
+                    while (index < line.length() && whiteSpaceChars.find(line[index]) != whiteSpaceChars.end()) {
                         index++;
                     }
                     // get value : values can be made up of any characters
-                    while (index < line.length()
-                            && whiteSpaceChars.find(line[index])
-                                    == whiteSpaceChars.end()
-                            && line[index] != '#') {
+                    while (index < line.length() && whiteSpaceChars.find(line[index]) == whiteSpaceChars.end() && line[index] != '#') {
                         parameterValue += line[index];
                         index++;
                     }
                     // move though whitespace till "#" or EoL
-                    while (index < line.length()
-                            && (whiteSpaceChars.find(line[index])
-                                    != whiteSpaceChars.end()
-                                    || line[index] == '#')) {
+                    while (index < line.length() && (whiteSpaceChars.find(line[index]) != whiteSpaceChars.end() || line[index] == '#')) {
                         if (line[index] == '#') { // if "#" move to end of line
                             index = line.length();
                         } else { // move past whitespace
@@ -154,27 +125,18 @@ public:
                     }
                 }
                 if (index != line.length()) { // if not at end of line, there was a problem
-                    cout << "  - Config File: SYNTAX ERROR on line "
-                            << line_number << " in file: \"" << configFileName
-                            << "\". Ignoring line.\n";
+                    cout << "  - Config File: SYNTAX ERROR on line " << line_number << " in file: \"" << configFileName << "\". Ignoring line.\n";
                 } else {
                     // if there is a name and a value
                     if (parameterName != "" && parameterValue != "") {
-                        if (config_file_list.find(parameterName)
-                                == config_file_list.end()) {
-                            config_file_list[parameterName] = string(
-                                    parameterValue);
+                        if (config_file_list.find(parameterName) == config_file_list.end()) {
+                            config_file_list[parameterName] = string(parameterValue);
                         } else {
-                            cout << "  - \"" << string(parameterName)
-                                    << "\" is defined more then once in config file (line "
-                                    << line_number
-                                    << "). Using first definition!\n";
+                            cout << "  - \"" << string(parameterName) << "\" is defined more then once in config file (line " << line_number << "). Using first definition!\n";
                         }
 
                     } else if (parameterName != "" && parameterValue == "") { // if there is a name but no value, throw warning
-                        cout << "  - Config File: SYNTAX ERROR on line "
-                                << line_number << " in file: \""
-                                << configFileName << "\". Ignoring line.\n";
+                        cout << "  - Config File: SYNTAX ERROR on line " << line_number << " in file: \"" << configFileName << "\". Ignoring line.\n";
                     }
                 }
             }
@@ -182,8 +144,7 @@ public:
         }
 
         else {
-            cout << "  - Config File: WARNING unable to open file \""
-                    << configFileName << "\". Proceeding without.\n";
+            cout << "  - Config File: WARNING unable to open file \"" << configFileName << "\". Proceeding without.\n";
         }
         cout << "\n";
         return config_file_list;
@@ -192,15 +153,11 @@ public:
 
 // Use static calls to set up the parameter before main calls "set parameters"
     template<class T>
-    static T& register_parameter(string name, const T& default_value,
-            const string& documentation,
-            const string& classification = "none") {
+    static T& register_parameter(string name, const T& default_value, const string& documentation, const string& classification = "none") {
         if (registry<T>().find(name) != registry<T>().end()) {
-            cout << "  - registering parameters :: \"" << name
-                    << "\" is being registered more then once... you should look into this!\n";
+            cout << "  - registering parameters :: \"" << name << "\" is being registered more then once... you should look into this!\n";
         }
-        registry<T>()[name] = Entry<T>(default_value, documentation,
-                classification);
+        registry<T>()[name] = Entry<T>(default_value, documentation, classification);
         return registry<T>()[name].variable;
     }
 
@@ -221,17 +178,14 @@ public:
 
 // Loads all of the parameters for a given type of variable from the key_value map
     template<class T>
-    static void load_parameters_of_type(
-            unordered_map<string, string> & key_value) {
+    static void load_parameters_of_type(unordered_map<string, string> & key_value) {
         for (auto & pair : registry<T>()) {
             const auto & it = key_value.find(pair.first);
             // Only set the configuration if no argument given
             if (it != key_value.end()) {
                 bool success = load_value(it->second, pair.second.variable);
                 if (!success) {
-                    throw std::invalid_argument(
-                            "Bad configuration option for '" + it->first
-                                    + "' given: " + it->second);
+                    throw std::invalid_argument("Bad configuration option for '" + it->first + "' given: " + it->second);
                 }
                 key_value.erase(pair.first);
             }
@@ -247,51 +201,37 @@ public:
 
     static void initialize_parameters(int argc, const char** argv) {
 
-        cout << "-----\n"
-                << "  use your own configFile by setting configFileName (default: settings.cfg).\n"
-                << "  to write out a new config file set \"makeConfigFile\" to 1.\n"
-                << "-----\n";
+        cout << "-----\n" << "  use your own configFile by setting configFileName (default: settings.cfg).\n" << "  to write out a new config file set \"makeConfigFile\" to 1.\n" << "-----\n";
 
-        unordered_map<string, string> comand_line_list = readCommandLine(argc,
-                argv);
+        unordered_map<string, string> comand_line_list = readCommandLine(argc, argv);
 
-        string configFileName =
-                (comand_line_list.find("configFileName")
-                        == comand_line_list.end()) ?
-                        "settings.cfg" : comand_line_list["configFileName"];
+        string configFileName = (comand_line_list.find("configFileName") == comand_line_list.end()) ? "settings.cfg" : comand_line_list["configFileName"];
 
         comand_line_list.erase("configFileName");
 
-        unordered_map<string, string> config_file_list = readConfigFile(
-                configFileName);
+        unordered_map<string, string> config_file_list = readConfigFile(configFileName);
 
         load_parameters(config_file_list);
         load_parameters(comand_line_list);
 
-        string makeConfigFile =
-                (comand_line_list.find("makeConfigFile")
-                        == comand_line_list.end()) ?
-                        "0" : comand_line_list["makeConfigFile"];
+        string makeConfigFile = (comand_line_list.find("makeConfigFile") == comand_line_list.end()) ? "0" : comand_line_list["makeConfigFile"];
         comand_line_list.erase("makeConfigFile");
         if (makeConfigFile == "1") {
             ofstream CONFIGFILE(configFileName);
             dump_parameters(CONFIGFILE);
             CONFIGFILE.close();
-            cout << "  - \"" << configFileName
-                    << "\" has been created. Exiting.\n";
+            cout << "  - \"" << configFileName << "\" has been created. Exiting.\n";
             exit(0);
         }
 
         if (!comand_line_list.empty()) {
-            cout
-                    << "  - The following values were defined on the command line, but were not used:\n";
+            cout << "  - The following values were defined on the command line, but were not used:\n";
             for (auto name : comand_line_list) {
                 cout << "  -  \"" << name.first << "\"\n";
             }
         }
         if (!config_file_list.empty()) {
-            cout
-                    << "  - The following values were defined in the config file, but were not used:\n";
+            cout << "  - The following values were defined in the config file, but were not used:\n";
             for (auto name : config_file_list) {
                 cout << "  -  \"" << name.first << "\"\n";
             }
@@ -318,14 +258,12 @@ public:
 
 // Output the type, name, current value, and doc string for each parameter of a given type
     template<class T>
-    static void dump_parameters_of_type(
-            map<string, map<string, string>> & sorted_parameters) {
+    static void dump_parameters_of_type(map<string, map<string, string>> & sorted_parameters) {
         ostringstream build_string;
 
         for (const auto & parameter : registry<T>()) {
 
-            build_string << parameter.first << " = "
-                    << parameter.second.variable;
+            build_string << parameter.first << " = " << parameter.second.variable;
 
             int size = build_string.str().size();
             while (size < 35) {
@@ -333,11 +271,9 @@ public:
                 size++;
             }
 
-            build_string << " # (" << get_type(parameter.second.variable)
-                    << ") " << parameter.second.documentation;
+            build_string << " # (" << get_type(parameter.second.variable) << ") " << parameter.second.documentation;
 
-            sorted_parameters[parameter.second.classification][parameter.first] =
-                    build_string.str();
+            sorted_parameters[parameter.second.classification][parameter.first] = build_string.str();
 
             build_string.str(string());
         }

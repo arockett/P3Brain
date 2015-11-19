@@ -58,8 +58,7 @@ public:
                 workingString = workingString + "," + to_string(value) + "]\""; // add ",value]"
                 data[key] = workingString; // put new list back in DataMap
             } else { // this key exists, but the associated element is not a list
-                cout
-                        << "  In DataMap::Append(key, value)\n  ERROR: attempted to append to a non list DataMap entry. \n    Exiting!\n";
+                cout << "  In DataMap::Append(key, value)\n  ERROR: attempted to append to a non list DataMap entry. \n    Exiting!\n";
                 exit(1);
             }
         }
@@ -77,8 +76,7 @@ class FileManager {
 public:
     static set<string> dataFilesCreated; // list of files, this allows us to track if headers must be written
     static const char separator = ',';
-    void static writeToFile(const string& fileName, const string& data,
-            const string& header  = ""); //fileName, data, header - used when you want to output formatted data (i.e. genomes)
+    void static writeToFile(const string& fileName, const string& data, const string& header = ""); //fileName, data, header - used when you want to output formatted data (i.e. genomes)
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Data__) */

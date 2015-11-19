@@ -22,8 +22,6 @@ private:
 
 public:
 
-
-
     virtual vector<string> getStats(); // move me to abstract class!!
 
     /*
@@ -38,7 +36,6 @@ public:
     static int& minGenomeSize;
     static int& maxGenomeSize;
 
-public:
     vector<unsigned char> sites;
 
     Genome() = default;

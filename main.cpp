@@ -12,10 +12,11 @@
 #include <stdlib.h>
 #include <vector>
 
+#include "BaseCode/Archivist.h"
 #include "BaseCode/Brain.h"
-#include "BaseCode/DataHandler.h"
 #include "BaseCode/Genome.h"
 #include "BaseCode/Global.h"
+#include "BaseCode/Group.h"
 #include "BaseCode/Optimizer.h"
 #include "BaseCode/Organism.h"
 #include "BaseCode/World.h"
@@ -47,21 +48,21 @@ int main(int argc, const char * argv[]) {
     }
 
     //Optimizer *optimizer = (Optimizer*) new GA();
-    Optimizer *optimizer = (Optimizer*) new Tournament();
+    // Optimizer *optimizer = (Optimizer*) new Tournament();
 
     World *world = (World*) new BerryWorld(); //new World();
 
     // setup population
     vector<Organism*> population;
 
-    DataHandler dataHandler;
+    Archivist archivist;
 
     // a progenitor must exist - that is, one ancestor genome
     // this genome is evaluated to populate the dataMap
 
     Global::update = -1; // before there was time, there was a progenitor
 
-    Organism* progenitor = new Organism(new Genome(),new Brain()); // make a organism with a genome and brain (if you need to change the types here is where you do it)
+    Organism* progenitor = new Organism(new Genome(), new Brain()); // make a organism with a genome and brain (if you need to change the types here is where you do it)
     Organism::MRCA = progenitor; // the progenitor is everyones ancestor
 
     Global::update = 0; // the begining of time - now we construct the first population
@@ -70,39 +71,34 @@ int main(int argc, const char * argv[]) {
         Genome* genome = new Genome();
         genome->fillRandom();
         population.push_back(new Organism(progenitor, genome)); // add a new org to population using progenitors template and a new random genome
-        population[population.size()-1]->gender = Random::getInt(0,1); // assign a random gender to the new org
+        population[population.size() - 1]->gender = Random::getInt(0, 1); // assign a random gender to the new org
     }
     progenitor->kill(); // the progenitor has served it's purpose.
+
+    Group* group = new Group(population, new Tournament());
 
     //////////////////
     // evolution loop
     //////////////////
 
     int outputMethod = 0; // if SSwD is being used then we want to run until intervalDelay for the last file has passed. This is assured at Global::intervalDelay + Global::updates
-    int realTerminateAfter = (outputMethod == 0) ? (Global::terminateAfter) : Global::intervalDelay; // if the output method is SSwD override terminateAfter
+    int realTerminateAfter = (outputMethod == 0) ? (Global::terminateAfter) : Archivist::intervalDelay; // if the output method is SSwD override terminateAfter
 
-    while (((Global::nextDataWrite <= Global::updates) || (Global::nextGenomeWrite <= Global::updates))
-            && (Global::update <= (Global::updates + realTerminateAfter))) {
+    while (((Archivist::nextDataWrite <= Global::updates) || (Archivist::nextGenomeWrite <= Global::updates)) && (Global::update <= (Global::updates + realTerminateAfter))) {
 
-        // evaluate each organism in the population using a World
-        world->evaluateFitness(population, false);
-
-        dataHandler.saveData(population,outputMethod);
-
-        // Data populations have been updated and data has been saved. It's time to make some new organisms.
+        world->evaluateFitness(group->population, false); // evaluate each organism in the population using a World
+        group->archive(); // save data, update memory and delete any unneeded data;
         Global::update++;
+        group->optimize(); // update the population (reproduction and death)
 
-        //make next generation using an optimizer
-        optimizer->makeNextGeneration(population);
-        cout << "update: " << Global::update - 1 << "   maxFitness: " << optimizer->maxFitness << "\n";
+        cout << "update: " << Global::update - 1 << "   maxFitness: " << group->optimizer->maxFitness << "\n";
     }
-    if (outputMethod == 0) {
-        cout << "Finished Evolution Loop... force file writes\n";
-        population[0]->flushDataOnLOD();
-    Organism * FinalMRCA = population[0]->getMostRecentCommonAncestor();
 
-    printf("MRCA - born on: %d\n", FinalMRCA->birthDate);
-    printf("%s\n", FinalMRCA->brain->gateList().c_str());
+    group->archive(1); // flush any data that has not been output yet
+
+    if (Archivist::outputMethod == 0) { // if using LODwAP, write out some info about MRCA
+        Organism* FinalMRCA = group->population[0]->getMostRecentCommonAncestor();
+        cout << "MRCA - ID: " << FinalMRCA->ID << " born on: " << FinalMRCA->timeOfBirth << "\n" << FinalMRCA->brain->description();
     }
 
     return 0;

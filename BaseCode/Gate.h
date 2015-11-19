@@ -30,7 +30,7 @@ using namespace std;
 #define OUT_ADDRESS_CODE 21
 #define DATA_CODE 30
 
-class Gate { // abstact class
+class Gate { // abstact class. Assumes that a standard genome is being used.
 public:
     static bool& usingProbGate;
     static bool& usingDetGate;
@@ -61,7 +61,7 @@ public:
     void getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, int& genome_index, Genome* genome, int codeNumber); // extracts many brain state value addresses from a genome
     void getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, int& genomeIndex, Genome* genome); // extracts the input and output brain state value addresses for this gate
 
-    int getIndexFromInputs(vector<double> & states); // used during update to convert gate input into table indexes
+    int getIndexFromInputs(vector<double> &brainState); // used during update to convert gate input into table indexes
 
     /*
      * build a table of size range[0],range[1] which is the upper left subset of a table rangeMax[0],rangeMax[1]
@@ -90,9 +90,7 @@ public:
                 genome->advanceIndex(genomeIndex); // advance genomeIndex to account for unused entries in the max sized table for this row
             }
         }
-        cout << "Y: " << Y << " maxY: " << maxY << " index: " << genomeIndex << "\n";
         genome->advanceIndex(genomeIndex, (maxY - Y) * maxX); // advance genomeIndex to account for extra rows in the max sized table
-        cout << "Y: " << Y << " maxY: " << maxY << " index: " << genomeIndex << "\n";
     }
 
     virtual void applyNodeMap(vector<int> nodeMap, int maxNodes); // converts genome values into brain state value addresses
@@ -103,7 +101,7 @@ public:
 
     // functions which must be provided with each gate
     virtual void update(vector<double> & states, vector<double> & nextStates) = 0; // the function is empty, and must be provided in any derived gates
-    virtual string description() = 0; // returns a description of the gate. This method can be used in derived gates description method
+    virtual string description() = 0; // returns a description of the gate. This method can be used in derived gates description method to return ins and outs and coding regions
 
 };
 
@@ -112,7 +110,7 @@ public:
     vector<vector<double>> table;
 
     ProbabilisticGate() = default;
-    ProbabilisticGate(Genome *genome, int startCodonAt);
+    ProbabilisticGate(Genome* genome, int startCodonAt);
 
     virtual ~ProbabilisticGate() = default;
 

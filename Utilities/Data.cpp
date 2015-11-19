@@ -20,7 +20,7 @@ void DataMap::SetMany(vector<string> dataPairs) {
         cout << "  In DataMap::SetMany : ERROR! dataPairs vector has an odd number of elements.\n  Exiting...\n";
         exit(1);
     }
-    for (auto i = 0; i < (int)dataPairs.size(); i += 2) {
+    for (auto i = 0; i < (int) dataPairs.size(); i += 2) {
         Set(dataPairs[i], dataPairs[i + 1]);
     }
 }
@@ -56,9 +56,7 @@ void DataMap::writeToFile(const string& fileName, const vector<string>& keys) {
             headerStr.erase(headerStr.begin()); // clip off the leading separator
             dataStr.erase(dataStr.begin()); // clip off the leading separator
         } else { // if the header string is empty, print a warning!
-            cout
-                    << "  In DataMap::writeToFile(): This DataMap contains no keys. Writing a blank line to file: "
-                    << fileName << "\n";
+            cout << "  In DataMap::writeToFile(): This DataMap contains no keys. Writing a blank line to file: " << fileName << "\n";
         }
     }
     FileManager::writeToFile(fileName, dataStr, headerStr); // write the data to file!
@@ -76,12 +74,10 @@ void DataMap::Clear() {
     data.clear();
 }
 
-void FileManager::writeToFile(const string& fileName, const string& data,
-        const string& header) {
+void FileManager::writeToFile(const string& fileName, const string& data, const string& header) {
     ofstream FILE;
     bool fileClosed = true;
-    if (FileManager::dataFilesCreated.find(fileName)
-            == FileManager::dataFilesCreated.end()) { // if file has not be initialized yet
+    if (FileManager::dataFilesCreated.find(fileName) == FileManager::dataFilesCreated.end()) { // if file has not be initialized yet
         FileManager::dataFilesCreated.insert(fileName); // make a note that file exists
         FILE.open(fileName); // clear file contents and open in write mode
         fileClosed = false;
@@ -95,8 +91,6 @@ void FileManager::writeToFile(const string& fileName, const string& data,
     FILE << data << "\n";
     FILE.close();
 }
-
-
 
 ///////////////////////////////////////
 // need to add support for output prefix directory

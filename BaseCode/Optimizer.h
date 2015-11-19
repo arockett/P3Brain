@@ -32,21 +32,21 @@ public:
     virtual void makeNextGeneration(vector<Organism*> &population);
 };
 
-class GA: Optimizer {
+class GA: public Optimizer {
 public:
     virtual void makeNextGeneration(vector<Organism*> &population);
 };
 
-class P3: Optimizer {
+class P3: public Optimizer {
 
 };
 
-class Tournament: Optimizer {
+class Tournament: public Optimizer {
 public:
     virtual void makeNextGeneration(vector<Organism*> &population);
 };
 
-class Tournament2: Optimizer {
+class Tournament2: public Optimizer {
 public:
     virtual void makeNextGeneration(vector<Organism*> &population);
 };

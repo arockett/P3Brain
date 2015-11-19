@@ -45,10 +45,11 @@ Organism::Organism() {
     gender = 0; // by default all orgs are female.
     genomeAncestors.insert(ID); // it is it's own Ancestor for genome tracking purposes
     dataAncestors.insert(ID); // it is it's own Ancestor for data tracking purposes
-    birthDate = Global::update; // happy birthday!
+    timeOfBirth = Global::update; // happy birthday!
+    timeOfDeath = -1; // still alive
     dataMap.Set("ID", ID);
     dataMap.Set("alive", alive);
-    dataMap.Set("birthDate", birthDate);
+    dataMap.Set("birthDate", timeOfBirth);
 }
 
 /*
@@ -64,10 +65,11 @@ Organism::Organism(Genome* _genome) {
     gender = 0; // by default all orgs are female.
     genomeAncestors.insert(ID); // it is it's own Ancestor for genome tracking purposes
     dataAncestors.insert(ID); // it is it's own Ancestor for data tracking purposes
-    birthDate = Global::update; // happy birthday!
+    timeOfBirth = Global::update; // happy birthday!
+    timeOfDeath = -1; // still alive
     dataMap.Set("ID", ID);
     dataMap.Set("alive", alive);
-    dataMap.Set("birthDate", birthDate);
+    dataMap.Set("birthDate", timeOfBirth);
     dataMap.SetMany(genome->getStats());
 }
 
@@ -80,10 +82,11 @@ Organism::Organism(Genome* _genome, Brain* _brain) {
     gender = 0; // by default all orgs are female.
     genomeAncestors.insert(ID); // it is it's own Ancestor for genome tracking purposes
     dataAncestors.insert(ID); // it is it's own Ancestor for data tracking purposes
-    birthDate = Global::update; // happy birthday!
+    timeOfBirth = Global::update; // happy birthday!
+    timeOfDeath = -1; // still alive
     dataMap.Set("ID", ID);
     dataMap.Set("alive", alive);
-    dataMap.Set("birthDate", birthDate);
+    dataMap.Set("birthDate", timeOfBirth);
     dataMap.SetMany(genome->getStats());
 }
 
@@ -107,10 +110,11 @@ Organism::Organism(Organism* from, Genome* _genome) {
     for (auto ancestorID : from->dataAncestors) {
         dataAncestors.insert(ancestorID); // union all parents dataAncestors into this organisms dataAncestor set.
     }
-    birthDate = Global::update; // happy birthday!
+    timeOfBirth = Global::update; // happy birthday!
+    timeOfDeath = -1; // still alive
     dataMap.Set("ID", ID);
     dataMap.Set("alive", alive);
-    dataMap.Set("birthDate", birthDate);
+    dataMap.Set("birthDate", timeOfBirth);
     dataMap.SetMany(genome->getStats());
     dataMap.SetMany(brain->getStats());
 }
@@ -139,10 +143,11 @@ Organism::Organism(const vector<Organism*>& from, Genome* _genome) {
     ID = registerOrganism();
     alive = true;
     gender = 0; // by default all orgs are female.
-    birthDate = Global::update; // happy birthday!
+    timeOfBirth = Global::update; // happy birthday!
+    timeOfDeath = -1; // still alive
     dataMap.Set("ID", ID);
     dataMap.Set("alive", alive);
-    dataMap.Set("birthDate", birthDate);
+    dataMap.Set("birthDate", timeOfBirth);
     dataMap.SetMany(genome->getStats());
     dataMap.SetMany(brain->getStats());
 }
@@ -151,17 +156,14 @@ Organism::~Organism() {
     delete genome;
     delete brain;
     for (auto parent : parents) {
-        if (parent != nullptr) {
-            parent->unFollow(); // this will tell parents that this child is dead (so they will decrement their referenceCounter and deconstruct if needed).
-                                // the "parents" set is then cleaned up by this destructor.
-        }
+        //if (parent != nullptr) {
+        parent->unFollow(); // this will tell parents that this child is dead (so they will decrement their referenceCounter and deconstruct if needed). the "parents" set is then cleaned up by this destructor.
+        //}
     }
 }
 
 int Organism::registerOrganism() {
-    int I = organismIDCounter;
-    organismIDCounter++;
-    return I;
+    return organismIDCounter++;;
 }
 
 /*
@@ -200,10 +202,9 @@ Organism* Organism::makeMutatedOffspring(double pointMutationRate) {
 
 Organism* Organism::makeMutatedOffspring(double pointMutationRate, Organism* parent2) {
     vector<Organism*> _parents = { this, parent2 };
-    //cout << "PARENTS SIZE: " << _parents.size() << "\n";
-    //cout << "IDs: " << _parents[0]->ID << " : : " << _parents[1]->ID << "\n";
     Organism* newOrg = new Organism(_parents, genome->makeMutatedGenome(Genome::pointMutationRate));
     newOrg->gender = (Random::getInt(0, 1)) ? this->gender : parent2->gender; // assign a random gender to the new org
+    cout << "parent IDs: " << _parents[0]->ID << " rc: " << _parents[0]->referenceCounter << " : : " << _parents[1]->ID << " rc: " << _parents[1]->referenceCounter << " -> " << newOrg->ID << "\n";
     return newOrg;
 }
 
@@ -220,8 +221,7 @@ vector<string> Organism::GetLODItem(string key) {
         list.insert(list.begin(), org->dataMap.Get(key)); // add that ancestors data to the front of the list
     }
     if (org->parents.size() > 1) { // if more than one parent we have a problem!
-        cout
-                << "  In Organism::GetLODItem :: ERROR! an Organism has more than one parent! Can not establish LOD (do not use getLOD with Sexual Populations).\n  Exiting...\n";
+        cout << "  In Organism::GetLODItem :: ERROR! an Organism has more than one parent! Can not establish LOD (do not use getLOD with Sexual Populations).\n  If you are using LODwAP, try using SSwD instead.\n  Exiting...\n";
         exit(1);
     }
     return list;
@@ -240,8 +240,7 @@ vector<Organism*> Organism::getLOD() {
         list.insert(list.begin(), org); // add that ancestor to the front of the LOD list
     }
     if (org->parents.size() > 1) { // if more than one parent we have a problem!
-        cout
-                << "  In Organism::getLOD :: ERROR! an Organism has more than one parent! Can not establish LOD (do not use getLOD with Sexual Populations).\n  Exiting...\n";
+        cout << "  In Organism::getLOD :: ERROR! an Organism has more than one parent! Can not establish LOD (do not use getLOD with Sexual Populations).\n  If you are using LODwAP, try using SSwD instead.\n  Exiting...\n";
         exit(1);
     }
     return list;
@@ -277,52 +276,51 @@ Organism* Organism::getMostRecentCommonAncestor() {
  * else set current brain as MRCA and output all data (used for early termination) - THIS CAN ONLY BE DONE ONE TIME
  * !!!! AFTER requireConvergance = 0 has been run for a file name IT'S filesLastUpdate IS NOT ACCURATE !!!!
  */
-void Organism::saveDataOnLOD(int flush) {
-
-    if (Global::files.find("data.csv") == Global::files.end()) { // if file has not be initialized yet
-        Global::files[Global::DataFileName] = dataMap.getKeys();
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // this may need to be looked at once dataMap and snapshot have been addressed!
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    }
-
-    vector<Organism*> LOD = getLOD(); 		// get line of decent
-    Organism* effective_MRCA;
-    if (flush) {				// if flush then we don't care about convergance
-        effective_MRCA = *parents.begin(); // this assumes that a population was created, but not tested at the end of the evolution loop!
-    } else {						// find the convergance point in the LOD.
-        effective_MRCA = MRCA;
-    }
-
-    while ((effective_MRCA->birthDate >= Global::nextDataWrite) && (Global::nextDataWrite <= Global::updates)) { // if there is convergence before the next data interval
-        Organism* current = LOD[Global::nextDataWrite - Global::lastPrune];
-        for (auto file : Global::files) { // for each file in files
-            current->dataMap.writeToFile(file.first, file.second); // append new data to the file
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // this will need to be looked at once dataMap and snapshot have been addressed!
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        }
-        Global::nextDataWrite += Global::dataInterval;
-    }
-
-    while ((effective_MRCA->birthDate >= Global::nextGenomeWrite) && (Global::nextGenomeWrite <= Global::updates)) { // if there is convergence before the next data interval
-        Organism* current = LOD[Global::nextGenomeWrite - Global::lastPrune];
-        string dataString;
-        if (current->genome->sites.size() > 0) { // convert the genome into a string of int
-            for (auto site : current->genome->sites) {
-                dataString += to_string((int) site) + FileManager::separator;
-            }
-            dataString.pop_back(); // remove extra separator at end
-        }
-        dataString = to_string(Global::nextGenomeWrite) + FileManager::separator + "\"[" + dataString + "]\""; // add write update and padding to genome string
-        FileManager::writeToFile(Global::GenomeFileName, dataString, "update,genome"); // write data to file
-        Global::nextGenomeWrite += Global::genomeInterval;
-    }
-
-}
-
-void Organism::flushDataOnLOD() {
-    cout << "Flushing remaining data to files!\n";
-    saveDataOnLOD(1);
-}
+//void Organism::saveDataOnLOD(int flush) {
+//
+//    if (Global::files.find("data.csv") == Global::files.end()) { // if file has not be initialized yet
+//        Global::files[Global::DataFileName] = dataMap.getKeys();
+//        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//        // this may need to be looked at once dataMap and snapshot have been addressed!
+//        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    }
+//
+//    vector<Organism*> LOD = getLOD(); 		// get line of decent
+//    Organism* effective_MRCA;
+//    if (flush) {				// if flush then we don't care about convergance
+//        effective_MRCA = *parents.begin(); // this assumes that a population was created, but not tested at the end of the evolution loop!
+//    } else {						// find the convergance point in the LOD.
+//        effective_MRCA = MRCA;
+//    }
+//
+//    while ((effective_MRCA->birthDate >= Global::nextDataWrite) && (Global::nextDataWrite <= Global::updates)) { // if there is convergence before the next data interval
+//        Organism* current = LOD[Global::nextDataWrite - Global::lastPrune];
+//        for (auto file : Global::files) { // for each file in files
+//            current->dataMap.writeToFile(file.first, file.second); // append new data to the file
+//            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//            // this will need to be looked at once dataMap and snapshot have been addressed!
+//            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//        }
+//        Global::nextDataWrite += Global::dataInterval;
+//    }
+//
+//    while ((effective_MRCA->birthDate >= Global::nextGenomeWrite) && (Global::nextGenomeWrite <= Global::updates)) { // if there is convergence before the next data interval
+//        Organism* current = LOD[Global::nextGenomeWrite - Global::lastPrune];
+//        string dataString;
+//        if (current->genome->sites.size() > 0) { // convert the genome into a string of int
+//            for (auto site : current->genome->sites) {
+//                dataString += to_string((int) site) + FileManager::separator;
+//            }
+//            dataString.pop_back(); // remove extra separator at end
+//        }
+//        dataString = to_string(Global::nextGenomeWrite) + FileManager::separator + "\"[" + dataString + "]\""; // add write update and padding to genome string
+//        FileManager::writeToFile(Global::GenomeFileName, dataString, "update,genome"); // write data to file
+//        Global::nextGenomeWrite += Global::genomeInterval;
+//    }
+//
+//}
+//void Organism::flushDataOnLOD() {
+//    cout << "Flushing remaining data to files!\n";
+//    saveDataOnLOD(1);
+//}
