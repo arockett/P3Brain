@@ -16,6 +16,7 @@
 
 #include "Evaluation.h"
 
+#include "Tools.h"
 #include "BitAgent.h"
 #include "LogicalWorld.h"
 #include "BerryWorld.h"
@@ -24,15 +25,31 @@
 * Make sure you set trainingGround to an instance of the World you
 * want to evaluate your BitAgents in.
 */
-MarkovWorld::MarkovWorld(Configuration& config, int run_number)
+MarkovWorld::MarkovWorld( Configuration& config, int run_number )
 {
-    /*
-    vector<LogicalWorld::Logic> args = {
-        LogicalWorld::Logic::XOR,
-        LogicalWorld::Logic::NAND
-    };
-    */
     trainingGround = shared_ptr<World>( new BerryWorld() );
+
+    string type = config.get<string>( "decoder" );
+    if( type == "Unstructured" )
+    {
+        decoderType = BitAgent::Unstructured;
+    }
+    else if( type == "FixedInput" )
+    {
+        decoderType = BitAgent::FixedInput;
+    }
+    else if( type == "FixedLogic" )
+    {
+        decoderType = BitAgent::FixedLogic;
+    }
+    else if( type == "Hypercube" )
+    {
+        decoderType = BitAgent::Hypercube;
+    }
+    else
+    {
+        ASSERT( false, "Invalid decoder type given in P3 config file." );
+    }
 }
 
 /*
@@ -44,7 +61,15 @@ MarkovWorld::MarkovWorld(Configuration& config, int run_number)
 */
 float MarkovWorld::evaluate(const vector<bool>& solution)
 {
-    BitAgent agent = BitAgent(solution, 11, BitAgent::Hypercube, 2);
+    BitAgent agent;
+    if( decoderType != BitAgent::Unstructured )
+    {
+        agent = BitAgent( solution, 11, decoderType, 2 );
+    }
+    else
+    {
+        agent = BitAgent( solution, 11, 10, 3 );
+    }
 
     return (float)trainingGround->testIndividual(&agent, false);
 }

@@ -29,11 +29,12 @@ public:
     };
 
     BitAgent();
+    BitAgent( const vector<bool>& startGenome, int numInputStates, int numHiddenStates, int numOutStates, int gateComplexity = 2 );
     BitAgent( const vector<bool>& startGenome, int numInputStates, Decoder decoder = FixedInput, int gateComplexity = 2 );
     virtual ~BitAgent();
 
 private:
-    void DecodeUnstructuredGenome( const vector<bool>&, int, int );
+    void DecodeUnstructuredGenome( const vector<bool>&, int, int, int, int );
     void DecodeFixedInputGenome( const vector<bool>&, int, int );
     void DecodeFixedLogicGenome( const vector<bool>&, int, int );
     void DecodeHypercubeGenome( const vector<bool>&, int, int );

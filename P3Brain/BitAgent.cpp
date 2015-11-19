@@ -18,6 +18,12 @@ BitAgent::BitAgent()
 {
 }
 
+BitAgent::BitAgent( const vector<bool>& startGenome, int numInputStates, int numHiddenStates, int numOutStates, int gateComplexity )
+{
+    this->genome = &SingletonGenome::getInstance();
+    DecodeUnstructuredGenome( startGenome, numInputStates, numHiddenStates, numOutStates, gateComplexity );
+}
+
 BitAgent::BitAgent( const vector<bool>& startGenome, int numInputStates, BitAgent::Decoder decoder, int gateComplexity)
 {
     this->genome = &SingletonGenome::getInstance();
@@ -25,7 +31,8 @@ BitAgent::BitAgent( const vector<bool>& startGenome, int numInputStates, BitAgen
     switch( decoder )
     {
     case Unstructured:
-        DecodeUnstructuredGenome( startGenome, numInputStates, gateComplexity );
+        // This should never happen
+        ASSERT( false, "You can't use this constructor for the Unstructured Decoder because you must specify the # of hidden and output states." );
         break;
     case FixedInput:
         DecodeFixedInputGenome( startGenome, numInputStates, gateComplexity );
@@ -52,9 +59,50 @@ BitAgent::~BitAgent()
  *************************   Decoders ****************************
  */
 
-void BitAgent::DecodeUnstructuredGenome( const vector<bool>& genome, int numInputStates, int gateIns )
+void BitAgent::DecodeUnstructuredGenome( const vector<bool>& genome, int numInputStates, int numHiddenStates, int numOutStates, int gateIns )
 {
-    // TODO Implement unstructured genome decoder where gates have variable logic and no limitations on where they get input
+    /********************************************************
+    * Calculate encoding sizes to ensure the genome is long enough
+    ********************************************************/
+    nrOfBrainStates = numInputStates + numHiddenStates + numOutStates;
+    states.resize( nrOfBrainStates );
+    nextStates.resize( nrOfBrainStates );
+
+    int logicEncodingSize = 2 << ( gateIns - 1 );
+    int inputEncodingSize = ceil( log2( nrOfBrainStates ) );
+    int gateEncodingSize = gateIns * inputEncodingSize + logicEncodingSize;
+    int numGates = genome.size() / gateEncodingSize;
+
+    ASSERT( numGates == numHiddenStates + numOutStates,
+        "Invalid genome length, should be " << ( numHiddenStates + numOutStates )*gateEncodingSize << "." );
+
+    /********************************************************
+    * Decode the genome bit string
+    ********************************************************/
+    gates.clear();
+    for( int i = numInputStates; i < nrOfBrainStates; i++ )
+    {
+        // Set the input indices
+        vector<int> inStates;
+        for( int k = 0; k < gateIns; k++ )
+        {
+            vector<bool> inNumber;
+            for( int j = 0; j < inputEncodingSize; j++ )
+            {
+                inNumber.push_back( genome[( ( i - numInputStates ) * gateEncodingSize ) + ( k*inputEncodingSize ) + j] );
+            }
+            inStates.push_back( boolStringToInt( inNumber ) % nrOfBrainStates );
+        }
+
+        // Get the gate logic table from the genome
+        vector<bool> gateLogic;
+        for( int j = 0; j < logicEncodingSize; j++ )
+        {
+            gateLogic.push_back( genome[( i - numInputStates ) * gateEncodingSize + gateIns * inputEncodingSize + j] );
+        }
+
+        gates.push_back( shared_ptr<Gate>( new BitGate( inStates, i, gateLogic ) ) );
+    }
 }
 
 void BitAgent::DecodeFixedInputGenome( const vector<bool>& genome, int numInputStates, int gateIns )
@@ -62,7 +110,7 @@ void BitAgent::DecodeFixedInputGenome( const vector<bool>& genome, int numInputS
     // TODO Layer the fixed gate inputs so that each Brain Input state can be accessed by a gate
 
     // Calculate the number of bits needed to represent a gate with the given # of ins
-    int logicSize = (int)pow( 2.0, gateIns );
+    int logicSize = 2 << ( gateIns - 1 );
 
     // How many gates does this genome size encode for? Assert that it is
     // a multiple of the number of bits needed to store one gate logic table
@@ -111,13 +159,13 @@ void BitAgent::DecodeFixedLogicGenome( const vector<bool>& genome, int numInputS
 
 void BitAgent::DecodeHypercubeGenome( const vector<bool>& genome, int numInputStates, int gateIns )
 {
-    // TODO Allow innefficient cube dimensions in order to decrease the genome length?
+    // TODO Allow innefficient cube dimensions in order to decrease the genome length
     /********************************************************
      * Check the genome size to ensure it's the right length
      ********************************************************/
     
     // Calculate number of bits needed for gate logic
-    int gateLogicEncodingSize = (int)pow( 2.0, gateIns );
+    int gateLogicEncodingSize = 2 << ( gateIns - 1 );
 
     //
     // Calculate cube dimension necessary for given number of input states
