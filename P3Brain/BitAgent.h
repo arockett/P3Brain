@@ -29,8 +29,8 @@ public:
     };
 
     BitAgent();
-    BitAgent( const vector<bool>& startGenome, int numInputStates, int numHiddenStates, int numOutStates, int gateComplexity = 2 );
-    BitAgent( const vector<bool>& startGenome, int numInputStates, Decoder decoder = FixedInput, int gateComplexity = 2 );
+    BitAgent( const vector<bool>& startGenome, int numInputStates, int numHiddenStates, int numOutStates, int gateComplexity );
+    BitAgent( const vector<bool>& startGenome, int numInputStates, int gateComplexity, Decoder decoder = Unstructured );
     virtual ~BitAgent();
 
 private:

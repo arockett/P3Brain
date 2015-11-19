@@ -64,11 +64,11 @@ float MarkovWorld::evaluate(const vector<bool>& solution)
     BitAgent agent;
     if( decoderType != BitAgent::Unstructured )
     {
-        agent = BitAgent( solution, 11, decoderType, 2 );
+        agent = BitAgent( solution, 11, 2, decoderType );
     }
     else
     {
-        agent = BitAgent( solution, 11, 10, 3 );
+        agent = BitAgent( solution, 11, 10, 3, 2 );
     }
 
     return (float)trainingGround->testIndividual(&agent, false);
