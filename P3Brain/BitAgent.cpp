@@ -21,6 +21,7 @@ BitAgent::BitAgent()
 BitAgent::BitAgent( const vector<bool>& startGenome, int numInputStates, int numHiddenStates, int numOutStates, int gateComplexity )
 {
     this->genome = &SingletonGenome::getInstance();
+    this->genome->dataMap.Clear();
     DecodeUnstructuredGenome( startGenome, numInputStates, numHiddenStates, numOutStates, gateComplexity );
 }
 
