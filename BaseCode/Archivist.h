@@ -103,19 +103,19 @@ public:
                 writeRealTimeFiles(population); // write to dominant and average files
             }
             if ((Global::update % pruneInterval == 0) || (flush == 1)) {
-
+                cout << "LODwAP\n";
                 shared_ptr<Organism> sampleOrg = population[0];
-                shared_ptr<Organism> MRCA = sampleOrg->getMostRecentCommonAncestor();
+                shared_ptr<Organism> MRCA = sampleOrg->getMostRecentCommonAncestor(sampleOrg);
 
                 if (files.find("data.csv") == files.end()) { // if file has not be initialized yet
                     files[DataFileName] = sampleOrg->dataMap.getKeys();
                 }
 
-                vector<shared_ptr<Organism>> LOD = sampleOrg->getLOD();       // get line of decent
+                vector<shared_ptr<Organism>> LOD = sampleOrg->getLOD(sampleOrg);       // get line of decent
                 shared_ptr<Organism> effective_MRCA;
                 if (flush) {                // if flush then we don't care about convergance
                     cout << "flushing LODwAP: using population[0] as MRCA\n";
-                    effective_MRCA = *(sampleOrg->parents).begin(); // this assumes that a population was created, but not tested at the end of the evolution loop!
+                    effective_MRCA = sampleOrg->parents[0]; // this assumes that a population was created, but not tested at the end of the evolution loop!
                 } else {
                     effective_MRCA = MRCA; // find the convergance point in the LOD.
                 }

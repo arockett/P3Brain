@@ -61,22 +61,23 @@ int main(int argc, const char * argv[]) {
     // this genome is evaluated to populate the dataMap
 
     Global::update = -1; // before there was time, there was a progenitor
+    {
+        //shared_ptr<Genome> _genome(new Genome());
+        //shared_ptr<Brain> _brain(new Brain());
 
-    shared_ptr<Genome> _genome(new Genome());
-    shared_ptr<Brain> _brain(new Brain());
+        //shared_ptr<Organism> progenitor = make_shared<Organism>(_genome, _brain); // make a organism with a genome and brain (if you need to change the types here is where you do it)
+        shared_ptr<Organism> progenitor = make_shared<Organism>(make_shared<Genome>(), make_shared<Brain>()); // make a organism with a genome and brain (if you need to change the types here is where you do it)
 
-    shared_ptr<Organism> progenitor = make_shared<Organism>(_genome, _brain); // make a organism with a genome and brain (if you need to change the types here is where you do it)
-    //shared_ptr<Organism> progenitor = make_shared<Organism>(make_shared<Genome>(), make_shared<Brain>()); // make a organism with a genome and brain (if you need to change the types here is where you do it)
-
-    Global::update = 0; // the begining of time - now we construct the first population
-    for (int i = 0; i < Global::popSize; i++) {
-        shared_ptr<Genome> genome(new Genome());
-        genome->fillRandom();
-        shared_ptr<Organism> org(new Organism(progenitor, genome));
-        population.push_back(org); // add a new org to population using progenitors template and a new random genome
-        population[population.size() - 1]->gender = Random::getInt(0, 1); // assign a random gender to the new org
+        Global::update = 0; // the begining of time - now we construct the first population
+        for (int i = 0; i < Global::popSize; i++) {
+            shared_ptr<Genome> genome(new Genome());
+            genome->fillRandom();
+            shared_ptr<Organism> org(new Organism(progenitor, genome));
+            population.push_back(org); // add a new org to population using progenitors template and a new random genome
+            population[population.size() - 1]->gender = Random::getInt(0, 1); // assign a random gender to the new org
+        }
+        progenitor->kill(); // the progenitor has served it's purpose.
     }
-    progenitor->kill(); // the progenitor has served it's purpose.
 
     shared_ptr<Tournament> _tournamnet(new Tournament());
 
@@ -112,7 +113,7 @@ int main(int argc, const char * argv[]) {
     group->archive(1); // flush any data that has not been output yet
 
     if (Archivist::outputMethod == 0) { // if using LODwAP, write out some info about MRCA
-        shared_ptr<Organism> FinalMRCA = group->population[0]->getMostRecentCommonAncestor();
+        shared_ptr<Organism> FinalMRCA = group->population[0]->getMostRecentCommonAncestor(group->population[0]);
         cout << "MRCA - ID: " << FinalMRCA->ID << " born on: " << FinalMRCA->timeOfBirth << "\n" << FinalMRCA->brain->description();
     }
 

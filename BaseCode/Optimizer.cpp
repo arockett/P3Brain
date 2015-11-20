@@ -28,7 +28,7 @@ void Optimizer::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
     vector<shared_ptr<Organism>> nextPopulation;
 
     for (size_t i = 0; i < population.size(); i++) {
-        shared_ptr<Organism> newOrg(new Organism(population[i], population[i]->genome));
+        shared_ptr<Organism> newOrg = make_shared<Organism>(population[i], population[i]->genome);
         nextPopulation.push_back(newOrg);
     }
     for (size_t i = 0; i < population.size(); i++) {
@@ -70,7 +70,8 @@ void GA::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
                 who = Random::getIndex(population.size()); // otherwise, just pick a random genome from population
             }
         }
-        nextPopulation.push_back(population[who]->makeMutatedOffspring(Genome::pointMutationRate));
+        nextPopulation.push_back(population[who]->makeMutatedOffspring(Genome::pointMutationRate,population[who]));
+
     }
     for (size_t i = 0; i < population.size(); i++) {
         population[i]->kill(); // set org.alive = 0 and delete the organism if it has no offspring
@@ -108,7 +109,7 @@ void Tournament::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
                 }
             }
         }
-        nextPopulation.push_back(population[winner]->makeMutatedOffspring(Genome::pointMutationRate));
+        nextPopulation.push_back(population[winner]->makeMutatedOffspring(Genome::pointMutationRate,population[winner]));
     }
     for (size_t i = 0; i < population.size(); i++) {
         population[i]->kill(); // set org.alive = 0 and delete the organism if it has no offspring

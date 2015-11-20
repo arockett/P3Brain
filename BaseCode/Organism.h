@@ -39,6 +39,9 @@ public:
 
     double score;
 
+    int referenceCount;
+    int dataCount;
+
     vector<shared_ptr<Organism>> parents; // parents are pointers to parents of this organism. In asexual populations this will have one element
     vector<int> genomeAncestors; // list of the IDs of organisms in the last genome file who are ancestors of this organism (genomes saved on genome interval)
     vector<int> dataAncestors; // list of the IDs of organisms in the last data files who are ancestors of this organism (i.e. all files saved on data interval)
@@ -62,11 +65,11 @@ public:
 
     virtual void kill(); // sets alive = 0 (on org and in dataMap)
 
-    virtual vector<string> GetLODItem(string key);
-    vector<shared_ptr<Organism>> getLOD();
-    virtual shared_ptr<Organism> getMostRecentCommonAncestor();
-    virtual shared_ptr<Organism> makeMutatedOffspring(double pointMutationRate);
-    virtual shared_ptr<Organism> makeMutatedOffspring(double pointMutationRate, shared_ptr<Organism> parent2);
+    virtual vector<string> GetLODItem(string key, shared_ptr<Organism> org);
+    virtual vector<shared_ptr<Organism>> getLOD(shared_ptr<Organism> org);
+    virtual shared_ptr<Organism> getMostRecentCommonAncestor(shared_ptr<Organism> org);
+    virtual shared_ptr<Organism> makeMutatedOffspring(double pointMutationRate, shared_ptr<Organism> parent);
+    virtual shared_ptr<Organism> makeMutatedOffspring(double pointMutationRate, shared_ptr<Organism> parent1, shared_ptr<Organism> parent2);
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Organism__) */
