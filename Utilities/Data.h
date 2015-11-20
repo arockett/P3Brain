@@ -12,6 +12,8 @@
 #include <iostream>
 
 #include <map>
+#include <unordered_map>
+
 #include <memory>
 #include <set>
 #include <stdlib.h>
@@ -24,7 +26,7 @@ using namespace std;
 
 class DataMap {
 private:
-    map<string, string> data;
+    unordered_map<string, string> data;
 
 public:
     /*

@@ -58,7 +58,7 @@ BerryWorld::BerryWorld() {
     cout << "  World using following BrainSates:\n    Inputs: 0 to " << inputStatesCount - 1 << "\n    Outputs: " << inputStatesCount << " to " << inputStatesCount + outputStatesCount - 1 << "\n";
 }
 
-double BerryWorld::testIndividual(Organism *org, bool analyse) {
+double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse) {
     vector<vector<int>> grid;
     grid.resize(worldRows);
     for (int rowCount = 0; rowCount < worldRows; rowCount++) {

@@ -29,7 +29,7 @@ AbstractOrganism::~AbstractOrganism() {
  */
 
 int Organism::organismIDCounter = -1; // every organism will get a unique ID
-Organism* Organism::MRCA; // THIS MAY NEED TO MOVE IF MULTI POPULATION IS NEEDED - ASSUMES ALL ORGANISMS ARE IN ONE POPULATION
+
 // this is used to hold the most recent common ancestor
 
 /*
@@ -39,54 +39,51 @@ Organism* Organism::MRCA; // THIS MAY NEED TO MOVE IF MULTI POPULATION IS NEEDED
 Organism::Organism() {
     genome = nullptr;
     brain = nullptr;
-    referenceCounter = 1; // it is self referencing
     ID = registerOrganism();
     alive = true;
     gender = 0; // by default all orgs are female.
-    genomeAncestors.insert(ID); // it is it's own Ancestor for genome tracking purposes
-    dataAncestors.insert(ID); // it is it's own Ancestor for data tracking purposes
+    genomeAncestors.push_back(ID); // it is it's own Ancestor for genome tracking purposes
+    dataAncestors.push_back(ID); // it is it's own Ancestor for data tracking purposes
     timeOfBirth = Global::update; // happy birthday!
     timeOfDeath = -1; // still alive
     dataMap.Set("ID", ID);
     dataMap.Set("alive", alive);
-    dataMap.Set("birthDate", timeOfBirth);
+    dataMap.Set("timeOfBirth", timeOfBirth);
 }
 
 /*
  * create a new orginism given only a genome - since we do not know the type of brain we are using, we can not make the brain yet
  * parents is left empty (this is organism has no parents!)
  */
-Organism::Organism(Genome* _genome) {
+Organism::Organism(shared_ptr<Genome> _genome) {
     genome = _genome;
     brain = nullptr;
-    referenceCounter = 1; // it is self referencing
     ID = registerOrganism();
     alive = true;
     gender = 0; // by default all orgs are female.
-    genomeAncestors.insert(ID); // it is it's own Ancestor for genome tracking purposes
-    dataAncestors.insert(ID); // it is it's own Ancestor for data tracking purposes
+    genomeAncestors.push_back(ID); // it is it's own Ancestor for genome tracking purposes
+    dataAncestors.push_back(ID); // it is it's own Ancestor for data tracking purposes
     timeOfBirth = Global::update; // happy birthday!
     timeOfDeath = -1; // still alive
     dataMap.Set("ID", ID);
     dataMap.Set("alive", alive);
-    dataMap.Set("birthDate", timeOfBirth);
+    dataMap.Set("timeOfBirth", timeOfBirth);
     dataMap.SetMany(genome->getStats());
 }
 
-Organism::Organism(Genome* _genome, Brain* _brain) {
+Organism::Organism(shared_ptr<Genome> _genome, shared_ptr<Brain> _brain) {
     genome = _genome;
     brain = _brain;
-    referenceCounter = 1; // it is self referencing
     ID = registerOrganism();
     alive = true;
     gender = 0; // by default all orgs are female.
-    genomeAncestors.insert(ID); // it is it's own Ancestor for genome tracking purposes
-    dataAncestors.insert(ID); // it is it's own Ancestor for data tracking purposes
+    genomeAncestors.push_back(ID); // it is it's own Ancestor for genome tracking purposes
+    dataAncestors.push_back(ID); // it is it's own Ancestor for data tracking purposes
     timeOfBirth = Global::update; // happy birthday!
     timeOfDeath = -1; // still alive
     dataMap.Set("ID", ID);
     dataMap.Set("alive", alive);
-    dataMap.Set("birthDate", timeOfBirth);
+    dataMap.Set("timeOfBirth", timeOfBirth);
     dataMap.SetMany(genome->getStats());
 }
 
@@ -95,26 +92,24 @@ Organism::Organism(Genome* _genome, Brain* _brain) {
  * a brain is created with the assumption that the new brain should be of the same type as the parents brain
  *
  */
-Organism::Organism(Organism* from, Genome* _genome) {
+Organism::Organism(shared_ptr<Organism> from, shared_ptr<Genome> _genome) {
     genome = _genome;
     brain = from->brain->makeBrainFromGenome(genome);
-    referenceCounter = 1; // it is self referencing
     ID = registerOrganism();
     alive = true;
     gender = 0; // by default all orgs are female.
-    parents.insert(from); // add this parent to the parents set
-    from->addFollow(); // tell each parent that they have a child looking at them
+    parents.push_back(from); // add this parent to the parents set
     for (auto ancestorID : from->genomeAncestors) {
-        genomeAncestors.insert(ancestorID); // union all parents genomeAncestors into this organisms genomeAncestor set.
+        genomeAncestors.push_back(ancestorID); // union all parents genomeAncestors into this organisms genomeAncestor set.
     }
     for (auto ancestorID : from->dataAncestors) {
-        dataAncestors.insert(ancestorID); // union all parents dataAncestors into this organisms dataAncestor set.
+        dataAncestors.push_back(ancestorID); // union all parents dataAncestors into this organisms dataAncestor set.
     }
     timeOfBirth = Global::update; // happy birthday!
     timeOfDeath = -1; // still alive
     dataMap.Set("ID", ID);
     dataMap.Set("alive", alive);
-    dataMap.Set("birthDate", timeOfBirth);
+    dataMap.Set("timeOfBirth", timeOfBirth);
     dataMap.SetMany(genome->getStats());
     dataMap.SetMany(brain->getStats());
 }
@@ -126,18 +121,16 @@ Organism::Organism(Organism* from, Genome* _genome) {
  * a) all organisms in from are the same
  * b) and the new brain should be of the same type as the parents brain
  */
-Organism::Organism(const vector<Organism*>& from, Genome* _genome) {
+Organism::Organism(const vector<shared_ptr<Organism>> from, shared_ptr<Genome> _genome) {
     genome = _genome;
     brain = from[0]->brain->makeBrainFromGenome(genome); // for now, just return parent[0] brain.
-    referenceCounter = 1; // it is self referencing
     for (auto i = 0; i < (int) from.size(); i++) {
-        parents.insert(from[i]); // add this parent to the parents set
-        from[i]->addFollow(); // tell each parent that they have a child looking at them
+        parents.push_back(from[i]); // add this parent to the parents set
         for (auto ancestorID : from[i]->genomeAncestors) {
-            genomeAncestors.insert(ancestorID); // union all parents genomeAncestors into this organisms genomeAncestor set.
+            genomeAncestors.push_back(ancestorID); // union all parents genomeAncestors into this organisms genomeAncestor set.
         }
         for (auto ancestorID : from[i]->dataAncestors) {
-            dataAncestors.insert(ancestorID); // union all parents dataAncestors into this organisms dataAncestor set.
+            dataAncestors.push_back(ancestorID); // union all parents dataAncestors into this organisms dataAncestor set.
         }
     }
     ID = registerOrganism();
@@ -147,19 +140,13 @@ Organism::Organism(const vector<Organism*>& from, Genome* _genome) {
     timeOfDeath = -1; // still alive
     dataMap.Set("ID", ID);
     dataMap.Set("alive", alive);
-    dataMap.Set("birthDate", timeOfBirth);
+    dataMap.Set("timeOfBirth", timeOfBirth);
     dataMap.SetMany(genome->getStats());
     dataMap.SetMany(brain->getStats());
 }
 
 Organism::~Organism() {
-    delete genome;
-    delete brain;
-    for (auto parent : parents) {
-        //if (parent != nullptr) {
-        parent->unFollow(); // this will tell parents that this child is dead (so they will decrement their referenceCounter and deconstruct if needed). the "parents" set is then cleaned up by this destructor.
-        //}
-    }
+    cout << ID << "\n";
 }
 
 int Organism::registerOrganism() {
@@ -167,44 +154,24 @@ int Organism::registerOrganism() {
 }
 
 /*
- * reduce the referenceCounter by 1 (i.e. one less thing is paying attention to this)
- * if referenceCounter <= 0, no one is paying attention, and this is deleted
- * return true is referenceCounter > 0, (i.e. someone is still looking at this)
- */
-void Organism::unFollow() {
-    referenceCounter--;
-    if (referenceCounter <= 0) {
-        delete this;
-    }
-}
-
-/*
- * someone new is interested in this organism. make a note of this fact.
- */
-void Organism::addFollow() {
-    referenceCounter++;
-}
-
-/*
  * called to kill an organism. Set alive to false
- * can unFollow to because this organism is no longer looking at itself (it's dead!)
  */
 void Organism::kill() {
     alive = false;
-    //dataMap.Set("alive", alive);
-    unFollow();
 }
 
-Organism* Organism::makeMutatedOffspring(double pointMutationRate) {
-    Organism* newOrg = new Organism(this, genome->makeMutatedGenome(Genome::pointMutationRate));
+shared_ptr<Organism> Organism::makeMutatedOffspring(double pointMutationRate) {
+    shared_ptr<Organism> parent1(this);
+    shared_ptr<Organism> newOrg = make_shared<Organism>(parent1, genome->makeMutatedGenome(Genome::pointMutationRate));
+    cout << "new offspring : " << newOrg->ID << " from parent: " << ID << "\n";
     return newOrg;
 }
 
-Organism* Organism::makeMutatedOffspring(double pointMutationRate, Organism* parent2) {
-    vector<Organism*> _parents = { this, parent2 };
-    Organism* newOrg = new Organism(_parents, genome->makeMutatedGenome(Genome::pointMutationRate));
-    newOrg->gender = (Random::getInt(0, 1)) ? this->gender : parent2->gender; // assign a random gender to the new org
-    cout << "parent IDs: " << _parents[0]->ID << " rc: " << _parents[0]->referenceCounter << " : : " << _parents[1]->ID << " rc: " << _parents[1]->referenceCounter << " -> " << newOrg->ID << "\n";
+shared_ptr<Organism> Organism::makeMutatedOffspring(double pointMutationRate, shared_ptr<Organism> parent2) {
+    shared_ptr<Organism> parent1(this);
+    vector<shared_ptr<Organism>> _parents = { parent1, parent2 };
+    shared_ptr<Organism> newOrg(new Organism(_parents, genome->makeMutatedGenome(Genome::pointMutationRate)));
+    newOrg->gender = (Random::getInt(0, 1)) ? parent1->gender : parent2->gender; // assign a random gender to the new org
     return newOrg;
 }
 
@@ -214,10 +181,10 @@ Organism* Organism::makeMutatedOffspring(double pointMutationRate, Organism* par
  */
 vector<string> Organism::GetLODItem(string key) {
     vector<string> list;
-    Organism* org = this;
+    shared_ptr<Organism> org(this);
     list.insert(list.begin(), org->dataMap.Get(key)); // add this organisms data to the front of the list
     while (org->parents.size() == 1) { // while the current org has one and only one parent
-        org = *org->parents.begin(); // move to the next ancestor (since there is only one parent it is the element in the first position).
+        org = org->parents[0]; // move to the next ancestor (since there is only one parent it is the element in the first position).
         list.insert(list.begin(), org->dataMap.Get(key)); // add that ancestors data to the front of the list
     }
     if (org->parents.size() > 1) { // if more than one parent we have a problem!
@@ -231,12 +198,12 @@ vector<string> Organism::GetLODItem(string key) {
  * Given a genome return a list of Organisms containing this Organism and all if this Organisms ancestors ordered oldest first
  * it will fail if any organism in the LOD has more then one parent. (!not for sexual reproduction!)
  */
-vector<Organism*> Organism::getLOD() {
-    vector<Organism*> list;
-    Organism * org = this;
+vector<shared_ptr<Organism>> Organism::getLOD() {
+    vector<shared_ptr<Organism>> list;
+    shared_ptr<Organism> org(this);
     list.insert(list.begin(), org); // add this organism to the front of the LOD list
     while (org->parents.size() == 1) { // while the current org has one and only one parent
-        org = *org->parents.begin(); // move to the next ancestor (since there is only one parent it is the element in the first position).
+        org = org->parents[0]; // move to the next ancestor (since there is only one parent it is the element in the first position).
         list.insert(list.begin(), org); // add that ancestor to the front of the LOD list
     }
     if (org->parents.size() > 1) { // if more than one parent we have a problem!
@@ -256,13 +223,14 @@ vector<Organism*> Organism::getLOD() {
  *       a dead Organism with a referenceCounter = 1 has only one offspring.
  *       a dead Organism with a referenceCounter > 1 has more then one spring with surviving lines of decent.
  */
-Organism* Organism::getMostRecentCommonAncestor() {
-    vector<Organism*> LOD = getLOD(); // get line of decent parent "parent"
+shared_ptr<Organism> Organism::getMostRecentCommonAncestor() {
+    vector<shared_ptr<Organism>> LOD = getLOD(); // get line of decent parent "parent"
     for (auto org : LOD) { // starting at the oldest parent, moving to the youngest
-        if (org->referenceCounter > 1) // the first (oldest) ancestor with more then one surviving offspring is the oldest
+        if (org.use_count() > 1) // the first (oldest) ancestor with more then one surviving offspring is the oldest
             return org;
     }
-    return this; // a currently active genome will have referenceCounter = 1 but may be the Most Recent Common Ancestor
+    shared_ptr<Organism> _this(this);
+    return _this; // a currently active genome will have referenceCounter = 1 but may be the Most Recent Common Ancestor
 }
 
 /*

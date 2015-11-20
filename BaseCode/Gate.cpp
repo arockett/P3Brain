@@ -48,45 +48,47 @@ void Gate::setupGates() {
         Gate::AddGate(i, nullptr);
     }
     if (usingProbGate) {
-        AddGate(42, [](Genome* genome,int pos) {return make_shared<ProbabilisticGate>(genome,pos);});
+        AddGate(42, [](shared_ptr<Genome> genome,int pos) {return make_shared<ProbabilisticGate>(genome,pos);});
         Global::inUseGateTypes.insert(42);
     }
     if (usingDetGate) {
-        AddGate(43, [](Genome* genome,int pos) {return make_shared<DeterministicGate>(genome,pos);});
+        AddGate(43, [](shared_ptr<Genome> genome,int pos) {return make_shared<DeterministicGate>(genome,pos);});
         Global::inUseGateTypes.insert(43);
     }
     if (usingFBGate) {
-        AddGate(44, [](Genome* genome,int pos) {return make_shared<FeedbackGate>(genome,pos);});
+        AddGate(44, [](shared_ptr<Genome> genome,int pos) {return make_shared<FeedbackGate>(genome,pos);});
         Global::inUseGateTypes.insert(44);
     }
     if (usingGPGate) {
-        AddGate(45, [](Genome* genome,int pos) {return make_shared<GPGate>(genome,pos);});
+        AddGate(45, [](shared_ptr<Genome> genome,int pos) {return make_shared<GPGate>(genome,pos);});
         Global::inUseGateTypes.insert(45);
     }
     if (usingThGate) {
-        AddGate(46, [](Genome* genome,int pos) {return make_shared<Thresholdgate>(genome,pos);});
+        AddGate(46, [](shared_ptr<Genome> genome,int pos) {return make_shared<Thresholdgate>(genome,pos);});
         Global::inUseGateTypes.insert(46);
     }
     if (usingEpsiGate) {
-        AddGate(47, [](Genome* genome,int pos) {return make_shared<FixedEpsilonGate>(genome,pos);});
+        AddGate(47, [](shared_ptr<Genome> genome,int pos) {return make_shared<FixedEpsilonGate>(genome,pos);});
         Global::inUseGateTypes.insert(47);
     }
     if (usingVoidGate) {
-        AddGate(48, [](Genome* genome,int pos) {return make_shared<VoidGate>(genome,pos);});
+        AddGate(48, [](shared_ptr<Genome> genome,int pos) {return make_shared<VoidGate>(genome,pos);});
         Global::inUseGateTypes.insert(47);
     }
 
 }
 
 /* *** some c++ 11 magic to speed up translation from genome to gates *** */
-function<shared_ptr<Gate>(Genome*, int)> Gate::makeGate[256];
-void Gate::AddGate(int ID, function<shared_ptr<Gate>(Genome*, int)> theFunction) {
+function<shared_ptr<Gate>(shared_ptr<Genome>, int)> Gate::makeGate[256];
+
+void Gate::AddGate(int ID, function<shared_ptr<Gate>(shared_ptr<Genome>, int)> theFunction) {
     makeGate[ID] = theFunction;
 }
+/* *** end - some c++ 11 magic to speed up translation from genome to gates *** */
 
 /* *** General tools for All Gates *** */
 
-void Gate::movePastStartCodeon(int& genomeIndex, Genome* genome) {
+void Gate::movePastStartCodeon(int& genomeIndex, shared_ptr<Genome> genome) {
     codingRegions[genomeIndex] = START_CODE;
     genome->advanceIndex(genomeIndex);
     codingRegions[genomeIndex] = START_CODE;
@@ -99,7 +101,7 @@ void Gate::movePastStartCodeon(int& genomeIndex, Genome* genome) {
  * if bitsPerBrainAddress = 10 and the next two sites were 14 (00001110) and 25(00011001)
  * the result would be 0000111000011001 masked with 0000001111111111 = 0000001000011001 or 537
  */
-int Gate::getIOAddress(int& genomeIndex, Genome* genome) {
+int Gate::getIOAddress(int& genomeIndex, shared_ptr<Genome> genome) {
     int bitCount;
     int address = (int) genome->sites[genomeIndex]; // grab a byte from the genome
     genome->advanceIndex(genomeIndex); // advance the genome_index
@@ -118,7 +120,7 @@ int Gate::getIOAddress(int& genomeIndex, Genome* genome) {
 /*
  * Gets "howMany" addresses, advances the genome_index buy "howManyMax" addresses and updates "codingRegions" with the addresses being used.
  */
-void Gate::getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, int& genome_index, Genome* genome, int codeNumber) {
+void Gate::getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, int& genome_index, shared_ptr<Genome> genome, int codeNumber) {
     int lastLocation = genome_index; //make a note of where were are now so we can get codingRegions later
     for (auto i = 0; i < howMany; i++) { // for the number of addresses we need
         addresses[i] = getIOAddress(genome_index, genome); // get an address
@@ -137,7 +139,7 @@ void Gate::getSomeBrainAddresses(const int& howMany, const int& howManyMax, vect
  * if number of inputs or outputs is less then the max possible inputs or outputs skip the unused sites in the genome
  * there can not be more then 255 inputs or outputs without additional support (to read more sites to generate these numbers)
  */
-void Gate::getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, int& genomeIndex, Genome* genome) { // (max#in, max#out,currentIndexInGenome,genome,codingRegions)
+void Gate::getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, int& genomeIndex, shared_ptr<Genome> genome) { // (max#in, max#out,currentIndexInGenome,genome,codingRegions)
 
     codingRegions[genomeIndex] = IN_COUNT_CODE;
     int numInputs = insRange[0] + (genome->sites[genomeIndex] & (insRange[1] - 1));
@@ -223,7 +225,7 @@ string Gate::description() {
 }
 /* *** ProbilisticGate implementation *** */
 
-ProbabilisticGate::ProbabilisticGate(Genome *genome, int genomeIndex) {
+ProbabilisticGate::ProbabilisticGate(shared_ptr<Genome> genome, int genomeIndex) {
     int i, j;
     inputs.clear();
     outputs.clear();
@@ -284,7 +286,7 @@ string ProbabilisticGate::description() {
 
 /* *** Determistic Gate Implementation *** */
 
-DeterministicGate::DeterministicGate(Genome *genome, int genomeIndex) {
+DeterministicGate::DeterministicGate(shared_ptr<Genome> genome, int genomeIndex) {
     inputs.clear();
     outputs.clear();
     int numOutputs, numInputs;
@@ -347,7 +349,7 @@ union intToFloatBitByBit {
     float F;
 };
 
-GPGate::GPGate(Genome *genome, int genomeIndex) {
+GPGate::GPGate(shared_ptr<Genome> genome, int genomeIndex) {
     int i;
     inputs.clear();
     outputs.clear();
@@ -451,7 +453,7 @@ string GPGate::description() {
 /* *** Feedback Gate *** */
 bool FeedbackGate::feedbackON = true;
 
-FeedbackGate::FeedbackGate(Genome *genome, int startCodonAt) {
+FeedbackGate::FeedbackGate(shared_ptr<Genome> genome, int startCodonAt) {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // need to move to new Get Address
@@ -621,7 +623,7 @@ vector<int> FeedbackGate::getIns() {
 
 /* *** Threshold Gate *** */
 
-Thresholdgate::Thresholdgate(Genome *genome, int startCodonAt) {
+Thresholdgate::Thresholdgate(shared_ptr<Genome> genome, int startCodonAt) {
     int i, k;
     inputs.clear();
     outputs.clear();
@@ -680,7 +682,7 @@ string Thresholdgate::description() {
 /* *** Fixed Epison Gate *** */
 /* this gate behaves like a deterministic gate with a constant externally set error which may cause the outputs to scramble */
 
-FixedEpsilonGate::FixedEpsilonGate(Genome *genome, int genomeIndex) :
+FixedEpsilonGate::FixedEpsilonGate(shared_ptr<Genome> genome, int genomeIndex) :
         DeterministicGate(genome, genomeIndex) { // use DeterministicGate constructor to build set up everything (including a table of 0s and 1s)
     epsilon = FixedEpsilonGateP; // in case you want to have different epsilon for different gates (who am I to judge?)
 
@@ -722,7 +724,7 @@ string FixedEpsilonGate::description() {
 /* *** VoidGate *** */
 /* this gate behaves like a deterministic gate with a constant externally set error which may set a single output to 0 */
 
-VoidGate::VoidGate(Genome *genome, int genomeIndex) :
+VoidGate::VoidGate(shared_ptr<Genome> genome, int genomeIndex) :
         DeterministicGate(genome, genomeIndex) { // use DeterministicGate constructor to build set up everything (including a table of 0s and 1s)
     epsilon = voidOutPut; // in case you want to have different epsilon for different gates (who am I to judge?)
 }

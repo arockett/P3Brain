@@ -63,7 +63,7 @@ public:
 
     int inputStatesCount = 0;
     int outputStatesCount = 0;
-    double testIndividual(Organism *org, bool analyse);
+    double testIndividual(shared_ptr<Organism> org, bool analyse);
 
 public:
     BerryWorld();

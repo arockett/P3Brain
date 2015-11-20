@@ -52,8 +52,8 @@ int main(int argc, const char * argv[]) {
 
     World *world = (World*) new BerryWorld(); //new World();
 
-    // setup population
-    vector<Organism*> population;
+    // define population
+    vector<shared_ptr<Organism>> population;
 
     Archivist archivist;
 
@@ -62,27 +62,42 @@ int main(int argc, const char * argv[]) {
 
     Global::update = -1; // before there was time, there was a progenitor
 
-    Organism* progenitor = new Organism(new Genome(), new Brain()); // make a organism with a genome and brain (if you need to change the types here is where you do it)
-    Organism::MRCA = progenitor; // the progenitor is everyones ancestor
+    shared_ptr<Genome> _genome(new Genome());
+    shared_ptr<Brain> _brain(new Brain());
+
+    shared_ptr<Organism> progenitor = make_shared<Organism>(_genome, _brain); // make a organism with a genome and brain (if you need to change the types here is where you do it)
+    //shared_ptr<Organism> progenitor = make_shared<Organism>(make_shared<Genome>(), make_shared<Brain>()); // make a organism with a genome and brain (if you need to change the types here is where you do it)
 
     Global::update = 0; // the begining of time - now we construct the first population
-
     for (int i = 0; i < Global::popSize; i++) {
-        Genome* genome = new Genome();
+        shared_ptr<Genome> genome(new Genome());
         genome->fillRandom();
-        population.push_back(new Organism(progenitor, genome)); // add a new org to population using progenitors template and a new random genome
+        shared_ptr<Organism> org(new Organism(progenitor, genome));
+        population.push_back(org); // add a new org to population using progenitors template and a new random genome
         population[population.size() - 1]->gender = Random::getInt(0, 1); // assign a random gender to the new org
     }
     progenitor->kill(); // the progenitor has served it's purpose.
 
-    Group* group = new Group(population, new Tournament());
+    shared_ptr<Tournament> _tournamnet(new Tournament());
+
+    Group* group = new Group(population, _tournamnet);
 
     //////////////////
     // evolution loop
     //////////////////
 
-    int outputMethod = 0; // if SSwD is being used then we want to run until intervalDelay for the last file has passed. This is assured at Global::intervalDelay + Global::updates
-    int realTerminateAfter = (outputMethod == 0) ? (Global::terminateAfter) : Archivist::intervalDelay; // if the output method is SSwD override terminateAfter
+    if (Archivist::outputMethod == -1) { // this is the first time archive is called. get the output method
+        if (Archivist::outputMethodStr == "LODwAP") {
+            Archivist::outputMethod = 0;
+        } else if (Archivist::outputMethodStr == "SSwD") {
+            Archivist::outputMethod = 1;
+        } else {
+            cout << "unrecognized archive method \"" << Archivist::outputMethodStr << "\". Should be either \"LODwAP\" or \"SSwD\"\nExiting.\n";
+            exit(1);
+        }
+    }
+
+    int realTerminateAfter = (Archivist::outputMethod == 0) ? (Global::terminateAfter) : Archivist::intervalDelay; // if the output method is SSwD override terminateAfter
 
     while (((Archivist::nextDataWrite <= Global::updates) || (Archivist::nextGenomeWrite <= Global::updates)) && (Global::update <= (Global::updates + realTerminateAfter))) {
 
@@ -97,7 +112,7 @@ int main(int argc, const char * argv[]) {
     group->archive(1); // flush any data that has not been output yet
 
     if (Archivist::outputMethod == 0) { // if using LODwAP, write out some info about MRCA
-        Organism* FinalMRCA = group->population[0]->getMostRecentCommonAncestor();
+        shared_ptr<Organism> FinalMRCA = group->population[0]->getMostRecentCommonAncestor();
         cout << "MRCA - ID: " << FinalMRCA->ID << " born on: " << FinalMRCA->timeOfBirth << "\n" << FinalMRCA->brain->description();
     }
 

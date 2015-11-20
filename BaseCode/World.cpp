@@ -22,7 +22,7 @@ World::World() {
 World::~World() {
 }
 
-void World::evaluateFitness(vector<Organism*> population, bool analyse) {
+void World::evaluateFitness(vector<shared_ptr<Organism>> population, bool analyse) {
     vector<double> W;
     for (size_t i = 0; i < population.size(); i++) {
         double scoreTotal = 0.0;
@@ -35,7 +35,7 @@ void World::evaluateFitness(vector<Organism*> population, bool analyse) {
     }
 }
 
-double World::testIndividual(Organism *org, bool analyse) {
+double World::testIndividual(shared_ptr<Organism> org, bool analyse) {
     return 1.0;
 }
 

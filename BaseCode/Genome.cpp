@@ -51,12 +51,12 @@ string Genome::convert_to_string() {
     return dataString;
 }
 
-Genome::Genome(Genome* from) {
+Genome::Genome(shared_ptr<Genome> from) {
     copyGenome(from);
 }
 
-void Genome::copyGenome(Genome* from) {
-    Genome* who = from;
+void Genome::copyGenome(shared_ptr<Genome> from) {
+    shared_ptr<Genome> who = from;
     sites.resize(who->sites.size());
     for (size_t i = 0; i < sites.size(); i++)
         sites[i] = who->sites[i];
@@ -122,8 +122,8 @@ void Genome::fillRandom() {
     }
 }
 
-Genome* Genome::makeMutatedGenome(double mutationRate) {
-    Genome* G = new Genome(this);
+shared_ptr<Genome> Genome::makeMutatedGenome(double mutationRate) {
+    shared_ptr<Genome> G(new Genome(shared_from_this()));
     G->applyMutations(mutationRate);
     return G;
 }

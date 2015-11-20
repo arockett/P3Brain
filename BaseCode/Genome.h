@@ -17,7 +17,7 @@
 
 using namespace std;
 
-class Genome {
+class Genome : public std::enable_shared_from_this<Genome> {
 private:
 
 public:
@@ -39,13 +39,13 @@ public:
     vector<unsigned char> sites;
 
     Genome() = default;
-    Genome(Genome* from);
+    Genome(shared_ptr<Genome> from);
     virtual ~Genome() = default;
 
     virtual void fillRandom();
-    virtual void copyGenome(Genome* from);
+    virtual void copyGenome(shared_ptr<Genome> from);
     virtual void applyMutations(double mutationRate);
-    virtual Genome* makeMutatedGenome(double mutationRate);
+    virtual shared_ptr<Genome> makeMutatedGenome(double mutationRate);
     virtual void makePointMutation();
 
     void advanceIndex(int& genomeIndex, int distance = 1) {

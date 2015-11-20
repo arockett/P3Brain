@@ -24,11 +24,11 @@ int& Optimizer::tournamentSize = Parameters::register_parameter("tournamentSize"
  * place holder function, copies population to make new population
  * no selection and no mutation
  */
-void Optimizer::makeNextGeneration(vector<Organism*> &population) {
-    vector<Organism*> nextPopulation;
+void Optimizer::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
+    vector<shared_ptr<Organism>> nextPopulation;
 
     for (size_t i = 0; i < population.size(); i++) {
-        Organism* newOrg = new Organism(population[i], population[i]->genome);
+        shared_ptr<Organism> newOrg(new Organism(population[i], population[i]->genome));
         nextPopulation.push_back(newOrg);
     }
     for (size_t i = 0; i < population.size(); i++) {
@@ -45,8 +45,8 @@ void Optimizer::makeNextGeneration(vector<Organism*> &population) {
  * to the next generation and mutate the copy. If it is too low, keep drawing genomes till you get one
  * which is good enough.
  */
-void GA::makeNextGeneration(vector<Organism*> &population) {
-    vector<Organism*> nextPopulation;
+void GA::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
+    vector<shared_ptr<Organism>> nextPopulation;
 
     vector<double> W;
     for (auto org : population) {
@@ -84,8 +84,8 @@ void GA::makeNextGeneration(vector<Organism*> &population) {
  * for each next population genome, randomly select (with replacement) n genomes (where n = Optimizer::tournamentSize)
  * copy to the next generation and mutate the copy.
  */
-void Tournament::makeNextGeneration(vector<Organism*> &population) {
-    vector<Organism*> nextPopulation;
+void Tournament::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
+    vector<shared_ptr<Organism>> nextPopulation;
 
     vector<double> Scores;
     for (auto org : population) {
@@ -113,10 +113,11 @@ void Tournament::makeNextGeneration(vector<Organism*> &population) {
     for (size_t i = 0; i < population.size(); i++) {
         population[i]->kill(); // set org.alive = 0 and delete the organism if it has no offspring
     }
+    population.clear();
     population = nextPopulation;
 }
 
-void Tournament2::makeNextGeneration(vector<Organism*> &population) {
+void Tournament2::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
 }
 
 //
