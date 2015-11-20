@@ -23,7 +23,7 @@ DEBUG=$(BUILD)/debug
 CXX=g++
 INC_PARAMS=$(VPATH:%=-I %)
 CXX_RELEASE_FLAGS=-Wall -std=c++11 -O3
-CXX_DEBUG_FLAGS=-Wall -g -std=c++11
+CXX_DEBUG_FLAGS=-Wall -g -p -std=c++11
 
 # Use make functions to get the paths of each .h, and .cpp file
 _DEPS=$(foreach dir,$(VPATH),$(wildcard $(dir)/*.h))
@@ -60,13 +60,13 @@ $(RELEASE_OBJ): $(RELEASE)/%.o: %.cpp $(DEPS)
 $(DEBUG_OBJ): $(DEBUG)/%.o: %.cpp $(DEPS)
 	$(CXX) $(CXX_DEBUG_FLAGS) $(INC_PARAMS) -c $(filter %.cpp, $<) -o $@
 
-.PHONY: clean junkless release_dir debug_dir objects
+.PHONY: clean junkless release_dir debug_dir
 
-clean:
-	rm -f $(RELEASE_TARGET) $(DEBUG_TARGET) $(RELEASE)/*.o $(DEBUG)/*.o $(VPATH:%=%/*~)
+clean: junkless
+	rm -f $(RELEASE_TARGET) $(DEBUG_TARGET) $(RELEASE)/*.o $(DEBUG)/*.o
 
 junkless:
-	rm -f $(VPATH:%=%/*~)
+	rm -f *~ $(VPATH:%=%/*~)
 
 release_dir:
 	mkdir -p $(RELEASE)
