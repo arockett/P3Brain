@@ -161,7 +161,6 @@ int Organism::registerOrganism() {
 }
 
 Organism::~Organism() {
-    cout << "destruct: " << ID << "   with ref: " << referenceCount << "   and dataCount: " << dataCount << "\n";
     for (auto parent : parents) {
         parent->referenceCount--; // this parent has one less child in memory
     }
@@ -172,14 +171,12 @@ Organism::~Organism() {
  * called to kill an organism. Set alive to false
  */
 void Organism::kill() {
-    cout << "killing ID: " << ID << "\n";
     alive = false;
     referenceCount--; // remove reference for self
 }
 
 shared_ptr<Organism> Organism::makeMutatedOffspring(double pointMutationRate, shared_ptr<Organism> parent) {
     shared_ptr<Organism> newOrg = make_shared<Organism>(parent, genome->makeMutatedGenome(Genome::pointMutationRate));
-    cout << "new offspring : " << newOrg->ID << " from parent: " << ID << "\n";
     return newOrg;
 }
 

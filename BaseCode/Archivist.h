@@ -103,7 +103,6 @@ public:
                 writeRealTimeFiles(population); // write to dominant and average files
             }
             if ((Global::update % pruneInterval == 0) || (flush == 1)) {
-                cout << "LODwAP\n";
                 shared_ptr<Organism> sampleOrg = population[0];
                 shared_ptr<Organism> MRCA = sampleOrg->getMostRecentCommonAncestor(sampleOrg);
 

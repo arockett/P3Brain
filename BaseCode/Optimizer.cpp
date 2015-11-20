@@ -114,7 +114,6 @@ void Tournament::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
     for (size_t i = 0; i < population.size(); i++) {
         population[i]->kill(); // set org.alive = 0 and delete the organism if it has no offspring
     }
-    population.clear();
     population = nextPopulation;
 }
 

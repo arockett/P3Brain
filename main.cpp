@@ -53,15 +53,16 @@ int main(int argc, const char * argv[]) {
     World *world = (World*) new BerryWorld(); //new World();
 
     // define population
-    vector<shared_ptr<Organism>> population;
-
-    Archivist archivist;
 
     // a progenitor must exist - that is, one ancestor genome
     // this genome is evaluated to populate the dataMap
 
     Global::update = -1; // before there was time, there was a progenitor
+    shared_ptr<Group> group;
+
     {
+        vector<shared_ptr<Organism>> population;
+
         //shared_ptr<Genome> _genome(new Genome());
         //shared_ptr<Brain> _brain(new Brain());
 
@@ -77,11 +78,10 @@ int main(int argc, const char * argv[]) {
             population[population.size() - 1]->gender = Random::getInt(0, 1); // assign a random gender to the new org
         }
         progenitor->kill(); // the progenitor has served it's purpose.
+        shared_ptr<Tournament> _tournamnet(new Tournament());
+
+        group = make_shared<Group>(population, _tournamnet);
     }
-
-    shared_ptr<Tournament> _tournamnet(new Tournament());
-
-    Group* group = new Group(population, _tournamnet);
 
     //////////////////
     // evolution loop
