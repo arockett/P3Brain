@@ -159,7 +159,6 @@ void BitAgent::DecodeFixedLogicGenome( const vector<bool>& genome, int numInputS
 
 void BitAgent::DecodeHypercubeGenome( const vector<bool>& genome, int numInputStates, int gateIns )
 {
-    // TODO Allow innefficient cube dimensions in order to decrease the genome length
     /********************************************************
      * Check the genome size to ensure it's the right length
      ********************************************************/
@@ -172,19 +171,12 @@ void BitAgent::DecodeHypercubeGenome( const vector<bool>& genome, int numInputSt
     //
     // Minimum dimension possible
     int cubeDimension = (int)ceil( log2( numInputStates ) ) + 1;
-    // If the minimum dimension is not a power of 2, make it the next power of 2 greater
-    // than the minimum possible dimension. If the hypercube dimension is not a power
-    // of 2, the bits encoding each gate input will be underutilized.
-    if( fmod( log2( cubeDimension ), 1 ) != 0 )
-    {
-        cubeDimension = (int)pow(2.0, ceil( log2( cubeDimension ) ));
-    }
 
     ASSERT( gateIns <= cubeDimension, "Too many gate inputs. For " << numInputStates
         << " you should have <= " << cubeDimension << " inputs per gate." );
 
     // Calculate number of bits needed to encode each gate input
-    int inputEncodingSize = (int)log2( cubeDimension );
+    int inputEncodingSize = (int)ceil( log2( cubeDimension ) );
 
     // Use the number of bits per input and number of bits for gate logic to calculate
     // the total number of bits needed to represent a gate
@@ -221,7 +213,7 @@ void BitAgent::DecodeHypercubeGenome( const vector<bool>& genome, int numInputSt
             {
                 inNumber.push_back( genome[( ( i - numInputStates ) * gateEncodingSize ) + ( k*inputEncodingSize ) + j] );
             }
-            inStates.push_back( flipBit(i, boolStringToInt( inNumber )) );
+            inStates.push_back( flipBit(i, boolStringToInt( inNumber ) % cubeDimension) );
         }
 
         // Get the gate logic
