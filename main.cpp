@@ -78,9 +78,8 @@ int main(int argc, const char * argv[]) {
             population[population.size() - 1]->gender = Random::getInt(0, 1); // assign a random gender to the new org
         }
         progenitor->kill(); // the progenitor has served it's purpose.
-        shared_ptr<Tournament> _tournamnet(new Tournament());
 
-        group = make_shared<Group>(population, _tournamnet);
+        group = make_shared<Group>(population, make_shared<Tournament2>());
     }
 
     //////////////////

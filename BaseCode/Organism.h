@@ -11,6 +11,7 @@
 
 #include <stdlib.h>
 #include <vector>
+#include <unordered_set>
 
 #include "Brain.h"
 #include "Genome.h"
@@ -40,11 +41,10 @@ public:
     double score;
 
     int referenceCount;
-    int dataCount;
 
     vector<shared_ptr<Organism>> parents; // parents are pointers to parents of this organism. In asexual populations this will have one element
-    vector<int> genomeAncestors; // list of the IDs of organisms in the last genome file who are ancestors of this organism (genomes saved on genome interval)
-    vector<int> dataAncestors; // list of the IDs of organisms in the last data files who are ancestors of this organism (i.e. all files saved on data interval)
+    unordered_set<int> genomeAncestors; // list of the IDs of organisms in the last genome file who are ancestors of this organism (genomes saved on genome interval)
+    unordered_set<int> dataAncestors; // list of the IDs of organisms in the last data files who are ancestors of this organism (i.e. all files saved on data interval)
 
     int ID;
     int timeOfBirth; // the time this organism was made
@@ -69,7 +69,7 @@ public:
     virtual vector<shared_ptr<Organism>> getLOD(shared_ptr<Organism> org);
     virtual shared_ptr<Organism> getMostRecentCommonAncestor(shared_ptr<Organism> org);
     virtual shared_ptr<Organism> makeMutatedOffspring(double pointMutationRate, shared_ptr<Organism> parent);
-    virtual shared_ptr<Organism> makeMutatedOffspring(double pointMutationRate, shared_ptr<Organism> parent1, shared_ptr<Organism> parent2);
+    virtual shared_ptr<Organism> makeMutatedOffspring(double pointMutationRate, vector<shared_ptr<Organism>> from);
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Organism__) */

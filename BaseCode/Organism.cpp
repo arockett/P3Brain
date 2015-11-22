@@ -43,9 +43,8 @@ Organism::Organism() {
     alive = true;
     gender = 0; // by default all orgs are female.
     referenceCount = 1; // because it's alive;
-    dataCount = 0;
-    genomeAncestors.push_back(ID); // it is it's own Ancestor for genome tracking purposes
-    dataAncestors.push_back(ID); // it is it's own Ancestor for data tracking purposes
+    genomeAncestors.insert(ID); // it is it's own Ancestor for genome tracking purposes
+    dataAncestors.insert(ID); // it is it's own Ancestor for data tracking purposes
     timeOfBirth = Global::update; // happy birthday!
     timeOfDeath = -1; // still alive
     dataMap.Set("ID", ID);
@@ -64,9 +63,8 @@ Organism::Organism(shared_ptr<Genome> _genome) {
     alive = true;
     gender = 0; // by default all orgs are female.
     referenceCount = 1; // because it's alive;
-    dataCount = 0;
-    genomeAncestors.push_back(ID); // it is it's own Ancestor for genome tracking purposes
-    dataAncestors.push_back(ID); // it is it's own Ancestor for data tracking purposes
+    genomeAncestors.insert(ID); // it is it's own Ancestor for genome tracking purposes
+    dataAncestors.insert(ID); // it is it's own Ancestor for data tracking purposes
     timeOfBirth = Global::update; // happy birthday!
     timeOfDeath = -1; // still alive
     dataMap.Set("ID", ID);
@@ -81,10 +79,9 @@ Organism::Organism(shared_ptr<Genome> _genome, shared_ptr<Brain> _brain) {
     ID = registerOrganism();
     alive = true;
     gender = 0; // by default all orgs are female.
-    dataCount = 0;
     referenceCount = 1; // because it's alive;
-    genomeAncestors.push_back(ID); // it is it's own Ancestor for genome tracking purposes
-    dataAncestors.push_back(ID); // it is it's own Ancestor for data tracking purposes
+    genomeAncestors.insert(ID); // it is it's own Ancestor for genome tracking purposes
+    dataAncestors.insert(ID); // it is it's own Ancestor for data tracking purposes
     timeOfBirth = Global::update; // happy birthday!
     timeOfDeath = -1; // still alive
     dataMap.Set("ID", ID);
@@ -104,14 +101,13 @@ Organism::Organism(shared_ptr<Organism> from, shared_ptr<Genome> _genome) {
     alive = true;
     gender = 0; // by default all orgs are female.
     referenceCount = 1; // because it's alive;
-    dataCount = 0;
     parents.push_back(from);
     from->referenceCount++; // this parent has an(other) offspring
     for (auto ancestorID : from->genomeAncestors) {
-        genomeAncestors.push_back(ancestorID); // union all parents genomeAncestors into this organisms genomeAncestor set.
+        genomeAncestors.insert(ancestorID); // union all parents genomeAncestors into this organisms genomeAncestor set.
     }
     for (auto ancestorID : from->dataAncestors) {
-        dataAncestors.push_back(ancestorID); // union all parents dataAncestors into this organisms dataAncestor set.
+        dataAncestors.insert(ancestorID); // union all parents dataAncestors into this organisms dataAncestor set.
     }
     timeOfBirth = Global::update; // happy birthday!
     timeOfDeath = -1; // still alive
@@ -135,16 +131,15 @@ Organism::Organism(const vector<shared_ptr<Organism>> from, shared_ptr<Genome> _
     ID = registerOrganism();
     alive = true;
     referenceCount = 1; // because it's alive;
-    dataCount = 0;
     gender = 0; // by default all orgs are female.
     for (auto parent : from) {
         parents.push_back(parent); // add this parent to the parents set
         parent->referenceCount++; // this parent has an(other) offspring
         for (auto ancestorID : parent->genomeAncestors) {
-            genomeAncestors.push_back(ancestorID); // union all parents genomeAncestors into this organisms genomeAncestor set.
+            genomeAncestors.insert(ancestorID); // union all parents genomeAncestors into this organisms genomeAncestor set.
         }
         for (auto ancestorID : parent->dataAncestors) {
-            dataAncestors.push_back(ancestorID); // union all parents dataAncestors into this organisms dataAncestor set.
+            dataAncestors.insert(ancestorID); // union all parents dataAncestors into this organisms dataAncestor set.
         }
     }
     timeOfBirth = Global::update; // happy birthday!
@@ -180,12 +175,16 @@ shared_ptr<Organism> Organism::makeMutatedOffspring(double pointMutationRate, sh
     return newOrg;
 }
 
-shared_ptr<Organism> Organism::makeMutatedOffspring(double pointMutationRate, shared_ptr<Organism> parent1, shared_ptr<Organism> parent2) {
-    vector<shared_ptr<Organism>> _parents = { parent1, parent2 };
-    shared_ptr<Organism> newOrg = make_shared<Organism>(_parents, genome->makeMutatedGenome(Genome::pointMutationRate));
-    newOrg->gender = (Random::getInt(0, 1)) ? parent1->gender : parent2->gender; // assign a random gender to the new org
+shared_ptr<Organism> Organism::makeMutatedOffspring(double pointMutationRate, vector<shared_ptr<Organism>> from) {
+    vector<shared_ptr<Genome>> parentGenomes;
+    for (auto p : from){
+        parentGenomes.push_back(p->genome);
+    }
+    shared_ptr<Organism> newOrg = make_shared<Organism>(from, genome->makeMutatedGenome(Genome::pointMutationRate,parentGenomes));
+    newOrg->gender = from[Random::getIndex(from.size())]->gender; // assign a gender to the new org randomly from one of it's parents
     return newOrg;
 }
+
 
 /*
  * Given a genome and a key(to data that has been saved into "dataMap"

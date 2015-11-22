@@ -128,6 +128,33 @@ shared_ptr<Genome> Genome::makeMutatedGenome(double mutationRate) {
     return G;
 }
 
+shared_ptr<Genome> Genome::makeMutatedGenome(double mutationRate,vector<shared_ptr<Genome>> from) {
+    shared_ptr<Genome> G = make_shared<Genome>(); // make a blank genome
+    int shortestGenome = from[0]->sites.size();
+    for (auto g : from){
+        if ((int)g->sites.size()<shortestGenome){
+            shortestGenome = g->sites.size();
+        }
+    }
+    int numberOfCuts = Random::getInt(10); // between 0 and 10 cuts
+    vector<int> cutLocations;
+    for (int i = 0; i < numberOfCuts; i++){
+        cutLocations.push_back(Random::getIndex(shortestGenome));
+    }
+    cutLocations.push_back(-1); // add a number at the end to avoid seg fault
+    sort(cutLocations.begin(), cutLocations.end());
+    shared_ptr<Genome> currSource = from[Random::getIndex(from.size())];
+    int currCutIndex = 0;
+    for (int i = 0; i < (int)currSource->sites.size(); i++){
+        G->sites.push_back(currSource->sites[i]);
+        if (i == cutLocations[currCutIndex]){
+            currCutIndex++;
+            shared_ptr<Genome> currSource = from[Random::getIndex(from.size())];
+        }
+    }
+    G->applyMutations(mutationRate);
+    return G;
+}
 void Genome::makePointMutation() {
     sites[Random::getIndex(sites.size())] = (unsigned char) Random::getIndex(256);
 }

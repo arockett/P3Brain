@@ -46,6 +46,8 @@ public:
     virtual void copyGenome(shared_ptr<Genome> from);
     virtual void applyMutations(double mutationRate);
     virtual shared_ptr<Genome> makeMutatedGenome(double mutationRate);
+    virtual shared_ptr<Genome> makeMutatedGenome(double mutationRate,vector<shared_ptr<Genome>> from);
+
     virtual void makePointMutation();
 
     void advanceIndex(int& genomeIndex, int distance = 1) {
