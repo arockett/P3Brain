@@ -14,7 +14,9 @@
 #include "../Utilities/Utilities.h"
 #include "../Utilities/Data.h"
 
-int& World::repeats = Parameters::register_parameter("repeats", 1, "Number of times to test each Genome per generation", "WORLD");
+int& World::repeats = Parameters::register_parameter(
+    "repeats", 1, "Number of times to test each Genome per generation",
+    "WORLD");
 
 World::World() {
 }
@@ -22,21 +24,22 @@ World::World() {
 World::~World() {
 }
 
-void World::evaluateFitness(vector<shared_ptr<Organism>> population, bool analyse) {
-    vector<double> W;
-    for (size_t i = 0; i < population.size(); i++) {
-        double scoreTotal = 0.0;
-        for (int r = 0; r < World::repeats; r++) {
-            scoreTotal += testIndividual(population[i], analyse);
-        }
-        population[i]->score = (scoreTotal / (double) World::repeats);
-        population[i]->dataMap.Set("score", population[i]->score);
-        population[i]->dataMap.Set("update", Global::update);
+void World::evaluateFitness(vector<shared_ptr<Organism>> population,
+                            bool analyse) {
+  vector<double> W;
+  for (size_t i = 0; i < population.size(); i++) {
+    double scoreTotal = 0.0;
+    for (int r = 0; r < World::repeats; r++) {
+      scoreTotal += testIndividual(population[i], analyse);
     }
+    population[i]->score = (scoreTotal / (double) World::repeats);
+    population[i]->dataMap.Set("score", population[i]->score);
+    population[i]->dataMap.Set("update", Global::update);
+  }
 }
 
 double World::testIndividual(shared_ptr<Organism> org, bool analyse) {
-    return 1.0;
+  return 1.0;
 }
 
 ///* *** Example World Implementation *** */

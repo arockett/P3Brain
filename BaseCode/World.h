@@ -19,14 +19,15 @@
 using namespace std;
 
 class World {
-public:
-    static int& repeats;
+ public:
+  static int& repeats;
 
-public:
-    World();
-    virtual ~World();
-    virtual void evaluateFitness(vector<shared_ptr<Organism>> population, bool analyse);
-    virtual double testIndividual(shared_ptr<Organism> org, bool analyse);
+ public:
+  World();
+  virtual ~World();
+  virtual void evaluateFitness(vector<shared_ptr<Organism>> population,
+                               bool analyse);
+  virtual double testIndividual(shared_ptr<Organism> org, bool analyse);
 };
 
 //class ExampleWorld: public World {

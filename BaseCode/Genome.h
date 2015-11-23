@@ -18,41 +18,42 @@
 using namespace std;
 
 class Genome : public std::enable_shared_from_this<Genome> {
-private:
+ private:
 
-public:
+ public:
 
-    virtual vector<string> getStats(); // move me to abstract class!!
+  virtual vector<string> getStats();  // move me to abstract class!!
 
-    /*
-     * converts the sites vector to a FileManager::separator separated list in string format.
-     */
-    virtual string convert_to_string(); // move me to abstract class!!
+  /*
+   * converts the sites vector to a FileManager::separator separated list in string format.
+   */
+  virtual string convert_to_string();  // move me to abstract class!!
 
-    static int& initialGenomeSize;
-    static double& pointMutationRate;
-    static double& insertionRate;
-    static double& deletionRate;
-    static int& minGenomeSize;
-    static int& maxGenomeSize;
+  static int& initialGenomeSize;
+  static double& pointMutationRate;
+  static double& insertionRate;
+  static double& deletionRate;
+  static int& minGenomeSize;
+  static int& maxGenomeSize;
 
-    vector<unsigned char> sites;
+  vector<unsigned char> sites;
 
-    Genome() = default;
-    Genome(shared_ptr<Genome> from);
-    virtual ~Genome() = default;
+  Genome() = default;
+  Genome(shared_ptr<Genome> from);
+  virtual ~Genome() = default;
 
-    virtual void fillRandom();
-    virtual void copyGenome(shared_ptr<Genome> from);
-    virtual void applyMutations(double mutationRate);
-    virtual shared_ptr<Genome> makeMutatedGenome(double mutationRate);
-    virtual shared_ptr<Genome> makeMutatedGenome(double mutationRate,vector<shared_ptr<Genome>> from);
+  virtual void fillRandom();
+  virtual void copyGenome(shared_ptr<Genome> from);
+  virtual void applyMutations(double mutationRate);
+  virtual shared_ptr<Genome> makeMutatedGenome(double mutationRate);
+  virtual shared_ptr<Genome> makeMutatedGenome(double mutationRate,
+                                               vector<shared_ptr<Genome>> from);
 
-    virtual void makePointMutation();
+  virtual void makePointMutation();
 
-    void advanceIndex(int& genomeIndex, int distance = 1) {
-        genomeIndex = (genomeIndex + distance) % (int) sites.size();
-    }
+  void advanceIndex(int& genomeIndex, int distance = 1) {
+    genomeIndex = (genomeIndex + distance) % (int) sites.size();
+  }
 
 };
 

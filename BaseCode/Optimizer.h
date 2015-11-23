@@ -21,34 +21,34 @@
 using namespace std;
 
 class Optimizer {
-public:
-    static int& elitism;
-    static int& tournamentSize;
+ public:
+  static int& elitism;
+  static int& tournamentSize;
 
-public:
-    double maxFitness;
-    Optimizer() = default;
-    virtual ~Optimizer() = default;
-    virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
+ public:
+  double maxFitness;
+  Optimizer() = default;
+  virtual ~Optimizer() = default;
+  virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
 };
 
-class GA: public Optimizer {
-public:
-    virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
+class GA : public Optimizer {
+ public:
+  virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
 };
 
-class P3: public Optimizer {
+class P3 : public Optimizer {
 
 };
 
-class Tournament: public Optimizer {
-public:
-    virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
+class Tournament : public Optimizer {
+ public:
+  virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
 };
 
-class Tournament2: public Optimizer {
-public:
-    virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
+class Tournament2 : public Optimizer {
+ public:
+  virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Optimizer__) */
