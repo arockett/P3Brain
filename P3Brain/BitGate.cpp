@@ -45,12 +45,10 @@ void BitGate::update( vector<double>& states, vector<double>& nextStates )
     //              If there are four inputs and the second input to be
     //              processed is a 1 (true), then add 4 to the outIndex
     //              because it's in the 4's place
-    for( unsigned i = 0; i < inputs.size(); i++ )
+    for(const auto input : inputs)
     {
-        if( (bool)states[inputs[i]] )
-        {
-            outIndex += (int)pow( 2.0, (inputs.size() - ( 1 + i )) );
-        }
+        outIndex <<= 1;
+        outIndex |= Bit(states[input]);
     }
 
     nextStates[gateIndex] = (double)logic[outIndex];
