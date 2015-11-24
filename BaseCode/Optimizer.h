@@ -14,35 +14,41 @@
 #include <vector>
 
 #include "Genome.h"
+#include "Organism.h"
 
 #include "../Utilities/Parameters.h"
 
 using namespace std;
 
 class Optimizer {
-public:
-	static int& elitism;
-	static int& tournamentSize;
+ public:
+  static int& elitism;
+  static int& tournamentSize;
 
-public:
-	double maxFitness;
-	Optimizer() = default;
-	virtual ~Optimizer() = default;
-	virtual vector<Genome*> makeNextGeneration(vector<Genome*> population, vector<double> W);
+ public:
+  double maxFitness;
+  Optimizer() = default;
+  virtual ~Optimizer() = default;
+  virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
 };
 
-class GA: Optimizer {
-public:
-	virtual vector<Genome*> makeNextGeneration(vector<Genome*> population, vector<double> W);
+class GA : public Optimizer {
+ public:
+  virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
 };
 
-class P3: Optimizer {
+class P3 : public Optimizer {
 
 };
 
-class Tournament: Optimizer {
-public:
-	virtual vector<Genome*> makeNextGeneration(vector<Genome*> population, vector<double> W);
+class Tournament : public Optimizer {
+ public:
+  virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
+};
+
+class Tournament2 : public Optimizer {
+ public:
+  virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Optimizer__) */

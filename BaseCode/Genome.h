@@ -17,52 +17,44 @@
 
 using namespace std;
 
-class Data;
+class Genome : public std::enable_shared_from_this<Genome> {
+ private:
 
-class Genome: public enable_shared_from_this<Genome> {
-private:
-	static int genomeIDCounter; // used to issue unique ids to Genomes
-	int registerGenome(); // get a Genome_id (uses genomeIDCounter)
+ public:
 
-public:
-	static Genome* MRCA;
+  virtual vector<string> getStats();  // move me to abstract class!!
 
-	static int& initialGenomeSize;
-	static double& pointMutationRate;
-	static double& insertionRate;
-	static double& deletionRate;
-	static int& minGenomeSize;
-	static int& maxGenomeSize;
+  /*
+   * converts the sites vector to a FileManager::separator separated list in string format.
+   */
+  virtual string convert_to_string();  // move me to abstract class!!
 
-public:
-	int ID;
-	int birthDate;
-	Genome* ancestor;
-	int referenceCounter;
-	vector<unsigned char> sites;
-	DataMap dataMap;
+  static int& initialGenomeSize;
+  static double& pointMutationRate;
+  static double& insertionRate;
+  static double& deletionRate;
+  static int& minGenomeSize;
+  static int& maxGenomeSize;
 
-	Genome();
-	Genome(Genome* from);
-	virtual ~Genome();
+  vector<unsigned char> sites;
 
-	virtual void fillRandom();
-	virtual void copyGenome(Genome* from);
-	virtual void applyMutations(double mutationRate);
-	virtual Genome* makeMutatedOffspring(double mutationRate);
-	virtual void makePointMutation();
-	virtual void kill();
+  Genome() = default;
+  Genome(shared_ptr<Genome> from);
+  virtual ~Genome() = default;
 
-	virtual vector<string> GetLODItem(string key);
-	virtual vector<Genome*> getLOD();
-	virtual Genome* getMostRecentCommonAncestor();
+  virtual void fillRandom();
+  virtual void copyGenome(shared_ptr<Genome> from);
+  virtual void applyMutations(double mutationRate);
+  virtual shared_ptr<Genome> makeMutatedGenome(double mutationRate);
+  virtual shared_ptr<Genome> makeMutatedGenome(double mutationRate,
+                                               vector<shared_ptr<Genome>> from);
 
-	virtual void saveDataOnLOD(int flush = 0); // for genome, save to file data for this genome and it's LOD
-	virtual void flushDataOnLOD(); // used at the end of a run to save data newer then the MRCA / convergance point
+  virtual void makePointMutation();
 
-	void advanceIndex(int& genomeIndex, int distance = 1) {
-		genomeIndex = (genomeIndex + distance) % (int) sites.size();
-	}
+  void advanceIndex(int& genomeIndex, int distance = 1) {
+    genomeIndex = (genomeIndex + distance) % (int) sites.size();
+  }
+
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Genome__) */

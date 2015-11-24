@@ -6,15 +6,19 @@
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
 //
 
+#include <algorithm>
 #include <memory>
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
 
-#include "BaseCode/Agent.h"
+#include "BaseCode/Archivist.h"
+#include "BaseCode/Brain.h"
 #include "BaseCode/Genome.h"
 #include "BaseCode/Global.h"
+#include "BaseCode/Group.h"
 #include "BaseCode/Optimizer.h"
+#include "BaseCode/Organism.h"
 #include "BaseCode/World.h"
 
 #include "Utilities/Parameters.h"
@@ -26,130 +30,102 @@
 
 using namespace std;
 
-void writeRealTimeFiles(vector<Genome*> population, vector<double> W) { // write Ave and Dominant files NOW!
-// write out Ave
-	double aveValue, temp;
-	DataMap AveMap;
-	for (auto key : Global::DefaultAveFileColumns) {
-		aveValue = 0;
-		for (auto genome : population) {
-			stringstream ss(genome->dataMap.Get(key));
-			ss >> temp;
-			aveValue += temp;
-		}
-		aveValue /= population.size();
-		AveMap.Set(key, aveValue);
-	}
-	AveMap.writeToFile(Global::AveFileName, Global::DefaultAveFileColumns);
-
-	// write out Dominant
-	int best = findGreatestInVector(W);
-	population[best]->dataMap.writeToFile(Global::DominantFileName);
-}
-
 int main(int argc, const char * argv[]) {
-	//setupParameters(argc, argv); // read command line and config file and set up parameters
 
-	Parameters::initialize_parameters(argc, argv); // loads command line and configFile values into registered parameters
-												   // also writes out a config file if requested
+  Parameters::initialize_parameters(argc, argv);  // loads command line and configFile values into registered parameters
+                                                  // also writes out a config file if requested
 
-	//make a node map to handle genome value to brain state address look up.
-	Agent::makeNodeMap(Agent::defaultNodeMap, Global::bitsPerBrainAddress, Agent::defaultNrOfBrainStates);
+  //make a node map to handle genome value to brain state address look up.
+  Brain::makeNodeMap(Brain::defaultNodeMap, Global::bitsPerBrainAddress,
+                     Brain::defaultNrOfBrainStates);
 
-	Gate::setupGates(); // determines which gate types will be in use.
+  Gate::setupGates();  // determines which gate types will be in use.
 
-	if (Global::seedRandom) {
-		random_device rd;
-		Random::getCommonGenerator().seed(rd());
-	} else {
-		Random::getCommonGenerator().seed(Global::repNumber);
-	}
+  if (Global::seedRandom) {
+    random_device rd;
+    Random::getCommonGenerator().seed(rd());
+  } else {
+    Random::getCommonGenerator().seed(Global::repNumber);
+  }
 
-	//Optimizer *optimizer = (Optimizer*) new GA();
-	Optimizer *optimizer = (Optimizer*) new Tournament();
+  //Optimizer *optimizer = (Optimizer*) new GA();
+  // Optimizer *optimizer = (Optimizer*) new Tournament();
 
-	World *world = (World*) new BerryWorld(); //new World();
+  World *world = (World*) new BerryWorld();  //new World();
 
-	// Make the output directory for this rep
-//	string makeDirCommand = "mkdir OUTPUT" + mkString(Global::repNumber);
-//	const char * DirCommand = makeDirCommand.c_str();
-//	system(DirCommand);
+  // define population
 
-	// To add extra output files, add something like this:
-	//   Global::files[file_name] = {list of elements to save from a DataMap};
-	//   eg: Global::files["world.csv"] = {"update","score","food1","food2","switches"};
+  // a progenitor must exist - that is, one ancestor genome
+  // this genome is evaluated to populate the dataMap
 
-	// setup population
-	vector<Genome*> population, newPopulation;
-	vector<double> W;
-	// a progenitor must exist - that is, one ancestor genome
-	Genome* progenitor = new Genome();
-	progenitor->birthDate = -1;
-	Genome::MRCA = progenitor;
-	for (int i = 0; i < Global::popSize; i++) {
-		Genome *G = new Genome();
-		G->fillRandom();
-		G->ancestor = progenitor;
-		progenitor->referenceCounter++;
-		population.push_back(G);
-	}
-	progenitor->kill();
+  Global::update = -1;  // before there was time, there was a progenitor
+  shared_ptr<Group> group;
 
-	// evolution loop
-	Global::update = 0;
-	while ((Global::nextDataWrite <= Global::updates) && (Global::nextGenomeWrite <= Global::updates)
-			&& (Global::update <= (Global::updates + Global::terminateAfter))) {
-		// translate all genomes to agents
-		vector<Agent*> agents;
-		for (int i = 0; i < Global::popSize; i++) {
-			agents.push_back(new Agent(population[i], Agent::defaultNrOfBrainStates));
-		}
+  {
+    vector<shared_ptr<Organism>> population;
 
-		// evaluate each organism in the population using a World
-		W = world->evaluateFitness(agents, false);
+    //shared_ptr<Genome> _genome(new Genome());
+    //shared_ptr<Brain> _brain(new Brain());
 
-		// delete all agents
-		for (int i = 0; i < Global::popSize; i++) {
-			delete agents[i];
-		}
+    //shared_ptr<Organism> progenitor = make_shared<Organism>(_genome, _brain); // make a organism with a genome and brain (if you need to change the types here is where you do it)
+    shared_ptr<Organism> progenitor = make_shared<Organism>(
+        make_shared<Genome>(), make_shared<Brain>());  // make a organism with a genome and brain (if you need to change the types here is where you do it)
 
-		// remove agent pointers (which are pointing to null, since the agents were deleted)
-		agents.clear();
+    Global::update = 0;  // the begining of time - now we construct the first population
+    for (int i = 0; i < Global::popSize; i++) {
+      shared_ptr<Genome> genome(new Genome());
+      genome->fillRandom();
+      shared_ptr<Organism> org(new Organism(progenitor, genome));
+      population.push_back(org);  // add a new org to population using progenitors template and a new random genome
+      population[population.size() - 1]->gender = Random::getInt(0, 1);  // assign a random gender to the new org
+    }
+    progenitor->kill();  // the progenitor has served it's purpose.
 
-		// write data to file and prune LOD every pruneInterval
-		if (Global::update % Global::pruneInterval == 0) {
-			writeRealTimeFiles(population, W); // write to dominant and average files
-			Genome::MRCA = population[0]->getMostRecentCommonAncestor();
-			population[0]->saveDataOnLOD(); // write out data and genomes
-			// data and genomes have now been written out up till the MRCA
-			// so all data and genomes from before the MRCA can be deleted
-			if (Genome::MRCA->ancestor != nullptr) { // if the MRCA is not the oldest in the LOD...
-				Genome::MRCA->ancestor->kill(); // kill MRCAs parent (and as a result all ancestors)
-				Genome::MRCA->ancestor = nullptr; // MRCA is now the oldest genome in LOD!
-			}
-			Global::lastPrune = Genome::MRCA->birthDate; // this will hold the time of the oldest genome in RAM
-		}
+    group = make_shared<Group>(population, make_shared<Tournament2>());
+  }
 
-		Global::update++;
+  //////////////////
+  // evolution loop
+  //////////////////
 
-		//make next generation using an optimizer
-		newPopulation = optimizer->makeNextGeneration(population, W);
-		cout << "update: " << Global::update - 1 << "   maxFitness: " << optimizer->maxFitness << "\n";
-		for (size_t i = 0; i < population.size(); i++) {
-			population[i]->kill(); // this deletes the genome if it has no offspring
-			population[i] = newPopulation[i];
-		}
-		newPopulation.clear();
-	}
-	cout << "Finished Evolution Loop... force file writes\n";
-	population[0]->flushDataOnLOD();
+  if (Archivist::outputMethod == -1) {  // this is the first time archive is called. get the output method
+    if (Archivist::outputMethodStr == "LODwAP") {
+      Archivist::outputMethod = 0;
+    } else if (Archivist::outputMethodStr == "SSwD") {
+      Archivist::outputMethod = 1;
+    } else {
+      cout << "unrecognized archive method \"" << Archivist::outputMethodStr
+           << "\". Should be either \"LODwAP\" or \"SSwD\"\nExiting.\n";
+      exit(1);
+    }
+  }
 
-	Genome * MRCA = population[0]->getMostRecentCommonAncestor();
+  int realTerminateAfter =
+      (Archivist::outputMethod == 0) ?
+          (Global::terminateAfter) : Archivist::intervalDelay;  // if the output method is SSwD override terminateAfter
 
-	Agent *A = new Agent(MRCA, Agent::defaultNrOfBrainStates);
-	printf("MRCA - born on: %d\n", MRCA->birthDate);
-	printf("%s\n", A->gateList().c_str());
+  while (((Archivist::nextDataWrite <= Global::updates)
+      || (Archivist::nextGenomeWrite <= Global::updates))
+      && (Global::update <= (Global::updates + realTerminateAfter))) {
 
-	return 0;
+    world->evaluateFitness(group->population, false);  // evaluate each organism in the population using a World
+    group->archive();  // save data, update memory and delete any unneeded data;
+    Global::update++;
+    group->optimize();  // update the population (reproduction and death)
+
+    cout << "update: " << Global::update - 1 << "   maxFitness: "
+         << group->optimizer->maxFitness << "\n";
+  }
+
+  group->archive(1);  // flush any data that has not been output yet
+
+  if (Archivist::outputMethod == 0) {  // if using LODwAP, write out some info about MRCA
+    shared_ptr<Organism> FinalMRCA = group->population[0]
+        ->getMostRecentCommonAncestor(group->population[0]);
+    cout << "MRCA - ID: " << FinalMRCA->ID << " born on: "
+         << FinalMRCA->timeOfBirth << "\n" << FinalMRCA->brain->description();
+  }
+
+  return 0;
 }
 
