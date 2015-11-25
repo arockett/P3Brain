@@ -1,0 +1,6 @@
+a couple of things we need to remember that aren't worth a report:
+
+AH: toggle output for files on off
+AH: the none group main code is missing
+AH: The archivist needs to become two separate classes 
+AH: Random:getInt needs a comment about the upper boundary being included or not
