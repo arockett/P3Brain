@@ -125,8 +125,7 @@ Organism::Organism(shared_ptr<Organism> from, shared_ptr<Genome> _genome) {
  * a) all organisms in from are the same
  * b) and the new brain should be of the same type as the parents brain
  */
-Organism::Organism(const vector<shared_ptr<Organism>> from,
-                   shared_ptr<Genome> _genome) {
+Organism::Organism(const vector<shared_ptr<Organism>> from, shared_ptr<Genome> _genome) {
   genome = _genome;
   brain = from[0]->brain->makeBrainFromGenome(genome);
   ID = registerOrganism();
@@ -171,22 +170,17 @@ void Organism::kill() {
   offspringCount--;  // remove reference for self
 }
 
-shared_ptr<Organism> Organism::makeMutatedOffspring(
-    double pointMutationRate, shared_ptr<Organism> parent) {
-  shared_ptr<Organism> newOrg = make_shared<Organism>(
-      parent, genome->makeMutatedGenome(Genome::pointMutationRate));
+shared_ptr<Organism> Organism::makeMutatedOffspring(shared_ptr<Organism> parent) {
+  shared_ptr<Organism> newOrg = make_shared<Organism>(parent, genome->makeMutatedGenome());
   return newOrg;
 }
 
-shared_ptr<Organism> Organism::makeMutatedOffspring(
-    double pointMutationRate, vector<shared_ptr<Organism>> from) {
+shared_ptr<Organism> Organism::makeMutatedOffspring(vector<shared_ptr<Organism>> from) {
   vector<shared_ptr<Genome>> parentGenomes;
   for (auto p : from) {
     parentGenomes.push_back(p->genome);
   }
-  shared_ptr<Organism> newOrg = make_shared<Organism>(
-      from,
-      genome->makeMutatedGenome(Genome::pointMutationRate, parentGenomes));
+  shared_ptr<Organism> newOrg = make_shared<Organism>(from, genome->makeMutatedGenome(parentGenomes));
   newOrg->gender = from[Random::getIndex(from.size())]->gender;  // assign a gender to the new org randomly from one of it's parents
   return newOrg;
 }
@@ -203,8 +197,7 @@ vector<string> Organism::GetLODItem(string key, shared_ptr<Organism> org) {
     list.insert(list.begin(), org->dataMap.Get(key));  // add that ancestors data to the front of the list
   }
   if (org->parents.size() > 1) {  // if more than one parent we have a problem!
-    cout
-        << "  In Organism::GetLODItem :: ERROR! an Organism has more than one parent! Can not establish LOD (do not use getLOD with Sexual Populations).\n  If you are using LODwAP, try using SSwD instead.\n  Exiting...\n";
+    cout << "  In Organism::GetLODItem :: ERROR! an Organism has more than one parent! Can not establish LOD (do not use getLOD with Sexual Populations).\n  If you are using LODwAP, try using SSwD instead.\n  Exiting...\n";
     exit(1);
   }
   return list;
@@ -224,8 +217,7 @@ vector<shared_ptr<Organism>> Organism::getLOD(shared_ptr<Organism> org) {
   }
   reverse(list.begin(), list.end());
   if (org->parents.size() > 1) {  // if more than one parent we have a problem!
-    cout
-        << "  In Organism::getLOD :: ERROR! an Organism has more than one parent! Can not establish LOD (do not use getLOD with Sexual Populations).\n  If you are using LODwAP, try using SSwD instead.\n  Exiting...\n";
+    cout << "  In Organism::getLOD :: ERROR! an Organism has more than one parent! Can not establish LOD (do not use getLOD with Sexual Populations).\n  If you are using LODwAP, try using SSwD instead.\n  Exiting...\n";
     exit(1);
   }
   return list;
@@ -241,8 +233,7 @@ vector<shared_ptr<Organism>> Organism::getLOD(shared_ptr<Organism> org) {
  *       a dead Organism with a referenceCounter = 1 has only one offspring.
  *       a dead Organism with a referenceCounter > 1 has more then one spring with surviving lines of decent.
  */
-shared_ptr<Organism> Organism::getMostRecentCommonAncestor(
-    shared_ptr<Organism> org) {
+shared_ptr<Organism> Organism::getMostRecentCommonAncestor(shared_ptr<Organism> org) {
   vector<shared_ptr<Organism>> LOD = getLOD(org);  // get line of decent parent "parent"
   for (auto org : LOD) {  // starting at the oldest parent, moving to the youngest
     if (org->offspringCount > 1)  // the first (oldest) ancestor with more then one surviving offspring

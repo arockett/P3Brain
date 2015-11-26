@@ -16,18 +16,8 @@
 
 using namespace std;
 
-int& Optimizer::elitism =
-    Parameters::register_parameter(
-        "elitism",
-        0,
-        "The highest scoring brain will be included in the next generation this many times (0 = no elitism)?",
-        "OPTIMIZER");
-int& Optimizer::tournamentSize =
-    Parameters::register_parameter(
-        "tournamentSize",
-        2,
-        "how many genomes to consider when doing Tournament selection? 1 will result in random selection.",
-        "OPTIMIZER");
+int& Optimizer::elitism = Parameters::register_parameter("elitism", 0, "The highest scoring brain will be included in the next generation this many times (0 = no elitism)?", "OPTIMIZER");
+int& Optimizer::tournamentSize = Parameters::register_parameter("tournamentSize", 2, "how many genomes to consider when doing Tournament selection? 1 will result in random selection.", "OPTIMIZER");
 
 /*
  * Optimizer::makeNextGeneration(vector<Genome*> population, vector<double> W)
@@ -38,8 +28,7 @@ void Optimizer::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
   vector<shared_ptr<Organism>> nextPopulation;
 
   for (size_t i = 0; i < population.size(); i++) {
-    shared_ptr<Organism> newOrg = make_shared<Organism>(population[i],
-                                                        population[i]->genome);
+    shared_ptr<Organism> newOrg = make_shared<Organism>(population[i], population[i]->genome);
     nextPopulation.push_back(newOrg);
   }
   for (size_t i = 0; i < population.size(); i++) {
@@ -76,15 +65,12 @@ void GA::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
       if (maxFitness > 0.0) {  // if anyone has fitness > 0
         do {
           who = Random::getIndex(population.size());  //keep choosing a random genome from population until we get one that's good enough
-        } while (pow(1.05, Random::getDouble(1))
-            > pow(1.05, (W[who] / maxFitness)));
+        } while (pow(1.05, Random::getDouble(1)) > pow(1.05, (W[who] / maxFitness)));
       } else {
         who = Random::getIndex(population.size());  // otherwise, just pick a random genome from population
       }
     }
-    nextPopulation.push_back(
-        population[who]->makeMutatedOffspring(Genome::pointMutationRate,
-                                              population[who]));
+    nextPopulation.push_back(population[who]->makeMutatedOffspring(population[who]));
 
   }
   for (size_t i = 0; i < population.size(); i++) {
@@ -123,9 +109,7 @@ void Tournament::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
         }
       }
     }
-    nextPopulation.push_back(
-        population[winner]->makeMutatedOffspring(Genome::pointMutationRate,
-                                                 population[winner]));
+    nextPopulation.push_back(population[winner]->makeMutatedOffspring(population[winner]));
   }
   for (size_t i = 0; i < population.size(); i++) {
     population[i]->kill();  // set org.alive = 0 and delete the organism if it has no offspring
@@ -164,8 +148,7 @@ void Tournament2::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
       }
     }
     if (same == true) {  // if there are not atleast 2 genders, make population[0] have a diffrent gender
-      (population[0]->gender == 1) ?
-          population[0]->gender = 0 : population[0]->gender = 1;
+      (population[0]->gender == 1) ? population[0]->gender = 0 : population[0]->gender = 1;
     }
   }
 
@@ -186,8 +169,7 @@ void Tournament2::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
 
     orgSurvived = 0;  // clear orgSurvived. if population[p1] survives this will become 1 and we will not pick a mate
     if (Random::P(surviveChance)) {  // if this org survives
-      if (find(nextPopulation.begin(), nextPopulation.end(), population[p1])
-          == nextPopulation.end()) {  // if they have not already survived
+      if (find(nextPopulation.begin(), nextPopulation.end(), population[p1]) == nextPopulation.end()) {  // if they have not already survived
         nextPopulation.push_back(population[p1]);  // push them to the next population
         orgSurvived = 1;
         survivors.insert(population[p1]);
@@ -204,10 +186,7 @@ void Tournament2::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
           }
         }
       }
-      nextPopulation.push_back(
-          population[p1]->makeMutatedOffspring(Genome::pointMutationRate, {
-                                                   population[p1],
-                                                   population[p2] }));
+      nextPopulation.push_back(population[p1]->makeMutatedOffspring({ population[p1], population[p2] }));
     }
 
   }

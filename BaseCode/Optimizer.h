@@ -46,6 +46,13 @@ class Tournament : public Optimizer {
   virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
 };
 
+//
+//****************************************************************************
+//* code below this line is for testing - it will be deleted at some point.
+//****************************************************************************
+//
+//
+
 class Tournament2 : public Optimizer {
  public:
   virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
