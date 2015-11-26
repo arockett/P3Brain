@@ -79,7 +79,7 @@ int main(int argc, const char * argv[]) {
     }
     progenitor->kill();  // the progenitor has served it's purpose.
 
-    group = make_shared<Group>(population, make_shared<Tournament2>());
+    group = make_shared<Group>(population, make_shared<Tournament>());
   }
 
   //////////////////
@@ -100,14 +100,10 @@ int main(int argc, const char * argv[]) {
   int realTerminateAfter = (Archivist::outputMethod == 0) ? (Global::terminateAfter) : Archivist::intervalDelay;  // if the output method is SSwD override terminateAfter
 
   while (((Archivist::nextDataWrite <= Global::updates) || (Archivist::nextGenomeWrite <= Global::updates)) && (Global::update <= (Global::updates + realTerminateAfter))) {
-    cout << "update: " << Global::update << "\n";
     world->evaluateFitness(group->population, false);  // evaluate each organism in the population using a World
-    cout << "  evaluate complete\n";
     group->archive();  // save data, update memory and delete any unneeded data;
-    cout << "  archive complete\n";
     Global::update++;
     group->optimize();  // update the population (reproduction and death)
-    cout << "  optimize complete\n";
 
     cout << "update: " << Global::update - 1 << "   maxFitness: " << group->optimizer->maxFitness << "\n";
   }
@@ -118,7 +114,6 @@ int main(int argc, const char * argv[]) {
     shared_ptr<Organism> FinalMRCA = group->population[0]->getMostRecentCommonAncestor(group->population[0]);
     cout << "MRCA - ID: " << FinalMRCA->ID << " born on: " << FinalMRCA->timeOfBirth << "\n" << FinalMRCA->brain->description();
   }
-
   return 0;
 }
 

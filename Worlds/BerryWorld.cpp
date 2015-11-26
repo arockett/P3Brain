@@ -18,7 +18,7 @@
 double& BerryWorld::TSK = Parameters::register_parameter("BERRY_taskSwitchingCost", 1.4, "cost to change food sources", "WORLD - BERRY");
 int& BerryWorld::worldUpdates = Parameters::register_parameter("BERRY_WorldUpdates", 400, "amount of time an brain is tested", "WORLD - BERRY");
 
-int& BerryWorld::foodSourceTypes = Parameters::register_parameter("BERRY_foodSourceTypes", 2, "number of types of food", "WORLD - BERRY");
+int& BerryWorld::foodTypes = Parameters::register_parameter("BERRY_foodSourceTypes", 2, "number of types of food", "WORLD - BERRY");
 double& BerryWorld::rewardForFood1 = Parameters::register_parameter("BERRY_rewardForFood1", 1.0, "reward for eating a Food1", "WORLD - BERRY");
 double& BerryWorld::rewardForFood2 = Parameters::register_parameter("BERRY_rewardForFood2", 1.0, "reward for eating a Food2", "WORLD - BERRY");
 double& BerryWorld::rewardForFood3 = Parameters::register_parameter("BERRY_rewardForFood3", 1.0, "reward for eating a Food3", "WORLD - BERRY");
@@ -47,18 +47,18 @@ BerryWorld::BerryWorld() {
   outputStatesCount = 3;  // number of brain states used for output, 2 for move, 1 for eat
 
   if (senseWalls) {
-    inputStatesCount = (senseDown * foodSourceTypes) + ((senseFront * foodSourceTypes) + senseWalls) + (2 * ((senseFrontSides * foodSourceTypes) + senseWalls));
+    inputStatesCount = (senseDown * foodTypes) + ((senseFront * foodTypes) + senseWalls) + (2 * ((senseFrontSides * foodTypes) + senseWalls));
     // sense down does not include walls (can't stand on a wall (yet!) * types of food
     // senseFront * types of food + wall, same for senseFrontSides, but there are 2
   } else {  // no border walls
-    inputStatesCount = (senseDown * foodSourceTypes) + (senseFront * foodSourceTypes) + (2 * (senseFrontSides * foodSourceTypes));
+    inputStatesCount = (senseDown * foodTypes) + (senseFront * foodTypes) + (2 * (senseFrontSides * foodTypes));
     // sense down * types of food, same for senseFront, same for senseFrontSides, but there are 2
   }
 
   cout << "  World using following BrainSates:\n    Inputs: 0 to " << inputStatesCount - 1 << "\n    Outputs: " << inputStatesCount << " to " << inputStatesCount + outputStatesCount - 1 << "\n";
 }
 
-void printGrid(vector<int> grid, pair<int,int> loc) {
+void printGrid(vector<int> grid, pair<int, int> loc) {
   for (int i = 0; i < BerryWorld::WorldX * BerryWorld::WorldY; i++) {
     if ((i % BerryWorld::WorldX == loc.first) && (i / BerryWorld::WorldX == loc.second)) {
       cout << "X ";
@@ -84,19 +84,19 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse) {
   // set up to track what food is eaten
   int switches = 0;  // number of times organism has switched food source
   int lastFood = -1;  //nothing has been eaten yet!
-  vector<int> eaten;  // stores numer of each type of food was eaten in total for this test
-  eaten.resize(foodSourceTypes);
+  vector<int> eaten;  // stores number of each type of food was eaten in total for this test NOTE: food is indexed from 1 so 0th entry is not used
+  eaten.resize(foodTypes+1);
 
   vector<double> foodRewards;
-  foodRewards.resize(8);
-  foodRewards[0] = rewardForFood1;
-  foodRewards[1] = rewardForFood2;
-  foodRewards[2] = rewardForFood3;
-  foodRewards[3] = rewardForFood4;
-  foodRewards[4] = rewardForFood5;
-  foodRewards[5] = rewardForFood6;
-  foodRewards[6] = rewardForFood7;
-  foodRewards[7] = rewardForFood8;
+  foodRewards.resize(9); // stores reward of each type of food NOTE: food is indexed from 1 so 0th entry is not used
+  foodRewards[1] = rewardForFood1;
+  foodRewards[2] = rewardForFood2;
+  foodRewards[3] = rewardForFood3;
+  foodRewards[4] = rewardForFood4;
+  foodRewards[5] = rewardForFood5;
+  foodRewards[6] = rewardForFood6;
+  foodRewards[7] = rewardForFood7;
+  foodRewards[8] = rewardForFood8;
 
   org->dataMap.Clear("foodList");  // since foodList is built with Append, if an org lives for more then one "generation update" it's foodList must be cleared
 
@@ -124,18 +124,18 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse) {
 
     if (senseWalls) {
       if (senseDown) {
-        for (int i = 0; i < foodSourceTypes; i++) {  // fill first states with food values at here location
+        for (int i = 0; i < foodTypes; i++) {  // fill first states with food values at here location
           org->brain->setState(statesAssignmentCounter++, (here == i + 1));
         }
       }
       if (senseFront) {
-        for (int i = 0; i < foodSourceTypes; i++) {  // fill first states with food values at front location
+        for (int i = 0; i < foodTypes; i++) {  // fill first states with food values at front location
           org->brain->setState(statesAssignmentCounter++, (front == i + 1));
         }
         org->brain->setState(statesAssignmentCounter++, (front == WALL));
       }
       if (senseFrontSides) {
-        for (int i = 0; i < foodSourceTypes; i++) {  // fill first states with food values at front location
+        for (int i = 0; i < foodTypes; i++) {  // fill first states with food values at front location
           org->brain->setState(statesAssignmentCounter++, (leftFront == i + 1));
           org->brain->setState(statesAssignmentCounter++, (rightFront == i + 1));
         }
@@ -144,17 +144,17 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse) {
       }
     } else {  // don't sense walls
       if (senseDown) {
-        for (int i = 0; i < foodSourceTypes; i++) {  // fill first states with food values at here location
+        for (int i = 0; i < foodTypes; i++) {  // fill first states with food values at here location
           org->brain->setState(statesAssignmentCounter++, (here == i + 1));
         }
       }
       if (senseFront) {
-        for (int i = 0; i < foodSourceTypes; i++) {  // fill first states with food values at front location
+        for (int i = 0; i < foodTypes; i++) {  // fill first states with food values at front location
           org->brain->setState(statesAssignmentCounter++, (front == i + 1));
         }
       }
       if (senseFrontSides) {
-        for (int i = 0; i < foodSourceTypes; i++) {  // fill first states with food values at front location
+        for (int i = 0; i < foodTypes; i++) {  // fill first states with food values at front location
           org->brain->setState(statesAssignmentCounter++, (leftFront == i + 1));
           org->brain->setState(statesAssignmentCounter++, (rightFront == i + 1));
         }
@@ -194,8 +194,8 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse) {
         }
       }
       lastFood = getGridValue(grid, currentLocation);  // remember the last food eaten
-      score += foodRewards[getGridValue(grid, currentLocation) - 1];  // you ate a food... good for you!
-      eaten[getGridValue(grid, currentLocation) - 1]++;  // track the number of each berry eaten
+      score += foodRewards[getGridValue(grid, currentLocation)];  // you ate a food... good for you!
+      eaten[getGridValue(grid, currentLocation)]++;  // track the number of each berry eaten
       org->dataMap.Append("foodList", getGridValue(grid, currentLocation));
       setGridValue(grid, currentLocation, 0);  // clear this location
     }
@@ -212,52 +212,37 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse) {
         case 3:  //move forward
           if (getGridValue(grid, moveOnGrid(currentLocation, facing)) != WALL) {  // if the proposed move is not a wall
             if (getGridValue(grid, currentLocation) == EMPTY) {  // if the current location is empty
-              setGridValue(grid, currentLocation, Random::getInt(1, foodSourceTypes));  // plant a red or blue food
+              setGridValue(grid, currentLocation, Random::getInt(1, foodTypes));  // plant a red or blue food
             }
             currentLocation = moveOnGrid(currentLocation, facing);
           }
           break;
       }
     }
-////		Data::Add(xp, "x"+mkString(t), org->brain->genome);
-////		Data::Add(yp, "y"+mkString(t), org->brain->genome);
-//
-//    /* uncommnet to print test output
-//     for(int x=0;x<xDim;x++){
-//     for(int y=0;y<yDim;y++){
-//     if((x==xp)&&(y==yp))
-//     printf("X");
-//     else
-//     printf("%i",grid[x][y]);
-//     }
-//     printf("\n");
-//     }
-//     printf("%f\n",score);
-//     for (int blah = 0; blah < 1000000; blah++){}
-//     */
-//  }
-    if (score < 0.0) {
-      score = 0.0;
-    }
+  }  // end world evaluation loop
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//	if (analyse) {
-//		org->dataMap[Global::update].Set("phi", Analyse::computeAtomicPhi(stateCollector, org->brain->nrOfBrainStates));
+  if (score < 0.0) {
+    score = 0.0;
   }
-  if (!org->dataMap.fieldExists("foodList")) {
-    org->dataMap.Append("foodList", 0);
+
+  if (!org->dataMap.fieldExists("foodList")) {  // if no food was eaten foodList will be empty.
+    org->dataMap.Append("foodList", 0);  // put a 0 in it as a placeholder (0 is no food)
   }
-  org->dataMap.Set("switches", switches);
+
   int total_eaten = 0;
-  for (int i = 0; i < foodSourceTypes; i++) {
+  for (int i = 1; i <= foodTypes; i++) {
     total_eaten += eaten[i];
-    string temp_name = "food" + to_string(i + 1);
+    string temp_name = "food" + to_string(i); // make food names i.e. food1, food2, etc.
     org->dataMap.Set(temp_name, eaten[i]);
   }
-  org->dataMap.Set("total", total_eaten);
+  org->dataMap.Set("total", total_eaten); // total food eaten (regardless of type)
+
+  org->dataMap.Set("switches", switches);
   org->dataMap.Set("score", score);
+
+  if (analyse) {
+    org->dataMap.Set("phi", Analyse::computeAtomicPhi(stateCollector, org->brain->nrOfBrainStates));
+  }
+
   return score;
 }

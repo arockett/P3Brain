@@ -39,7 +39,7 @@ class BerryWorld : public World {
 
   static double& TSK;
   static int& worldUpdates;
-  static int& foodSourceTypes;
+  static int& foodTypes;
   static double& rewardForFood1;
   static double& rewardForFood2;
   static double& rewardForFood3;
@@ -115,7 +115,7 @@ class BerryWorld : public World {
         if (borderWalls && (x == 0 || x == WorldX - 1 || y == 0 || y == WorldY - 1)) {
           setGridValue(grid, { x, y }, WALL);  // place walls on edge
         } else {
-          setGridValue(grid, { x, y }, Random::getInt(1, foodSourceTypes));  // plase random food where there is not a wall
+          setGridValue(grid, { x, y }, Random::getInt(1, foodTypes));  // plase random food where there is not a wall
         }
       }
     }
