@@ -244,20 +244,19 @@ class Archivist {
             bool found = false;
             shared_ptr<Organism> org;
 
-            while (!found) {  // check each org in checkPointTraker[nextDataWrite] until we get a valid org
+            while (!found) {  // check each org in checkPointTraker[nextDataWrite] until we find a valid org
               if (auto temp_org = checkpoints[nextDataWrite][0].lock()) {  // this ptr is still good
                 org = temp_org;
                 found = true;
-                cout << "found ID: " << org->ID << "\n";
               } else {  // it' empty, swap to back and remove.
                 swap(checkpoints[nextDataWrite][0],checkpoints[nextDataWrite].back());// swap expired ptr to back of vector
                 checkpoints[nextDataWrite].pop_back();// pop expired ptr from back of vector
               }
             }
 
-            vector<string> tempKeysList = org->snapShotDataMaps[nextDataWrite].getKeys();  // get all keys from an orgs dataMap (don't care which one - they should all be the same)
+            vector<string> tempKeysList = org->snapShotDataMaps[nextDataWrite].getKeys();  // get all keys from the valid orgs dataMap (all orgs should have the same keys in their dataMaps)
             for (auto key : tempKeysList) {  // for every key in dataMap...
-              if (key != "genomeAncestors") {  // as long as it's not genomeAncestors... genomeAncestors may be here is a genome and data interval overlap
+              if (key != "genomeAncestors") {  // as long as it's not genomeAncestors... (genomeAncestors may be in the dataMap if a genome and data interval overlap)
                 files["data"].push_back(key);// add it to the list of keys associated with the genome file.
               }
             }

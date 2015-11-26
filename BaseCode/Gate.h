@@ -43,8 +43,7 @@ class Gate {  // abstact class. Assumes that a standard genome is being used.
   static double& voidOutPut;
   static double& FixedEpsilonGateP;
 
-  static void AddGate(
-      int ID, function<shared_ptr<Gate>(shared_ptr<Genome>, int)> theFunction);
+  static void AddGate(int ID, function<shared_ptr<Gate>(shared_ptr<Genome>, int)> theFunction);
   static void setupGates();
   static function<shared_ptr<Gate>(shared_ptr<Genome>, int)> makeGate[256];
 
@@ -59,11 +58,8 @@ class Gate {  // abstact class. Assumes that a standard genome is being used.
   // functions used in genome translation
   void movePastStartCodeon(int& genomeIndex, shared_ptr<Genome> genome);  // simply addvances genomeIndex by the size of a start codeon (2)
   int getIOAddress(int& genomeIndex, shared_ptr<Genome> genome);  // extracts one brain state value address from a genome
-  void getSomeBrainAddresses(const int& howMany, const int& howManyMax,
-                             vector<int>& addresses, int& genome_index,
-                             shared_ptr<Genome> genome, int codeNumber);  // extracts many brain state value addresses from a genome
-  void getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange,
-                           int& genomeIndex, shared_ptr<Genome> genome);  // extracts the input and output brain state value addresses for this gate
+  void getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, int& genome_index, shared_ptr<Genome> genome, int codeNumber);  // extracts many brain state value addresses from a genome
+  void getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, int& genomeIndex, shared_ptr<Genome> genome);  // extracts the input and output brain state value addresses for this gate
 
   int getIndexFromInputs(vector<double> &brainState);  // used during update to convert gate input into table indexes
 
@@ -74,9 +70,7 @@ class Gate {  // abstact class. Assumes that a standard genome is being used.
    * set codingRegions for each used genome site value = DATA_CODE; (may need to add more support for this later!)
    */
   template<typename Type>
-  void getTableFromGenome(vector<int> range, vector<int> rangeMax,
-                          int& genomeIndex, shared_ptr<Genome> genome,
-                          vector<vector<Type>> &table) {
+  void getTableFromGenome(vector<int> range, vector<int> rangeMax, int& genomeIndex, shared_ptr<Genome> genome, vector<vector<Type>> &table) {
     int x, y;
     int Y = range[0];
     int X = range[1];

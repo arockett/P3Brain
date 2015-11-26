@@ -15,67 +15,31 @@
 
 /* *** implementation of the World *** */
 
-double& BerryWorld::TSK = Parameters::register_parameter(
-    "BERRY_taskSwitchingCost", 1.4, "cost to change food sources",
-    "WORLD - BERRY");
-int& BerryWorld::worldUpdates = Parameters::register_parameter(
-    "BERRY_WorldUpdates", 400, "amount of time an brain is tested",
-    "WORLD - BERRY");
+double& BerryWorld::TSK = Parameters::register_parameter("BERRY_taskSwitchingCost", 1.4, "cost to change food sources", "WORLD - BERRY");
+int& BerryWorld::worldUpdates = Parameters::register_parameter("BERRY_WorldUpdates", 400, "amount of time an brain is tested", "WORLD - BERRY");
 
-int& BerryWorld::foodSourceTypes = Parameters::register_parameter(
-    "BERRY_foodSourceTypes", 2, "number of types of food", "WORLD - BERRY");
-double& BerryWorld::rewardForFood1 = Parameters::register_parameter(
-    "BERRY_rewardForFood1", 1.0, "reward for eating a Food1", "WORLD - BERRY");
-double& BerryWorld::rewardForFood2 = Parameters::register_parameter(
-    "BERRY_rewardForFood2", 1.0, "reward for eating a Food2", "WORLD - BERRY");
-double& BerryWorld::rewardForFood3 = Parameters::register_parameter(
-    "BERRY_rewardForFood3", 1.0, "reward for eating a Food3", "WORLD - BERRY");
-double& BerryWorld::rewardForFood4 = Parameters::register_parameter(
-    "BERRY_rewardForFood4", 1.0, "reward for eating a Food4", "WORLD - BERRY");
-double& BerryWorld::rewardForFood5 = Parameters::register_parameter(
-    "BERRY_rewardForFood5", 1.0, "reward for eating a Food5", "WORLD - BERRY");
-double& BerryWorld::rewardForFood6 = Parameters::register_parameter(
-    "BERRY_rewardForFood6", 1.0, "reward for eating a Food6", "WORLD - BERRY");
-double& BerryWorld::rewardForFood7 = Parameters::register_parameter(
-    "BERRY_rewardForFood7", 1.0, "reward for eating a Food7", "WORLD - BERRY");
-double& BerryWorld::rewardForFood8 = Parameters::register_parameter(
-    "BERRY_rewardForFood8", 1.0, "reward for eating a Food8", "WORLD - BERRY");
+int& BerryWorld::foodSourceTypes = Parameters::register_parameter("BERRY_foodSourceTypes", 2, "number of types of food", "WORLD - BERRY");
+double& BerryWorld::rewardForFood1 = Parameters::register_parameter("BERRY_rewardForFood1", 1.0, "reward for eating a Food1", "WORLD - BERRY");
+double& BerryWorld::rewardForFood2 = Parameters::register_parameter("BERRY_rewardForFood2", 1.0, "reward for eating a Food2", "WORLD - BERRY");
+double& BerryWorld::rewardForFood3 = Parameters::register_parameter("BERRY_rewardForFood3", 1.0, "reward for eating a Food3", "WORLD - BERRY");
+double& BerryWorld::rewardForFood4 = Parameters::register_parameter("BERRY_rewardForFood4", 1.0, "reward for eating a Food4", "WORLD - BERRY");
+double& BerryWorld::rewardForFood5 = Parameters::register_parameter("BERRY_rewardForFood5", 1.0, "reward for eating a Food5", "WORLD - BERRY");
+double& BerryWorld::rewardForFood6 = Parameters::register_parameter("BERRY_rewardForFood6", 1.0, "reward for eating a Food6", "WORLD - BERRY");
+double& BerryWorld::rewardForFood7 = Parameters::register_parameter("BERRY_rewardForFood7", 1.0, "reward for eating a Food7", "WORLD - BERRY");
+double& BerryWorld::rewardForFood8 = Parameters::register_parameter("BERRY_rewardForFood8", 1.0, "reward for eating a Food8", "WORLD - BERRY");
 
-int& BerryWorld::worldColumns = Parameters::register_parameter("BERRY_WorldX",
-                                                               8,
-                                                               "world X size",
-                                                               "WORLD - BERRY");
-int& BerryWorld::worldRows = Parameters::register_parameter("BERRY_WorldY", 8,
-                                                            "world Y size",
-                                                            "WORLD - BERRY");
-bool& BerryWorld::borderWalls = Parameters::register_parameter(
-    "BERRY_makeBorderWalls", true, "if true world will have a bounding wall",
-    "WORLD - BERRY");
-int& BerryWorld::randomWalls = Parameters::register_parameter(
-    "BERRY_makeRandomWalls", 0, "add this many walls to the world",
-    "WORLD - BERRY");
+int& BerryWorld::WorldY = Parameters::register_parameter("BERRY_WorldX", 8, "world X size", "WORLD - BERRY");
+int& BerryWorld::WorldX = Parameters::register_parameter("BERRY_WorldY", 8, "world Y size", "WORLD - BERRY");
+bool& BerryWorld::borderWalls = Parameters::register_parameter("BERRY_makeBorderWalls", true, "if true world will have a bounding wall", "WORLD - BERRY");
+int& BerryWorld::randomWalls = Parameters::register_parameter("BERRY_makeRandomWalls", 0, "add this many walls to the world", "WORLD - BERRY");
 
-bool& BerryWorld::clearOutputs = Parameters::register_parameter(
-    "BERRY_clearOutputs", false,
-    "if true outputs will be cleared on each world update", "WORLD - BERRY");
+bool& BerryWorld::clearOutputs = Parameters::register_parameter("BERRY_clearOutputs", false, "if true outputs will be cleared on each world update", "WORLD - BERRY");
 
-bool& BerryWorld::allowMoveAndEat = Parameters::register_parameter(
-    "BERRY_allowMoveAndEat", false,
-    "if true, the brain can move and eat in the same world update",
-    "WORLD - BERRY");
-bool& BerryWorld::senseDown = Parameters::register_parameter(
-    "BERRY_senseDown", true, "if true, Agent can sense what it's standing on",
-    "WORLD - BERRY");
-bool& BerryWorld::senseFront = Parameters::register_parameter(
-    "BERRY_senseFront", true, "if true, Agent can sense what's in front of it",
-    "WORLD - BERRY");
-bool& BerryWorld::senseFrontSides = Parameters::register_parameter(
-    "BERRY_senseFrontSides", true,
-    "if true, Agent can sense what's in front to the left and right of it",
-    "WORLD - BERRY");
-bool& BerryWorld::senseWalls = Parameters::register_parameter(
-    "BERRY_senseWalls", true, "if true, Agent can sense Walls",
-    "WORLD - BERRY");
+bool& BerryWorld::allowMoveAndEat = Parameters::register_parameter("BERRY_allowMoveAndEat", false, "if true, the brain can move and eat in the same world update", "WORLD - BERRY");
+bool& BerryWorld::senseDown = Parameters::register_parameter("BERRY_senseDown", true, "if true, Agent can sense what it's standing on", "WORLD - BERRY");
+bool& BerryWorld::senseFront = Parameters::register_parameter("BERRY_senseFront", true, "if true, Agent can sense what's in front of it", "WORLD - BERRY");
+bool& BerryWorld::senseFrontSides = Parameters::register_parameter("BERRY_senseFrontSides", true, "if true, Agent can sense what's in front to the left and right of it", "WORLD - BERRY");
+bool& BerryWorld::senseWalls = Parameters::register_parameter("BERRY_senseWalls", true, "if true, Agent can sense Walls", "WORLD - BERRY");
 
 BerryWorld::BerryWorld() {
   senseWalls = senseWalls & (borderWalls | (randomWalls > 0));  // if there are no walls, there is no need to sense them!
@@ -83,41 +47,45 @@ BerryWorld::BerryWorld() {
   outputStatesCount = 3;  // number of brain states used for output, 2 for move, 1 for eat
 
   if (senseWalls) {
-    inputStatesCount = (senseDown * foodSourceTypes)
-        + ((senseFront * foodSourceTypes) + senseWalls)
-        + (2 * ((senseFrontSides * foodSourceTypes) + senseWalls));
+    inputStatesCount = (senseDown * foodSourceTypes) + ((senseFront * foodSourceTypes) + senseWalls) + (2 * ((senseFrontSides * foodSourceTypes) + senseWalls));
     // sense down does not include walls (can't stand on a wall (yet!) * types of food
     // senseFront * types of food + wall, same for senseFrontSides, but there are 2
   } else {  // no border walls
-    inputStatesCount = (senseDown * foodSourceTypes)
-        + (senseFront * foodSourceTypes)
-        + (2 * (senseFrontSides * foodSourceTypes));
+    inputStatesCount = (senseDown * foodSourceTypes) + (senseFront * foodSourceTypes) + (2 * (senseFrontSides * foodSourceTypes));
     // sense down * types of food, same for senseFront, same for senseFrontSides, but there are 2
   }
 
-  cout << "  World using following BrainSates:\n    Inputs: 0 to "
-       << inputStatesCount - 1 << "\n    Outputs: " << inputStatesCount
-       << " to " << inputStatesCount + outputStatesCount - 1 << "\n";
+  cout << "  World using following BrainSates:\n    Inputs: 0 to " << inputStatesCount - 1 << "\n    Outputs: " << inputStatesCount << " to " << inputStatesCount + outputStatesCount - 1 << "\n";
+}
+
+void printGrid(vector<int> grid, pair<int,int> loc) {
+  for (int i = 0; i < BerryWorld::WorldX * BerryWorld::WorldY; i++) {
+    if ((i % BerryWorld::WorldX == loc.first) && (i / BerryWorld::WorldX == loc.second)) {
+      cout << "X ";
+    } else {
+      cout << grid[i] << " ";
+    }
+    if (i % BerryWorld::WorldX == BerryWorld::WorldX - 1) {
+      cout << "\n";
+    }
+  }
+  cout << "\n";
 }
 
 double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse) {
-  vector<vector<int>> grid;
-  grid.resize(worldRows);
-  for (int rowCount = 0; rowCount < worldRows; rowCount++) {
-    grid[rowCount].resize(worldColumns);
-  }
-
-  // agent starts in the center of the world, facing in a random direction.
-  int currentColumn = worldColumns / 2;  // column being occupied by agent
-  int currentRow = worldRows / 2;  // row being occupied by agent
-  int facing = Random::getInt(7);  // direction the agent is facing
-
-  int switches = 0;
-  int statesAssignmentCounter;
-
-  vector<int> stateCollector;
   double score = 0.0;
+
+  vector<int> grid = makeTestGrid();
+
+  // organism starts in the center of the world, facing in a random direction.
+  pair<int, int> currentLocation = { WorldX / 2, WorldY / 2 };  // location of the organism
+  int facing = Random::getIndex(8);  // direction the agent is facing
+
+  // set up to track what food is eaten
+  int switches = 0;  // number of times organism has switched food source
   int lastFood = -1;  //nothing has been eaten yet!
+  vector<int> eaten;  // stores numer of each type of food was eaten in total for this test
+  eaten.resize(foodSourceTypes);
 
   vector<double> foodRewards;
   foodRewards.resize(8);
@@ -130,54 +98,29 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse) {
   foodRewards[6] = rewardForFood7;
   foodRewards[7] = rewardForFood8;
 
-  vector<int> eaten;  //the array eaten has 2 elements and they are both 0
-  eaten.resize(foodSourceTypes);
+  org->dataMap.Clear("foodList");  // since foodList is built with Append, if an org lives for more then one "generation update" it's foodList must be cleared
 
-  if (borderWalls) {
-    for (int row = 1; row < worldRows - 1; row++)
-      for (int column = 1; column < worldColumns - 1; column++) {  //as you go across the x and y directions in grid...
-        grid[row][column] = Random::getInt(1, foodSourceTypes);  // plant red or blue food
-      }
-    for (int column = 0; column < worldColumns; column++) {  //makes horizontal walls
-      grid[0][column] = WALL;
-      grid[worldRows - 1][column] = WALL;
-    }
-    for (int row = 0; row < worldRows; row++) {  //makes vertical walls
-      grid[row][0] = WALL;
-      grid[row][worldColumns - 1] = WALL;
-    }
-
-  } else {  // no border walls
-    for (int row = 0; row < worldRows; row++) {
-      for (int column = 0; column < worldColumns; column++) {  //as you go across the x and y directions in grid...
-        grid[row][column] = Random::getInt(1, foodSourceTypes);  // plant red or blue food
-      }
-    }
-  }
-  for (int i = 0; i < randomWalls; i++) {  // add walls
-    grid[Random::getIndex(worldRows)][Random::getIndex(worldColumns)] = WALL;
-  }
-
-  org->brain->resetBrain();
-
-  int output1 = 0;
+  // set up vars needed to run
+  int output1 = 0;  // store outputs from brain
   int output2 = 0;
 
-  int here, leftFront, front, rightFront;
+  int here, leftFront, front, rightFront;  // store grid values relitive to organsism
+
+  int statesAssignmentCounter;  // this world can has number of brainState inputs set by parameter. This counter is used while assigning inputs
+
+  vector<int> stateCollector;  // used i the phi calculation
+
+  // make sure the brain does not have values from last run
+  org->brain->resetBrain();
 
   for (int t = 0; t < worldUpdates; t++) {  //run agent for "worldUpdates" brain updates
 
-    here = grid[currentColumn][currentRow];  // where the agent is standing
-    front = grid[loopMod((currentColumn + xm[facing]), (worldColumns))][loopMod(
-        (currentRow + ym[facing]), (worldRows))];
-    leftFront = grid[loopMod((currentColumn + xm[(facing - 1) & 7]),
-                             (worldColumns))][loopMod(
-        (currentRow + ym[(facing - 1) & 7]), (worldRows))];
-    rightFront = grid[loopMod((currentColumn + xm[(facing + 1) & 7]),
-                              (worldColumns))][loopMod(
-        (currentRow + ym[(facing + 1) & 7]), (worldRows))];
+    here = getGridValue(grid, currentLocation);
+    front = getGridValue(grid, moveOnGrid(currentLocation, facing));
+    leftFront = getGridValue(grid, moveOnGrid(currentLocation, turnLeft(facing)));
+    rightFront = getGridValue(grid, moveOnGrid(currentLocation, turnRight(facing)));
 
-    statesAssignmentCounter = 0;
+    statesAssignmentCounter = 0;  // get ready to start assigning inputs
 
     if (senseWalls) {
       if (senseDown) {
@@ -194,8 +137,7 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse) {
       if (senseFrontSides) {
         for (int i = 0; i < foodSourceTypes; i++) {  // fill first states with food values at front location
           org->brain->setState(statesAssignmentCounter++, (leftFront == i + 1));
-          org->brain->setState(statesAssignmentCounter++,
-                               (rightFront == i + 1));
+          org->brain->setState(statesAssignmentCounter++, (rightFront == i + 1));
         }
         org->brain->setState(statesAssignmentCounter++, (leftFront == WALL));
         org->brain->setState(statesAssignmentCounter++, (rightFront == WALL));
@@ -214,12 +156,12 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse) {
       if (senseFrontSides) {
         for (int i = 0; i < foodSourceTypes; i++) {  // fill first states with food values at front location
           org->brain->setState(statesAssignmentCounter++, (leftFront == i + 1));
-          org->brain->setState(statesAssignmentCounter++,
-                               (rightFront == i + 1));
+          org->brain->setState(statesAssignmentCounter++, (rightFront == i + 1));
         }
       }
     }
 
+    // inputStatesCount is not set to the first output Brain State Address. we will not move it until the next world update!
     if (clearOutputs) {
       org->brain->setState(inputStatesCount, 0.0);
       org->brain->setState(inputStatesCount + 1, 0.0);
@@ -231,74 +173,79 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse) {
       for (int i = 0; i < inputStatesCount; i++)
         S = (S << 1) + Bit(org->brain->states[i]);
       org->brain->update();
-      for (int i = inputStatesCount + outputStatesCount;
-          i < org->brain->nrOfBrainStates; i++)
+      for (int i = inputStatesCount + outputStatesCount; i < org->brain->nrOfBrainStates; i++)
         S = (S << 1) + Bit(org->brain->states[i]);
       stateCollector.push_back(S);
     } else {
       org->brain->update();  // just run the update!
     }
 
-    // set output values
-    output1 = Bit(org->brain->getState(inputStatesCount))
-        + (Bit(org->brain->getState(inputStatesCount + 1)) << 1);
+// set output values
+    // output1 has info about the first 2 output bits these [00 eat, 10 left, 01 right, 11 move]
+    output1 = Bit(org->brain->getState(inputStatesCount)) + (Bit(org->brain->getState(inputStatesCount + 1)) << 1);
+    // output 2 has info about the 3rd output bit, which either does nothing, or is eat.
     output2 = Bit(org->brain->getState(inputStatesCount + 2));
 
-    if ((output2 == 1) && (grid[currentColumn][currentRow] != EMPTY)) {  // eat food here (if there is food here)
+    if ((output2 == 1) && (getGridValue(grid, currentLocation) != EMPTY)) {  // eat food here (if there is food here)
       if (lastFood != -1) {  // if some food has already been eaten
-        if (lastFood != grid[currentColumn][currentRow]) {  // if this food is different then the last food eaten
+        if (lastFood != getGridValue(grid, currentLocation)) {  // if this food is different then the last food eaten
           score -= BerryWorld::TSK;  // pay the task switch cost
           switches++;
         }
       }
-      score += foodRewards[grid[currentColumn][currentRow] - 1];  // you ate a food... good for you!
-      lastFood = grid[currentColumn][currentRow];  // remember the last food eaten
-      eaten[grid[currentColumn][currentRow] - 1]++;  // track the number of each berry eaten
-      org->dataMap.Append("foodList", grid[currentColumn][currentRow]);
-      grid[currentColumn][currentRow] = 0;  // clear this location
+      lastFood = getGridValue(grid, currentLocation);  // remember the last food eaten
+      score += foodRewards[getGridValue(grid, currentLocation) - 1];  // you ate a food... good for you!
+      eaten[getGridValue(grid, currentLocation) - 1]++;  // track the number of each berry eaten
+      org->dataMap.Append("foodList", getGridValue(grid, currentLocation));
+      setGridValue(grid, currentLocation, 0);  // clear this location
     }
     if ((output2 == 0) || (allowMoveAndEat == 1)) {  // if we did not eat or we allow moving and eating in the same world update
       switch (output1) {
         case 0:  //nothing
           break;
         case 1:  //turn left
-          facing = (facing - 1) & 7;
+          facing = turnRight(facing);
           break;
         case 2:  //turn right
-          facing = (facing + 1) & 7;
+          facing = turnLeft(facing);
           break;
         case 3:  //move forward
-          if (grid[loopMod((currentColumn + xm[facing]), (worldColumns))][loopMod(
-              (currentRow + ym[facing]), (worldRows))] != WALL) {  // if the proposed move is not a wall
-            if (grid[currentColumn][currentRow] == EMPTY) {  // if the current location is empty
-              grid[currentColumn][currentRow] = Random::getInt(1,
-                                                               foodSourceTypes);  // plant a red or blue food
+          if (getGridValue(grid, moveOnGrid(currentLocation, facing)) != WALL) {  // if the proposed move is not a wall
+            if (getGridValue(grid, currentLocation) == EMPTY) {  // if the current location is empty
+              setGridValue(grid, currentLocation, Random::getInt(1, foodSourceTypes));  // plant a red or blue food
             }
-            currentColumn = loopMod((currentColumn + xm[facing]), worldColumns);  // move to the new X
-            currentRow = loopMod((currentRow + ym[facing]), worldRows);  // move to the new Y
+            currentLocation = moveOnGrid(currentLocation, facing);
           }
           break;
       }
     }
-//		Data::Add(xp, "x"+mkString(t), org->brain->genome);
-//		Data::Add(yp, "y"+mkString(t), org->brain->genome);
+////		Data::Add(xp, "x"+mkString(t), org->brain->genome);
+////		Data::Add(yp, "y"+mkString(t), org->brain->genome);
+//
+//    /* uncommnet to print test output
+//     for(int x=0;x<xDim;x++){
+//     for(int y=0;y<yDim;y++){
+//     if((x==xp)&&(y==yp))
+//     printf("X");
+//     else
+//     printf("%i",grid[x][y]);
+//     }
+//     printf("\n");
+//     }
+//     printf("%f\n",score);
+//     for (int blah = 0; blah < 1000000; blah++){}
+//     */
+//  }
+    if (score < 0.0) {
+      score = 0.0;
+    }
 
-    /* uncommnet to print test output
-     for(int x=0;x<xDim;x++){
-     for(int y=0;y<yDim;y++){
-     if((x==xp)&&(y==yp))
-     printf("X");
-     else
-     printf("%i",grid[x][y]);
-     }
-     printf("\n");
-     }
-     printf("%f\n",score);
-     for (int blah = 0; blah < 1000000; blah++){}
-     */
-  }
-  if (score < 0.0) {
-    score = 0.0;
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//	if (analyse) {
+//		org->dataMap[Global::update].Set("phi", Analyse::computeAtomicPhi(stateCollector, org->brain->nrOfBrainStates));
   }
   if (!org->dataMap.fieldExists("foodList")) {
     org->dataMap.Append("foodList", 0);
@@ -312,12 +259,5 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse) {
   }
   org->dataMap.Set("total", total_eaten);
   org->dataMap.Set("score", score);
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//	if (analyse) {
-//		org->dataMap[Global::update].Set("phi", Analyse::computeAtomicPhi(stateCollector, org->brain->nrOfBrainStates));
-//	}
   return score;
 }

@@ -15,16 +15,14 @@
 
 vector<int> Brain::defaultNodeMap;
 
-int& Brain::defaultNrOfBrainStates = Parameters::register_parameter(
-    "brainSize", 16, "number of Brain Values", "BRAIN");
+int& Brain::defaultNrOfBrainStates = Parameters::register_parameter("brainSize", 16, "number of Brain Values", "BRAIN");
 
 #if SKIPGATE==1 // if SKIPGATE is enabled, there is a chance a gate will not update
 double& Brain::skipGate = Parameters::register_parameter("skipGate", 0.0,
     "chance that a gate will not fire", "BRAIN");
 #endif // SKIPGATE
 
-bool& Brain::serialProcessing = Parameters::register_parameter(
-    "serialProcessing", false, "sets brains to overwrite... right?", "BRAIN");
+bool& Brain::serialProcessing = Parameters::register_parameter("serialProcessing", false, "sets brains to overwrite... right?", "BRAIN");
 //////////////////////////////////////////
 // required code to support abstract class
 AbstractBrain::AbstractBrain() {
@@ -34,15 +32,13 @@ AbstractBrain::~AbstractBrain() {
 void AbstractBrain::update() {
 }
 string AbstractBrain::description() {
-  cout
-      << "   In AbstractBrain::description() : is an abstract method and should not be used\n";
+  cout << "   In AbstractBrain::description() : is an abstract method and should not be used\n";
   string S = "";
   return (S);
 }
 
 vector<string> AbstractBrain::getStats() {
-  cout
-      << "   In AbstractBrain::getStats() : is an abstract method and should not be used\n";
+  cout << "   In AbstractBrain::getStats() : is an abstract method and should not be used\n";
   vector<string> dataPairs;
   return (dataPairs);
 }
@@ -166,10 +162,8 @@ vector<vector<int>> Brain::getConnectivityMatrix() {
 
 set<int> Brain::findCodingRegions(int mask) {  //if mask=0, all coding regions are returned. if mask=1, return everything except start codon. if mask=2, return everything except start codon and wiring.
   set<int> allCodingRegions;
-  for (auto gateIterator = gates.begin(); gateIterator != gates.end();
-      gateIterator++) {
-    for (auto iterator = (*gateIterator)->codingRegions.begin();
-        iterator != (*gateIterator)->codingRegions.end(); iterator++) {
+  for (auto gateIterator = gates.begin(); gateIterator != gates.end(); gateIterator++) {
+    for (auto iterator = (*gateIterator)->codingRegions.begin(); iterator != (*gateIterator)->codingRegions.end(); iterator++) {
       if (iterator->second >= mask) {
         allCodingRegions.insert(iterator->first);
       }

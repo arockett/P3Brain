@@ -46,8 +46,7 @@ class Brain : AbstractBrain {
    * Builds a look up table to convert genome site values into brain state addresses - this is only used when there is a fixed number of brain states
    * if there is a variable number of brain states, then the node map must be rebuilt.
    */
-  static int makeNodeMap(vector<int> & nodeMap, int sizeInBits,
-                         int defaultNrOfBrainStates) {
+  static int makeNodeMap(vector<int> & nodeMap, int sizeInBits, int defaultNrOfBrainStates) {
     for (int i = 0; i < pow(2, (sizeInBits)); i++) {  // each site in the genome has 8 bits so we need to count though (  2 to the (8 * number of sites)  )
       nodeMap.push_back(i % defaultNrOfBrainStates);
     }
@@ -63,8 +62,7 @@ class Brain : AbstractBrain {
   Brain() {
     nrOfBrainStates = defaultNrOfBrainStates;
   }
-  Brain(shared_ptr<Genome> startGenome,
-        int _nrOfStates = defaultNrOfBrainStates);
+  Brain(shared_ptr<Genome> startGenome, int _nrOfStates = defaultNrOfBrainStates);
   virtual ~Brain() {
   }
   ;
@@ -92,8 +90,7 @@ class Brain : AbstractBrain {
     if (state < (int) states.size()) {
       states[state] = value;
     } else {
-      cout
-          << "Writing to invalid brain state - this brain needs more states!\nExiting\n";
+      cout << "Writing to invalid brain state - this brain needs more states!\nExiting\n";
       exit(1);
     }
   }
@@ -101,8 +98,7 @@ class Brain : AbstractBrain {
     if (state < (int) states.size()) {
       return states[state];
     } else {
-      cout
-          << "Reading from invalid brain state - this brain needs more states!\nExiting\n";
+      cout << "Reading from invalid brain state - this brain needs more states!\nExiting\n";
       exit(1);
     }
   }
