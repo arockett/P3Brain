@@ -155,7 +155,7 @@ class Archivist {
               checkpointEmpty = true;
               for (auto weakPtrToOrg : checkpoints[checkpoint.first]) {  // than for each element in that checkpoint
                 if(auto org = weakPtrToOrg.lock()) {  // if this ptr is still good
-                  if(org->timeOfDeath < (Global::update - intervalDelay)) {  // and if the organism was dead at the time of this checkpoint
+                  if((!org->alive) && (org->timeOfDeath < (Global::update - intervalDelay))) {  // and if the organism was dead at the time of this checkpoint
                     org->parents.clear();// clear this organisms parents
                   } else {
                     checkpointEmpty = false;  // there is an organism in this checkpoint that was alive later then (Global::update - intervalDelay)
