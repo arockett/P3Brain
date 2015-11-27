@@ -86,6 +86,10 @@ class Archivist {
   }
 
   void archive(vector<shared_ptr<Organism>> population, int flush = 0) {
+    if ((Global::update % pruneInterval == 0) && (flush == 0)) {  // do not write files on flush - these organisms have not been evaluated!
+      writeRealTimeFiles(population);// write to dominant and average files
+    }
+
     if (outputMethod == -1) {  // this is the first time archive is called. get the output method
       if (outputMethodStr == "LODwAP") {
         outputMethod = 0;
@@ -95,27 +99,22 @@ class Archivist {
         cout << "unrecognized archive method \"" << outputMethodStr << "\". Should be either \"LODwAP\" or \"SSwD\"\nExiting.\n";
       }
     }
+
     if (outputMethod == 0) {
-      if ((Global::update % pruneInterval == 0) && (flush == 0)) {  // do not write files on flush - these organisms have not been evaluated!
-        writeRealTimeFiles(population);// write to dominant and average files
-      }
       if ((Global::update % pruneInterval == 0) || (flush == 1)) {
-        shared_ptr<Organism> sampleOrg = population[0];
-        shared_ptr<Organism> MRCA = sampleOrg->getMostRecentCommonAncestor(sampleOrg);
 
         if (files.find("data.csv") == files.end()) {  // if file has not be initialized yet
-          files[DataFileName] = sampleOrg->dataMap.getKeys();
+          files[DataFileName] = population[0]->dataMap.getKeys();
         }
 
-        vector<shared_ptr<Organism>> LOD = sampleOrg->getLOD(sampleOrg);  // get line of decent
+        vector<shared_ptr<Organism>> LOD = population[0]->getLOD(population[0]);  // get line of decent
         shared_ptr<Organism> effective_MRCA;
-        if (flush) {            // if flush then we don't care about convergance
+        if (flush) {  // if flush then we don't care about convergance
           cout << "flushing LODwAP: using population[0] as MRCA\n";
-          effective_MRCA = sampleOrg->parents[0];// this assumes that a population was created, but not tested at the end of the evolution loop!
+          effective_MRCA = population[0]->parents[0];// this assumes that a population was created, but not tested at the end of the evolution loop!
         } else {
-          effective_MRCA = MRCA;  // find the convergance point in the LOD.
+          effective_MRCA = population[0]->getMostRecentCommonAncestor(LOD);  // find the convergance point in the LOD.
         }
-
         while ((effective_MRCA->timeOfBirth >= nextDataWrite) && (nextDataWrite <= Global::updates)) {  // if there is convergence before the next data interval
           shared_ptr<Organism> current = LOD[nextDataWrite - lastPrune];
           for (auto file : files) {  // for each file in files
@@ -132,8 +131,8 @@ class Archivist {
         }
         // data and genomes have now been written out up till the MRCA
         // so all data and genomes from before the MRCA can be deleted
-        MRCA->parents.clear();
-        lastPrune = MRCA->timeOfBirth;// this will hold the time of the oldest genome in RAM
+        effective_MRCA->parents.clear();
+        lastPrune = effective_MRCA->timeOfBirth;// this will hold the time of the oldest genome in RAM
       }
     }
 
@@ -142,9 +141,6 @@ class Archivist {
       if (flush == 1) {
         cout << "flushing SSwD: nothing needs to be done\n";
       } else {  // not a flush - perform normal achive
-        if (Global::update % pruneInterval == 0) {
-          writeRealTimeFiles(population);  // write to dominant and average files
-        }
 
         ///// CLEANUP DELETE STALE CHECKPOINTS
         // if a checkpoint is from before Global::update - archivist::intervalDelay than delete the checkpoint

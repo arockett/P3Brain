@@ -101,8 +101,11 @@ int main(int argc, const char * argv[]) {
 
   while (((Archivist::nextDataWrite <= Global::updates) || (Archivist::nextGenomeWrite <= Global::updates)) && (Global::update <= (Global::updates + realTerminateAfter))) {
     world->evaluateFitness(group->population, false);  // evaluate each organism in the population using a World
+
     group->archive();  // save data, update memory and delete any unneeded data;
+
     Global::update++;
+
     group->optimize();  // update the population (reproduction and death)
 
     cout << "update: " << Global::update - 1 << "   maxFitness: " << group->optimizer->maxFitness << "\n";

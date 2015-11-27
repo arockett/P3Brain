@@ -23,7 +23,6 @@ World::~World() {
 }
 
 void World::evaluateFitness(vector<shared_ptr<Organism>> population, bool analyse) {
-  vector<double> W;
   for (size_t i = 0; i < population.size(); i++) {
     double scoreTotal = 0.0;
     for (int r = 0; r < World::repeats; r++) {
@@ -33,7 +32,6 @@ void World::evaluateFitness(vector<shared_ptr<Organism>> population, bool analys
     population[i]->dataMap.Set("score", population[i]->score);
     population[i]->dataMap.Set("update", Global::update);
   }
-
 }
 
 double World::testIndividual(shared_ptr<Organism> org, bool analyse) {

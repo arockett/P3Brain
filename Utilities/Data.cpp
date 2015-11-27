@@ -70,7 +70,7 @@ vector<string> DataMap::getKeys() {
   return (keys);
 }
 
-void DataMap::Clear() {
+void DataMap::clear() {
   data.clear();
 }
 

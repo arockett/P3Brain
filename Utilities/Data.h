@@ -81,7 +81,7 @@ class DataMap {
 
   void writeToFile(const string &fileName, const vector<string>& keys = { });  // write from this DataMap to fileName the data associated with keys
   vector<string> getKeys();
-  void Clear();
+  void clear();
 };
 
 class FileManager {
