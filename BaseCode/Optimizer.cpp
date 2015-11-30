@@ -191,7 +191,7 @@ void Tournament2::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
 
   }
   for (auto org : population) {
-    if (!survivors.count(org)) {  // if this org did not survive to the next generation, it must be killed. (sad.)
+    if (!survivors.count(org)) {  // if this org did not survive to the next generation, it must be killed (sad.)
       org->kill();
     }
   }

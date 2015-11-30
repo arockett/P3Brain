@@ -17,7 +17,7 @@
 #define VOIDOUTPUT 0
 
 bool& Gate::usingProbGate = Parameters::register_parameter("probGate", false, "set to true to enable probabilistic gates", "GATE TYPES");
-bool& Gate::usingDetGate = Parameters::register_parameter("detGate", false, "set to true to enable deterministic gates?", "GATE TYPES");
+bool& Gate::usingDetGate = Parameters::register_parameter("detGate", true, "set to true to enable deterministic gates?", "GATE TYPES");
 bool& Gate::usingFBGate = Parameters::register_parameter("fbGate", false, "set to true to enable feedback gates", "GATE TYPES");
 bool& Gate::usingGPGate = Parameters::register_parameter("gpGate", false, "set to true to enable GP (what?) gates", "GATE TYPES");
 bool& Gate::usingThGate = Parameters::register_parameter("thGate", false, "set to true to enable theta gates", "GATE TYPES");

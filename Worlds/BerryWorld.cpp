@@ -6,7 +6,8 @@
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
 //
 
-#include <stdlib.h>     // for atoi()
+//#include <stdlib.h>     // for atoi()
+#include <unistd.h>     // for sleep()
 
 #include "BerryWorld.h"
 
@@ -28,8 +29,8 @@ double& BerryWorld::rewardForFood6 = Parameters::register_parameter("BERRY_rewar
 double& BerryWorld::rewardForFood7 = Parameters::register_parameter("BERRY_rewardForFood7", 1.0, "reward for eating a Food7", "WORLD - BERRY");
 double& BerryWorld::rewardForFood8 = Parameters::register_parameter("BERRY_rewardForFood8", 1.0, "reward for eating a Food8", "WORLD - BERRY");
 
-int& BerryWorld::WorldY = Parameters::register_parameter("BERRY_WorldX", 8, "world X size", "WORLD - BERRY");
-int& BerryWorld::WorldX = Parameters::register_parameter("BERRY_WorldY", 8, "world Y size", "WORLD - BERRY");
+int& BerryWorld::WorldY = Parameters::register_parameter("BERRY_WorldY", 8, "world Y size", "WORLD - BERRY");
+int& BerryWorld::WorldX = Parameters::register_parameter("BERRY_WorldX", 8, "world X size", "WORLD - BERRY");
 bool& BerryWorld::borderWalls = Parameters::register_parameter("BERRY_makeBorderWalls", true, "if true world will have a bounding wall", "WORLD - BERRY");
 int& BerryWorld::randomWalls = Parameters::register_parameter("BERRY_makeRandomWalls", 0, "add this many walls to the world", "WORLD - BERRY");
 
@@ -58,21 +59,26 @@ BerryWorld::BerryWorld() {
   cout << "  World using following BrainSates:\n    Inputs: 0 to " << inputStatesCount - 1 << "\n    Outputs: " << inputStatesCount << " to " << inputStatesCount + outputStatesCount - 1 << "\n";
 }
 
-void printGrid(vector<int> grid, pair<int, int> loc) {
-  for (int i = 0; i < BerryWorld::WorldX * BerryWorld::WorldY; i++) {
-    if ((i % BerryWorld::WorldX == loc.first) && (i / BerryWorld::WorldX == loc.second)) {
-      cout << "X ";
-    } else {
-      cout << grid[i] << " ";
+void BerryWorld::printGrid(vector<int> grid, pair<int, int> loc, int facing) {
+  for (int y = 0; y < BerryWorld::WorldY; y++) {
+    for (int x = 0; x < BerryWorld::WorldX; x++) {
+      if ((x == loc.first) && (y == loc.second)) {
+        cout << facingDisplay[facing] << " ";
+      } else {
+        if (getGridValue(grid, { x, y }) == WALL){
+          cout << "X";
+        } else {
+                  cout << getGridValue(grid, { x, y });
+        }
+        cout << " ";
+      }
     }
-    if (i % BerryWorld::WorldX == BerryWorld::WorldX - 1) {
-      cout << "\n";
-    }
+    cout << "\n";
   }
   cout << "\n";
 }
 
-double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse) {
+double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool show) {
   double score = 0.0;
 
   vector<int> grid = makeTestGrid();
@@ -85,10 +91,10 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse) {
   int switches = 0;  // number of times organism has switched food source
   int lastFood = -1;  //nothing has been eaten yet!
   vector<int> eaten;  // stores number of each type of food was eaten in total for this test NOTE: food is indexed from 1 so 0th entry is not used
-  eaten.resize(foodTypes+1);
+  eaten.resize(foodTypes + 1);
 
   vector<double> foodRewards;
-  foodRewards.resize(9); // stores reward of each type of food NOTE: food is indexed from 1 so 0th entry is not used
+  foodRewards.resize(9);  // stores reward of each type of food NOTE: food is indexed from 1 so 0th entry is not used
   foodRewards[1] = rewardForFood1;
   foodRewards[2] = rewardForFood2;
   foodRewards[3] = rewardForFood3;
@@ -171,16 +177,16 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse) {
     if (analyse) {  // gather some data before and after running update
       int S = 0;
       for (int i = 0; i < inputStatesCount; i++)
-        S = (S << 1) + Bit(org->brain->states[i]);
+        S = (S << 1) + Bit(org->brain->getState(i));
       org->brain->update();
       for (int i = inputStatesCount + outputStatesCount; i < org->brain->nrOfBrainStates; i++)
-        S = (S << 1) + Bit(org->brain->states[i]);
+        S = (S << 1) + Bit(org->brain->getState(i));
       stateCollector.push_back(S);
     } else {
       org->brain->update();  // just run the update!
     }
 
-// set output values
+    // set output values
     // output1 has info about the first 2 output bits these [00 eat, 10 left, 01 right, 11 move]
     output1 = Bit(org->brain->getState(inputStatesCount)) + (Bit(org->brain->getState(inputStatesCount + 1)) << 1);
     // output 2 has info about the 3rd output bit, which either does nothing, or is eat.
@@ -219,6 +225,14 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse) {
           break;
       }
     }
+    if (show) {
+      cout << Global::update << "  " << t << "\n";
+      printGrid(grid, currentLocation, facing);
+      cout << "here: " << getGridValue(grid,currentLocation) << "loc: " << currentLocation.first << "," << currentLocation.second << "  facing: " << facing << "\n";
+      cout << "score: " << score << "\nfood1: " << eaten[1] << "  food2: " << eaten[2] << "  switches: " << switches << "\n";
+      cout << "output1: " << output1 << "  output2: " << output2 << "\n";
+      sleep(1);
+    }
   }  // end world evaluation loop
 
   if (score < 0.0) {
@@ -232,10 +246,10 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse) {
   int total_eaten = 0;
   for (int i = 1; i <= foodTypes; i++) {
     total_eaten += eaten[i];
-    string temp_name = "food" + to_string(i); // make food names i.e. food1, food2, etc.
+    string temp_name = "food" + to_string(i);  // make food names i.e. food1, food2, etc.
     org->dataMap.Set(temp_name, eaten[i]);
   }
-  org->dataMap.Set("total", total_eaten); // total food eaten (regardless of type)
+  org->dataMap.Set("total", total_eaten);  // total food eaten (regardless of type)
 
   org->dataMap.Set("switches", switches);
   org->dataMap.Set("score", score);

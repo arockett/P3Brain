@@ -29,6 +29,7 @@ class Global {
 
   static int& bitsPerBrainAddress;  // how many bits are evaluated to determine the brain addresses.
                                     // i.e. ceil(bitsPerBrainAddress/8) = number of genome sites used
+
   //////////
   // Below are non configurable values (not set directly by Parameters.h methods)
   //////////

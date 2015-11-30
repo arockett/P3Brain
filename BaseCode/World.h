@@ -27,6 +27,10 @@ class World {
   virtual ~World();
   virtual void evaluateFitness(vector<shared_ptr<Organism>> population, bool analyse);
   virtual double testIndividual(shared_ptr<Organism> org, bool analyse);
+  virtual double testIndividual(shared_ptr<Organism> org, bool analyse, bool show){
+    return testIndividual(org, analyse);
+  }
+
 };
 
 //class ExampleWorld: public World {

@@ -203,7 +203,7 @@ class Parameters {
 
   static void initialize_parameters(int argc, const char** argv) {
 
-    cout << "-----\n" << "  use your own configFile by setting configFileName (default: settings.cfg).\n" << "  to write out a new config file set \"makeConfigFile\" to 1.\n" << "-----\n";
+    cout << "-----\n" << "  You can use your own configFile by setting the comand line flag \"configFileName\" to the name of your config file (default: configFile settings.cfg).\n" << "  to write out a new config file set the comnad line flag \"makeConfigFile\" to 1.\n" << "-----\n";
 
     unordered_map<string, string> comand_line_list = readCommandLine(argc, argv);
 

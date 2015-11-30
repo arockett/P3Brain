@@ -51,18 +51,55 @@ string Genome::convert_to_string() {
   return dataString;
 }
 
+Genome::Genome(vector<unsigned char> _sites) {
+  sites = _sites;
+}
+
 Genome::Genome(shared_ptr<Genome> from) {
   copyGenome(from);
 }
 
-void Genome::copyGenome(shared_ptr<Genome> from) {
-  shared_ptr<Genome> who = from;
-  sites.resize(who->sites.size());
-  for (size_t i = 0; i < sites.size(); i++)
-    sites[i] = who->sites[i];
+void Genome::loadSites(string fileName, int update, int ID) {
+  cout << "In loadGenome\n";
+
+  map<string, vector<string>> fileContents;
+  fileContents = readFromCSVFile("genome.csv");
+
+  int update_index = -1;
+  size_t i = 0;
+  int temp;
+
+  while (i < fileContents["update"].size() && update_index == -1) {
+    bool success = load_value(fileContents["update"][i], temp);
+    if (!success) {
+      throw std::invalid_argument("In Genome::loadGenome() attempt to convert update from string to int failed\n");
+    } else {
+      if (update == temp) {
+        update_index = i;
+      }
+    }
+    i++;
+  }
+
+  if (update_index == -1){
+    throw std::invalid_argument("In Genome::loadSites() could not find requested update\n");
+  }
+
+  sites.clear();
+  vector<int> _sites;
+  convertCSVListToVector(fileContents["genome"][update_index],_sites);
+  for (auto site : _sites){
+    sites.push_back((unsigned char)site);
+  }
 }
 
-void Genome::applyMutations(double pointMutationRate, double insertionRate, double deletionRate, int minGenomeSize, int maxGenomeSize){
+void Genome::copyGenome(shared_ptr<Genome> from) {
+  sites.clear();
+  for (auto site : from->sites)
+    sites.push_back(site);
+}
+
+void Genome::applyMutations(double pointMutationRate, double insertionRate, double deletionRate, int minGenomeSize, int maxGenomeSize) {
   if (pointMutationRate > 0.0) {
     int nucleotides = (int) sites.size();
     int i, s, o, w;

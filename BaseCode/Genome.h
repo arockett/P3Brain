@@ -39,8 +39,11 @@ class Genome : public std::enable_shared_from_this<Genome> {
   vector<unsigned char> sites;
 
   Genome() = default;
+  Genome(vector<unsigned char> sites);
   Genome(shared_ptr<Genome> from);
   virtual ~Genome() = default;
+
+  virtual void loadSites(string fileName, int update, int ID = -1);
 
   virtual void fillRandom();
   virtual void copyGenome(shared_ptr<Genome> from);
