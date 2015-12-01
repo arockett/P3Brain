@@ -36,8 +36,7 @@ int main(int argc, const char * argv[]) {
                                                   // also writes out a config file if requested
 
   //make a node map to handle genome value to brain state address look up.
-  Brain::makeNodeMap(Brain::defaultNodeMap, Global::bitsPerBrainAddress,
-                     Brain::defaultNrOfBrainStates);
+  Brain::makeNodeMap(Brain::defaultNodeMap, Global::bitsPerBrainAddress, Brain::defaultNrOfBrainStates);
 
   Gate::setupGates();  // determines which gate types will be in use.
 
@@ -68,8 +67,7 @@ int main(int argc, const char * argv[]) {
     //shared_ptr<Brain> _brain(new Brain());
 
     //shared_ptr<Organism> progenitor = make_shared<Organism>(_genome, _brain); // make a organism with a genome and brain (if you need to change the types here is where you do it)
-    shared_ptr<Organism> progenitor = make_shared<Organism>(
-        make_shared<Genome>(), make_shared<Brain>());  // make a organism with a genome and brain (if you need to change the types here is where you do it)
+    shared_ptr<Organism> progenitor = make_shared<Organism>(make_shared<Genome>(), make_shared<Brain>());  // make a organism with a genome and brain (if you need to change the types here is where you do it)
 
     Global::update = 0;  // the begining of time - now we construct the first population
     for (int i = 0; i < Global::popSize; i++) {
@@ -94,36 +92,31 @@ int main(int argc, const char * argv[]) {
     } else if (Archivist::outputMethodStr == "SSwD") {
       Archivist::outputMethod = 1;
     } else {
-      cout << "unrecognized archive method \"" << Archivist::outputMethodStr
-           << "\". Should be either \"LODwAP\" or \"SSwD\"\nExiting.\n";
+      cout << "unrecognized archive method \"" << Archivist::outputMethodStr << "\". Should be either \"LODwAP\" or \"SSwD\"\nExiting.\n";
       exit(1);
     }
   }
 
-  int realTerminateAfter =
-      (Archivist::outputMethod == 0) ?
-          (Global::terminateAfter) : Archivist::intervalDelay;  // if the output method is SSwD override terminateAfter
+  int realTerminateAfter = (Archivist::outputMethod == 0) ? (Global::terminateAfter) : Archivist::intervalDelay;  // if the output method is SSwD override terminateAfter
 
-  while (((Archivist::nextDataWrite <= Global::updates)
-      || (Archivist::nextGenomeWrite <= Global::updates))
-      && (Global::update <= (Global::updates + realTerminateAfter))) {
-
+  while (((Archivist::nextDataWrite <= Global::updates) || (Archivist::nextGenomeWrite <= Global::updates)) && (Global::update <= (Global::updates + realTerminateAfter))) {
+    cout << "update: " << Global::update << "\n";
     world->evaluateFitness(group->population, false);  // evaluate each organism in the population using a World
+    cout << "  evaluate complete\n";
     group->archive();  // save data, update memory and delete any unneeded data;
+    cout << "  archive complete\n";
     Global::update++;
     group->optimize();  // update the population (reproduction and death)
+    cout << "  optimize complete\n";
 
-    cout << "update: " << Global::update - 1 << "   maxFitness: "
-         << group->optimizer->maxFitness << "\n";
+    cout << "update: " << Global::update - 1 << "   maxFitness: " << group->optimizer->maxFitness << "\n";
   }
 
   group->archive(1);  // flush any data that has not been output yet
 
   if (Archivist::outputMethod == 0) {  // if using LODwAP, write out some info about MRCA
-    shared_ptr<Organism> FinalMRCA = group->population[0]
-        ->getMostRecentCommonAncestor(group->population[0]);
-    cout << "MRCA - ID: " << FinalMRCA->ID << " born on: "
-         << FinalMRCA->timeOfBirth << "\n" << FinalMRCA->brain->description();
+    shared_ptr<Organism> FinalMRCA = group->population[0]->getMostRecentCommonAncestor(group->population[0]);
+    cout << "MRCA - ID: " << FinalMRCA->ID << " born on: " << FinalMRCA->timeOfBirth << "\n" << FinalMRCA->brain->description();
   }
 
   return 0;

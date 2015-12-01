@@ -14,9 +14,7 @@
 #include "../Utilities/Utilities.h"
 #include "../Utilities/Data.h"
 
-int& World::repeats = Parameters::register_parameter(
-    "repeats", 1, "Number of times to test each Genome per generation",
-    "WORLD");
+int& World::repeats = Parameters::register_parameter("repeats", 1, "Number of times to test each Genome per generation", "WORLD");
 
 World::World() {
 }
@@ -24,8 +22,7 @@ World::World() {
 World::~World() {
 }
 
-void World::evaluateFitness(vector<shared_ptr<Organism>> population,
-                            bool analyse) {
+void World::evaluateFitness(vector<shared_ptr<Organism>> population, bool analyse) {
   vector<double> W;
   for (size_t i = 0; i < population.size(); i++) {
     double scoreTotal = 0.0;
@@ -36,6 +33,7 @@ void World::evaluateFitness(vector<shared_ptr<Organism>> population,
     population[i]->dataMap.Set("score", population[i]->score);
     population[i]->dataMap.Set("update", Global::update);
   }
+
 }
 
 double World::testIndividual(shared_ptr<Organism> org, bool analyse) {

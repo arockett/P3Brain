@@ -44,10 +44,9 @@ class Genome : public std::enable_shared_from_this<Genome> {
 
   virtual void fillRandom();
   virtual void copyGenome(shared_ptr<Genome> from);
-  virtual void applyMutations(double mutationRate);
-  virtual shared_ptr<Genome> makeMutatedGenome(double mutationRate);
-  virtual shared_ptr<Genome> makeMutatedGenome(double mutationRate,
-                                               vector<shared_ptr<Genome>> from);
+  virtual void applyMutations(double pointMutationRate = Genome::pointMutationRate, double insertionRate = Genome::insertionRate, double deletionRate = Genome::deletionRate,int minGenomeSize = Genome::minGenomeSize,int maxGenomeSize = Genome::maxGenomeSize);
+  virtual shared_ptr<Genome> makeMutatedGenome();
+  virtual shared_ptr<Genome> makeMutatedGenome(vector<shared_ptr<Genome>> from);
 
   virtual void makePointMutation();
 
