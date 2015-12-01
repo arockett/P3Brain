@@ -65,14 +65,10 @@ float MarkovWorld::evaluate(const vector<bool>& solution)
     if( decoderType != BitAgent::Unstructured )
     {
       org->brain = make_shared<BitAgent>(solution, 11, 2, decoderType);
-      //agent = BitAgent(  );
     }
     else
     {
       org->brain = make_shared<BitAgent>(solution, 11, 10, 3, 2);
-        //agent = BitAgent(  );
     }
-
-    //org.brain = agent;
     return (float)trainingGround->testIndividual(org, false);
 }
