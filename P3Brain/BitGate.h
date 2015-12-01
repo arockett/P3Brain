@@ -11,7 +11,7 @@
 
 #include "Gate.h"
 
-class BitGate : public Gate
+class BitGate : public DeterministicGate
 {
 public:
     BitGate() = delete;

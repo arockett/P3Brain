@@ -9,7 +9,7 @@
 #ifndef BITAGENT_H_
 #define BITAGENT_H_
 
-#include "Agent.h"
+#include "Brain.h"
 
 #include <memory>
 
@@ -18,7 +18,7 @@
  * a Markov Brain. It can be used in conjunction with P3 and the MarkovWorld
  * evaluator to evolve MarkovBrains with bit strings and the P3 algorithm.
  */
-class BitAgent : public Agent
+class BitAgent : public Brain
 {
 public:
     enum Decoder {

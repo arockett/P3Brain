@@ -20,7 +20,7 @@
 #include "../Analyse/Analyse.h"
 #include "../Utilities/Parameters.h"
 #include "../Utilities/Utilities.h"
-#include "../Utilities/Random.h"
+
 
 using namespace std;
 
@@ -105,31 +105,8 @@ class BerryWorld : public World {
     grid.resize(x * y);
     return grid;
   }
-
   // return a vector of size x*y (grid) with walls with borderWalls (if borderWalls = true) and randomWalls (that many) randomly placed walls
-  vector<int> makeTestGrid() {
-    vector<int> grid = makeGrid(WorldX, WorldY);
-
-    for (int x = 0; x < WorldX; x++) {  // fill grid with food (and outer wall if needed)
-      for (int y = 0; y < WorldY; y++) {
-        if (borderWalls && (x == 0 || x == WorldX - 1 || y == 0 || y == WorldY - 1)) {
-          setGridValue(grid, { x, y }, WALL);  // place walls on edge
-        } else {
-          setGridValue(grid, { x, y }, Random::getInt(1, foodSourceTypes));  // plase random food where there is not a wall
-        }
-      }
-    }
-
-    for (int i = 0; i < randomWalls; i++) {  // add random walls
-      if (borderWalls) {
-        setGridValue(grid, { Random::getInt(1, WorldX - 2), Random::getInt(1, WorldY - 2) }, WALL);  // if borderWalls than don't place random walls on the outer edge
-      } else {
-        setGridValue(grid, { Random::getIndex(WorldX), Random::getIndex(WorldY) }, WALL);  // place walls anywhere
-      }
-    }
-    return grid;
-  }
-
+  vector<int> makeTestGrid();
   inline int turnLeft(int facing) {
     return (facing < 1) ? numberOfDirections : facing-1;
   }

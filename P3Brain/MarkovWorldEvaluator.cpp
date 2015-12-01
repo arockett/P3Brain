@@ -61,15 +61,18 @@ MarkovWorld::MarkovWorld( Configuration& config, int run_number )
 */
 float MarkovWorld::evaluate(const vector<bool>& solution)
 {
-    BitAgent agent;
+    auto org = make_shared<Organism>();
     if( decoderType != BitAgent::Unstructured )
     {
-        agent = BitAgent( solution, 11, 2, decoderType );
+      org->brain = make_shared<BitAgent>(solution, 11, 2, decoderType);
+      //agent = BitAgent(  );
     }
     else
     {
-        agent = BitAgent( solution, 11, 10, 3, 2 );
+      org->brain = make_shared<BitAgent>(solution, 11, 10, 3, 2);
+        //agent = BitAgent(  );
     }
 
-    return (float)trainingGround->testIndividual(&agent, false);
+    //org.brain = agent;
+    return (float)trainingGround->testIndividual(org, false);
 }

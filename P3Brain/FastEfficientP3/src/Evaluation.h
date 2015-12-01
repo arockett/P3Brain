@@ -65,7 +65,7 @@ public:
     create_evaluator ( MatchMaker );
 
 private:
-    int group_size;
+    size_t group_size;
 };
 
 // Deceptive trap problem, where the string is composed of non-overlapping

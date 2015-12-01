@@ -30,7 +30,7 @@ void BitGate::update( vector<double>& states, vector<double>& nextStates )
     // First make sure the size of our logic table is correct
     // for this number of inputs. It should never be incorrect
     // if the BitAgent uses a valid decoder
-    ASSERT( logic.size() == (int)pow( 2.0, inputs.size() ),
+    ASSERT( static_cast<int>(logic.size()) == (1 << inputs.size()),
         "Invalid logic table in gate " << gateIndex <<
         ". This should never happen... check your BitAgent decoder." );
 

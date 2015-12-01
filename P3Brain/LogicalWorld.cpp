@@ -32,15 +32,8 @@ LogicalWorld::~LogicalWorld()
 {
 }
 
-
-vector<double> LogicalWorld::evaluateFitness(vector<Agent*> agents, bool analyse) {
-    vector<double> fitnesses;
-    for (unsigned i = 0; i < agents.size(); i++)
-        fitnesses.push_back(testIndividual(agents[i], analyse));
-    return fitnesses;
-}
-
-double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
+double LogicalWorld::testIndividual(shared_ptr<Organism> organism, bool analyse) {
+    auto& agent = organism->brain;
     // If there aren't enough non-input nodes to check then return 0 fitness
     // because the bit string is not long enough
     if( (int)logic.size() > agent->nrOfBrainStates - 2 )
@@ -59,7 +52,7 @@ double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
     {
         agent->states[0] = 0.0;
         agent->states[1] = 0.0;
-        agent->updateStates();
+        agent->update();
     }
     for( unsigned i = 0; i < logic.size(); i++ )
     {
@@ -75,7 +68,7 @@ double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
     {
         agent->states[0] = 0.0;
         agent->states[1] = 1.0;
-        agent->updateStates();
+        agent->update();
     }
     for( unsigned i = 0; i < logic.size(); i++ )
     {
@@ -91,7 +84,7 @@ double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
     {
         agent->states[0] = 1.0;
         agent->states[1] = 0.0;
-        agent->updateStates();
+        agent->update();
     }
     for( unsigned i = 0; i < logic.size(); i++ )
     {
@@ -107,7 +100,7 @@ double LogicalWorld::testIndividual(Agent *agent, bool analyse) {
     {
         agent->states[0] = 1.0;
         agent->states[1] = 1.0;
-        agent->updateStates();
+        agent->update();
     }
     for( unsigned i = 0; i < logic.size(); i++ )
     {

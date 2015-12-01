@@ -37,12 +37,12 @@ float MatchMaker::evaluate( const vector<bool>& solution )
     for ( int n = 0; n <= max; n++ )
     {
         bool same = true;
-        int i = n * group_size;
+        size_t i = n * group_size;
 
         if ( i < solution.size() )
         {
             // For each member in the group
-            for ( int k = 0; k < group_size; k++ )
+            for ( size_t k = 0; k < group_size; k++ )
             {
                 if ( i + k < solution.size() && solution[i + k] != solution[i] )
                     same = false;
