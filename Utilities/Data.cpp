@@ -1,10 +1,10 @@
 #include <cstring>
+//#include <cwctype>
 #include <memory>
 #include <iostream>
 
 #include <fstream>
 #include <map>
-#include <sstream>
 
 #include "Data.h"
 
@@ -70,7 +70,7 @@ vector<string> DataMap::getKeys() {
   return (keys);
 }
 
-void DataMap::Clear() {
+void DataMap::clear() {
   data.clear();
 }
 

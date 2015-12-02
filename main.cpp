@@ -48,28 +48,32 @@ int main(int argc, const char * argv[]) {
   }
 
   //Optimizer *optimizer = (Optimizer*) new GA();
-  // Optimizer *optimizer = (Optimizer*) new Tournament();
+  //Optimizer *optimizer = (Optimizer*) new Tournament();
 
   World *world = (World*) new BerryWorld();  //new World();
 
+////  ///// to show org in world
+//  shared_ptr<Genome> testGenome = make_shared<Genome>();
+//  testGenome->loadSites("genome.csv",1000);
+//  shared_ptr<Organism> testOrg = make_shared<Organism>(testGenome, make_shared<Brain>());
+//  world->testIndividual(testOrg,0,1);
+//  exit(0);
+////  ///// end to show org in world
+
+  //////////////////
   // define population
+  //////////////////
 
-  // a progenitor must exist - that is, one ancestor genome
-  // this genome is evaluated to populate the dataMap
-
-  Global::update = -1;  // before there was time, there was a progenitor
   shared_ptr<Group> group;
 
   {
-    vector<shared_ptr<Organism>> population;
+    // a progenitor must exist - that is, one ancestor genome
+    Global::update = -1;  // before there was time, there was a progenitor
 
-    //shared_ptr<Genome> _genome(new Genome());
-    //shared_ptr<Brain> _brain(new Brain());
-
-    //shared_ptr<Organism> progenitor = make_shared<Organism>(_genome, _brain); // make a organism with a genome and brain (if you need to change the types here is where you do it)
     shared_ptr<Organism> progenitor = make_shared<Organism>(make_shared<Genome>(), make_shared<Brain>());  // make a organism with a genome and brain (if you need to change the types here is where you do it)
 
     Global::update = 0;  // the begining of time - now we construct the first population
+    vector<shared_ptr<Organism>> population;
     for (int i = 0; i < Global::popSize; i++) {
       shared_ptr<Genome> genome(new Genome());
       genome->fillRandom();
@@ -79,7 +83,7 @@ int main(int argc, const char * argv[]) {
     }
     progenitor->kill();  // the progenitor has served it's purpose.
 
-    group = make_shared<Group>(population, make_shared<Tournament2>());
+    group = make_shared<Group>(population, make_shared<Tournament>());
   }
 
   //////////////////
@@ -100,14 +104,13 @@ int main(int argc, const char * argv[]) {
   int realTerminateAfter = (Archivist::outputMethod == 0) ? (Global::terminateAfter) : Archivist::intervalDelay;  // if the output method is SSwD override terminateAfter
 
   while (((Archivist::nextDataWrite <= Global::updates) || (Archivist::nextGenomeWrite <= Global::updates)) && (Global::update <= (Global::updates + realTerminateAfter))) {
-    cout << "update: " << Global::update << "\n";
     world->evaluateFitness(group->population, false);  // evaluate each organism in the population using a World
-    cout << "  evaluate complete\n";
+
     group->archive();  // save data, update memory and delete any unneeded data;
-    cout << "  archive complete\n";
+
     Global::update++;
+
     group->optimize();  // update the population (reproduction and death)
-    cout << "  optimize complete\n";
 
     cout << "update: " << Global::update - 1 << "   maxFitness: " << group->optimizer->maxFitness << "\n";
   }
@@ -118,7 +121,6 @@ int main(int argc, const char * argv[]) {
     shared_ptr<Organism> FinalMRCA = group->population[0]->getMostRecentCommonAncestor(group->population[0]);
     cout << "MRCA - ID: " << FinalMRCA->ID << " born on: " << FinalMRCA->timeOfBirth << "\n" << FinalMRCA->brain->description();
   }
-
   return 0;
 }
 

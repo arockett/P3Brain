@@ -75,7 +75,7 @@ Organism::Organism(shared_ptr<Genome> _genome) {
 
 Organism::Organism(shared_ptr<Genome> _genome, shared_ptr<Brain> _brain) {
   genome = _genome;
-  brain = _brain;
+  brain = (genome->sites.size()>0)?_brain->makeBrainFromGenome(genome):_brain;
   ID = registerOrganism();
   alive = true;
   gender = 0;  // by default all orgs are female.
@@ -100,7 +100,7 @@ Organism::Organism(shared_ptr<Organism> from, shared_ptr<Genome> _genome) {
   ID = registerOrganism();
   alive = true;
   gender = 0;  // by default all orgs are female.
-  offspringCount = 0;  // because it's alive;
+  offspringCount = 0;
   parents.push_back(from);
   from->offspringCount++;  // this parent has an(other) offspring
   for (auto ancestorID : from->genomeAncestors) {
@@ -167,7 +167,6 @@ Organism::~Organism() {
  */
 void Organism::kill() {
   alive = false;
-  offspringCount--;  // remove reference for self
 }
 
 shared_ptr<Organism> Organism::makeMutatedOffspring(shared_ptr<Organism> parent) {
@@ -210,18 +209,20 @@ vector<string> Organism::GetLODItem(string key, shared_ptr<Organism> org) {
 vector<shared_ptr<Organism>> Organism::getLOD(shared_ptr<Organism> org) {
   vector<shared_ptr<Organism>> list;
 
-  list.insert(list.begin(), org);  // add this organism to the front of the LOD list
+  list.push_back(org);  // add this organism to the front of the LOD list
   while (org->parents.size() == 1) {  // while the current org has one and only one parent
     org = org->parents[0];  // move to the next ancestor (since there is only one parent it is the element in the first position).
     list.push_back(org);  // add that ancestor to the front of the LOD list
   }
   reverse(list.begin(), list.end());
+  for (size_t i = 0; i<list.size();i++){
+  }
   if (org->parents.size() > 1) {  // if more than one parent we have a problem!
-    cout << "  In Organism::getLOD :: ERROR! an Organism has more than one parent! Can not establish LOD (do not use getLOD with Sexual Populations).\n  If you are using LODwAP, try using SSwD instead.\n  Exiting...\n";
     exit(1);
   }
   return list;
 }
+
 
 /*
  * find the Most Recent Common Ancestor
@@ -240,4 +241,11 @@ shared_ptr<Organism> Organism::getMostRecentCommonAncestor(shared_ptr<Organism> 
       return org;
   }
   return org;  // a currently active genome will have referenceCounter = 1 but may be the Most Recent Common Ancestor
+}
+shared_ptr<Organism> Organism::getMostRecentCommonAncestor(vector<shared_ptr<Organism>> LOD) {
+  for (auto org : LOD) {  // starting at the oldest parent, moving to the youngest
+    if (org->offspringCount > 1)  // the first (oldest) ancestor with more then one surviving offspring
+      return org;
+  }
+  return LOD.back();  // a currently active genome will have referenceCounter = 1 but may be the Most Recent Common Ancestor
 }

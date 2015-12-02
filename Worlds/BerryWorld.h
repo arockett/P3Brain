@@ -31,15 +31,14 @@ class BerryWorld : public World {
   const int numberOfDirections = 8;
   const int xm[8] = { 0, 1, 1, 1, 0, -1, -1, -1 };  //these are directions
   const int ym[8] = { -1, -1, 0, 1, 1, 1, 0, -1 };
+  const char facingDisplay[8] = {94,47,62,92,118,47,60,92};
 
   const int EMPTY = 0;
-  const int RED = 1;
-  const int BLUE = 2;
   const int WALL = 9;
 
   static double& TSK;
   static int& worldUpdates;
-  static int& foodSourceTypes;
+  static int& foodTypes;
   static double& rewardForFood1;
   static double& rewardForFood2;
   static double& rewardForFood3;
@@ -67,7 +66,13 @@ class BerryWorld : public World {
 
   BerryWorld();
 
-  double testIndividual(shared_ptr<Organism> org, bool analyse);
+//  double testIndividual(shared_ptr<Organism> org, bool analyse);
+
+  double testIndividual(shared_ptr<Organism> org, bool analyse, bool show);
+  double testIndividual(shared_ptr<Organism> org, bool analyse){
+    return testIndividual(org, analyse, 0);
+  }
+
 
   // convert x,y into a grid index
   int getGridIndexFromXY(pair<int, int> loc) {
@@ -110,12 +115,12 @@ class BerryWorld : public World {
   vector<int> makeTestGrid() {
     vector<int> grid = makeGrid(WorldX, WorldY);
 
-    for (int x = 0; x < WorldX; x++) {  // fill grid with food (and outer wall if needed)
-      for (int y = 0; y < WorldY; y++) {
+    for (int y = 0; y < WorldY; y++) {  // fill grid with food (and outer wall if needed)
+      for (int x = 0; x < WorldX; x++) {
         if (borderWalls && (x == 0 || x == WorldX - 1 || y == 0 || y == WorldY - 1)) {
           setGridValue(grid, { x, y }, WALL);  // place walls on edge
         } else {
-          setGridValue(grid, { x, y }, Random::getInt(1, foodSourceTypes));  // plase random food where there is not a wall
+          setGridValue(grid, { x, y }, Random::getInt(1, foodTypes));  // place random food where there is not a wall
         }
       }
     }
@@ -131,12 +136,13 @@ class BerryWorld : public World {
   }
 
   inline int turnLeft(int facing) {
-    return (facing < 1) ? numberOfDirections : facing-1;
+    return (facing < 1) ? numberOfDirections-1 : facing-1;
   }
   inline int turnRight(int facing) {
     return ((facing >= (numberOfDirections - 1))? 0 : facing+1);
   }
 
+  void printGrid(vector<int> grid, pair<int, int> loc, int facing);
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__BerryWorld__) */
