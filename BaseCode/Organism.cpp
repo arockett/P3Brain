@@ -75,7 +75,7 @@ Organism::Organism(shared_ptr<Genome> _genome) {
 
 Organism::Organism(shared_ptr<Genome> _genome, shared_ptr<Brain> _brain) {
   genome = _genome;
-  brain = _brain;//(genome->sites.size()>0)?_brain->makeBrainFromGenome(genome):_brain;
+  brain = (genome->sites.size()>0)?_brain->makeBrainFromGenome(genome):_brain;
   ID = registerOrganism();
   alive = true;
   gender = 0;  // by default all orgs are female.

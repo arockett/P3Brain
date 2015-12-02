@@ -52,14 +52,13 @@ int main(int argc, const char * argv[]) {
 
   World *world = (World*) new BerryWorld();  //new World();
 
-//  ///// to show org in world
+////  ///// to show org in world
 //  shared_ptr<Genome> testGenome = make_shared<Genome>();
-//  testGenome->loadSites("genome.csv",125);
+//  testGenome->loadSites("genome.csv",1000);
 //  shared_ptr<Organism> testOrg = make_shared<Organism>(testGenome, make_shared<Brain>());
 //  world->testIndividual(testOrg,0,1);
-//
 //  exit(0);
-//  ///// end to show org in world
+////  ///// end to show org in world
 
   //////////////////
   // define population
@@ -81,7 +80,6 @@ int main(int argc, const char * argv[]) {
       shared_ptr<Organism> org(new Organism(progenitor, genome));
       population.push_back(org);  // add a new org to population using progenitors template and a new random genome
       population[population.size() - 1]->gender = Random::getInt(0, 1);  // assign a random gender to the new org
-      cout << population[population.size() - 1]->gender << " " << population[population.size() - 1]->genome->sites.size() << "\n";
     }
     progenitor->kill();  // the progenitor has served it's purpose.
 

@@ -65,10 +65,10 @@ void BerryWorld::printGrid(vector<int> grid, pair<int, int> loc, int facing) {
       if ((x == loc.first) && (y == loc.second)) {
         cout << facingDisplay[facing] << " ";
       } else {
-        if (getGridValue(grid, { x, y }) == WALL){
+        if (getGridValue(grid, { x, y }) == WALL) {
           cout << "X";
         } else {
-                  cout << getGridValue(grid, { x, y });
+          cout << getGridValue(grid, { x, y });
         }
         cout << " ";
       }
@@ -114,7 +114,7 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 
   int statesAssignmentCounter;  // this world can has number of brainState inputs set by parameter. This counter is used while assigning inputs
 
-  vector<int> stateCollector;  // used i the phi calculation
+  vector<int> stateCollector;  // used in the phi calculation
 
   // make sure the brain does not have values from last run
   org->brain->resetBrain();
@@ -167,6 +167,16 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
       }
     }
 
+    if (show) {
+      cout << "\n----------------------------\n";
+      cout << "\ngeneration update: " << Global::update << "  world update: " << t << "\n";
+      cout << "inStates: ";
+      for (int i = 0; i < inputStatesCount; i++) {
+        cout << org->brain->getState(i);
+      }
+      cout << "\n\n  -- brain update --\n\n";
+    }
+
     // inputStatesCount is not set to the first output Brain State Address. we will not move it until the next world update!
     if (clearOutputs) {
       org->brain->setState(inputStatesCount, 0.0);
@@ -210,10 +220,10 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
         case 0:  //nothing
           break;
         case 1:  //turn left
-          facing = turnRight(facing);
+          facing = turnLeft(facing);
           break;
         case 2:  //turn right
-          facing = turnLeft(facing);
+          facing = turnRight(facing);
           break;
         case 3:  //move forward
           if (getGridValue(grid, moveOnGrid(currentLocation, facing)) != WALL) {  // if the proposed move is not a wall
@@ -225,14 +235,16 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
           break;
       }
     }
+
     if (show) {
-      cout << Global::update << "  " << t << "\n";
-      printGrid(grid, currentLocation, facing);
-      cout << "here: " << getGridValue(grid,currentLocation) << "loc: " << currentLocation.first << "," << currentLocation.second << "  facing: " << facing << "\n";
-      cout << "score: " << score << "\nfood1: " << eaten[1] << "  food2: " << eaten[2] << "  switches: " << switches << "\n";
+      cout << "outStates: " << Bit(org->brain->getState(inputStatesCount)) << Bit(org->brain->getState(inputStatesCount + 1)) << Bit(org->brain->getState(inputStatesCount + 2)) << "\n";
       cout << "output1: " << output1 << "  output2: " << output2 << "\n";
-      sleep(1);
+      cout << "\n  -- world update --\n\n";
+      printGrid(grid, currentLocation, facing);
+      cout << "last: " << lastFood << " here: " << getGridValue(grid, currentLocation) << "\nloc: " << currentLocation.first << "," << currentLocation.second << "  facing: " << facing << "\n";
+      cout << "score: " << score << "\nfood1: " << eaten[1] << "  food2: " << eaten[2] << "  switches: " << switches << "\n";
     }
+
   }  // end world evaluation loop
 
   if (score < 0.0) {
