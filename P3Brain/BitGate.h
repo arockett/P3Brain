@@ -19,6 +19,7 @@ public:
     virtual ~BitGate();
 
     void update( vector<double>& states, vector<double>& nextStates ) override;
+    string description() override;
 
 private:
     int gateIndex;

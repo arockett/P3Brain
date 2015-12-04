@@ -25,6 +25,20 @@ BitGate::~BitGate()
 }
 
 
+string BitGate::description() {
+  ostringstream out;
+  out << "BitGate In ( ";
+  for (const auto in : inputs) {
+    out << in << " ";
+  }
+  out << ") Out ( " << gateIndex << " ) Table ( ";
+  for (const auto bit : logic) {
+    out << bit << " ";
+  }
+  out << ")\n";
+  return out.str();
+}
+
 void BitGate::update( vector<double>& states, vector<double>& nextStates )
 {
     // First make sure the size of our logic table is correct
