@@ -116,7 +116,7 @@ static bool load_value(const string& value, T& target) {
 template<class T>
 void convertCSVListToVector(string stringData, vector<T> &returnData, const char separator = ',') {
   returnData.clear();
-  stringData = stringData.substr(1, stringData.size() - 2);
+  stringData = stringData.substr(1, stringData.size() - 2); // strip off leading and trailing square brakets
   vector<string> dataLine = parseCSVLine(stringData, separator);
 
   T tempValue;

@@ -83,30 +83,29 @@ int main(int argc, const char * argv[]) {
     }
     progenitor->kill();  // the progenitor has served it's purpose.
 
-    group = make_shared<Group>(population, make_shared<Tournament>());
+    group = make_shared<Group>(population, make_shared<Tournament>(),make_shared<Default_Archivist>());
   }
 
   //////////////////
   // evolution loop
   //////////////////
 
-  if (Archivist::outputMethod == -1) {  // this is the first time archive is called. get the output method
-    if (Archivist::outputMethodStr == "LODwAP") {
-      Archivist::outputMethod = 0;
-    } else if (Archivist::outputMethodStr == "SSwD") {
-      Archivist::outputMethod = 1;
-    } else {
-      cout << "unrecognized archive method \"" << Archivist::outputMethodStr << "\". Should be either \"LODwAP\" or \"SSwD\"\nExiting.\n";
-      exit(1);
-    }
-  }
+//  if (Archivist::outputMethod == -1) {  // this is the first time archive is called. get the output method
+//    if (Archivist::outputMethodStr == "LODwAP") {
+//      Archivist::outputMethod = 0;
+//    } else if (Archivist::outputMethodStr == "SSwD") {
+//      Archivist::outputMethod = 1;
+//    } else {
+//      cout << "unrecognized archive method \"" << Archivist::outputMethodStr << "\". Should be either \"LODwAP\" or \"SSwD\"\nExiting.\n";
+//      exit(1);
+//    }
+//  }
+  bool finished = false; // when the archivist says we are done, we can stop!
 
-  int realTerminateAfter = (Archivist::outputMethod == 0) ? (Global::terminateAfter) : Archivist::intervalDelay;  // if the output method is SSwD override terminateAfter
-
-  while (((Archivist::nextDataWrite <= Global::updates) || (Archivist::nextGenomeWrite <= Global::updates)) && (Global::update <= (Global::updates + realTerminateAfter))) {
+  while (!finished) {
     world->evaluateFitness(group->population, false);  // evaluate each organism in the population using a World
 
-    group->archive();  // save data, update memory and delete any unneeded data;
+    finished = group->archive();  // save data, update memory and delete any unneeded data;
 
     Global::update++;
 
@@ -117,7 +116,7 @@ int main(int argc, const char * argv[]) {
 
   group->archive(1);  // flush any data that has not been output yet
 
-  if (Archivist::outputMethod == 0) {  // if using LODwAP, write out some info about MRCA
+  if (Default_Archivist::Arch_outputMethodStr == "LODwAP") {  // if using LODwAP, write out some info about MRCA
     shared_ptr<Organism> FinalMRCA = group->population[0]->getMostRecentCommonAncestor(group->population[0]);
     cout << "MRCA - ID: " << FinalMRCA->ID << " born on: " << FinalMRCA->timeOfBirth << "\n" << FinalMRCA->brain->description();
   }

@@ -54,7 +54,7 @@ class Organism : AbstractOrganism {
 
   DataMap dataMap;  // holds all data (genome size, score, world data, etc.)
   unordered_map<int, DataMap> snapShotDataMaps;  // Used only with SnapShot with Delay (SSwD) stores contents of dataMap when an ouput interval is reached so that
-  // after the delay we have the correct data for the given time. key is 'update'.
+  // after the delay we have the correct data for the given time. key is 'update'. This possibly should be wrapped into Archivist.
   Organism();  // make an empty organism
   Organism(shared_ptr<Genome> _genome);  // make a parentless organism with a genome, and a nullptr to brain
   Organism(shared_ptr<Genome> _genome, shared_ptr<Brain> _brain);  // make a parentless organism with a genome, and a brain
@@ -71,7 +71,7 @@ class Organism : AbstractOrganism {
   virtual shared_ptr<Organism> getMostRecentCommonAncestor(vector<shared_ptr<Organism>> LOD);
   virtual shared_ptr<Organism> makeMutatedOffspring(shared_ptr<Organism> parent);
   virtual shared_ptr<Organism> makeMutatedOffspring(vector<shared_ptr<Organism>> from);
-
+  virtual void clearHistory(); // clear all historical data (used when only saving real time data)
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Organism__) */

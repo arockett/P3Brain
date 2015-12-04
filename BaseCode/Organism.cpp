@@ -249,3 +249,10 @@ shared_ptr<Organism> Organism::getMostRecentCommonAncestor(vector<shared_ptr<Org
   }
   return LOD.back();  // a currently active genome will have referenceCounter = 1 but may be the Most Recent Common Ancestor
 }
+
+// clear all historical data (used when only saving real time data)
+void Organism::clearHistory(){
+  parents.clear();
+  genomeAncestors.clear();
+  dataAncestors.clear();
+}

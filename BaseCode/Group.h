@@ -16,14 +16,14 @@
 class Group {
  public:
   vector<shared_ptr<Organism>> population;
-  shared_ptr<Archivist> archivist;
+  shared_ptr<Default_Archivist> archivist;
   shared_ptr<Optimizer> optimizer;
 
   Group();
-  Group(vector<shared_ptr<Organism>> _population, shared_ptr<Optimizer> _optimizer);
+  Group(vector<shared_ptr<Organism>> _population, shared_ptr<Optimizer> _optimizer, shared_ptr<Default_Archivist>);
   ~Group();
 
-  void archive(int flush = 0);
+  bool archive(int flush = 0);
   void optimize();
 };
 
