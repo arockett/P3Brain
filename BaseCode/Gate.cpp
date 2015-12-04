@@ -7,7 +7,6 @@
 //
 
 #include <iostream>
-//#include <time.h>
 
 #include "Gate.h"
 
@@ -24,7 +23,7 @@ bool& Gate::usingThGate = Parameters::register_parameter("thGate", false, "set t
 bool& Gate::usingEpsiGate = Parameters::register_parameter("epsiGate", false, "set to true to enable epsilon gates", "GATE TYPES");
 bool& Gate::usingVoidGate = Parameters::register_parameter("voidGate", false, "set to true to enable void gates", "GATE TYPES");
 
-double& Gate::voidOutPut = Parameters::register_parameter("voidOutput", 0.0, "chance that an output from a determinstic gate will be set to 0", "GATES");
+double& Gate::voidOutPut = Parameters::register_parameter("voidOutput", 0.0, "chance that an output from a void gate will be set to 0", "GATES");
 double& Gate::FixedEpsilonGateP = Parameters::register_parameter("FixedEpsilonGateProb", 0.05, "chance that an output from a FixedEpsilonGate gate will be randomized", "GATES");
 
 //////////////////////////////////////////

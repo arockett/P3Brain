@@ -20,7 +20,7 @@ class Group {
   shared_ptr<Optimizer> optimizer;
 
   Group();
-  Group(vector<shared_ptr<Organism>> _population, shared_ptr<Optimizer> _optimizer, shared_ptr<Default_Archivist>);
+  Group(vector<shared_ptr<Organism>> _population, shared_ptr<Optimizer> _optimizer, shared_ptr<Default_Archivist> _archivist);
   ~Group();
 
   bool archive(int flush = 0);

@@ -6,9 +6,6 @@
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
 //
 
-//#include <stdlib.h>     // for atoi()
-#include <unistd.h>     // for sleep()
-
 #include "BerryWorld.h"
 
 #include "../Utilities/Random.h"
@@ -29,8 +26,8 @@ double& BerryWorld::rewardForFood6 = Parameters::register_parameter("BERRY_rewar
 double& BerryWorld::rewardForFood7 = Parameters::register_parameter("BERRY_rewardForFood7", 1.0, "reward for eating a Food7", "WORLD - BERRY");
 double& BerryWorld::rewardForFood8 = Parameters::register_parameter("BERRY_rewardForFood8", 1.0, "reward for eating a Food8", "WORLD - BERRY");
 
-int& BerryWorld::WorldY = Parameters::register_parameter("BERRY_WorldY", 8, "world Y size", "WORLD - BERRY");
 int& BerryWorld::WorldX = Parameters::register_parameter("BERRY_WorldX", 8, "world X size", "WORLD - BERRY");
+int& BerryWorld::WorldY = Parameters::register_parameter("BERRY_WorldY", 8, "world Y size", "WORLD - BERRY");
 bool& BerryWorld::borderWalls = Parameters::register_parameter("BERRY_makeBorderWalls", true, "if true world will have a bounding wall", "WORLD - BERRY");
 int& BerryWorld::randomWalls = Parameters::register_parameter("BERRY_makeRandomWalls", 0, "add this many walls to the world", "WORLD - BERRY");
 
@@ -40,7 +37,7 @@ bool& BerryWorld::allowMoveAndEat = Parameters::register_parameter("BERRY_allowM
 bool& BerryWorld::senseDown = Parameters::register_parameter("BERRY_senseDown", true, "if true, Agent can sense what it's standing on", "WORLD - BERRY");
 bool& BerryWorld::senseFront = Parameters::register_parameter("BERRY_senseFront", true, "if true, Agent can sense what's in front of it", "WORLD - BERRY");
 bool& BerryWorld::senseFrontSides = Parameters::register_parameter("BERRY_senseFrontSides", true, "if true, Agent can sense what's in front to the left and right of it", "WORLD - BERRY");
-bool& BerryWorld::senseWalls = Parameters::register_parameter("BERRY_senseWalls", true, "if true, Agent can sense Walls", "WORLD - BERRY");
+bool& BerryWorld::senseWalls = Parameters::register_parameter("BERRY_senseWalls", false, "if true, Agent can sense Walls", "WORLD - BERRY");
 
 BerryWorld::BerryWorld() {
   senseWalls = senseWalls & (borderWalls | (randomWalls > 0));  // if there are no walls, there is no need to sense them!

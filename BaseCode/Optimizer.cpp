@@ -17,7 +17,7 @@
 using namespace std;
 
 int& Optimizer::elitism = Parameters::register_parameter("elitism", 0, "The highest scoring brain will be included in the next generation this many times (0 = no elitism)?", "OPTIMIZER");
-int& Optimizer::tournamentSize = Parameters::register_parameter("tournamentSize", 2, "how many genomes to consider when doing Tournament selection? 1 will result in random selection.", "OPTIMIZER");
+int& Optimizer::tournamentSize = Parameters::register_parameter("tournamentSize", 5, "how many genomes to consider when doing Tournament selection? 1 will result in random selection.", "OPTIMIZER");
 
 /*
  * Optimizer::makeNextGeneration(vector<Genome*> population, vector<double> W)

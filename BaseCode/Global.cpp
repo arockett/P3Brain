@@ -8,7 +8,7 @@ bool& Global::seedRandom = Parameters::register_parameter("seedRandom", false, "
 int& Global::updates = Parameters::register_parameter("updates", 200, "how long the program will run", "GLOBAL");
 int& Global::popSize = Parameters::register_parameter("popSize", 100, "number of genomes in the populaiton", "GLOBAL");
 
-int& Global::bitsPerBrainAddress = Parameters::register_parameter("bitsPerBrainAddress", 10, "how many bits are evaluated to determine the brain addresses", "AGENT");
+int& Global::bitsPerBrainAddress = Parameters::register_parameter("bitsPerBrainAddress", 10, "how many bits are evaluated to determine the brain addresses", "BRAIN");
 
 int Global::update = 0;
 set<int> Global::inUseGateTypes;

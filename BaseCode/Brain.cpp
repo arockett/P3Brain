@@ -15,11 +15,10 @@
 
 vector<int> Brain::defaultNodeMap;
 
-int& Brain::defaultNrOfBrainStates = Parameters::register_parameter("brainSize", 16, "number of Brain Values", "BRAIN");
+int& Brain::defaultNrOfBrainStates = Parameters::register_parameter("brainSize", 15, "number of Brain Values", "BRAIN");
 
 #if SKIPGATE==1 // if SKIPGATE is enabled, there is a chance a gate will not update
-double& Brain::skipGate = Parameters::register_parameter("skipGate", 0.0,
-    "chance that a gate will not fire", "BRAIN");
+double& Brain::skipGate = Parameters::register_parameter("skipGate", 0.0, "chance that a gate will not fire", "BRAIN");
 #endif // SKIPGATE
 
 bool& Brain::serialProcessing = Parameters::register_parameter("serialProcessing", false, "sets brains to overwrite... right?", "BRAIN");

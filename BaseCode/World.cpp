@@ -14,7 +14,7 @@
 #include "../Utilities/Utilities.h"
 #include "../Utilities/Data.h"
 
-int& World::repeats = Parameters::register_parameter("repeats", 1, "Number of times to test each Genome per generation", "WORLD");
+int& World::repeats = Parameters::register_parameter("repeats", 3, "Number of times to test each Genome per generation", "WORLD");
 
 World::World() {
 }

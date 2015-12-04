@@ -83,7 +83,7 @@ int main(int argc, const char * argv[]) {
     }
     progenitor->kill();  // the progenitor has served it's purpose.
 
-    group = make_shared<Group>(population, make_shared<Tournament>(),make_shared<Default_Archivist>());
+    group = make_shared<Group>(population, make_shared<Tournament>(),make_shared<SSwD_Archivist>());
   }
 
   //////////////////
