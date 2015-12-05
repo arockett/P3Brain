@@ -83,12 +83,27 @@ int main(int argc, const char * argv[]) {
     }
     progenitor->kill();  // the progenitor has served it's purpose.
 
-    group = make_shared<Group>(population, make_shared<Tournament>(),make_shared<SSwD_Archivist>());
+    shared_ptr<Default_Archivist> archivist;
+
+    if (Default_Archivist::Arch_outputMethodStr == "default") {
+      archivist = make_shared<Default_Archivist>();
+    }
+    if (Default_Archivist::Arch_outputMethodStr == "LODwAP") {
+      archivist = make_shared<LODwAP_Archivist>();
+    }
+    if (Default_Archivist::Arch_outputMethodStr == "snapshot") {
+      archivist = make_shared<Snapshot_Archivist>();
+    }
+    if (Default_Archivist::Arch_outputMethodStr == "SSwD") {
+      archivist = make_shared<SSwD_Archivist>();
+    }
+
+    group = make_shared<Group>(population, make_shared<Tournament>(), archivist);
   }
 
-  //////////////////
-  // evolution loop
-  //////////////////
+//////////////////
+// evolution loop
+//////////////////
 
 //  if (Archivist::outputMethod == -1) {  // this is the first time archive is called. get the output method
 //    if (Archivist::outputMethodStr == "LODwAP") {
@@ -100,7 +115,7 @@ int main(int argc, const char * argv[]) {
 //      exit(1);
 //    }
 //  }
-  bool finished = false; // when the archivist says we are done, we can stop!
+  bool finished = false;  // when the archivist says we are done, we can stop!
 
   while (!finished) {
     world->evaluateFitness(group->population, false);  // evaluate each organism in the population using a World
