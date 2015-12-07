@@ -52,8 +52,8 @@ Brain::Brain(shared_ptr<Genome> genome, int _nrOfBrainStates) {  //this is a con
   for (size_t i = 0; i < genome->sites.size() - 1; i++) {
     const int S = genome->sites[i];
     if ((S + genome->sites[i + 1]) == 256) {
-      if (Gate::makeGate[S] != nullptr) {
-        gates.push_back(Gate::makeGate[S](genome, i));
+      if (Gate_Builder::makeGate[S] != nullptr) {
+        gates.push_back(Gate_Builder::makeGate[S](genome, i));
       }
     }
   }

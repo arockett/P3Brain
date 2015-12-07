@@ -32,23 +32,13 @@ using namespace std;
 
 class Gate {  // abstact class. Assumes that a standard genome is being used.
  public:
-  static bool& usingProbGate;
-  static bool& usingDetGate;
-  static bool& usingFBGate;
-  static bool& usingGPGate;
-  static bool& usingThGate;
-  static bool& usingEpsiGate;
-  static bool& usingVoidGate;
-
-  static double& voidOutput_Probability;
-  static double& FixedEpsilonGate_Probability;
 
   static void AddGate(int ID, function<shared_ptr<Gate>(shared_ptr<Genome>, int)> theFunction);
   static void setupGates();
   static function<shared_ptr<Gate>(shared_ptr<Genome>, int)> makeGate[256];
 
-  Gate();
-  virtual ~Gate();
+  Gate(){};
+  virtual ~Gate(){};
 
   vector<int> inputs;
   vector<int> outputs;
@@ -107,9 +97,10 @@ class Gate {  // abstact class. Assumes that a standard genome is being used.
 
 class ProbabilisticGate : public Gate {  //conventional probabilistic gate
  public:
+
   vector<vector<double>> table;
 
-  ProbabilisticGate() = default;
+  ProbabilisticGate();
   ProbabilisticGate(shared_ptr<Genome> genome, int startCodonAt);
 
   virtual ~ProbabilisticGate() = default;
@@ -124,7 +115,7 @@ class DeterministicGate : public Gate {
  public:
   vector<vector<int>> table;
 
-  DeterministicGate() = default;
+  DeterministicGate();
   DeterministicGate(shared_ptr<Genome> genome, int startCodonAt);
   virtual ~DeterministicGate() = default;
   virtual void update(vector<double> & states, vector<double> & nextStates);
@@ -136,56 +127,15 @@ class DeterministicGate : public Gate {
   //double voidOutput;
 };
 
-/* ***** ADVANCED IMPLEMENTATION! - ENTER ON OWN RISK ***** */
-class FeedbackGate : public Gate {
- private:
-  vector<vector<double>> table;
-  vector<vector<double>> originalTable;
-  unsigned char posFBNode, negFBNode;
-  unsigned char nrPos, nrNeg;
-  vector<double> posLevelOfFB, negLevelOfFB;
-  deque<unsigned char> chosenInPos, chosenInNeg, chosenOutPos, chosenOutNeg;
- public:
-  static bool feedbackON;
-  FeedbackGate() = default;
-  FeedbackGate(shared_ptr<Genome> genome, int startCodonAt);
-  virtual ~FeedbackGate() = default;
-  virtual void update(vector<double> & states, vector<double> & nextStates);
-  virtual string description();
-  virtual void applyNodeMap(vector<int> nodeMap, int maxNodes);
-  virtual void resetGate(void);
-  virtual vector<int> getIns();
-};
-
-class GPGate : public Gate {
- private:
-  int myGateType;  //<link> stores the kind of GP operation (Add, Sub, Mult...)
-  vector<double> myValues;								//<link>
- public:
-  GPGate() = default;
-  GPGate(shared_ptr<Genome> genome, int startCodonAt);
-  virtual ~GPGate() = default;
-  virtual void update(vector<double> & states, vector<double> & nextStates);
-  virtual string description();
-};
-
-class Thresholdgate : public Gate {
- private:
-  int threshold;
- public:
-  Thresholdgate() = default;
-  Thresholdgate(shared_ptr<Genome> genome, int startCodonAt);
-  virtual ~Thresholdgate() = default;
-  virtual void update(vector<double> & states, vector<double> & nextStates);
-  virtual string description();
-};
 
 class FixedEpsilonGate : public DeterministicGate {
  private:
  public:
+  static double& FixedEpsilonGate_Probability;
+
   vector<int> defaultOutput;
   double epsilon;
-  FixedEpsilonGate() = default;
+  FixedEpsilonGate();
   FixedEpsilonGate(shared_ptr<Genome> genome, int startCodonAt);
   virtual ~FixedEpsilonGate() = default;
   virtual void update(vector<double> & states, vector<double> & nextStates);
@@ -193,11 +143,13 @@ class FixedEpsilonGate : public DeterministicGate {
 };
 
 class VoidGate : public DeterministicGate {
+  static double& voidGate_Probability;
+
  private:
  public:
   vector<int> defaultOutput;
   double epsilon;
-  VoidGate() = default;
+  VoidGate();
   VoidGate(shared_ptr<Genome> genome, int startCodonAt);
   virtual ~VoidGate() = default;
   virtual void update(vector<double> & states, vector<double> & nextStates);

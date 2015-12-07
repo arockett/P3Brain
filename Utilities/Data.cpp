@@ -10,7 +10,8 @@
 
 //global variables that should be accessible to all
 set<string> FileManager::dataFilesCreated;
-//char FileManager::separator = ','; // set as const in .h remove this line if everything is working
+
+string FileManager::outputDirectory = "./";
 
 /*
  * takes a vector of string with key value pairs. Calls set for each pair.
@@ -79,14 +80,14 @@ void FileManager::writeToFile(const string& fileName, const string& data, const 
   bool fileClosed = true;
   if (FileManager::dataFilesCreated.find(fileName) == FileManager::dataFilesCreated.end()) {  // if file has not be initialized yet
     FileManager::dataFilesCreated.insert(fileName);  // make a note that file exists
-    FILE.open(fileName);  // clear file contents and open in write mode
+    FILE.open(outputDirectory+fileName);  // clear file contents and open in write mode
     fileClosed = false;
     if (header != "") {
       FILE << header << "\n";
     }
   }
   if (fileClosed) {
-    FILE.open(fileName, ios::out | ios::app);  // open file in append mode
+    FILE.open(outputDirectory+fileName, ios::out | ios::app);  // open file in append mode
   }
   FILE << data << "\n";
   FILE.close();

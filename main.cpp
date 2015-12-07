@@ -42,7 +42,12 @@ int main(int argc, const char * argv[]) {
   //make a node map to handle genome value to brain state address look up.
   Brain::makeNodeMap(Brain::defaultNodeMap, Global::bitsPerBrainAddress, Brain::defaultNrOfBrainStates);
 
-  Gate::setupGates();  // determines which gate types will be in use.
+  Gate_Builder::setupGates();  // determines which gate types will be in use.
+
+
+
+  FileManager::outputDirectory = Global::outputDirectory;
+
 
   if (Global::seedRandom) {
     random_device rd;

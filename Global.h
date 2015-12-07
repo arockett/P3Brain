@@ -26,6 +26,8 @@ class Global {
   static int& updates;  // run until there is a MCRA at this time
   static int& popSize;  // number of genomes in the population
 
+  static string& outputDirectory; // where files will be written
+
   static int& bitsPerBrainAddress;  // how many bits are evaluated to determine the brain addresses.
                                     // i.e. ceil(bitsPerBrainAddress/8) = number of genome sites used
 

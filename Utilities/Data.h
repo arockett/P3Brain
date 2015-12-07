@@ -88,6 +88,7 @@ class DataMap {
 
 class FileManager {
  public:
+  static string outputDirectory;
   static set<string> dataFilesCreated;  // list of files, this allows us to track if headers must be written
   static const char separator = ',';
   static void writeToFile(const string& fileName, const string& data, const string& header = "");  //fileName, data, header - used when you want to output formatted data (i.e. genomes)
