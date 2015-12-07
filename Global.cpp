@@ -1,6 +1,5 @@
 #include "Global.h"
-#include "../Utilities/Parameters.h"
-#include "../Utilities/Utilities.h"
+#include "Utilities/Parameters.h"
 
 //global variables that should be accessible to all
 int& Global::repNumber = Parameters::register_parameter("repNumber", 101, "Replicate ID and seed (if seedWithPID not set true)", "GLOBAL");

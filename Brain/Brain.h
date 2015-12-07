@@ -15,8 +15,8 @@
 #include <set>
 #include <vector>
 
-#include "Gate.h"
-#include "Genome.h"
+#include "../Gate/Gate.h"
+#include "../Genome/Genome.h"
 
 #include "../Utilities/Parameters.h"
 

@@ -13,8 +13,8 @@
 #include <vector>
 #include <unordered_set>
 
-#include "Brain.h"
-#include "Genome.h"
+#include "../Brain/Brain.h"
+#include "../Genome/Genome.h"
 
 #include "../Utilities/Data.h"
 #include "../Utilities/Parameters.h"

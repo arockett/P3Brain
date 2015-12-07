@@ -16,14 +16,15 @@
 #include <stdlib.h>
 #include <vector>
 
-#include "../BaseCode/Genome.h"
-#include "../BaseCode/World.h"
-#include "../Worlds/BerryWorld.h"
+#include "../Brain/Brain.h"
+#include "../Genome/Genome.h"
+#include "../World/World.h"
+#include "../World/BerryWorld.h"
+
 #include "../Utilities/Data.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include "../BaseCode/Brain.h"
 
 using namespace std;
 //class MutationAnalyse {

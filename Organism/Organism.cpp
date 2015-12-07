@@ -8,9 +8,9 @@
 
 #include <algorithm>
 
-#include "Genome.h"
-#include "Global.h"
-#include "Organism.h"
+#include "../Genome/Genome.h"
+#include "../Global.h"
+#include "../Organism/Organism.h"
 
 #include "../Utilities/Random.h"
 #include "../Utilities/Utilities.h"

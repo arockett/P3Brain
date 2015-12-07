@@ -13,8 +13,8 @@
 #include <thread>
 #include <vector>
 
-#include "Brain.h"
-#include "Organism.h"
+#include "../Brain/Brain.h"
+#include "../Organism/Organism.h"
 
 using namespace std;
 

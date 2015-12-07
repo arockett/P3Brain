@@ -13,8 +13,8 @@
 #include <stdlib.h>
 #include <vector>
 
-#include "Genome.h"
-#include "Organism.h"
+#include "../Genome/Genome.h"
+#include "../Organism/Organism.h"
 
 #include "../Utilities/Parameters.h"
 

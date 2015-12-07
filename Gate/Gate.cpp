@@ -23,8 +23,8 @@ bool& Gate::usingThGate = Parameters::register_parameter("thGate", false, "set t
 bool& Gate::usingEpsiGate = Parameters::register_parameter("epsiGate", false, "set to true to enable epsilon gates", "GATE TYPES");
 bool& Gate::usingVoidGate = Parameters::register_parameter("voidGate", false, "set to true to enable void gates", "GATE TYPES");
 
-double& Gate::voidOutPut = Parameters::register_parameter("voidOutput", 0.0, "chance that an output from a void gate will be set to 0", "GATES");
-double& Gate::FixedEpsilonGateP = Parameters::register_parameter("FixedEpsilonGateProb", 0.05, "chance that an output from a FixedEpsilonGate gate will be randomized", "GATES");
+double& Gate::voidOutput_Probability = Parameters::register_parameter("voidOutput", 0.0, "chance that an output from a void gate will be set to 0", "GATES");
+double& Gate::FixedEpsilonGate_Probability = Parameters::register_parameter("FixedEpsilonGateProb", 0.05, "chance that an output from a FixedEpsilonGate gate will be randomized", "GATES");
 
 //////////////////////////////////////////
 // required code to support abstract class
@@ -683,7 +683,7 @@ string Thresholdgate::description() {
 
 FixedEpsilonGate::FixedEpsilonGate(shared_ptr<Genome> genome, int genomeIndex)
     : DeterministicGate(genome, genomeIndex) {  // use DeterministicGate constructor to build set up everything (including a table of 0s and 1s)
-  epsilon = FixedEpsilonGateP;  // in case you want to have different epsilon for different gates (who am I to judge?)
+  epsilon = FixedEpsilonGate_Probability;  // in case you want to have different epsilon for different gates (who am I to judge?)
 
   // now to the specifics of this gate - we convert the table to a list of numbers (i.e. bitstrings) so we can do fast comparisons in the update
   defaultOutput.clear();  // clear the defaultOutput vector... the list of bitstrings
@@ -725,7 +725,7 @@ string FixedEpsilonGate::description() {
 
 VoidGate::VoidGate(shared_ptr<Genome> genome, int genomeIndex)
     : DeterministicGate(genome, genomeIndex) {  // use DeterministicGate constructor to build set up everything (including a table of 0s and 1s)
-  epsilon = voidOutPut;  // in case you want to have different epsilon for different gates (who am I to judge?)
+  epsilon = voidOutput_Probability;  // in case you want to have different epsilon for different gates (who am I to judge?)
 }
 
 void VoidGate::update(vector<double> & states, vector<double> & nextStates) {

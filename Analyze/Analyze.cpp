@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
 //
 
-#include "Analyse.h"
+#include "Analyze.h"
 
 double Analyse::mutualInformation(vector<int> A, vector<int> B) {
 	set<int> nrA, nrB;

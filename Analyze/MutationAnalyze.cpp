@@ -5,7 +5,7 @@
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
 //
 
-#include "MutationAnalyse.h"
+#include "MutationAnalyze.h"
 
 using namespace std;
 

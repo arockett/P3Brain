@@ -16,8 +16,8 @@
 #include <stdlib.h>
 #include <vector>
 
-#include "Genome.h"
-#include "Global.h"
+#include "../Genome/Genome.h"
+#include "../Global.h"
 
 #include "../Utilities/Parameters.h"
 
@@ -40,8 +40,8 @@ class Gate {  // abstact class. Assumes that a standard genome is being used.
   static bool& usingEpsiGate;
   static bool& usingVoidGate;
 
-  static double& voidOutPut;
-  static double& FixedEpsilonGateP;
+  static double& voidOutput_Probability;
+  static double& FixedEpsilonGate_Probability;
 
   static void AddGate(int ID, function<shared_ptr<Gate>(shared_ptr<Genome>, int)> theFunction);
   static void setupGates();

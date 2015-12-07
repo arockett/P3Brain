@@ -14,10 +14,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../BaseCode/Brain.h"
-#include "../BaseCode/Genome.h"
-#include "../BaseCode/World.h"
-#include "../Analyse/Analyse.h"
+#include "../Brain/Brain.h"
+#include "../Genome/Genome.h"
+#include "../World/World.h"
+#include "../Analyze/Analyze.h"
 #include "../Utilities/Parameters.h"
 #include "../Utilities/Utilities.h"
 #include "../Utilities/Random.h"

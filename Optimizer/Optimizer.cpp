@@ -10,7 +10,7 @@
 #include <math.h>
 #include <stdlib.h>     // for atoi
 
-#include "Optimizer.h"
+#include "../Optimizer/Optimizer.h"
 
 #include "../Utilities/Random.h"
 

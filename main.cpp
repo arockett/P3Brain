@@ -12,21 +12,25 @@
 #include <stdlib.h>
 #include <vector>
 
-#include "BaseCode/Archivist.h"
-#include "BaseCode/Brain.h"
-#include "BaseCode/Genome.h"
-#include "BaseCode/Global.h"
-#include "BaseCode/Group.h"
-#include "BaseCode/Optimizer.h"
-#include "BaseCode/Organism.h"
-#include "BaseCode/World.h"
+#include "Global.h"
+
+#include "Archivist/Archivist.h"
+#include "Archivist/LODwAP_Archivist.h"
+#include "Archivist/snapshot_Archivist.h"
+#include "Archivist/SSwD_Archivist.h"
+#include "Brain/Brain.h"
+#include "Genome/Genome.h"
+#include "Group/Group.h"
+#include "Optimizer/Optimizer.h"
+#include "Organism/Organism.h"
+#include "World/World.h"
+#include "World/BerryWorld.h"
 
 #include "Utilities/Parameters.h"
 #include "Utilities/Random.h"
 #include "Utilities/Data.h"
 #include "Utilities/Utilities.h"
 
-#include "Worlds/BerryWorld.h"
 
 using namespace std;
 

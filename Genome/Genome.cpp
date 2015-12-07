@@ -6,8 +6,8 @@
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
 //
 
-#include "Genome.h"
-#include "Global.h"
+#include "../Genome/Genome.h"
+#include "../Global.h"
 
 #include "../Utilities/Random.h"
 #include "../Utilities/Utilities.h"

@@ -8,10 +8,10 @@
 #ifndef __BasicMarkovBrainTemplate__Group__
 #define __BasicMarkovBrainTemplate__Group__
 
-#include "Archivist.h"
-#include "Global.h"
-#include "Optimizer.h"
-#include "Organism.h"
+#include "../Archivist/Archivist.h"
+#include "../Global.h"
+#include "../Optimizer/Optimizer.h"
+#include "../Organism/Organism.h"
 
 class Group {
  public:

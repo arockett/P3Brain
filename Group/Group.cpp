@@ -5,7 +5,7 @@
  *      Author: cliff
  */
 
-#include "Group.h"
+#include "../Group/Group.h"
 
 Group::Group() {  // create an empty Group
 }
