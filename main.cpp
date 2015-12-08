@@ -44,8 +44,7 @@ int main(int argc, const char * argv[]) {
 
   Gate_Builder::setupGates();  // determines which gate types will be in use.
 
-
-
+  // outputDirectory must exist. If outputDirectory does not exist, no error will occur, but no data will be writen.
   FileManager::outputDirectory = Global::outputDirectory;
 
 
@@ -81,7 +80,7 @@ int main(int argc, const char * argv[]) {
 
     shared_ptr<Organism> progenitor = make_shared<Organism>(make_shared<Genome>(), make_shared<Brain>());  // make a organism with a genome and brain (if you need to change the types here is where you do it)
 
-    Global::update = 0;  // the begining of time - now we construct the first population
+    Global::update = 0;  // the beginning of time - now we construct the first population
     vector<shared_ptr<Organism>> population;
     for (int i = 0; i < Global::popSize; i++) {
       shared_ptr<Genome> genome(new Genome());

@@ -16,17 +16,6 @@
 double& FixedEpsilonGate::FixedEpsilonGate_Probability = Parameters::register_parameter("FixedEpsilonGate_Probability", 0.05, "chance that an output from a FixedEpsilonGate gate will be randomized", "GATES");
 double& VoidGate::voidGate_Probability = Parameters::register_parameter("voidOutputGate_Probability", 0.05, "chance that an output from a void gate will be set to 0", "GATES");
 
-////////////////////////////////////////////
-//// required code to support abstract class
-//Gate::Gate() {
-//}
-//Gate::~Gate() {
-//}
-//void Gate::update(vector<double> & states, vector<double> & nextStates) {
-//}
-//// required code to support abstract class
-////////////////////////////////////////////
-
 /* *** General tools for All Gates *** */
 
 void Gate::movePastStartCodeon(int& genomeIndex, shared_ptr<Genome> genome) {

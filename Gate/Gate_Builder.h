@@ -6,7 +6,7 @@
 #include "GP_Gate.h"
 #include "Threshold_Gate.h"
 
-class Gate_Builder {  // abstact class. Assumes that a standard genome is being used.
+class Gate_Builder {  // manages what kinds of gates can be built
  public:
 
   static bool& usingProbGate;
@@ -23,7 +23,7 @@ class Gate_Builder {  // abstact class. Assumes that a standard genome is being 
   static void setupGates();
   static function<shared_ptr<Gate>(shared_ptr<Genome>, int)> makeGate[256];
 
-  Gate_Builder();
+  Gate_Builder() = delete;
   ~Gate_Builder();
 };
 

@@ -19,7 +19,7 @@ class GPGate : public Gate {
   int myGateType;  //<link> stores the kind of GP operation (Add, Sub, Mult...)
   vector<double> myValues;								//<link>
  public:
-  GPGate() = default;
+  GPGate() = delete;
   GPGate(shared_ptr<Genome> genome, int startCodonAt);
   virtual ~GPGate() = default;
   virtual void update(vector<double> & states, vector<double> & nextStates);

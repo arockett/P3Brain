@@ -37,8 +37,8 @@ class Gate {  // abstact class. Assumes that a standard genome is being used.
   static void setupGates();
   static function<shared_ptr<Gate>(shared_ptr<Genome>, int)> makeGate[256];
 
-  Gate(){};
-  virtual ~Gate(){};
+  Gate()=default;
+  virtual ~Gate()=default;
 
   vector<int> inputs;
   vector<int> outputs;
@@ -100,7 +100,7 @@ class ProbabilisticGate : public Gate {  //conventional probabilistic gate
 
   vector<vector<double>> table;
 
-  ProbabilisticGate();
+  ProbabilisticGate() = delete;
   ProbabilisticGate(shared_ptr<Genome> genome, int startCodonAt);
 
   virtual ~ProbabilisticGate() = default;
@@ -115,7 +115,7 @@ class DeterministicGate : public Gate {
  public:
   vector<vector<int>> table;
 
-  DeterministicGate();
+  DeterministicGate() = delete;
   DeterministicGate(shared_ptr<Genome> genome, int startCodonAt);
   virtual ~DeterministicGate() = default;
   virtual void update(vector<double> & states, vector<double> & nextStates);
@@ -135,7 +135,7 @@ class FixedEpsilonGate : public DeterministicGate {
 
   vector<int> defaultOutput;
   double epsilon;
-  FixedEpsilonGate();
+  FixedEpsilonGate() = delete;
   FixedEpsilonGate(shared_ptr<Genome> genome, int startCodonAt);
   virtual ~FixedEpsilonGate() = default;
   virtual void update(vector<double> & states, vector<double> & nextStates);
@@ -149,7 +149,7 @@ class VoidGate : public DeterministicGate {
  public:
   vector<int> defaultOutput;
   double epsilon;
-  VoidGate();
+  VoidGate() = delete;
   VoidGate(shared_ptr<Genome> genome, int startCodonAt);
   virtual ~VoidGate() = default;
   virtual void update(vector<double> & states, vector<double> & nextStates);
