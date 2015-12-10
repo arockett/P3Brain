@@ -10,7 +10,7 @@
 Group::Group() {  // create an empty Group
 }
 
-Group::Group(vector<shared_ptr<Organism>> _population, shared_ptr<Optimizer> _optimizer,shared_ptr<Default_Archivist> _archivist) {
+Group::Group(vector<shared_ptr<Organism>> _population, shared_ptr<BaseOptimizer> _optimizer,shared_ptr<Archivist> _archivist) {
   population = _population;
   optimizer = _optimizer;
   archivist = _archivist;

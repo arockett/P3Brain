@@ -1,15 +1,15 @@
 
 #include "Gate_Builder.h"
 
-bool& Gate_Builder::usingProbGate = Parameters::register_parameter("probGate", false, "set to true to enable probabilistic gates", "GATE TYPES");
-bool& Gate_Builder::usingDetGate = Parameters::register_parameter("detGate", true, "set to true to enable deterministic gates?", "GATE TYPES");
-bool& Gate_Builder::usingEpsiGate = Parameters::register_parameter("epsiGate", false, "set to true to enable epsilon gates", "GATE TYPES");
+bool& Gate_Builder::usingProbGate = Parameters::register_parameter("probabilisticGate", false, "set to true to enable probabilistic gates", "GATE TYPES");
+bool& Gate_Builder::usingDetGate = Parameters::register_parameter("deterministicGate", true, "set to true to enable deterministic gates?", "GATE TYPES");
+bool& Gate_Builder::usingEpsiGate = Parameters::register_parameter("fixedEpsilonGate", false, "set to true to enable epsilon gates", "GATE TYPES");
 bool& Gate_Builder::usingVoidGate = Parameters::register_parameter("voidGate", false, "set to true to enable void gates", "GATE TYPES");
 
 
-bool& Gate_Builder::usingFBGate = Parameters::register_parameter("fbGate", false, "set to true to enable feedback gates", "GATE TYPES");
-bool& Gate_Builder::usingGPGate = Parameters::register_parameter("gpGate", false, "set to true to enable GP (what?) gates", "GATE TYPES");
-bool& Gate_Builder::usingThGate = Parameters::register_parameter("thGate", false, "set to true to enable threshold gates", "GATE TYPES");
+bool& Gate_Builder::usingFBGate = Parameters::register_parameter("feedBackGate", false, "set to true to enable feedback gates", "GATE TYPES");
+bool& Gate_Builder::usingGPGate = Parameters::register_parameter("geneticProgramingGate", false, "set to true to enable GP (what?) gates", "GATE TYPES");
+bool& Gate_Builder::usingThGate = Parameters::register_parameter("thresholdGate", false, "set to true to enable threshold gates", "GATE TYPES");
 
 /*
  * setupGates() populates Gate::makeGate (a structure containing functions) with the constructors for various types of gates.

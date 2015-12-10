@@ -21,8 +21,7 @@ using namespace std;
 class Global {
  public:
   // parameters
-  static int& repNumber;  // number used for output directory names and random seed
-  static bool& seedRandom;  // if this is true, seed with a random value
+  static int& randomSeed;  // seed for random number generator, if -1 random number generator will be seeded randomly
   static int& updates;  // run until there is a MCRA at this time
   static int& popSize;  // number of genomes in the population
 

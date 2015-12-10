@@ -17,7 +17,7 @@ double& Genome::pointMutationRate = Parameters::register_parameter("pointMutatio
 double& Genome::insertionRate = Parameters::register_parameter("insertionRate", 0.02, "per genome insertion/deletion rate", "GENOME");
 double& Genome::deletionRate = Parameters::register_parameter("deletionRate", 0.02, "insertion rate per 1000 genome sites", "GENOME");
 int& Genome::minGenomeSize = Parameters::register_parameter("genomeSizeMin", 5000, "if the genome is smaller then this, mutations will only increse genome size", "GENOME");
-int& Genome::maxGenomeSize = Parameters::register_parameter("GenomeSizeMax", 20000, "if the genome is larger then this, mutations will only decrease genome size", "GENOME");
+int& Genome::maxGenomeSize = Parameters::register_parameter("genomeSizeMax", 20000, "if the genome is larger then this, mutations will only decrease genome size", "GENOME");
 
 //////////////////////////////////////////
 // required code to support abstract class

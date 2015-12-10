@@ -25,7 +25,7 @@
 
 using namespace std;
 
-class Default_Archivist {
+class Archivist {
  public:
 
   static string& Arch_outputMethodStr;  // string parameter for outputMethod;
@@ -49,61 +49,15 @@ class Default_Archivist {
 
   bool finished;  // if finished, then as far as the archivist is concerned, we can stop the run.
 
-  Default_Archivist() {
-    realtimeFilesInterval = Arch_realtimeFilesInterval;
-    writeAveFile = Arch_writeAveFile;
-    writeDominantFile = Arch_writeDominantFile;
-    AveFileName = Arch_AveFileName;
-    DominantFileName = Arch_DominantFileName;
-    convertCSVListToVector(Arch_DefaultAveFileColumnNames, DefaultAveFileColumns);
-    finished = false;
-  }
+  Archivist();
+  virtual ~Archivist() = default;
 
-  virtual ~Default_Archivist() = default;
-
-  void writeRealTimeFiles(vector<shared_ptr<Organism>> &population) {  // write Ave and Dominant files NOW!
-    // write out Ave
-    if (writeAveFile) {
-      double aveValue, temp;
-      DataMap AveMap;
-      for (auto key : DefaultAveFileColumns) {
-        aveValue = 0;
-        for (auto org : population) {
-          stringstream ss(org->dataMap.Get(key));
-          ss >> temp;
-          aveValue += temp;
-        }
-        aveValue /= population.size();
-        AveMap.Set(key, aveValue);
-      }
-      AveMap.writeToFile(AveFileName, DefaultAveFileColumns);
-    }
-    // write out Dominant
-    if (writeDominantFile) {
-      vector<double> Scores;
-      for (auto org : population) {
-        Scores.push_back(org->score);
-      }
-
-      int best = findGreatestInVector(Scores);
-      population[best]->dataMap.writeToFile(DominantFileName);
-    }
-  }
+  //save dominant and average file data
+  void writeRealTimeFiles(vector<shared_ptr<Organism>> &population);
 
   // save data and manage in memory data
   // return true if next save will be > updates + terminate after
-  virtual bool archive(vector<shared_ptr<Organism>> population, int flush = 0) {
-    if (flush != 1) {
-      if ((Global::update % realtimeFilesInterval == 0) && (flush == 0)) {  // do not write files on flush - these organisms have not been evaluated!
-        writeRealTimeFiles(population);  // write to dominant and average files
-      }
-      for (auto org : population) {  // we don't need to worry about tracking parents or lineage, so we clear out this data every generation.
-        org->clearHistory();
-      }
-    }
-    // if we are at the end of the run
-    return (Global::update >= Global::updates);
-  }
+  virtual bool archive(vector<shared_ptr<Organism>> population, int flush = 0);
 
 };
 

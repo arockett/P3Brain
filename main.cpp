@@ -18,10 +18,16 @@
 #include "Archivist/LODwAP_Archivist.h"
 #include "Archivist/snapshot_Archivist.h"
 #include "Archivist/SSwD_Archivist.h"
+
 #include "Brain/Brain.h"
 #include "Genome/Genome.h"
 #include "Group/Group.h"
+
 #include "Optimizer/Optimizer.h"
+#include "Optimizer/GA_Optimizer.h"
+#include "Optimizer/Tournament_Optimizer.h"
+#include "Optimizer/Tournament2_Optimizer.h"
+
 #include "Organism/Organism.h"
 #include "World/World.h"
 #include "World/BerryWorld.h"
@@ -48,15 +54,12 @@ int main(int argc, const char * argv[]) {
   FileManager::outputDirectory = Global::outputDirectory;
 
 
-  if (Global::seedRandom) {
+  if (Global::randomSeed == -1) {
     random_device rd;
     Random::getCommonGenerator().seed(rd());
   } else {
-    Random::getCommonGenerator().seed(Global::repNumber);
+    Random::getCommonGenerator().seed(Global::randomSeed);
   }
-
-  //Optimizer *optimizer = (Optimizer*) new GA();
-  //Optimizer *optimizer = (Optimizer*) new Tournament();
 
   World *world = (World*) new BerryWorld();  //new World();
 
@@ -91,18 +94,18 @@ int main(int argc, const char * argv[]) {
     }
     progenitor->kill();  // the progenitor has served it's purpose.
 
-    shared_ptr<Default_Archivist> archivist;
+    shared_ptr<Archivist> archivist;
 
-    if (Default_Archivist::Arch_outputMethodStr == "default") {
-      archivist = make_shared<Default_Archivist>();
+    if (Archivist::Arch_outputMethodStr == "default") {
+      archivist = make_shared<Archivist>();
     }
-    if (Default_Archivist::Arch_outputMethodStr == "LODwAP") {
+    if (Archivist::Arch_outputMethodStr == "LODwAP") {
       archivist = make_shared<LODwAP_Archivist>();
     }
-    if (Default_Archivist::Arch_outputMethodStr == "snapshot") {
+    if (Archivist::Arch_outputMethodStr == "snapshot") {
       archivist = make_shared<Snapshot_Archivist>();
     }
-    if (Default_Archivist::Arch_outputMethodStr == "SSwD") {
+    if (Archivist::Arch_outputMethodStr == "SSwD") {
       archivist = make_shared<SSwD_Archivist>();
     }
 
@@ -139,7 +142,7 @@ int main(int argc, const char * argv[]) {
 
   group->archive(1);  // flush any data that has not been output yet
 
-  if (Default_Archivist::Arch_outputMethodStr == "LODwAP") {  // if using LODwAP, write out some info about MRCA
+  if (Archivist::Arch_outputMethodStr == "LODwAP") {  // if using LODwAP, write out some info about MRCA
     shared_ptr<Organism> FinalMRCA = group->population[0]->getMostRecentCommonAncestor(group->population[0]);
     cout << "MRCA - ID: " << FinalMRCA->ID << " born on: " << FinalMRCA->timeOfBirth << "\n" << FinalMRCA->brain->description();
   }
