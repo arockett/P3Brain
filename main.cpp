@@ -12,21 +12,25 @@
 #include <stdlib.h>
 #include <vector>
 
-#include "BaseCode/Archivist.h"
-#include "BaseCode/Brain.h"
-#include "BaseCode/Genome.h"
-#include "BaseCode/Global.h"
-#include "BaseCode/Group.h"
-#include "BaseCode/Optimizer.h"
-#include "BaseCode/Organism.h"
-#include "BaseCode/World.h"
+#include "Global.h"
+
+#include "Archivist/Archivist.h"
+#include "Archivist/LODwAP_Archivist.h"
+#include "Archivist/snapshot_Archivist.h"
+#include "Archivist/SSwD_Archivist.h"
+#include "Brain/Brain.h"
+#include "Genome/Genome.h"
+#include "Group/Group.h"
+#include "Optimizer/Optimizer.h"
+#include "Organism/Organism.h"
+#include "World/World.h"
+#include "World/BerryWorld.h"
 
 #include "Utilities/Parameters.h"
 #include "Utilities/Random.h"
 #include "Utilities/Data.h"
 #include "Utilities/Utilities.h"
 
-#include "Worlds/BerryWorld.h"
 
 using namespace std;
 
@@ -38,7 +42,11 @@ int main(int argc, const char * argv[]) {
   //make a node map to handle genome value to brain state address look up.
   Brain::makeNodeMap(Brain::defaultNodeMap, Global::bitsPerBrainAddress, Brain::defaultNrOfBrainStates);
 
-  Gate::setupGates();  // determines which gate types will be in use.
+  Gate_Builder::setupGates();  // determines which gate types will be in use.
+
+  // outputDirectory must exist. If outputDirectory does not exist, no error will occur, but no data will be writen.
+  FileManager::outputDirectory = Global::outputDirectory;
+
 
   if (Global::seedRandom) {
     random_device rd;
@@ -48,28 +56,32 @@ int main(int argc, const char * argv[]) {
   }
 
   //Optimizer *optimizer = (Optimizer*) new GA();
-  // Optimizer *optimizer = (Optimizer*) new Tournament();
+  //Optimizer *optimizer = (Optimizer*) new Tournament();
 
   World *world = (World*) new BerryWorld();  //new World();
 
+////  ///// to show org in world
+//  shared_ptr<Genome> testGenome = make_shared<Genome>();
+//  testGenome->loadSites("genome.csv",1000);
+//  shared_ptr<Organism> testOrg = make_shared<Organism>(testGenome, make_shared<Brain>());
+//  world->testIndividual(testOrg,0,1);
+//  exit(0);
+////  ///// end to show org in world
+
+  //////////////////
   // define population
+  //////////////////
 
-  // a progenitor must exist - that is, one ancestor genome
-  // this genome is evaluated to populate the dataMap
-
-  Global::update = -1;  // before there was time, there was a progenitor
   shared_ptr<Group> group;
 
   {
-    vector<shared_ptr<Organism>> population;
+    // a progenitor must exist - that is, one ancestor genome
+    Global::update = -1;  // before there was time, there was a progenitor
 
-    //shared_ptr<Genome> _genome(new Genome());
-    //shared_ptr<Brain> _brain(new Brain());
-
-    //shared_ptr<Organism> progenitor = make_shared<Organism>(_genome, _brain); // make a organism with a genome and brain (if you need to change the types here is where you do it)
     shared_ptr<Organism> progenitor = make_shared<Organism>(make_shared<Genome>(), make_shared<Brain>());  // make a organism with a genome and brain (if you need to change the types here is where you do it)
 
-    Global::update = 0;  // the begining of time - now we construct the first population
+    Global::update = 0;  // the beginning of time - now we construct the first population
+    vector<shared_ptr<Organism>> population;
     for (int i = 0; i < Global::popSize; i++) {
       shared_ptr<Genome> genome(new Genome());
       genome->fillRandom();
@@ -79,46 +91,58 @@ int main(int argc, const char * argv[]) {
     }
     progenitor->kill();  // the progenitor has served it's purpose.
 
-    group = make_shared<Group>(population, make_shared<Tournament2>());
-  }
+    shared_ptr<Default_Archivist> archivist;
 
-  //////////////////
-  // evolution loop
-  //////////////////
-
-  if (Archivist::outputMethod == -1) {  // this is the first time archive is called. get the output method
-    if (Archivist::outputMethodStr == "LODwAP") {
-      Archivist::outputMethod = 0;
-    } else if (Archivist::outputMethodStr == "SSwD") {
-      Archivist::outputMethod = 1;
-    } else {
-      cout << "unrecognized archive method \"" << Archivist::outputMethodStr << "\". Should be either \"LODwAP\" or \"SSwD\"\nExiting.\n";
-      exit(1);
+    if (Default_Archivist::Arch_outputMethodStr == "default") {
+      archivist = make_shared<Default_Archivist>();
     }
+    if (Default_Archivist::Arch_outputMethodStr == "LODwAP") {
+      archivist = make_shared<LODwAP_Archivist>();
+    }
+    if (Default_Archivist::Arch_outputMethodStr == "snapshot") {
+      archivist = make_shared<Snapshot_Archivist>();
+    }
+    if (Default_Archivist::Arch_outputMethodStr == "SSwD") {
+      archivist = make_shared<SSwD_Archivist>();
+    }
+
+    group = make_shared<Group>(population, make_shared<Tournament>(), archivist);
   }
 
-  int realTerminateAfter = (Archivist::outputMethod == 0) ? (Global::terminateAfter) : Archivist::intervalDelay;  // if the output method is SSwD override terminateAfter
+//////////////////
+// evolution loop
+//////////////////
 
-  while (((Archivist::nextDataWrite <= Global::updates) || (Archivist::nextGenomeWrite <= Global::updates)) && (Global::update <= (Global::updates + realTerminateAfter))) {
-    cout << "update: " << Global::update << "\n";
+//  if (Archivist::outputMethod == -1) {  // this is the first time archive is called. get the output method
+//    if (Archivist::outputMethodStr == "LODwAP") {
+//      Archivist::outputMethod = 0;
+//    } else if (Archivist::outputMethodStr == "SSwD") {
+//      Archivist::outputMethod = 1;
+//    } else {
+//      cout << "unrecognized archive method \"" << Archivist::outputMethodStr << "\". Should be either \"LODwAP\" or \"SSwD\"\nExiting.\n";
+//      exit(1);
+//    }
+//  }
+  bool finished = false;  // when the archivist says we are done, we can stop!
+
+  while (!finished) {
     world->evaluateFitness(group->population, false);  // evaluate each organism in the population using a World
-    cout << "  evaluate complete\n";
-    group->archive();  // save data, update memory and delete any unneeded data;
-    cout << "  archive complete\n";
+
+    finished = group->archive();  // save data, update memory and delete any unneeded data;
+
     Global::update++;
+
     group->optimize();  // update the population (reproduction and death)
-    cout << "  optimize complete\n";
 
     cout << "update: " << Global::update - 1 << "   maxFitness: " << group->optimizer->maxFitness << "\n";
   }
 
   group->archive(1);  // flush any data that has not been output yet
 
-  if (Archivist::outputMethod == 0) {  // if using LODwAP, write out some info about MRCA
+  if (Default_Archivist::Arch_outputMethodStr == "LODwAP") {  // if using LODwAP, write out some info about MRCA
     shared_ptr<Organism> FinalMRCA = group->population[0]->getMostRecentCommonAncestor(group->population[0]);
     cout << "MRCA - ID: " << FinalMRCA->ID << " born on: " << FinalMRCA->timeOfBirth << "\n" << FinalMRCA->brain->description();
   }
-
   return 0;
 }
 

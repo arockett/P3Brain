@@ -9,15 +9,17 @@
 #ifndef __BasicMarkovBrainTemplate__Data__
 #define __BasicMarkovBrainTemplate__Data__
 
+#include <cwctype>
+#include <fstream>
 #include <iostream>
-
+#include <iterator>
 #include <map>
-#include <unordered_map>
-
 #include <memory>
 #include <set>
+#include <sstream>
 #include <stdlib.h>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "Utilities.h"
@@ -81,14 +83,15 @@ class DataMap {
 
   void writeToFile(const string &fileName, const vector<string>& keys = { });  // write from this DataMap to fileName the data associated with keys
   vector<string> getKeys();
-  void Clear();
+  void clear();
 };
 
 class FileManager {
  public:
+  static string outputDirectory;
   static set<string> dataFilesCreated;  // list of files, this allows us to track if headers must be written
   static const char separator = ',';
-  void static writeToFile(const string& fileName, const string& data, const string& header = "");  //fileName, data, header - used when you want to output formatted data (i.e. genomes)
+  static void writeToFile(const string& fileName, const string& data, const string& header = "");  //fileName, data, header - used when you want to output formatted data (i.e. genomes)
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Data__) */
