@@ -17,32 +17,32 @@
 
 namespace hill_climb {
 // Creates a type name for pointers to hill climbing functions
-using pointer=void (*)(Random & rand, vector<bool> & solution, float & fitness, shared_ptr<Evaluator> evaluator);
+using pointer=void (*)(generator & rand, vector<bool> & solution, float & fitness, shared_ptr<Evaluator> evaluator);
 
 // Each time an improvement is found, it is immediately kept, with search progressing
 // from the modified solution
-void first_improvement(Random & rand, vector<bool> & solution, float & fitness,
+void first_improvement(generator & rand, vector<bool> & solution, float & fitness,
                        shared_ptr<Evaluator> evaluator);
 
 // Before accepting any improvement, all possible 1 bit neighbors are tested.
 // The 1 bit change that results in the highest fitness is then chosen, with search
 // progressing from that modified solution
-void steepest_ascent(Random & rand, vector<bool> & solution, float & fitness,
+void steepest_ascent(generator & rand, vector<bool> & solution, float & fitness,
                      shared_ptr<Evaluator> evaluator);
 
 // Stub function used to turn off local search.  Always returns immediately
 // without modifying the solution.
-void no_action(Random & rand, vector<bool> & solution, float & fitness,
+void no_action(generator & rand, vector<bool> & solution, float & fitness,
                shared_ptr<Evaluator> evaluator);
 
 // Generates a single random solution.  If that solution is better than the passed
 // in vector, the passed in vector is overwritten.
-void binary_tournament(Random & rand, vector<bool> & solution, float & fitness,
+void binary_tournament(generator & rand, vector<bool> & solution, float & fitness,
                        shared_ptr<Evaluator> evaluator);
 
 // Similar to "first_improvement" except that each bit is flipped at most one
 // time.  Improvements are kept as they are found, but a gene is never revisited
-void once_each(Random & rand, vector<bool> & solution, float & fitness,
+void once_each(generator & rand, vector<bool> & solution, float & fitness,
                shared_ptr<Evaluator> evaluator);
 
 // Mapping used to convert configuration string names to actual function pointers

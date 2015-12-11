@@ -14,7 +14,7 @@
 // Inherits and implements the BitStringOptimizer interface
 class LambdaLambda : public BitStringOptimizer {
  public:
-  LambdaLambda(Random& _rand, shared_ptr<Evaluator> _evaluator,
+  LambdaLambda(generator& _rand, shared_ptr<Evaluator> _evaluator,
                Configuration& _config);
   virtual bool iterate() override;
   create_optimizer(LambdaLambda);

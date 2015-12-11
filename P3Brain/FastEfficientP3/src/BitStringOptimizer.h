@@ -15,7 +15,7 @@
 using std::shared_ptr;
 
 // Macro used to create a function which returns new instances of the desired optimization method.
-#define create_optimizer(name) static shared_ptr<BitStringOptimizer> create(Random& rand, shared_ptr<Evaluator> evaluator, Configuration& config)\
+#define create_optimizer(name) static shared_ptr<BitStringOptimizer> create(generator& rand, shared_ptr<Evaluator> evaluator, Configuration& config)\
 {\
 	return shared_ptr<BitStringOptimizer>(new name(rand, evaluator, config));\
 }
@@ -23,7 +23,7 @@ using std::shared_ptr;
 // Base class for optimization methods
 class BitStringOptimizer {
  public:
-  BitStringOptimizer(Random& _rand, shared_ptr<Evaluator> _evaluator,
+  BitStringOptimizer(generator& _rand, shared_ptr<Evaluator> _evaluator,
             Configuration& _config)
       : rand(_rand),
         evaluator(_evaluator),
@@ -43,7 +43,7 @@ class BitStringOptimizer {
 
  protected:
   // Tools useful to the actual optimization methods.
-  Random& rand;
+  generator& rand;
   shared_ptr<Evaluator> evaluator;
   Configuration& config;
   size_t length;

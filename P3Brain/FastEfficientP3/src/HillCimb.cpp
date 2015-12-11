@@ -20,7 +20,7 @@ hill_climb::pointer Configuration::get(const string key) {
 // Iteratively tests bits in a random order, accepting improvements as they
 // are found.  Tracks bits that have been tested since the last modification
 // to prevent waste.
-void hill_climb::first_improvement(Random & rand, vector<bool> & solution,
+void hill_climb::first_improvement(generator & rand, vector<bool> & solution,
                                    float & fitness, shared_ptr<Evaluator> evaluator) {
   // Set up data structure for random bit selection
   vector<int> options(solution.size());
@@ -60,7 +60,7 @@ void hill_climb::first_improvement(Random & rand, vector<bool> & solution,
 
 // Only modify the solution once you know which single bit change will
 // result in the best fitness improvement
-void hill_climb::steepest_ascent(Random & rand, vector<bool> & solution,
+void hill_climb::steepest_ascent(generator & rand, vector<bool> & solution,
                                  float & fitness, shared_ptr<Evaluator> evaluator) {
   float new_fitness;
   bool improved;
@@ -101,13 +101,13 @@ void hill_climb::steepest_ascent(Random & rand, vector<bool> & solution,
 }
 
 // Do nothing, just return the solution as is
-void hill_climb::no_action(Random & rand, vector<bool> & solution,
+void hill_climb::no_action(generator & rand, vector<bool> & solution,
                            float & fitness, shared_ptr<Evaluator> evaluator) {
 }
 
 // Compare solution with a randomly generated opponent, return whichever
 // has the higher fitness
-void hill_climb::binary_tournament(Random & rand, vector<bool> & solution,
+void hill_climb::binary_tournament(generator & rand, vector<bool> & solution,
                                    float & fitness, shared_ptr<Evaluator> evaluator) {
   auto guess = rand_vector(rand, solution.size());
   float guess_fitness = evaluator->evaluate(guess);
@@ -119,7 +119,7 @@ void hill_climb::binary_tournament(Random & rand, vector<bool> & solution,
 
 // Attempt to flip each bit in a random order, accepting improvements
 // as they are found.  Test each bit exactly once for improvement
-void hill_climb::once_each(Random & rand, vector<bool> & solution,
+void hill_climb::once_each(generator & rand, vector<bool> & solution,
                            float & fitness, shared_ptr<Evaluator> evaluator) {
   vector<int> options(solution.size());
   iota(options.begin(), options.end(), 0);

@@ -9,7 +9,7 @@
 using std::endl;
 
 // Constructs and evaluates the initial population of solutions
-LTGA::LTGA(Random& _rand, shared_ptr<Evaluator> _evaluator,
+LTGA::LTGA(generator& _rand, shared_ptr<Evaluator> _evaluator,
            Configuration& _config)
     : BitStringOptimizer(_rand, _evaluator, _config),
       pop(_config),
@@ -38,7 +38,7 @@ LTGA::LTGA(Random& _rand, shared_ptr<Evaluator> _evaluator,
 
 // Determines which solutions in the population should be used when
 // calculating the pairwise entropy.
-void LTGA::binary_insert(Random& rand, vector<vector<bool>> & solutions,
+void LTGA::binary_insert(generator& rand, vector<vector<bool>> & solutions,
                          Population& next_pop) {
   std::shuffle(solutions.begin(), solutions.end(), rand);
   for (size_t i = 0; i + 1 < solutions.size(); i += 2) {
