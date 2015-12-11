@@ -65,7 +65,7 @@ int main(int argc, char * argv[]) {
 
   // Set up the random number seed either using the configuration value
   // or the computers built in seed generator.
-  Random rand;
+  generator rand;
   int seed = config.get<int>("seed");
   if (seed == -1) {
     std::random_device rd;

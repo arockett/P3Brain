@@ -197,7 +197,7 @@ NearestNeighborNK::NearestNeighborNK(Configuration& config, int run_number) {
     in.close();
   } else {
     // Generate the new problem
-    Random rand(rng_seed);
+    generator rand(rng_seed);
 
     // Generate the table
     auto generator = std::uniform_real_distribution<>(0, 1);
@@ -429,7 +429,7 @@ MAXSAT::MAXSAT(Configuration& config, int run_number) {
   signs.resize(clauses.size());
 
   int rng_seed = config.get<int>("problem_seed") + run_number;
-  Random rand(rng_seed);
+  generator rand(rng_seed);
 
   // Create the random target solution
   vector<bool> solution = rand_vector(rand, length);
