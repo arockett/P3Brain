@@ -3,11 +3,11 @@
 *
 * This file defines the constructor and evaluate function for the P3 Evaluator
 * named 'MarkovWorld'. 'MarkovWorld' allows you to use P3 to evolve Markov Brains
-* by using the custom 'BitAgent' to translate bit strings into Markov Brains and 
+* by using the custom 'BitBrain' to translate bit strings into Markov Brains and 
 * then using a normal Markov Brain World to calculate a fitness for the translated
 * bit string.
 *
-* Look at BitAgent.h and BitAgent.cpp for more information on translating bit
+* Look at BitBrain.h and BitBrain.cpp for more information on translating bit
 * strings into Markov Brains.
 *
 * author: Aaron Beckett
@@ -17,7 +17,7 @@
 #include "Evaluation.h"
 
 #include "Tools.h"
-#include "BitAgent.h"
+#include "BitBrain.h"
 #include "LogicalWorld.h"
 #include "BerryWorld.h"
 
@@ -32,19 +32,19 @@ MarkovWorld::MarkovWorld( Configuration& config, int run_number )
     string type = config.get<string>( "decoder" );
     if( type == "Unstructured" )
     {
-        decoderType = BitAgent::Unstructured;
+        decoderType = BitBrain::Unstructured;
     }
     else if( type == "FixedInput" )
     {
-        decoderType = BitAgent::FixedInput;
+        decoderType = BitBrain::FixedInput;
     }
     else if( type == "FixedLogic" )
     {
-        decoderType = BitAgent::FixedLogic;
+        decoderType = BitBrain::FixedLogic;
     }
     else if( type == "Hypercube" )
     {
-        decoderType = BitAgent::Hypercube;
+        decoderType = BitBrain::Hypercube;
     }
     else
     {
@@ -62,13 +62,13 @@ MarkovWorld::MarkovWorld( Configuration& config, int run_number )
 float MarkovWorld::evaluate(const vector<bool>& solution)
 {
     auto org = make_shared<Organism>();
-    if( decoderType != BitAgent::Unstructured )
+    if( decoderType != BitBrain::Unstructured )
     {
-      org->brain = make_shared<BitAgent>(solution, 11, 2, decoderType);
+      org->brain = make_shared<BitBrain>(solution, 11, 2, decoderType);
     }
     else
     {
-      org->brain = make_shared<BitAgent>(solution, 11, 10, 3, 2);
+      org->brain = make_shared<BitBrain>(solution, 11, 10, 3, 2);
     }
     return (float)trainingGround->testIndividual(org, false);
 }

@@ -19,7 +19,7 @@
 
 // Include the Markov World header to use for the MarkovWorld Evaluator
 #include "World.h"
-#include "BitAgent.h"
+#include "BitBrain.h"
 
 #define PI 3.14159265
 
@@ -281,7 +281,7 @@ public:
 
 private:
     shared_ptr<World> trainingGround = nullptr;
-    BitAgent::Decoder decoderType;
+    BitBrain::Decoder decoderType;
 };
 
 

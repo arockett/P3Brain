@@ -18,7 +18,7 @@
 
 
 /**
- * Singleton genome used as a stand-in genome object for the BitAgent
+ * Singleton genome used as a stand-in genome object for the BitBrain
  */
 class SingletonGenome
 {

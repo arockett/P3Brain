@@ -1,6 +1,6 @@
 #pragma once
 /******************************************************************************
-* file: BitAgent.h
+* file: BitBrain.h
 *
 * author: Aaron Beckett
 * date: 10/15/2015
@@ -14,11 +14,11 @@
 #include <memory>
 
 /*
- * The BitAgent class is a type of Agent that uses a bit string to represent
+ * The BitBrain class is a type of Agent that uses a bit string to represent
  * a Markov Brain. It can be used in conjunction with P3 and the MarkovWorld
  * evaluator to evolve MarkovBrains with bit strings and the P3 algorithm.
  */
-class BitAgent : public Brain
+class BitBrain : public Brain
 {
 public:
     enum Decoder {
@@ -28,10 +28,10 @@ public:
         Hypercube
     };
 
-    BitAgent();
-    BitAgent( const vector<bool>& startGenome, int numInputStates, int numHiddenStates, int numOutStates, int gateComplexity );
-    BitAgent( const vector<bool>& startGenome, int numInputStates, int gateComplexity, Decoder decoder = Unstructured );
-    virtual ~BitAgent();
+    BitBrain();
+    BitBrain( const vector<bool>& startGenome, int numInputStates, int numHiddenStates, int numOutStates, int gateComplexity );
+    BitBrain( const vector<bool>& startGenome, int numInputStates, int gateComplexity, Decoder decoder = Unstructured );
+    virtual ~BitBrain();
 
 private:
     void DecodeUnstructuredGenome( const vector<bool>&, int, int, int, int );

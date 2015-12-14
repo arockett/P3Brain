@@ -1,29 +1,28 @@
 /******************************************************************************
-* file: BitAgent.cpp
+* file: BitBrain.cpp
 *
 * author: Aaron Beckett
 * date: 10/15/2015
 ******************************************************************************/
 
-#include "BitAgent.h"
+#include "BitBrain.h"
 
 #include <cmath>
 #include <cassert>
 
-#include "BitGate.h"
 #include "Tools.h"
 
 
-BitAgent::BitAgent()
+BitBrain::BitBrain()
 {
 }
 
-BitAgent::BitAgent( const vector<bool>& startGenome, int numInputStates, int numHiddenStates, int numOutStates, int gateComplexity )
+BitBrain::BitBrain( const vector<bool>& startGenome, int numInputStates, int numHiddenStates, int numOutStates, int gateComplexity )
 {
     DecodeUnstructuredGenome( startGenome, numInputStates, numHiddenStates, numOutStates, gateComplexity );
 }
 
-BitAgent::BitAgent( const vector<bool>& startGenome, int numInputStates, int gateComplexity, BitAgent::Decoder decoder )
+BitBrain::BitBrain( const vector<bool>& startGenome, int numInputStates, int gateComplexity, BitBrain::Decoder decoder )
 {
     switch( decoder )
     {
@@ -42,12 +41,12 @@ BitAgent::BitAgent( const vector<bool>& startGenome, int numInputStates, int gat
         break;
     default:
         // This should never happen
-        ASSERT( false, "Something went wrong while choosing a Decoder type in BitAgent constructor." );
+        ASSERT( false, "Something went wrong while choosing a Decoder type in BitBrain constructor." );
         break;
     }
 }
 
-BitAgent::~BitAgent()
+BitBrain::~BitBrain()
 {
 }
 
@@ -56,7 +55,7 @@ BitAgent::~BitAgent()
  *************************   Decoders ****************************
  */
 
-void BitAgent::DecodeUnstructuredGenome( const vector<bool>& genome, int numInputStates, int numHiddenStates, int numOutStates, int gateIns )
+void BitBrain::DecodeUnstructuredGenome( const vector<bool>& genome, int numInputStates, int numHiddenStates, int numOutStates, int gateIns )
 {
     /********************************************************
     * Calculate encoding sizes to ensure the genome is long enough
@@ -91,6 +90,10 @@ void BitAgent::DecodeUnstructuredGenome( const vector<bool>& genome, int numInpu
             inStates.push_back( boolStringToInt( inNumber ) % nrOfBrainStates );
         }
 
+        // Set the output indices
+        vector<int> outStates;
+        outStates.push_back( i );
+
         // Get the gate logic table from the genome
         vector<bool> gateLogic;
         for( int j = 0; j < logicEncodingSize; j++ )
@@ -98,11 +101,11 @@ void BitAgent::DecodeUnstructuredGenome( const vector<bool>& genome, int numInpu
             gateLogic.push_back( genome[( i - numInputStates ) * gateEncodingSize + gateIns * inputEncodingSize + j] );
         }
 
-        gates.push_back( shared_ptr<Gate>( new BitGate( inStates, i, gateLogic ) ) );
+        gates.push_back( shared_ptr<Gate>( new BitGate( inStates, outStates, gateLogic ) ) );
     }
 }
 
-void BitAgent::DecodeFixedInputGenome( const vector<bool>& genome, int numInputStates, int gateIns )
+void BitBrain::DecodeFixedInputGenome( const vector<bool>& genome, int numInputStates, int gateIns )
 {
     // TODO Layer the fixed gate inputs so that each Brain Input state can be accessed by a gate
 
@@ -138,6 +141,10 @@ void BitAgent::DecodeFixedInputGenome( const vector<bool>& genome, int numInputS
             inStates.push_back( i - j );
         }
 
+        // Set the output indices
+        vector<int> outStates;
+        outStates.push_back( i );
+
         // Get the gate logic table from the genome
         vector<bool> gateLogic;
         for( int j = 0; j < logicSize; j++ )
@@ -145,16 +152,16 @@ void BitAgent::DecodeFixedInputGenome( const vector<bool>& genome, int numInputS
             gateLogic.push_back( genome[( i - numInputStates ) * logicSize + j] );
         }
 
-        gates.push_back( shared_ptr<Gate>( new BitGate( inStates, i, gateLogic ) ) );
+        gates.push_back( shared_ptr<Gate>( new BitGate( inStates, outStates, gateLogic ) ) );
     }
 }
 
-void BitAgent::DecodeFixedLogicGenome( const vector<bool>& genome, int numInputStates, int gateIns)
+void BitBrain::DecodeFixedLogicGenome( const vector<bool>& genome, int numInputStates, int gateIns)
 {
     // TODO Implement Fixed Logic Decoder using XOR gates (functionally complete)
 }
 
-void BitAgent::DecodeHypercubeGenome( const vector<bool>& genome, int numInputStates, int gateIns )
+void BitBrain::DecodeHypercubeGenome( const vector<bool>& genome, int numInputStates, int gateIns )
 {
     /********************************************************
      * Check the genome size to ensure it's the right length
@@ -213,6 +220,10 @@ void BitAgent::DecodeHypercubeGenome( const vector<bool>& genome, int numInputSt
             inStates.push_back( flipBit(i, boolStringToInt( inNumber ) % cubeDimension) );
         }
 
+        // Set the output indices
+        vector<int> outStates;
+        outStates.push_back( i );
+
         // Get the gate logic
         vector<bool> gateLogic;
         for( int j = 0; j < gateLogicEncodingSize; j++ )
@@ -222,6 +233,6 @@ void BitAgent::DecodeHypercubeGenome( const vector<bool>& genome, int numInputSt
 
         // inStates will hold the index of each input to the gate, possible input indices
         // are any adjacent nodes (gates) to i if all brain states were connected in a hypercube
-        gates.push_back( shared_ptr<Gate>( new BitGate(inStates, i, gateLogic) ) );
+        gates.push_back( shared_ptr<Gate>( new BitGate(inStates, outStates, gateLogic) ) );
     }
 }
