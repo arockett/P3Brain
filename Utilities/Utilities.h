@@ -9,6 +9,9 @@
 #define __BasicMarkovBrainTemplate__Utilities__
 
 #include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <map>
 #include <sstream>
 
 using namespace std;
@@ -26,6 +29,7 @@ inline int loopMod(const int numerator, const int denominator) {
 inline int Bit(double d) {
   return (d > 0.0);
 }
+
 
 inline vector<string> parseCSVLine(string rawLine, const char separator = ',') {
   vector<string> dataLine;
@@ -66,6 +70,7 @@ inline vector<string> parseCSVLine(string rawLine, const char separator = ',') {
   return dataLine;
 }
 
+
 // reads a csv file with header and converts to a map of string,vector<string>
 inline map<string, vector<string>> readFromCSVFile(const string& fileName, const char separator = ',') {
   std::ifstream FILE(fileName);
@@ -97,6 +102,44 @@ inline map<string, vector<string>> readFromCSVFile(const string& fileName, const
   return data;
 }
 
+
+// extract a value from a map<string,vector<string>>
+// given a value from one vector, return the value in another vector at the same index
+inline string CSVLookUp(map<string, vector<string>> CSV_Table, const string& lookupKey, const string& lookupValue, const string& returnKey) {
+
+  int lookupIndex = -1;
+  size_t i = 0;
+  string temp;
+
+  // check to make sure that CSV_Table has both the lookup and return keys
+  // throw errors if either key is not found
+  auto iter = CSV_Table.find(lookupKey);
+  if (iter == CSV_Table.end()){
+    throw std::invalid_argument("CSVLookup could not find requested lookup key\n");
+  }
+
+  iter = CSV_Table.find(returnKey);
+  if (iter == CSV_Table.end()){
+    throw std::invalid_argument("CSVLookup could not find requested return key\n");
+  }
+
+  // if the lookup and return keys exist, look for the look up value in the lookup keys vector
+  while (i < CSV_Table[lookupKey].size() && lookupIndex == -1) {
+    if (lookupValue == CSV_Table[lookupKey][i]) {
+      lookupIndex = i;
+    }
+    i++;
+  }
+
+  // if the lookup value is was not found, throw an error
+  if (lookupIndex == -1) {
+    throw std::invalid_argument("CSVLookup could not find requested lookup value.\n");
+  }
+
+  return CSV_Table[returnKey][lookupIndex];
+}
+
+
 // Put an arbitrary value to the target variable, return false on conversion failure
 template<class T>
 static bool load_value(const string& value, T& target) {
@@ -112,11 +155,12 @@ static bool load_value(const string& value, T& target) {
   }
 }
 
+
 // converts a vector of strings to a vector of type of returnData
 template<class T>
 void convertCSVListToVector(string stringData, vector<T> &returnData, const char separator = ',') {
   returnData.clear();
-  stringData = stringData.substr(1, stringData.size() - 2); // strip off leading and trailing square brakets
+  stringData = stringData.substr(1, stringData.size() - 2);  // strip off leading and trailing square brakets
   vector<string> dataLine = parseCSVLine(stringData, separator);
 
   T tempValue;
@@ -130,12 +174,12 @@ void convertCSVListToVector(string stringData, vector<T> &returnData, const char
   }
 }
 
-/*
- * this is here so we can use to string and it will work even if we give it a string as input
- */
+
+// this is here so we can use to string and it will work even if we give it a string as input
 inline string to_string(string str) {
   return (str);
 }
+
 
 /*
  * getBestInVector(vector<T> vec)
@@ -146,5 +190,6 @@ template<typename Type>
 inline int findGreatestInVector(vector<Type> vec) {
   return distance(vec.begin(), max_element(vec.begin(), vec.end()));
 }
+
 
 #endif // __BasicMarkovBrainTemplate__Utilities__

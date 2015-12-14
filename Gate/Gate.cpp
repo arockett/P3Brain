@@ -16,82 +16,44 @@
 double& FixedEpsilonGate::FixedEpsilonGate_Probability = Parameters::register_parameter("fixedEpsilonGate_Probability", 0.05, "chance that an output from a FixedEpsilonGate gate will be randomized", "GATES - FIXED EPSILON");
 double& VoidGate::voidGate_Probability = Parameters::register_parameter("voidGate_Probability", 0.05, "chance that an output from a void gate will be set to 0", "GATES - VOID");
 
-/* *** General tools for All Gates *** */
+// *** General tools for All Gates ***
 
-void Gate::movePastStartCodeon(int& genomeIndex, shared_ptr<Genome> genome) {
-  codingRegions[genomeIndex] = START_CODE;
-  genome->advanceIndex(genomeIndex);
-  codingRegions[genomeIndex] = START_CODE;
-  genome->advanceIndex(genomeIndex);
+// Gets "howMany" addresses, advances the genome_index buy "howManyMax" addresses and updates "codingRegions" with the addresses being used.
+void Gate::getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, int& genome_index, shared_ptr<Genome> genome, int code) {
+  int i;
+  for (i = 0; i < howMany; i++) {  // for the number of addresses we need
+    addresses[i] = genome->extractValue(genome_index, { 0, (1 << Global::bitsPerBrainAddress) - 1 }, code);  // get an address
+    //cout << addresses[i] << "\n";
+  }
+  while (i < howManyMax) {  // leave room in the genome in case this gate gets more IO later
+    //cout << "skipping: " << i << "\n";
+    genome->extractValue(genome_index, { 0, (1 << Global::bitsPerBrainAddress) - 1 }, -1);
+    i++;
+  }
 }
 
-/*
- * gets an address with Agent::bitsPerBrainAddress bits
- * reads the required number of sites and then trims the leading bits.
- * if bitsPerBrainAddress = 10 and the next two sites were 14 (00001110) and 25(00011001)
- * the result would be 0000111000011001 masked with 0000001111111111 = 0000001000011001 or 537
- */
-int Gate::getIOAddress(int& genomeIndex, shared_ptr<Genome> genome) {
-  int bitCount;
-  int address = (int) genome->sites[genomeIndex];  // grab a byte from the genome
-  genome->advanceIndex(genomeIndex);  // advance the genome_index
-
-  for (bitCount = 8; Global::bitsPerBrainAddress > bitCount; bitCount += 8) {  // now, one site (8 bits) at a time, add sites to the address, until we have enough bits
-    address = (address << 8) | (int) genome->sites[genomeIndex];  // shift the current value 8 bits left and add the next site
-    genome->advanceIndex(genomeIndex);  // advance the genome_index
-  }
-  int bitMask = 0;
-  for (bitCount = 0; bitCount < Global::bitsPerBrainAddress; bitCount++) {  // create the bit mask - this is used to trim off unwanted leading bits from the address
-    bitMask = (bitMask << 1) | 1;
-  }
-  return address & bitMask;  // trim the address with the bitMask
-}
-
-/*
- * Gets "howMany" addresses, advances the genome_index buy "howManyMax" addresses and updates "codingRegions" with the addresses being used.
- */
-void Gate::getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, int& genome_index, shared_ptr<Genome> genome, int codeNumber) {
-  int lastLocation = genome_index;  //make a note of where were are now so we can get codingRegions later
-  for (auto i = 0; i < howMany; i++) {  // for the number of addresses we need
-    addresses[i] = getIOAddress(genome_index, genome);  // get an address
-  }
-  while (lastLocation < genome_index) {  // fill in codingRegions between lastLocation and currLocation
-    codingRegions[lastLocation] = codeNumber;  // with 10 (inputs) or 11 (outputs) (connections)
-    lastLocation++;
-  }
-  genome_index += ((ceil(((double) Global::bitsPerBrainAddress) / 8.0)) * (howManyMax - howMany));
-  // move the genome_index ahead to account not only the addresses we need, but the total number of possible addresses
-}
-
-/*
- * given a genome and a genomeIndex:
- * pull out the number a number of inputs, number of outputs and then that many inputs and outputs
- * if number of inputs or outputs is less then the max possible inputs or outputs skip the unused sites in the genome
- * there can not be more then 255 inputs or outputs without additional support (to read more sites to generate these numbers)
- */
+// given a genome and a genomeIndex:
+// pull out the number a number of inputs, number of outputs and then that many inputs and outputs
+// if number of inputs or outputs is less then the max possible inputs or outputs skip the unused sites in the genome
 void Gate::getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, int& genomeIndex, shared_ptr<Genome> genome) {  // (max#in, max#out,currentIndexInGenome,genome,codingRegions)
 
-  codingRegions[genomeIndex] = IN_COUNT_CODE;
-  int numInputs = insRange[0] + (genome->sites[genomeIndex] & (insRange[1] - 1));
-  genome->advanceIndex(genomeIndex);
-  codingRegions[genomeIndex] = OUT_COUNT_CODE;
-  int numOutputs = outsRange[0] + (genome->sites[genomeIndex++] & (outsRange[1] - 1));
-  genome->advanceIndex(genomeIndex);
+  int numInputs = genome->extractValue(genomeIndex, { insRange[0], insRange[1] }, Genome::IN_COUNT_CODE);
+  //cout << "num_Inputs: " << numInputs << "\n";
+  int numOutputs = genome->extractValue(genomeIndex, { outsRange[0], outsRange[1] }, Genome::OUT_COUNT_CODE);
+  //cout << "num_Outputs: " << numOutputs << "\n";
 
   inputs.resize(numInputs);
   outputs.resize(numOutputs);
   if (insRange[1] > 0) {
-    getSomeBrainAddresses(numInputs, insRange[1], inputs, genomeIndex, genome, 11);
+    getSomeBrainAddresses(numInputs, insRange[1], inputs, genomeIndex, genome, Genome::IN_ADDRESS_CODE);
   }
   if (outsRange[1] > 0) {
-    getSomeBrainAddresses(numOutputs, outsRange[1], outputs, genomeIndex, genome, 21);
+    getSomeBrainAddresses(numOutputs, outsRange[1], outputs, genomeIndex, genome, Genome::OUT_ADDRESS_CODE);
   }
 }
 
-/*
- * converts values attained from genome for inputs and outputs to vaild brain state ids
- * uses nodeMap to accomplish the remaping
- */
+// converts values attained from genome for inputs and outputs to vaild brain state ids
+// uses nodeMap to accomplish the remaping
 void Gate::applyNodeMap(vector<int> nodeMap, int maxNodes) {
   for (size_t i = 0; i < inputs.size(); i++) {
     inputs[i] = nodeMap[inputs[i]] % maxNodes;
@@ -130,15 +92,15 @@ vector<int> Gate::getOuts() {
   return outputs;
 }
 
-// display the getCodingRegions for a gate as (Index1,Type1,Index2,Type2...)
-string Gate::getCodingRegions() {
-  string S = "";
-  for (auto site : codingRegions) {
-    S = S + to_string(site.first) + ":" + to_string(site.second) + "  ";
-  }
-  S += "\n";
-  return S;
-}
+//// display the getCodingRegions for a gate as (Index1,Type1,Index2,Type2...)
+//string Gate::getCodingRegions() {
+//  string S = "";
+//  for (auto site : codingRegions) {
+//    S = S + to_string(site.first) + ":" + to_string(site.second) + "  ";
+//  }
+//  S += "\n";
+//  return S;
+//}
 
 string Gate::description() {
   string S = " Gate\n";
@@ -150,10 +112,9 @@ string Gate::description() {
   for (size_t i = 0; i < outputs.size(); i++)
     S = S + " " + to_string(outputs[i]);
   S = S + "\n";
-  S = S + getCodingRegions();
+  //S = S + getCodingRegions();
   return S;
 }
-
 
 /* *** ProbilisticGate implementation *** */
 
@@ -162,28 +123,26 @@ ProbabilisticGate::ProbabilisticGate(shared_ptr<Genome> genome, int genomeIndex)
   inputs.clear();
   outputs.clear();
   int numOutputs, numInputs;
-  codingRegions.clear();
 
-  //move past the first to sites (start codeon)
-  movePastStartCodeon(genomeIndex, genome);
+  genome->advanceIndexPastStartCodon(genomeIndex);
 
   // get numInputs inputs and numOutputs outputs, advance k (genomeIndex) as if we had gotten 4 of each and record this in codingRegions
   getInputsAndOutputs( { 1, 4 }, { 1, 4 }, genomeIndex, genome);  // (insRange, outsRange,currentIndexInGenome,genome,codingRegions)
   numInputs = inputs.size();
   numOutputs = outputs.size();
 
-  genome->advanceIndex(genomeIndex, 16);
-
   // get a table filled with values from the genome that has
   // rows = (the number of possible combinations of input values) and columns = (the number of possible combinations of output values)
-  getTableFromGenome( { 1 << numInputs, 1 << numOutputs }, { 16, 16 }, genomeIndex, genome, table);
+  vector<vector<int>> rawTable = genome->extractTable(genomeIndex, { 1 << numInputs, 1 << numOutputs }, { 16, 16 }, { 0, 255 });
 
+  table.resize(1 << numInputs);
   //normalize each row
   for (i = 0; i < (1 << numInputs); i++) {  //for each row (each possible input bit string)
+    table[i].resize(1 << numOutputs);
     // first sum the row
     double S = 0;
     for (j = 0; j < (1 << numOutputs); j++) {
-      S += table[i][j];
+      S += (double)rawTable[i][j];
     }
     // now normalize the row
     if (S == 0.0) {  //if all the inputs on this row are 0, then give them all a probability of 1/(2^(number of outputs))
@@ -191,7 +150,7 @@ ProbabilisticGate::ProbabilisticGate(shared_ptr<Genome> genome, int genomeIndex)
         table[i][j] = 1.0 / (double) (1 << numOutputs);
     } else {  //otherwise divide all values in a row by the sum of the row
       for (j = 0; j < (1 << numOutputs); j++)
-        table[i][j] /= S;
+        table[i][j] = (double)rawTable[i][j] / S;
     }
   }
 
@@ -216,39 +175,36 @@ string ProbabilisticGate::description() {
   return S;
 }
 
-
-
 /* *** Determistic Gate Implementation *** */
 
 DeterministicGate::DeterministicGate(shared_ptr<Genome> genome, int genomeIndex) {
   inputs.clear();
   outputs.clear();
   int numOutputs, numInputs;
-  codingRegions.clear();
-
-  //move past the first to sites (start codeon)
-  movePastStartCodeon(genomeIndex, genome);
+  //cout << " before startcodon index: " << genomeIndex << "\n";
+  genome->advanceIndexPastStartCodon(genomeIndex);
+  //cout << " after startcodon index: " << genomeIndex << "\n";
 
   // get numInputs inputs and numOutputs outputs, advance k (genomeIndex) as if we had gotten 4 of each and record this in codingRegions
   getInputsAndOutputs( { 1, 4 }, { 1, 4 }, genomeIndex, genome);  // (insRange, outsRange,currentIndexInGenome,genome,codingRegions)
   numInputs = inputs.size();
   numOutputs = outputs.size();
-
-  genome->advanceIndex(genomeIndex, 16);  //move forward 16 spaces in genome
+  //cout << " after getIO index: " << genomeIndex << "\n";
 
   // get a table filled with values from the genome that has
-  // numbr of rows = (the number of possible combinations of input values) and number of columns = (the number of output values)
-  getTableFromGenome( { (1 << numInputs), numOutputs }, { 1 << 4, 4 }, genomeIndex, genome, table);
+  // rows = (the number of possible combinations of input values) and columns = (the number of possible combinations of output values)
+  table = genome->extractTable(genomeIndex, { 1 << numInputs, numOutputs }, { 16, 4 }, { 0, 1 });
+  //cout << " after extract table index: " << genomeIndex << "\n";
 
-  // convert the table contents to bits
-  for (int i = 0; i < (1 << numInputs); i++) {
-    for (int o = 0; o < numOutputs; o++) {
-      table[i][0] = table[i][0] & 1;  // convert even to 0 and odd to 1
-      //if (table[i][0] == 1) cout << "* "; // uncomment for light show! //
-      //else cout << "  ";                  // uncomment for light show! //
-
-    }
-  }
+//  // convert the table contents to bits
+//  for (int i = 0; i < (1 << numInputs); i++) {
+//    for (int o = 0; o < numOutputs; o++) {
+//      table[i][0] = table[i][0] & 1;  // convert even to 0 and odd to 1
+//      //if (table[i][0] == 1) cout << "* "; // uncomment for light show! //
+//      //else cout << "  ";                  // uncomment for light show! //
+//
+//    }
+//  }
 }
 
 void DeterministicGate::setupForBits(int* Ins, int nrOfIns, int Out, int logic) {
@@ -274,8 +230,6 @@ void DeterministicGate::update(vector<double> & states, vector<double> & nextSta
 string DeterministicGate::description() {
   return "Deterministic " + Gate::description();
 }
-
-
 
 /* *** Fixed Epison Gate *** */
 /* this gate behaves like a deterministic gate with a constant externally set error which may cause the outputs to scramble */
@@ -318,8 +272,6 @@ void FixedEpsilonGate::update(vector<double> & states, vector<double> & nextStat
 string FixedEpsilonGate::description() {
   return "Fixed Epsilon " + to_string(epsilon) + "\n " + Gate::description();
 }
-
-
 
 /* *** VoidGate *** */
 /* this gate behaves like a deterministic gate with a constant externally set error which may set a single output to 0 */

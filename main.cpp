@@ -37,7 +37,6 @@
 #include "Utilities/Data.h"
 #include "Utilities/Utilities.h"
 
-
 using namespace std;
 
 int main(int argc, const char * argv[]) {
@@ -52,7 +51,6 @@ int main(int argc, const char * argv[]) {
 
   // outputDirectory must exist. If outputDirectory does not exist, no error will occur, but no data will be writen.
   FileManager::outputDirectory = Global::outputDirectory;
-
 
   if (Global::randomSeed == -1) {
     random_device rd;
@@ -81,12 +79,12 @@ int main(int argc, const char * argv[]) {
     // a progenitor must exist - that is, one ancestor genome
     Global::update = -1;  // before there was time, there was a progenitor
 
-    shared_ptr<Organism> progenitor = make_shared<Organism>(make_shared<Genome>(), make_shared<Brain>());  // make a organism with a genome and brain (if you need to change the types here is where you do it)
+    shared_ptr<Organism> progenitor = make_shared<Organism>(make_shared<ClassicGenome>(), make_shared<Brain>());  // make a organism with a genome and brain (if you need to change the types here is where you do it)
 
     Global::update = 0;  // the beginning of time - now we construct the first population
     vector<shared_ptr<Organism>> population;
     for (int i = 0; i < Global::popSize; i++) {
-      shared_ptr<Genome> genome(new Genome());
+      shared_ptr<ClassicGenome> genome = make_shared<ClassicGenome>();
       genome->fillRandom();
       shared_ptr<Organism> org(new Organism(progenitor, genome));
       population.push_back(org);  // add a new org to population using progenitors template and a new random genome
@@ -130,7 +128,6 @@ int main(int argc, const char * argv[]) {
 
   while (!finished) {
     world->evaluateFitness(group->population, false);  // evaluate each organism in the population using a World
-
     finished = group->archive();  // save data, update memory and delete any unneeded data;
 
     Global::update++;

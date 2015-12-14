@@ -14,9 +14,9 @@ class Gate_Builder {  // manages what kinds of gates can be built
   static bool& usingEpsiGate;
   static bool& usingVoidGate;
 
-  static bool& usingFBGate;
-  static bool& usingGPGate;
-  static bool& usingThGate;
+//  static bool& usingFBGate;
+//  static bool& usingGPGate;
+//  static bool& usingThGate;
 
 
   static void AddGate(int ID, function<shared_ptr<Gate>(shared_ptr<Genome>, int)> theFunction);

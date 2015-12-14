@@ -23,8 +23,8 @@
 using namespace std;
 class AbstractBrain {
  public:
-  AbstractBrain();
-  virtual ~AbstractBrain() = 0;
+  AbstractBrain() = default;
+  virtual ~AbstractBrain() = default;
   virtual void update() = 0;
   virtual string description() = 0;  // returns a desription of this brain in it's current state
   virtual vector<string> getStats() =0;  // returns a vector of string pairs of any stats that can then be used for data tracking (etc.)
@@ -37,7 +37,6 @@ class Brain : AbstractBrain {
  public:
   static int& defaultNrOfBrainStates;  // default value for number of states in all brains
   int nrOfBrainStates;  // the number of states in THIS brain
-  static double& skipGate;  // probablity to skip a gate when this brain is updating
   static bool& serialProcessing;  // write directly states (overwrite) - do not use nextStates
 
   static void initializeParameters();

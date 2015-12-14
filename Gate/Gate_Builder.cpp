@@ -7,9 +7,9 @@ bool& Gate_Builder::usingEpsiGate = Parameters::register_parameter("fixedEpsilon
 bool& Gate_Builder::usingVoidGate = Parameters::register_parameter("voidGate", false, "set to true to enable void gates", "GATE TYPES");
 
 
-bool& Gate_Builder::usingFBGate = Parameters::register_parameter("feedBackGate", false, "set to true to enable feedback gates", "GATE TYPES");
-bool& Gate_Builder::usingGPGate = Parameters::register_parameter("geneticProgramingGate", false, "set to true to enable GP (what?) gates", "GATE TYPES");
-bool& Gate_Builder::usingThGate = Parameters::register_parameter("thresholdGate", false, "set to true to enable threshold gates", "GATE TYPES");
+//bool& Gate_Builder::usingFBGate = Parameters::register_parameter("feedBackGate", false, "set to true to enable feedback gates", "GATE TYPES");
+//bool& Gate_Builder::usingGPGate = Parameters::register_parameter("geneticProgramingGate", false, "set to true to enable GP (what?) gates", "GATE TYPES");
+//bool& Gate_Builder::usingThGate = Parameters::register_parameter("thresholdGate", false, "set to true to enable threshold gates", "GATE TYPES");
 
 /*
  * setupGates() populates Gate::makeGate (a structure containing functions) with the constructors for various types of gates.
@@ -28,18 +28,6 @@ void Gate_Builder::setupGates() {
     AddGate(43, [](shared_ptr<Genome> genome,int pos) {return make_shared<DeterministicGate>(genome,pos);});
     Global::inUseGateTypes.insert(43);
   }
-  if (usingFBGate) {
-    AddGate(44, [](shared_ptr<Genome> genome,int pos) {return make_shared<FeedbackGate>(genome,pos);});
-    Global::inUseGateTypes.insert(44);
-  }
-  if (usingGPGate) {
-    AddGate(45, [](shared_ptr<Genome> genome,int pos) {return make_shared<GPGate>(genome,pos);});
-    Global::inUseGateTypes.insert(45);
-  }
-  if (usingThGate) {
-    AddGate(46, [](shared_ptr<Genome> genome,int pos) {return make_shared<Thresholdgate>(genome,pos);});
-    Global::inUseGateTypes.insert(46);
-  }
   if (usingEpsiGate) {
     AddGate(47, [](shared_ptr<Genome> genome,int pos) {return make_shared<FixedEpsilonGate>(genome,pos);});
     Global::inUseGateTypes.insert(47);
@@ -48,6 +36,18 @@ void Gate_Builder::setupGates() {
     AddGate(48, [](shared_ptr<Genome> genome,int pos) {return make_shared<VoidGate>(genome,pos);});
     Global::inUseGateTypes.insert(47);
   }
+//  if (usingFBGate) {
+//    AddGate(44, [](shared_ptr<Genome> genome,int pos) {return make_shared<FeedbackGate>(genome,pos);});
+//    Global::inUseGateTypes.insert(44);
+//  }
+//  if (usingGPGate) {
+//    AddGate(45, [](shared_ptr<Genome> genome,int pos) {return make_shared<GPGate>(genome,pos);});
+//    Global::inUseGateTypes.insert(45);
+//  }
+//  if (usingThGate) {
+//    AddGate(46, [](shared_ptr<Genome> genome,int pos) {return make_shared<Thresholdgate>(genome,pos);});
+//    Global::inUseGateTypes.insert(46);
+//  }
 
 }
 

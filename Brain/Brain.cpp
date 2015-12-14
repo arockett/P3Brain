@@ -11,52 +11,47 @@
 #include "../Utilities/Random.h"
 #include "../Utilities/Utilities.h"
 
-#define SKIPGATE 0 // if 0, remove the skipgate code - FOR SPEED UP!
-
 vector<int> Brain::defaultNodeMap;
 
 int& Brain::defaultNrOfBrainStates = Parameters::register_parameter("brainSize", 15, "number of Brain Values", "BRAIN");
 
-#if SKIPGATE==1 // if SKIPGATE is enabled, there is a chance a gate will not update
-double& Brain::skipGate = Parameters::register_parameter("skipGate", 0.0, "chance that a gate will not fire", "BRAIN");
-#endif // SKIPGATE
-
 bool& Brain::serialProcessing = Parameters::register_parameter("serialProcessing", false, "sets brains to overwrite... right?", "BRAIN");
-//////////////////////////////////////////
-// required code to support abstract class
-AbstractBrain::AbstractBrain() {
-}
-AbstractBrain::~AbstractBrain() {
-}
-void AbstractBrain::update() {
-}
-string AbstractBrain::description() {
-  cout << "   In AbstractBrain::description() : is an abstract method and should not be used\n";
-  string S = "";
-  return (S);
-}
-
-vector<string> AbstractBrain::getStats() {
-  cout << "   In AbstractBrain::getStats() : is an abstract method and should not be used\n";
-  vector<string> dataPairs;
-  return (dataPairs);
-}
-// required code to support abstract class
-//////////////////////////////////////////
 
 Brain::Brain(shared_ptr<Genome> genome, int _nrOfBrainStates) {  //this is a constructor. it is run whenever a new brain is created.
   nrOfBrainStates = _nrOfBrainStates;
   states.resize(nrOfBrainStates);
   nextStates.resize(nrOfBrainStates);
   gates.clear();
-  for (size_t i = 0; i < genome->sites.size() - 1; i++) {
-    const int S = genome->sites[i];
-    if ((S + genome->sites[i + 1]) == 256) {
-      if (Gate_Builder::makeGate[S] != nullptr) {
-        gates.push_back(Gate_Builder::makeGate[S](genome, i));
+  int genomeSize = genome->getSize();
+  int genomeIndex = 0;
+  int testIndex;
+  while (genomeIndex < genomeSize) {  // while there are sites in the genome
+    //cout << genomeIndex << "\n";
+    testIndex = genomeIndex;
+    const int testSite1Value = genome->extractValue(testIndex, { 0, 255 });  // get first 1/2 of startcodon
+//cout << testSite1Value << "  " << testIndex << "\n";
+    const int testSite2Value = genome->extractValue(testIndex, { 0, 255 });  // get second 1/2 of startcodon
+//cout << testSite2Value << "  " << testIndex << "\n";
+    if (testSite1Value + testSite2Value == 255) {
+      if (Gate_Builder::makeGate[testSite1Value] != nullptr) {
+        //cout << " building gate: " << testSite1Value << "\n";
+        gates.push_back(Gate_Builder::makeGate[testSite1Value](genome, genomeIndex));
       }
     }
+    if (genomeIndex < testIndex) {
+      genome->extractValue(genomeIndex, { 0, 255 });  // advance genomeIndex
+    } else {
+      genomeIndex = genomeSize;
+    }
   }
+//  for (int genomeIndex = 0; genomeIndex < (genomeSize - 1); genome->advanceIndex(genomeIndex)) {
+//    const int S = genome->sites[i];
+//    if ((S + genome->sites[i + 1]) == 256) {
+//      if (Gate_Builder::makeGate[S] != nullptr) {
+//        gates.push_back(Gate_Builder::makeGate[S](genome, genomeIndex));
+//      }
+//    }
+//  }
   inOutReMap();  // map ins and outs from genome values to brain states
 }
 
@@ -84,17 +79,8 @@ void Brain::update() {
    } else {*/
   //this is the default way of parallel updating
   nextStates.assign(nrOfBrainStates, 0.0);
-//    for (int i = 0; i < nrOfBrainStates; i++) { //reset all states to 0
-//        nextStates[i] = 0.0;
-//    }
   for (size_t i = 0; i < gates.size(); i++) {  //update each gate
-#if SKIPGATE==1 // if SKIPGATE is enabled, there is a chance a gate will not update
-      if (!Random::P(Brain::skipGate)) {
-        gates[i]->update(states, nextStates);
-      }
-#else
     gates[i]->update(states, nextStates);
-#endif // SKIPGATE
   }
   swap(states, nextStates);
 }

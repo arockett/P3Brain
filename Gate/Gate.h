@@ -23,13 +23,6 @@
 
 using namespace std;
 
-#define START_CODE 0
-#define IN_COUNT_CODE 10
-#define IN_ADDRESS_CODE 11
-#define OUT_COUNT_CODE 20
-#define OUT_ADDRESS_CODE 21
-#define DATA_CODE 30
-
 class Gate {  // abstact class. Assumes that a standard genome is being used.
  public:
 
@@ -53,41 +46,41 @@ class Gate {  // abstact class. Assumes that a standard genome is being used.
 
   int getIndexFromInputs(vector<double> &brainState);  // used during update to convert gate input into table indexes
 
-  /*
-   * build a table of size range[0],range[1] which is the upper left subset of a table rangeMax[0],rangeMax[1]
-   * the table rangeMax[0],rangeMax[0] would be filled with values from the genome (filling each row before going to the next column
-   * This table is assigned to the gates table field.
-   * set codingRegions for each used genome site value = DATA_CODE; (may need to add more support for this later!)
-   */
-  template<typename Type>
-  void getTableFromGenome(vector<int> range, vector<int> rangeMax, int& genomeIndex, shared_ptr<Genome> genome, vector<vector<Type>> &table) {
-    int x, y;
-    int Y = range[0];
-    int X = range[1];
-    int maxY = rangeMax[0];
-    int maxX = rangeMax[1];
-
-    table.resize(Y);  // set the number of rows in the table
-
-    for (y = 0; y < (Y); y++) {
-      table[y].resize(X);  // set the number of columns in this row
-      for (x = 0; x < X; x++) {
-        table[y][x] = (Type) (genome->sites[genomeIndex]);
-        codingRegions[genomeIndex] = DATA_CODE;
-        genome->advanceIndex(genomeIndex);
-      }
-      for (; x < maxX; x++) {
-        genome->advanceIndex(genomeIndex);  // advance genomeIndex to account for unused entries in the max sized table for this row
-      }
-    }
-    genome->advanceIndex(genomeIndex, (maxY - Y) * maxX);  // advance genomeIndex to account for extra rows in the max sized table
-  }
+//  /*
+//   * build a table of size range[0],range[1] which is the upper left subset of a table rangeMax[0],rangeMax[1]
+//   * the table rangeMax[0],rangeMax[0] would be filled with values from the genome (filling each row before going to the next column
+//   * This table is assigned to the gates table field.
+//   * set codingRegions for each used genome site value = DATA_CODE; (may need to add more support for this later!)
+//   */
+//  template<typename Type>
+//  void getTableFromGenome(vector<int> range, vector<int> rangeMax, int& genomeIndex, shared_ptr<Genome> genome, vector<vector<Type>> &table) {
+//    int x, y;
+//    int Y = range[0];
+//    int X = range[1];
+//    int maxY = rangeMax[0];
+//    int maxX = rangeMax[1];
+//
+//    table.resize(Y);  // set the number of rows in the table
+//
+//    for (y = 0; y < (Y); y++) {
+//      table[y].resize(X);  // set the number of columns in this row
+//      for (x = 0; x < X; x++) {
+//        table[y][x] = (Type) (genome->sites[genomeIndex]);
+//        codingRegions[genomeIndex] = Genome::DATA_CODE;
+//        genome->advanceIndex(genomeIndex);
+//      }
+//      for (; x < maxX; x++) {
+//        genome->advanceIndex(genomeIndex);  // advance genomeIndex to account for unused entries in the max sized table for this row
+//      }
+//    }
+//    genome->advanceIndex(genomeIndex, (maxY - Y) * maxX);  // advance genomeIndex to account for extra rows in the max sized table
+//  }
 
   virtual void applyNodeMap(vector<int> nodeMap, int maxNodes);  // converts genome values into brain state value addresses
   virtual void resetGate(void);  // this is empty here. Some gates so not need to reset, they can use this method.
   virtual vector<int> getIns();  // returns a vector of int with the adress for this gates input brain state value addresses
   virtual vector<int> getOuts();  // returns a vector of int with the adress for this gates onput brain state value addresses
-  virtual string getCodingRegions();  // return a string with the codingRegions
+  //virtual string getCodingRegions();  // return a string with the codingRegions
 
   // functions which must be provided with each gate
   virtual void update(vector<double> & states, vector<double> & nextStates) = 0;  // the function is empty, and must be provided in any derived gates
