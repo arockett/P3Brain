@@ -73,7 +73,7 @@ Organism::Organism(shared_ptr<Genome> _genome) {
   dataMap.SetMany(genome->getStats());
 }
 
-Organism::Organism(shared_ptr<Genome> _genome, shared_ptr<Brain> _brain) {
+Organism::Organism(shared_ptr<Genome> _genome, shared_ptr<ClassicBrain> _brain) {
   genome = _genome;
   brain = _brain->makeBrainFromGenome(genome);
   ID = registerOrganism();

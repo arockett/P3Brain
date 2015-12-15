@@ -1,4 +1,3 @@
-
 #include "Gate_Builder.h"
 
 bool& Gate_Builder::usingProbGate = Parameters::register_parameter("probabilisticGate", false, "set to true to enable probabilistic gates", "GATE TYPES");
@@ -6,16 +5,13 @@ bool& Gate_Builder::usingDetGate = Parameters::register_parameter("deterministic
 bool& Gate_Builder::usingEpsiGate = Parameters::register_parameter("fixedEpsilonGate", false, "set to true to enable epsilon gates", "GATE TYPES");
 bool& Gate_Builder::usingVoidGate = Parameters::register_parameter("voidGate", false, "set to true to enable void gates", "GATE TYPES");
 
+bool& Gate_Builder::usingFBGate = Parameters::register_parameter("feedBackGate", false, "set to true to enable feedback gates", "GATE TYPES");
+bool& Gate_Builder::usingGPGate = Parameters::register_parameter("geneticProgramingGate", false, "set to true to enable GP (what?) gates", "GATE TYPES");
+bool& Gate_Builder::usingThGate = Parameters::register_parameter("thresholdGate", false, "set to true to enable threshold gates", "GATE TYPES");
 
-//bool& Gate_Builder::usingFBGate = Parameters::register_parameter("feedBackGate", false, "set to true to enable feedback gates", "GATE TYPES");
-//bool& Gate_Builder::usingGPGate = Parameters::register_parameter("geneticProgramingGate", false, "set to true to enable GP (what?) gates", "GATE TYPES");
-//bool& Gate_Builder::usingThGate = Parameters::register_parameter("thresholdGate", false, "set to true to enable threshold gates", "GATE TYPES");
-
-/*
- * setupGates() populates Gate::makeGate (a structure containing functions) with the constructors for various types of gates.
- * there are 256 possible gates identified each by a pair of codons (n followed by 256-n)
- * after initializing Gate::MakeGate, Gate::AddGate() adds values and the associated constructor function to Gate::MakeGate
- */
+//setupGates() populates Gate::makeGate (a structure containing functions) with the constructors for various types of gates.
+//there are 256 possible gates identified each by a pair of codons (n followed by 256-n)
+//after initializing Gate::MakeGate, Gate::AddGate() adds values and the associated constructor function to Gate::MakeGate
 void Gate_Builder::setupGates() {
   for (int i = 0; i < 256; i++) {
     AddGate(i, nullptr);
@@ -36,18 +32,18 @@ void Gate_Builder::setupGates() {
     AddGate(48, [](shared_ptr<Genome> genome,int pos) {return make_shared<VoidGate>(genome,pos);});
     Global::inUseGateTypes.insert(47);
   }
-//  if (usingFBGate) {
-//    AddGate(44, [](shared_ptr<Genome> genome,int pos) {return make_shared<FeedbackGate>(genome,pos);});
-//    Global::inUseGateTypes.insert(44);
-//  }
-//  if (usingGPGate) {
-//    AddGate(45, [](shared_ptr<Genome> genome,int pos) {return make_shared<GPGate>(genome,pos);});
-//    Global::inUseGateTypes.insert(45);
-//  }
-//  if (usingThGate) {
-//    AddGate(46, [](shared_ptr<Genome> genome,int pos) {return make_shared<Thresholdgate>(genome,pos);});
-//    Global::inUseGateTypes.insert(46);
-//  }
+  if (usingFBGate) {
+    AddGate(44, [](shared_ptr<Genome> genome,int pos) {return make_shared<FeedbackGate>(genome,pos);});
+    Global::inUseGateTypes.insert(44);
+  }
+  if (usingGPGate) {
+    AddGate(45, [](shared_ptr<Genome> genome,int pos) {return make_shared<GPGate>(genome,pos);});
+    Global::inUseGateTypes.insert(45);
+  }
+  if (usingThGate) {
+    AddGate(46, [](shared_ptr<Genome> genome,int pos) {return make_shared<Thresholdgate>(genome,pos);});
+    Global::inUseGateTypes.insert(46);
+  }
 
 }
 

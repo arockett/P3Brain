@@ -18,8 +18,8 @@
 #include "Archivist/LODwAP_Archivist.h"
 #include "Archivist/snapshot_Archivist.h"
 #include "Archivist/SSwD_Archivist.h"
+#include "Brain/ClassicBrain.h"
 
-#include "Brain/Brain.h"
 #include "Genome/Genome.h"
 #include "Group/Group.h"
 
@@ -45,7 +45,7 @@ int main(int argc, const char * argv[]) {
                                                   // also writes out a config file if requested
 
   //make a node map to handle genome value to brain state address look up.
-  Brain::makeNodeMap(Brain::defaultNodeMap, Global::bitsPerBrainAddress, Brain::defaultNrOfBrainStates);
+  ClassicBrain::makeNodeMap(ClassicBrain::defaultNodeMap, Global::bitsPerBrainAddress, ClassicBrain::defaultNrOfBrainStates);
 
   Gate_Builder::setupGates();  // determines which gate types will be in use.
 
@@ -79,7 +79,7 @@ int main(int argc, const char * argv[]) {
     // a progenitor must exist - that is, one ancestor genome
     Global::update = -1;  // before there was time, there was a progenitor
 
-    shared_ptr<Organism> progenitor = make_shared<Organism>(make_shared<ClassicGenome>(), make_shared<Brain>());  // make a organism with a genome and brain (if you need to change the types here is where you do it)
+    shared_ptr<Organism> progenitor = make_shared<Organism>(make_shared<ClassicGenome>(), make_shared<ClassicBrain>());  // make a organism with a genome and brain (if you need to change the types here is where you do it)
 
     Global::update = 0;  // the beginning of time - now we construct the first population
     vector<shared_ptr<Organism>> population;

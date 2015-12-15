@@ -92,16 +92,6 @@ vector<int> Gate::getOuts() {
   return outputs;
 }
 
-//// display the getCodingRegions for a gate as (Index1,Type1,Index2,Type2...)
-//string Gate::getCodingRegions() {
-//  string S = "";
-//  for (auto site : codingRegions) {
-//    S = S + to_string(site.first) + ":" + to_string(site.second) + "  ";
-//  }
-//  S += "\n";
-//  return S;
-//}
-
 string Gate::description() {
   string S = " Gate\n";
   S = S + "IN:";

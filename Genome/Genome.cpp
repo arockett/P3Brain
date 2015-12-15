@@ -40,10 +40,6 @@ string ClassicGenome::convert_to_string() {
   return dataString;
 }
 
-ClassicGenome::ClassicGenome(vector<unsigned char> _sites) {
-  sites = _sites;
-}
-
 ClassicGenome::ClassicGenome(shared_ptr<ClassicGenome> from) {
   copyGenome(from);
 }
@@ -69,9 +65,7 @@ void ClassicGenome::loadGenome(string fileName, string key, string keyValue) {
 }
 
 void ClassicGenome::copyGenome(shared_ptr<ClassicGenome> from) {
-  sites.clear();
-  for (auto site : from->sites)
-    sites.push_back(site);
+  sites = from->sites;
 }
 
 void ClassicGenome::applyMutations(double pointMutationRate, double insertionRate, double deletionRate, int minGenomeSize, int maxGenomeSize) {
@@ -123,8 +117,8 @@ void ClassicGenome::mutate(){
   applyMutations(pointMutationRate, insertionRate, deletionRate, minGenomeSize, maxGenomeSize);
 }
 
-void ClassicGenome::fillRandom() {
-  sites.resize(ClassicGenome::initialGenomeSize);
+void ClassicGenome::fillRandom(int size) {
+  sites.resize(size);
   for (size_t i = 0; i < sites.size(); i++) {  // fill al sites with random values 0->255
     sites[i] = (unsigned char) Random::getIndex(256);
     //sites[i] = (unsigned char) 2; // uncomment to test genome with fixed number
@@ -139,8 +133,8 @@ void ClassicGenome::fillRandom() {
 }
 
 shared_ptr<Genome> ClassicGenome::makeMutatedGenome() {
-  shared_ptr<Genome> G = make_shared<ClassicGenome>(this->sites);
-  //G->sites = sites;
+  shared_ptr<ClassicGenome> G = make_shared<ClassicGenome>();
+  G->sites = sites;
   G->mutate();
   return G;
 }
@@ -169,7 +163,8 @@ shared_ptr<Genome> ClassicGenome::makeMutatedGenome(vector<shared_ptr<ClassicGen
       shared_ptr<ClassicGenome> currSource = from[Random::getIndex(from.size())];
     }
   }
-  shared_ptr<Genome> G = make_shared<ClassicGenome>(newSites);  // make a blank genome
+  shared_ptr<ClassicGenome> G = make_shared<ClassicGenome>();  // make a blank genome  G->sites = sites;
+  G->sites = newSites;
   G->mutate();
   return G;
 }

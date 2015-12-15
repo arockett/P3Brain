@@ -33,7 +33,7 @@ class Genome {
 
   // randomize this genomes contents
   // the undefined action is to take no action
-  virtual void fillRandom() {
+  virtual void fillRandom(){
   }
 
   // assign a value at a given location
@@ -129,6 +129,9 @@ class Genome {
   virtual inline void assignCodingRegionValue(int index, int code) {
     if (code != -1) {
       //cout << "assigning: [" << (int) codingRegions.size() - 1 << "][" << index << "] = " << code << "\n";
+      if (codingRegions.size() == 0) {
+        newCodingRegion();
+      }
       codingRegions[(int) codingRegions.size() - 1][index] = code;
     }
   }
@@ -161,29 +164,28 @@ class ClassicGenome : public Genome {
   static double& deletionRate;
 
   ClassicGenome() = default;
-  ClassicGenome(vector<unsigned char> _sites);
   ClassicGenome(shared_ptr<ClassicGenome> from);
   virtual ~ClassicGenome() = default;
 
-
-  virtual void fillRandom();
+  virtual void fillRandom(int size = ClassicGenome::initialGenomeSize);
   virtual void assignValue(int loc, int value){
     sites[loc % (int) sites.size()] = value;
   }
 
+  // copy functions
   virtual void copyGenome(shared_ptr<ClassicGenome> from);
 
   virtual shared_ptr<Genome> makeMutatedGenome();
   virtual shared_ptr<Genome> makeMutatedGenome(vector<shared_ptr<ClassicGenome>> from);
 
-// load sites from a file
+  // IO functions
   virtual void loadGenome(string fileName, string key, string keyValue);
 
   virtual string convert_to_string();
   virtual vector<string> getStats();
 
+  // mutation functions
   virtual void mutate();
-
   virtual void applyMutations(double pointMutationRate = pointMutationRate, double insertionRate = insertionRate, double deletionRate = deletionRate, int minGenomeSize = minGenomeSize, int maxGenomeSize = maxGenomeSize);
   virtual void makePointMutation();
 
@@ -191,7 +193,9 @@ class ClassicGenome : public Genome {
     return sites.size();
   }
 
-// advance an index by 1 site, or distance sites if distance is given
+  // advance an index by 1 site, or distance sites if distance is given
+  // this should only be used if you are not worried about the actualy size of the chunk being skipped
+  // if size is important, use extractValue and ignore the return value
   virtual void advanceIndex(int& genomeIndex, int distance = 1) {
     for (int i = 0; i < distance; i++) {
       genomeIndex = (genomeIndex + distance) % (int) sites.size();

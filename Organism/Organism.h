@@ -13,7 +13,7 @@
 #include <vector>
 #include <unordered_set>
 
-#include "../Brain/Brain.h"
+#include "../Brain/ClassicBrain.h"
 #include "../Genome/Genome.h"
 
 #include "../Utilities/Data.h"
@@ -36,7 +36,7 @@ class Organism : AbstractOrganism {
   int gender;  // generally 0=female, 1=male, *=?
 
   shared_ptr<Genome> genome;
-  shared_ptr<Brain> brain;
+  shared_ptr<ClassicBrain> brain;
 
   double score;
 
@@ -57,7 +57,7 @@ class Organism : AbstractOrganism {
   // after the delay we have the correct data for the given time. key is 'update'. This possibly should be wrapped into Archivist.
   Organism();  // make an empty organism
   Organism(shared_ptr<Genome> _genome);  // make a parentless organism with a genome, and a nullptr to brain
-  Organism(shared_ptr<Genome> _genome, shared_ptr<Brain> _brain);  // make a parentless organism with a genome, and a brain
+  Organism(shared_ptr<Genome> _genome, shared_ptr<ClassicBrain> _brain);  // make a parentless organism with a genome, and a brain
   Organism(shared_ptr<Organism> from, shared_ptr<Genome> _genome);  // make an organism with one parent, a genome and a brain determined from the parents brain type.
   Organism(const vector<shared_ptr<Organism>> from, shared_ptr<Genome> _genome);  // make a organism with many parents, a genome, and a brain determined from the parents brain type.
 

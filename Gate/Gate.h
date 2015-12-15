@@ -36,10 +36,10 @@ class Gate {  // abstact class. Assumes that a standard genome is being used.
   vector<int> inputs;
   vector<int> outputs;
 
-  map<int, int> codingRegions;  //indicates coding regions. maps genome index to usage of nucleotide in gate. 0=start codon. 1=wiring(defines # of inputs and outputs and what they are). 2=gate specific information
+  //map<int, int> codingRegions;  //indicates coding regions. maps genome index to usage of nucleotide in gate. 0=start codon. 1=wiring(defines # of inputs and outputs and what they are). 2=gate specific information
 
   // functions used in genome translation
-  void movePastStartCodeon(int& genomeIndex, shared_ptr<Genome> genome);  // simply addvances genomeIndex by the size of a start codeon (2)
+  //void movePastStartCodeon(int& genomeIndex, shared_ptr<Genome> genome);  // simply addvances genomeIndex by the size of a start codeon (2)
   int getIOAddress(int& genomeIndex, shared_ptr<Genome> genome);  // extracts one brain state value address from a genome
   void getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, int& genome_index, shared_ptr<Genome> genome, int codeNumber);  // extracts many brain state value addresses from a genome
   void getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, int& genomeIndex, shared_ptr<Genome> genome);  // extracts the input and output brain state value addresses for this gate
