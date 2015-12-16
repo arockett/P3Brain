@@ -186,7 +186,7 @@ class ClassicGenome : public Genome {
 
   // mutation functions
   virtual void mutate();
-  virtual void applyMutations(double pointMutationRate = pointMutationRate, double insertionRate = insertionRate, double deletionRate = deletionRate, int minGenomeSize = minGenomeSize, int maxGenomeSize = maxGenomeSize);
+  virtual void applyMutations(double _pointMutationRate = pointMutationRate, double _insertionRate = insertionRate, double _deletionRate = deletionRate, int _minGenomeSize = minGenomeSize, int _maxGenomeSize = maxGenomeSize);
   virtual void makePointMutation();
 
   virtual inline int getSize() {

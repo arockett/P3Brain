@@ -68,18 +68,18 @@ void ClassicGenome::copyGenome(shared_ptr<ClassicGenome> from) {
   sites = from->sites;
 }
 
-void ClassicGenome::applyMutations(double pointMutationRate, double insertionRate, double deletionRate, int minGenomeSize, int maxGenomeSize) {
-  if (pointMutationRate > 0.0) {
+void ClassicGenome::applyMutations(double _pointMutationRate, double _insertionRate, double _deletionRate, int _minGenomeSize, int _maxGenomeSize) {
+  if (_pointMutationRate > 0.0) {
     int nucleotides = (int) sites.size();
     int i, s, o, w;
     vector<unsigned char> buffer;
-    int localMutations = Random::getBinomial(nucleotides, pointMutationRate);
+    int localMutations = Random::getBinomial(nucleotides, _pointMutationRate);
     for (i = 0; i < localMutations; i++) {
       sites[Random::getIndex(nucleotides)] = Random::getIndex(256);
     }
-    int numInsertions = Random::getBinomial((int) sites.size(), (insertionRate / 1000));
+    int numInsertions = Random::getBinomial((int) sites.size(), (_insertionRate / 1000));
     while (numInsertions > 0) {
-      if ((int) nucleotides < maxGenomeSize) {
+      if ((int) nucleotides < _maxGenomeSize) {
         //duplication
         w = 128 + Random::getIndex(512 - 128);  // w is between 128 and 512 (size of the chunk to be duplicated)
         if (w >= nucleotides) {  // if w is >= the size of the genome, make w smaller!
@@ -95,10 +95,10 @@ void ClassicGenome::applyMutations(double pointMutationRate, double insertionRat
       numInsertions--;
     }
 
-    int numDels = Random::getBinomial(nucleotides, (deletionRate / 1000));
+    int numDels = Random::getBinomial(nucleotides, (_deletionRate / 1000));
     while (numDels > 0) {
 
-      if (nucleotides > minGenomeSize) {
+      if (nucleotides > _minGenomeSize) {
         //deletion
         w = 128 + Random::getIndex(512 - 128);  //  w is between 128 and 255 (size of the chunk to be deleted)
         if (w >= nucleotides) {  // if w is >= the size of the genome, make w smaller!

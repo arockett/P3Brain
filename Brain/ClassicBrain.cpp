@@ -26,15 +26,11 @@ ClassicBrain::ClassicBrain(shared_ptr<Genome> genome, int _nrOfBrainStates) {  /
   int genomeIndex = 0;
   int testIndex;
   while (genomeIndex < genomeSize) {  // while there are sites in the genome
-    //cout << genomeIndex << "\n";
     testIndex = genomeIndex;
     const int testSite1Value = genome->extractValue(testIndex, { 0, 255 });  // get first 1/2 of startcodon
-//cout << testSite1Value << "  " << testIndex << "\n";
     const int testSite2Value = genome->extractValue(testIndex, { 0, 255 });  // get second 1/2 of startcodon
-//cout << testSite2Value << "  " << testIndex << "\n";
     if (testSite1Value + testSite2Value == 255) {
       if (Gate_Builder::makeGate[testSite1Value] != nullptr) {
-        //cout << " building gate: " << testSite1Value << "\n";
         gates.push_back(Gate_Builder::makeGate[testSite1Value](genome, genomeIndex));
       }
     }
