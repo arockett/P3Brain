@@ -6,8 +6,8 @@
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
 //
 
-#ifndef __BasicMarkovBrainTemplate__Agent__
-#define __BasicMarkovBrainTemplate__Agent__
+#ifndef __BasicMarkovBrainTemplate__Brain__
+#define __BasicMarkovBrainTemplate__Brain__
 
 #include <math.h>
 #include <memory>
@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "../Gate/Gate_Builder.h"
+#include "../GateListBuilder/GateListBuilder.h"
 #include "../Genome/Genome.h"
 
 #include "../Utilities/Parameters.h"
@@ -33,6 +34,7 @@ class AbstractBrain {
 class ClassicBrain : AbstractBrain {
  protected:
   vector<shared_ptr<Gate>> gates;
+  shared_ptr<Base_GateListBuilder> GLB;
 
  public:
   static int& defaultNrOfBrainStates;  // default value for number of states in all brains
@@ -40,6 +42,7 @@ class ClassicBrain : AbstractBrain {
   static bool& serialProcessing;  // write directly states (overwrite) - do not use nextStates
 
   static void initializeParameters();
+  static vector<int> defaultNodeMap;
 
   /*
    * Builds a look up table to convert genome site values into brain state addresses - this is only used when there is a fixed number of brain states
@@ -52,19 +55,16 @@ class ClassicBrain : AbstractBrain {
 
     return 1;
   }
-  static vector<int> defaultNodeMap;
 
   //Genome *genome;
   vector<double> states;
   vector<double> nextStates;
 
-  ClassicBrain() {
-    nrOfBrainStates = defaultNrOfBrainStates;
-  }
-  ClassicBrain(shared_ptr<Genome> startGenome, int _nrOfStates = defaultNrOfBrainStates);
-  virtual ~ClassicBrain() {
-  }
-  ;
+  ClassicBrain() = delete;
+
+  ClassicBrain(shared_ptr<Base_GateListBuilder> _GLB, int _nrOfStates = defaultNrOfBrainStates);
+  ClassicBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<Genome> startGenome, int _nrOfStates = defaultNrOfBrainStates);
+  virtual ~ClassicBrain() = default;
 
   virtual void update();
 
@@ -104,4 +104,4 @@ class ClassicBrain : AbstractBrain {
 
 };
 
-#endif /* defined(__BasicMarkovBrainTemplate__Agent__) */
+#endif /* defined(__BasicMarkovBrainTemplate__Brain__) */
