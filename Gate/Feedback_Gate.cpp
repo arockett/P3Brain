@@ -28,8 +28,6 @@ FeedbackGate::FeedbackGate(shared_ptr<Genome> genome, int genomeIndex) {
   outputs.clear();
   int _xDim, _yDim;
 
-  genome->advanceIndexPastStartCodon(genomeIndex);
-
   //get the dimensions of the table
   _xDim = genome->extractValue(genomeIndex, { 1, 4 }, Genome::IN_COUNT_CODE);
   _yDim = genome->extractValue(genomeIndex, { 1, 4 }, Genome::OUT_COUNT_CODE);

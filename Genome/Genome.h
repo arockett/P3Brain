@@ -104,11 +104,6 @@ class Genome {
   virtual void advanceIndex(int &index, int distance = 1) {
   }
 
-  // advance an index by the size of that genomes start codon
-  // the undefined action is to take no action
-  virtual void advanceIndexPastStartCodon(int &index) {
-  }
-
   // convert genome sites at location index into a value in range [min,max] and advance index to the next unused site
   // any sites used will be assigned code in codingRegions
   // no undefined action, this function must be defined
@@ -202,14 +197,6 @@ class ClassicGenome : public Genome {
     }
   }
 
-  virtual void advanceIndexPastStartCodon(int &index) {
-    newCodingRegion();
-    assignCodingRegionValue(index, Genome::START_CODE);
-    advanceIndex(index);  // classic genomes use two sites for their start codons
-    assignCodingRegionValue(index, Genome::START_CODE);
-    advanceIndex(index);  // classic genomes use two sites for their start codons
-  }
-
   virtual int extractValue(int &index, vector<int> valueRange, int code = -1) {
     if (valueRange[0] > valueRange[1]) {
       int temp = valueRange[0];
@@ -221,12 +208,12 @@ class ClassicGenome : public Genome {
     assignCodingRegionValue(index, code);
     advanceIndex(index);
     while ((valueRange[1] - valueRange[0] + 1) > currentMax) {
-      genomeValue = (genomeValue << 8) + (int) sites[index];
+      genomeValue = genomeValue + (int) sites[index];
       assignCodingRegionValue(index, code);
       advanceIndex(index);
       currentMax += 256;
     }
-    return (genomeValue % (valueRange[1] - valueRange[0] + 1)) + valueRange[0];
+  return (genomeValue % (valueRange[1] - valueRange[0] + 1)) + valueRange[0];
   }
 
 // convert genome sites at location index into a table and advance index to next unused site

@@ -25,9 +25,6 @@ GPGate::GPGate(shared_ptr<Genome> genome, int genomeIndex) {
   inputs.clear();
   outputs.clear();
   int numOutputs;
-  //move past the first to sites (start codeon)
-  genome->advanceIndexPastStartCodon(genomeIndex);
-
 
   // get numInputs inputs and numOutputs outputs, advance k (genomeIndex) as if we had gotten 4 of each and record this in codingRegions
   getInputsAndOutputs( { 1, 4 }, { 1, 4 }, genomeIndex, genome);  // (insRange, outsRange,currentIndexInGenome,genome,codingRegions)

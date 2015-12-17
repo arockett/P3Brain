@@ -20,9 +20,6 @@ Thresholdgate::Thresholdgate(shared_ptr<Genome> genome, int genomeIndex) {
   outputs.clear();
   int _xDim;
 
-
-  genome->advanceIndexPastStartCodon(genomeIndex);
-
   //The dimensions are different here, the first inputs is the trigger
   //the next one are the current state Counter
   //the outputSize is the same, the first bit of the output is the ping

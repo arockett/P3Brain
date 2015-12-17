@@ -114,8 +114,6 @@ ProbabilisticGate::ProbabilisticGate(shared_ptr<Genome> genome, int genomeIndex)
   outputs.clear();
   int numOutputs, numInputs;
 
-  genome->advanceIndexPastStartCodon(genomeIndex);
-
   // get numInputs inputs and numOutputs outputs, advance k (genomeIndex) as if we had gotten 4 of each and record this in codingRegions
   getInputsAndOutputs( { 1, 4 }, { 1, 4 }, genomeIndex, genome);  // (insRange, outsRange,currentIndexInGenome,genome,codingRegions)
   numInputs = inputs.size();
@@ -171,9 +169,6 @@ DeterministicGate::DeterministicGate(shared_ptr<Genome> genome, int genomeIndex)
   inputs.clear();
   outputs.clear();
   int numOutputs, numInputs;
-  //cout << " before startcodon index: " << genomeIndex << "\n";
-  genome->advanceIndexPastStartCodon(genomeIndex);
-  //cout << " after startcodon index: " << genomeIndex << "\n";
 
   // get numInputs inputs and numOutputs outputs, advance k (genomeIndex) as if we had gotten 4 of each and record this in codingRegions
   getInputsAndOutputs( { 1, 4 }, { 1, 4 }, genomeIndex, genome);  // (insRange, outsRange,currentIndexInGenome,genome,codingRegions)
@@ -184,17 +179,6 @@ DeterministicGate::DeterministicGate(shared_ptr<Genome> genome, int genomeIndex)
   // get a table filled with values from the genome that has
   // rows = (the number of possible combinations of input values) and columns = (the number of possible combinations of output values)
   table = genome->extractTable(genomeIndex, { 1 << numInputs, numOutputs }, { 16, 4 }, { 0, 1 });
-  //cout << " after extract table index: " << genomeIndex << "\n";
-
-//  // convert the table contents to bits
-//  for (int i = 0; i < (1 << numInputs); i++) {
-//    for (int o = 0; o < numOutputs; o++) {
-//      table[i][0] = table[i][0] & 1;  // convert even to 0 and odd to 1
-//      //if (table[i][0] == 1) cout << "* "; // uncomment for light show! //
-//      //else cout << "  ";                  // uncomment for light show! //
-//
-//    }
-//  }
 }
 
 void DeterministicGate::setupForBits(int* Ins, int nrOfIns, int Out, int logic) {

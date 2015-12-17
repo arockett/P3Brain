@@ -22,32 +22,29 @@ ClassicBrain::ClassicBrain(shared_ptr<Genome> genome, int _nrOfBrainStates) {  /
   states.resize(nrOfBrainStates);
   nextStates.resize(nrOfBrainStates);
   gates.clear();
-  int genomeSize = genome->getSize();
+  bool translation_Complete = false;
+  if (genome->getSize() == 0){
+    translation_Complete = true;
+  }
   int genomeIndex = 0;
+  int saveIndex = 0;
   int testIndex;
-  while (genomeIndex < genomeSize) {  // while there are sites in the genome
-    testIndex = genomeIndex;
-    const int testSite1Value = genome->extractValue(testIndex, { 0, 255 });  // get first 1/2 of startcodon
-    const int testSite2Value = genome->extractValue(testIndex, { 0, 255 });  // get second 1/2 of startcodon
-    if (testSite1Value + testSite2Value == 255) {
-      if (Gate_Builder::makeGate[testSite1Value] != nullptr) {
-        gates.push_back(Gate_Builder::makeGate[testSite1Value](genome, genomeIndex));
+  while (!translation_Complete) {  // while there are sites in the genome
+    testIndex = genomeIndex;  // get to values from genome to test for start codns
+    const int testSite1Value = genome->extractValue(testIndex, { 0, 255 });  // extract first 1/2 of startcodon
+    saveIndex = testIndex;  // save this index, this is where we pick up when we come back from building a gate.
+    const int testSite2Value = genome->extractValue(testIndex, { 0, 255 });  // extract second 1/2 of startcodon
+    if (genomeIndex > testIndex) {  // if genomeIndex > testIndex, testIndex has wrapped and we are done translating
+      translation_Complete = true;
+    } else if (testSite1Value + testSite2Value == 255) {  // if we found a start codon
+      if (Gate_Builder::makeGate[testSite1Value] != nullptr) {  // and that start codon codes to an in use gate class
+        genome->extractValue(genomeIndex, { 0, 255 }, Genome::START_CODE);  // mark start codon in genomes coding region
+        genome->extractValue(genomeIndex, { 0, 255 }, Genome::START_CODE);  // mark start codon in genomes coding region
+        gates.push_back(Gate_Builder::makeGate[testSite1Value](genome, genomeIndex));  // make a gate of the type associated with the value in testSite1Value
       }
     }
-    if (genomeIndex < testIndex) {
-      genome->extractValue(genomeIndex, { 0, 255 });  // advance genomeIndex
-    } else {
-      genomeIndex = genomeSize;
-    }
+    genomeIndex = saveIndex;
   }
-//  for (int genomeIndex = 0; genomeIndex < (genomeSize - 1); genome->advanceIndex(genomeIndex)) {
-//    const int S = genome->sites[i];
-//    if ((S + genome->sites[i + 1]) == 256) {
-//      if (Gate_Builder::makeGate[S] != nullptr) {
-//        gates.push_back(Gate_Builder::makeGate[S](genome, genomeIndex));
-//      }
-//    }
-//  }
   inOutReMap();  // map ins and outs from genome values to brain states
 }
 
