@@ -19,7 +19,7 @@ double& VoidGate::voidGate_Probability = Parameters::register_parameter("voidGat
 // *** General tools for All Gates ***
 
 // Gets "howMany" addresses, advances the genome_index buy "howManyMax" addresses and updates "codingRegions" with the addresses being used.
-void Gate::getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, int& genome_index, shared_ptr<Genome> genome, int code) {
+void Gate::getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, shared_ptr<Genome::Index> genome_index, shared_ptr<Genome> genome, int code) {
   int i;
   for (i = 0; i < howMany; i++) {  // for the number of addresses we need
     addresses[i] = genome->extractValue(genome_index, { 0, (1 << Global::bitsPerBrainAddress) - 1 }, code);  // get an address
@@ -35,7 +35,7 @@ void Gate::getSomeBrainAddresses(const int& howMany, const int& howManyMax, vect
 // given a genome and a genomeIndex:
 // pull out the number a number of inputs, number of outputs and then that many inputs and outputs
 // if number of inputs or outputs is less then the max possible inputs or outputs skip the unused sites in the genome
-void Gate::getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, int& genomeIndex, shared_ptr<Genome> genome) {  // (max#in, max#out,currentIndexInGenome,genome,codingRegions)
+void Gate::getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, shared_ptr<Genome::Index> genomeIndex, shared_ptr<Genome> genome) {  // (max#in, max#out,currentIndexInGenome,genome,codingRegions)
 
   int numInputs = genome->extractValue(genomeIndex, { insRange[0], insRange[1] }, Genome::IN_COUNT_CODE);
   //cout << "num_Inputs: " << numInputs << "\n";
@@ -108,7 +108,7 @@ string Gate::description() {
 
 /* *** ProbilisticGate implementation *** */
 
-ProbabilisticGate::ProbabilisticGate(shared_ptr<Genome> genome, int genomeIndex) {
+ProbabilisticGate::ProbabilisticGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> genomeIndex) {
   int i, j;
   inputs.clear();
   outputs.clear();
@@ -165,7 +165,7 @@ string ProbabilisticGate::description() {
 
 /* *** Determistic Gate Implementation *** */
 
-DeterministicGate::DeterministicGate(shared_ptr<Genome> genome, int genomeIndex) {
+DeterministicGate::DeterministicGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> genomeIndex) {
   inputs.clear();
   outputs.clear();
   int numOutputs, numInputs;
@@ -208,7 +208,7 @@ string DeterministicGate::description() {
 /* *** Fixed Epison Gate *** */
 /* this gate behaves like a deterministic gate with a constant externally set error which may cause the outputs to scramble */
 
-FixedEpsilonGate::FixedEpsilonGate(shared_ptr<Genome> genome, int genomeIndex)
+FixedEpsilonGate::FixedEpsilonGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> genomeIndex)
     : DeterministicGate(genome, genomeIndex) {  // use DeterministicGate constructor to build set up everything (including a table of 0s and 1s)
   epsilon = FixedEpsilonGate_Probability;  // in case you want to have different epsilon for different gates (who am I to judge?)
 
@@ -250,7 +250,7 @@ string FixedEpsilonGate::description() {
 /* *** VoidGate *** */
 /* this gate behaves like a deterministic gate with a constant externally set error which may set a single output to 0 */
 
-VoidGate::VoidGate(shared_ptr<Genome> genome, int genomeIndex)
+VoidGate::VoidGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> genomeIndex)
     : DeterministicGate(genome, genomeIndex) {  // use DeterministicGate constructor to build set up everything (including a table of 0s and 1s)
   epsilon = voidGate_Probability;  // in case you want to have different epsilon for different gates (who am I to judge?)
 }

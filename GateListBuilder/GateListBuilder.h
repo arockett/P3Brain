@@ -44,15 +44,17 @@ class Classic_GateListBuilder : public Base_GateListBuilder {
     if (genome->getSize() == 0){
       translation_Complete = true;
     }
-    int genomeIndex = 0;
-    int saveIndex = 0;
-    int testIndex;
+    shared_ptr<Genome::Index> genomeIndex = genome->getIndex();
+
+    shared_ptr<Genome::Index> saveIndex = genome->getIndex();
+    shared_ptr<Genome::Index> testIndex = genome->getIndex();
+    genome->copyIndex(genomeIndex,saveIndex);
     while (!translation_Complete) {  // while there are sites in the genome
-      testIndex = genomeIndex;  // get to values from genome to test for start codns
+      genome->copyIndex(genomeIndex,testIndex);  // get to values from genome to test for start codns
       const int testSite1Value = genome->extractValue(testIndex, { 0, 255 });  // extract first 1/2 of startcodon
-      saveIndex = testIndex;  // save this index, this is where we pick up when we come back from building a gate.
+      genome->copyIndex(testIndex,saveIndex);  // save this index, this is where we pick up when we come back from building a gate.
       const int testSite2Value = genome->extractValue(testIndex, { 0, 255 });  // extract second 1/2 of startcodon
-      if (genomeIndex > testIndex) {  // if genomeIndex > testIndex, testIndex has wrapped and we are done translating
+      if (saveIndex->eog) {  // if genomeIndex > testIndex, testIndex has wrapped and we are done translating
         translation_Complete = true;
       } else if (testSite1Value + testSite2Value == 255) {  // if we found a start codon
         if (Gate_Builder::makeGate[testSite1Value] != nullptr) {  // and that start codon codes to an in use gate class
@@ -61,7 +63,7 @@ class Classic_GateListBuilder : public Base_GateListBuilder {
           gates.push_back(Gate_Builder::makeGate[testSite1Value](genome, genomeIndex));  // make a gate of the type associated with the value in testSite1Value
         }
       }
-      genomeIndex = saveIndex;
+      genome->copyIndex(saveIndex,genomeIndex);
     }
     return gates;
   }

@@ -14,7 +14,7 @@
 #include "../Utilities/Random.h"
 #include "../Utilities/Utilities.h"
 
-Thresholdgate::Thresholdgate(shared_ptr<Genome> genome, int genomeIndex) {
+Thresholdgate::Thresholdgate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> genomeIndex) {
   int i;
   inputs.clear();
   outputs.clear();

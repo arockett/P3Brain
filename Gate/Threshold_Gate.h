@@ -17,7 +17,7 @@ class Thresholdgate : public Gate {
   int threshold;
  public:
   Thresholdgate() = delete;
-  Thresholdgate(shared_ptr<Genome> genome, int startCodonAt);
+  Thresholdgate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> index);
   virtual ~Thresholdgate() = default;
   virtual void update(vector<double> & states, vector<double> & nextStates);
   virtual string description();

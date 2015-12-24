@@ -25,7 +25,7 @@ class FeedbackGate : public Gate {
 
   static bool feedbackON;
   FeedbackGate() = delete;
-  FeedbackGate(shared_ptr<Genome> genome, int startCodonAt);
+  FeedbackGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> index);
   virtual ~FeedbackGate() = default;
   virtual void update(vector<double> & states, vector<double> & nextStates);
   virtual string description();

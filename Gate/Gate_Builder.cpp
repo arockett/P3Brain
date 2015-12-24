@@ -17,40 +17,40 @@ void Gate_Builder::setupGates() {
     AddGate(i, nullptr);
   }
   if (usingProbGate) {
-    AddGate(42, [](shared_ptr<Genome> genome,int pos) {return make_shared<ProbabilisticGate>(genome,pos);});
+    AddGate(42, [](shared_ptr<Genome> genome,shared_ptr<Genome::Index> index) {return make_shared<ProbabilisticGate>(genome,index);});
     Global::inUseGateTypes.insert(42);
   }
   if (usingDetGate) {
-    AddGate(43, [](shared_ptr<Genome> genome,int pos) {return make_shared<DeterministicGate>(genome,pos);});
+    AddGate(43, [](shared_ptr<Genome> genome,shared_ptr<Genome::Index> index) {return make_shared<DeterministicGate>(genome,index);});
     Global::inUseGateTypes.insert(43);
   }
   if (usingEpsiGate) {
-    AddGate(47, [](shared_ptr<Genome> genome,int pos) {return make_shared<FixedEpsilonGate>(genome,pos);});
+    AddGate(47, [](shared_ptr<Genome> genome,shared_ptr<Genome::Index> index) {return make_shared<FixedEpsilonGate>(genome,index);});
     Global::inUseGateTypes.insert(47);
   }
   if (usingVoidGate) {
-    AddGate(48, [](shared_ptr<Genome> genome,int pos) {return make_shared<VoidGate>(genome,pos);});
+    AddGate(48, [](shared_ptr<Genome> genome,shared_ptr<Genome::Index> index) {return make_shared<VoidGate>(genome,index);});
     Global::inUseGateTypes.insert(47);
   }
   if (usingFBGate) {
-    AddGate(44, [](shared_ptr<Genome> genome,int pos) {return make_shared<FeedbackGate>(genome,pos);});
+    AddGate(44, [](shared_ptr<Genome> genome,shared_ptr<Genome::Index> index) {return make_shared<FeedbackGate>(genome,index);});
     Global::inUseGateTypes.insert(44);
   }
   if (usingGPGate) {
-    AddGate(45, [](shared_ptr<Genome> genome,int pos) {return make_shared<GPGate>(genome,pos);});
+    AddGate(45, [](shared_ptr<Genome> genome,shared_ptr<Genome::Index> index) {return make_shared<GPGate>(genome,index);});
     Global::inUseGateTypes.insert(45);
   }
   if (usingThGate) {
-    AddGate(46, [](shared_ptr<Genome> genome,int pos) {return make_shared<Thresholdgate>(genome,pos);});
+    AddGate(46, [](shared_ptr<Genome> genome,shared_ptr<Genome::Index> index) {return make_shared<Thresholdgate>(genome,index);});
     Global::inUseGateTypes.insert(46);
   }
 
 }
 
 /* *** some c++ 11 magic to speed up translation from genome to gates *** */
-function<shared_ptr<Gate>(shared_ptr<Genome>, int)> Gate_Builder::makeGate[256];
+function<shared_ptr<Gate>(shared_ptr<Genome>, shared_ptr<Genome::Index>)> Gate_Builder::makeGate[256];
 
-void Gate_Builder::AddGate(int ID, function<shared_ptr<Gate>(shared_ptr<Genome>, int)> theFunction) {
+void Gate_Builder::AddGate(int ID, function<shared_ptr<Gate>(shared_ptr<Genome>, shared_ptr<Genome::Index> index)> theFunction) {
   makeGate[ID] = theFunction;
 }
 /* *** end - some c++ 11 magic to speed up translation from genome to gates *** */

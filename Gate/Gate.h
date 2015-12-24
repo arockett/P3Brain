@@ -40,9 +40,9 @@ class Gate {  // abstact class. Assumes that a standard genome is being used.
 
   // functions used in genome translation
   //void movePastStartCodeon(int& genomeIndex, shared_ptr<Genome> genome);  // simply addvances genomeIndex by the size of a start codeon (2)
-  int getIOAddress(int& genomeIndex, shared_ptr<Genome> genome);  // extracts one brain state value address from a genome
-  void getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, int& genome_index, shared_ptr<Genome> genome, int codeNumber);  // extracts many brain state value addresses from a genome
-  void getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, int& genomeIndex, shared_ptr<Genome> genome);  // extracts the input and output brain state value addresses for this gate
+  int getIOAddress(shared_ptr<Genome::Index> genomeIndex, shared_ptr<Genome> genome);  // extracts one brain state value address from a genome
+  void getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, shared_ptr<Genome::Index> genome_index, shared_ptr<Genome> genome, int codeNumber);  // extracts many brain state value addresses from a genome
+  void getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, shared_ptr<Genome::Index> genomeIndex, shared_ptr<Genome> genome);  // extracts the input and output brain state value addresses for this gate
 
   int getIndexFromInputs(vector<double> &brainState);  // used during update to convert gate input into table indexes
 
@@ -94,7 +94,7 @@ class ProbabilisticGate : public Gate {  //conventional probabilistic gate
   vector<vector<double>> table;
 
   ProbabilisticGate() = delete;
-  ProbabilisticGate(shared_ptr<Genome> genome, int startCodonAt);
+  ProbabilisticGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> index);
 
   virtual ~ProbabilisticGate() = default;
 
@@ -109,7 +109,7 @@ class DeterministicGate : public Gate {
   vector<vector<int>> table;
 
   DeterministicGate() = delete;
-  DeterministicGate(shared_ptr<Genome> genome, int startCodonAt);
+  DeterministicGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> index);
   virtual ~DeterministicGate() = default;
   virtual void update(vector<double> & states, vector<double> & nextStates);
 
@@ -129,7 +129,7 @@ class FixedEpsilonGate : public DeterministicGate {
   vector<int> defaultOutput;
   double epsilon;
   FixedEpsilonGate() = delete;
-  FixedEpsilonGate(shared_ptr<Genome> genome, int startCodonAt);
+  FixedEpsilonGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> index);
   virtual ~FixedEpsilonGate() = default;
   virtual void update(vector<double> & states, vector<double> & nextStates);
   virtual string description();
@@ -143,7 +143,7 @@ class VoidGate : public DeterministicGate {
   vector<int> defaultOutput;
   double epsilon;
   VoidGate() = delete;
-  VoidGate(shared_ptr<Genome> genome, int startCodonAt);
+  VoidGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> index);
   virtual ~VoidGate() = default;
   virtual void update(vector<double> & states, vector<double> & nextStates);
   virtual string description();

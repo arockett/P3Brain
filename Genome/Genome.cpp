@@ -6,20 +6,20 @@
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
 //
 
-#include "../Genome/Genome.h"
+#include "Genome.h"
 #include "../Global.h"
 
 #include "../Utilities/Random.h"
 #include "../Utilities/Utilities.h"
 
-int& ClassicGenome::initialGenomeSize = Parameters::register_parameter("genomeSizeInitial", 5000, "starting size for genomes", "CLASSIC_GENOME");
-double& ClassicGenome::pointMutationRate = Parameters::register_parameter("pointMutationRate", 0.005, "per site mutation rate", "CLASSIC_GENOME");
-double& ClassicGenome::insertionRate = Parameters::register_parameter("insertionRate", 0.02, "per genome insertion/deletion rate", "CLASSIC_GENOME");
-double& ClassicGenome::deletionRate = Parameters::register_parameter("deletionRate", 0.02, "insertion rate per 1000 genome sites", "CLASSIC_GENOME");
-int& ClassicGenome::minGenomeSize = Parameters::register_parameter("genomeSizeMin", 5000, "if the genome is smaller then this, mutations will only increse genome size", "CLASSIC_GENOME");
-int& ClassicGenome::maxGenomeSize = Parameters::register_parameter("genomeSizeMax", 20000, "if the genome is larger then this, mutations will only decrease genome size", "CLASSIC_GENOME");
+int& ByteGenome::initialGenomeSize = Parameters::register_parameter("genomeSizeInitial", 5000, "starting size for genomes", "CLASSIC_GENOME");
+double& ByteGenome::pointMutationRate = Parameters::register_parameter("pointMutationRate", 0.005, "per site mutation rate", "CLASSIC_GENOME");
+double& ByteGenome::insertionRate = Parameters::register_parameter("insertionRate", 0.02, "per genome insertion/deletion rate", "CLASSIC_GENOME");
+double& ByteGenome::deletionRate = Parameters::register_parameter("deletionRate", 0.02, "insertion rate per 1000 genome sites", "CLASSIC_GENOME");
+int& ByteGenome::minGenomeSize = Parameters::register_parameter("genomeSizeMin", 5000, "if the genome is smaller then this, mutations will only increse genome size", "CLASSIC_GENOME");
+int& ByteGenome::maxGenomeSize = Parameters::register_parameter("genomeSizeMax", 20000, "if the genome is larger then this, mutations will only decrease genome size", "CLASSIC_GENOME");
 
-vector<string> ClassicGenome::getStats() {
+vector<string> ByteGenome::getStats() {
   vector<string> dataPairs;
   dataPairs.push_back("genomeSize");
   dataPairs.push_back(to_string(sites.size()));
@@ -29,7 +29,7 @@ vector<string> ClassicGenome::getStats() {
 /*
  * converts the sites vector to a FileManager::separator separated list in string format.
  */
-string ClassicGenome::convert_to_string() {
+string ByteGenome::convert_to_string() {
   string dataString;
   if (sites.size() > 0) {  // convert the genome into a string of int
     for (auto site : sites) {
@@ -40,12 +40,13 @@ string ClassicGenome::convert_to_string() {
   return dataString;
 }
 
-ClassicGenome::ClassicGenome(shared_ptr<ClassicGenome> from) {
+
+ByteGenome::ByteGenome(shared_ptr<ByteGenome> from) {
   copyGenome(from);
 }
 
 // load a genome from file - will look for genome with key keyvalue pair
-void ClassicGenome::loadGenome(string fileName, string key, string keyValue) {
+void ByteGenome::loadGenome(string fileName, string key, string keyValue) {
   cout << "In loadGenome\n";
 
   map<string, vector<string>> fileContents;
@@ -64,11 +65,11 @@ void ClassicGenome::loadGenome(string fileName, string key, string keyValue) {
   }
 }
 
-void ClassicGenome::copyGenome(shared_ptr<ClassicGenome> from) {
+void ByteGenome::copyGenome(shared_ptr<ByteGenome> from) {
   sites = from->sites;
 }
 
-void ClassicGenome::applyMutations(double _pointMutationRate, double _insertionRate, double _deletionRate, int _minGenomeSize, int _maxGenomeSize) {
+void ByteGenome::applyMutations(double _pointMutationRate, double _insertionRate, double _deletionRate, int _minGenomeSize, int _maxGenomeSize) {
   if (_pointMutationRate > 0.0) {
     int nucleotides = (int) sites.size();
     int i, s, o, w;
@@ -113,33 +114,33 @@ void ClassicGenome::applyMutations(double _pointMutationRate, double _insertionR
   }
 }
 
-void ClassicGenome::mutate(){
+void ByteGenome::mutate(){
   applyMutations(pointMutationRate, insertionRate, deletionRate, minGenomeSize, maxGenomeSize);
 }
 
-void ClassicGenome::fillRandom(int size) {
+void ByteGenome::fillRandom(int size) {
   sites.resize(size);
   for (size_t i = 0; i < sites.size(); i++) {  // fill al sites with random values 0->255
     sites[i] = (unsigned char) Random::getIndex(256);
     //sites[i] = (unsigned char) 2; // uncomment to test genome with fixed number
   }
-  for (int codon = 42; codon < 50; codon++) {  // place gate start codeons
-    for (int i = 0; i < 4; i++) {
-      int j = Random::getIndex(sites.size() - 2);
-      sites[j] = codon;
-      sites[j + 1] = 256 - codon;
-    }
-  }
+//  for (int codon = 42; codon < 50; codon++) {  // place gate start codeons
+//    for (int i = 0; i < 4; i++) {
+//      int j = Random::getIndex(sites.size() - 2);
+//      sites[j] = codon;
+//      sites[j + 1] = 256 - codon;
+//    }
+//  }
 }
 
-shared_ptr<Genome> ClassicGenome::makeMutatedGenome() {
-  shared_ptr<ClassicGenome> G = make_shared<ClassicGenome>();
+shared_ptr<Genome> ByteGenome::makeMutatedGenome() {
+  shared_ptr<ByteGenome> G = make_shared<ByteGenome>();
   G->sites = sites;
   G->mutate();
   return G;
 }
 
-shared_ptr<Genome> ClassicGenome::makeMutatedGenome(vector<shared_ptr<ClassicGenome>> from) {
+shared_ptr<Genome> ByteGenome::makeMutatedGenome(vector<shared_ptr<ByteGenome>> from) {
   int shortestGenome = from[0]->sites.size();
   for (auto g : from) {
     if ((int) g->sites.size() < shortestGenome) {
@@ -153,22 +154,22 @@ shared_ptr<Genome> ClassicGenome::makeMutatedGenome(vector<shared_ptr<ClassicGen
   }
   cutLocations.push_back(-1);  // add a number at the end to avoid seg fault
   sort(cutLocations.begin(), cutLocations.end());
-  shared_ptr<ClassicGenome> currSource = from[Random::getIndex(from.size())];
+  shared_ptr<ByteGenome> currSource = from[Random::getIndex(from.size())];
   int currCutIndex = 0;
   vector<unsigned char> newSites;
   for (int i = 0; i < (int) currSource->sites.size(); i++) {
     newSites.push_back(currSource->sites[i]);
     if (i == cutLocations[currCutIndex]) {
       currCutIndex++;
-      shared_ptr<ClassicGenome> currSource = from[Random::getIndex(from.size())];
+      shared_ptr<ByteGenome> currSource = from[Random::getIndex(from.size())];
     }
   }
-  shared_ptr<ClassicGenome> G = make_shared<ClassicGenome>();  // make a blank genome  G->sites = sites;
+  shared_ptr<ByteGenome> G = make_shared<ByteGenome>();  // make a blank genome  G->sites = sites;
   G->sites = newSites;
   G->mutate();
   return G;
 }
 
-void ClassicGenome::makePointMutation() {
-  sites[Random::getIndex(sites.size())] = (unsigned char) Random::getIndex(256);
+void ByteGenome::makePointMutation() {
+  sites[Random::getIndex(sites.size())] = (unsigned char) Random::getInt(255);
 }

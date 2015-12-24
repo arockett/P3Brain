@@ -17,7 +17,7 @@
 
 bool FeedbackGate::feedbackON = true;
 
-FeedbackGate::FeedbackGate(shared_ptr<Genome> genome, int genomeIndex) {
+FeedbackGate::FeedbackGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> genomeIndex) {
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // need to move to new Get Address
