@@ -18,7 +18,7 @@
 using namespace std;
 
 class Analyse {
-public:
+ public:
 	static double mutualInformation(vector<int> A, vector<int> B);
 	static double ei(vector<int> A, vector<int> B, int theMask);
 	static double computeAtomicPhi(vector<int> A, int states);

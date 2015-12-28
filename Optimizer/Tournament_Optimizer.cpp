@@ -22,34 +22,34 @@ using namespace std;
  * copy to the next generation and mutate the copy.
  */
 void Tournament::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
-  vector<shared_ptr<Organism>> nextPopulation;
+	vector<shared_ptr<Organism>> nextPopulation;
 
-  vector<double> Scores;
-  for (auto org : population) {
-    Scores.push_back(org->score);
-  }
+	vector<double> Scores;
+	for (auto org : population) {
+		Scores.push_back(org->score);
+	}
 
-  int best = findGreatestInVector(Scores);
-  maxFitness = Scores[best];
+	int best = findGreatestInVector(Scores);
+	maxFitness = Scores[best];
 
-  while (nextPopulation.size() < population.size()) {
-    int winner, challanger;
-    if ((int) nextPopulation.size() < BaseOptimizer::elitism) {
-      winner = best;
-    } else {
-      winner = Random::getIndex(population.size());
-      for (int i = 0; i < BaseOptimizer::tournamentSize - 1; i++) {
-        challanger = Random::getIndex(population.size());
-        if (Scores[challanger] > Scores[winner]) {
-          winner = challanger;
-        }
-      }
-    }
-    nextPopulation.push_back(population[winner]->makeMutatedOffspring(population[winner]));
-  }
-  for (size_t i = 0; i < population.size(); i++) {
-    population[i]->kill();  // set org.alive = 0 and delete the organism if it has no offspring
-  }
-  population = nextPopulation;
+	while (nextPopulation.size() < population.size()) {
+		int winner, challanger;
+		if ((int) nextPopulation.size() < BaseOptimizer::elitism) {
+			winner = best;
+		} else {
+			winner = Random::getIndex(population.size());
+			for (int i = 0; i < BaseOptimizer::tournamentSize - 1; i++) {
+				challanger = Random::getIndex(population.size());
+				if (Scores[challanger] > Scores[winner]) {
+					winner = challanger;
+				}
+			}
+		}
+		nextPopulation.push_back(population[winner]->makeMutatedOffspring(population[winner]));
+	}
+	for (size_t i = 0; i < population.size(); i++) {
+		population[i]->kill();  // set org.alive = 0 and delete the organism if it has no offspring
+	}
+	population = nextPopulation;
 
 }

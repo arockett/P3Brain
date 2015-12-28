@@ -25,14 +25,14 @@ int& BaseOptimizer::tournamentSize = Parameters::register_parameter("tournamentS
  * no selection and no mutation
  */
 void BaseOptimizer::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
-  vector<shared_ptr<Organism>> nextPopulation;
+	vector<shared_ptr<Organism>> nextPopulation;
 
-  for (size_t i = 0; i < population.size(); i++) {
-    shared_ptr<Organism> newOrg = make_shared<Organism>(population[i], population[i]->genome);
-    nextPopulation.push_back(newOrg);
-  }
-  for (size_t i = 0; i < population.size(); i++) {
-    population[i]->kill();  // set org.alive = 0 and delete the organism if it has no offspring
-  }
-  population = nextPopulation;
+	for (size_t i = 0; i < population.size(); i++) {
+		shared_ptr<Organism> newOrg = make_shared<Organism>(population[i], population[i]->genome);
+		nextPopulation.push_back(newOrg);
+	}
+	for (size_t i = 0; i < population.size(); i++) {
+		population[i]->kill();  // set org.alive = 0 and delete the organism if it has no offspring
+	}
+	population = nextPopulation;
 }

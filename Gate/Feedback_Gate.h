@@ -15,23 +15,23 @@ using namespace std;
 
 class FeedbackGate : public Gate {
  private:
-  vector<vector<double>> table;
-  vector<vector<double>> originalTable;
-  unsigned char posFBNode, negFBNode;
-  unsigned char nrPos, nrNeg;
-  vector<double> posLevelOfFB, negLevelOfFB;
-  deque<unsigned char> chosenInPos, chosenInNeg, chosenOutPos, chosenOutNeg;
+	vector<vector<double>> table;
+	vector<vector<double>> originalTable;
+	unsigned char posFBNode, negFBNode;
+	unsigned char nrPos, nrNeg;
+	vector<double> posLevelOfFB, negLevelOfFB;
+	deque<unsigned char> chosenInPos, chosenInNeg, chosenOutPos, chosenOutNeg;
  public:
 
-  static bool feedbackON;
-  FeedbackGate() = delete;
-  FeedbackGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> index);
-  virtual ~FeedbackGate() = default;
-  virtual void update(vector<double> & states, vector<double> & nextStates);
-  virtual string description();
-  virtual void applyNodeMap(vector<int> nodeMap, int maxNodes);
-  virtual void resetGate(void);
-  virtual vector<int> getIns();
+	static bool feedbackON;
+	FeedbackGate() = delete;
+	FeedbackGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> index, int gateID);
+	virtual ~FeedbackGate() = default;
+	virtual void update(vector<double> & states, vector<double> & nextStates);
+	virtual string description();
+	virtual void applyNodeMap(vector<int> nodeMap, int maxNodes);
+	virtual void resetGate(void);
+	virtual vector<int> getIns();
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Feedback_Gate__) */

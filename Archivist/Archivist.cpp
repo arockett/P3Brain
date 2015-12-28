@@ -10,56 +10,56 @@ string& Archivist::Arch_DominantFileName = Parameters::register_parameter("domin
 string& Archivist::Arch_DefaultAveFileColumnNames = Parameters::register_parameter("aveFileColumns", (string) "[update,score,genomeSize,gates]", "data to be saved into average file (must be values that can generate an average)", "ARCHIVIST");
 
 Archivist::Archivist() {
-  realtimeFilesInterval = Arch_realtimeFilesInterval;
-  writeAveFile = Arch_writeAveFile;
-  writeDominantFile = Arch_writeDominantFile;
-  AveFileName = Arch_AveFileName;
-  DominantFileName = Arch_DominantFileName;
-  convertCSVListToVector(Arch_DefaultAveFileColumnNames, DefaultAveFileColumns);
-  finished = false;
+	realtimeFilesInterval = Arch_realtimeFilesInterval;
+	writeAveFile = Arch_writeAveFile;
+	writeDominantFile = Arch_writeDominantFile;
+	AveFileName = Arch_AveFileName;
+	DominantFileName = Arch_DominantFileName;
+	convertCSVListToVector(Arch_DefaultAveFileColumnNames, DefaultAveFileColumns);
+	finished = false;
 }
 
 //save dominant and average file data
 void Archivist::writeRealTimeFiles(vector<shared_ptr<Organism>> &population) {
-  // write out Average data
-  if (writeAveFile) {
-    double aveValue, temp;
-    DataMap AveMap;
-    for (auto key : DefaultAveFileColumns) {
-      aveValue = 0;
-      for (auto org : population) {
-        stringstream ss(org->dataMap.Get(key));
-        ss >> temp;
-        aveValue += temp;
-      }
-      aveValue /= population.size();
-      AveMap.Set(key, aveValue);
-    }
-    AveMap.writeToFile(AveFileName, DefaultAveFileColumns);
-  }
-  // write out Dominant data
-  if (writeDominantFile) {
-    vector<double> Scores;
-    for (auto org : population) {
-      Scores.push_back(org->score);
-    }
+	// write out Average data
+	if (writeAveFile) {
+		double aveValue, temp;
+		DataMap AveMap;
+		for (auto key : DefaultAveFileColumns) {
+			aveValue = 0;
+			for (auto org : population) {
+				stringstream ss(org->dataMap.Get(key));
+				ss >> temp;
+				aveValue += temp;
+			}
+			aveValue /= population.size();
+			AveMap.Set(key, aveValue);
+		}
+		AveMap.writeToFile(AveFileName, DefaultAveFileColumns);
+	}
+	// write out Dominant data
+	if (writeDominantFile) {
+		vector<double> Scores;
+		for (auto org : population) {
+			Scores.push_back(org->score);
+		}
 
-    int best = findGreatestInVector(Scores);
-    population[best]->dataMap.writeToFile(DominantFileName);
-  }
+		int best = findGreatestInVector(Scores);
+		population[best]->dataMap.writeToFile(DominantFileName);
+	}
 }
 
 // save data and manage in memory data
 // return true if next save will be > updates + terminate after
 bool Archivist::archive(vector<shared_ptr<Organism>> population, int flush) {
-  if (flush != 1) {
-    if ((Global::update % realtimeFilesInterval == 0) && (flush == 0)) {  // do not write files on flush - these organisms have not been evaluated!
-      writeRealTimeFiles(population);  // write to dominant and average files
-    }
-    for (auto org : population) {  // we don't need to worry about tracking parents or lineage, so we clear out this data every generation.
-      org->clearHistory();
-    }
-  }
-  // if we are at the end of the run
-  return (Global::update >= Global::updates);
+	if (flush != 1) {
+		if ((Global::update % realtimeFilesInterval == 0) && (flush == 0)) {  // do not write files on flush - these organisms have not been evaluated!
+			writeRealTimeFiles(population);  // write to dominant and average files
+		}
+		for (auto org : population) {  // we don't need to worry about tracking parents or lineage, so we clear out this data every generation.
+			org->clearHistory();
+		}
+	}
+	// if we are at the end of the run
+	return (Global::update >= Global::updates);
 }

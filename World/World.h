@@ -20,16 +20,16 @@ using namespace std;
 
 class World {
  public:
-  static int& repeats;
+	static int& repeats;
 
  public:
-  World();
-  virtual ~World();
-  virtual void evaluateFitness(vector<shared_ptr<Organism>> population, bool analyse);
-  virtual double testIndividual(shared_ptr<Organism> org, bool analyse);
-  virtual double testIndividual(shared_ptr<Organism> org, bool analyse, bool show){
-    return testIndividual(org, analyse);
-  }
+	World();
+	virtual ~World();
+	virtual void evaluateFitness(vector<shared_ptr<Organism>> population, bool analyse);
+	virtual double testIndividual(shared_ptr<Organism> org, bool analyse);
+	virtual double testIndividual(shared_ptr<Organism> org, bool analyse, bool show) {
+		return testIndividual(org, analyse);
+	}
 
 };
 

@@ -22,14 +22,14 @@ using namespace std;
 
 class BaseOptimizer {
  public:
-  static int& elitism;
-  static int& tournamentSize;
+	static int& elitism;
+	static int& tournamentSize;
 
  public:
-  double maxFitness;
-  BaseOptimizer() = default;
-  virtual ~BaseOptimizer() = default;
-  virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
+	double maxFitness;
+	BaseOptimizer() = default;
+	virtual ~BaseOptimizer() = default;
+	virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Optimizer__) */

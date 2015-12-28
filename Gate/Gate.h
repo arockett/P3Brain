@@ -25,26 +25,29 @@ using namespace std;
 
 class Gate {  // abstact class. Assumes that a standard genome is being used.
  public:
+	int ID;
 
-  static void AddGate(int ID, function<shared_ptr<Gate>(shared_ptr<Genome>, int)> theFunction);
-  static void setupGates();
-  static function<shared_ptr<Gate>(shared_ptr<Genome>, int)> makeGate[256];
+	static void AddGate(int ID, function<shared_ptr<Gate>(shared_ptr<Genome>, int)> theFunction);
+	static void setupGates();
+	static function<shared_ptr<Gate>(shared_ptr<Genome>, int)> makeGate[256];
 
-  Gate()=default;
-  virtual ~Gate()=default;
+	Gate() {
+		ID = 0;
+	}
+	virtual ~Gate() = default;
 
-  vector<int> inputs;
-  vector<int> outputs;
+	vector<int> inputs;
+	vector<int> outputs;
 
-  //map<int, int> codingRegions;  //indicates coding regions. maps genome index to usage of nucleotide in gate. 0=start codon. 1=wiring(defines # of inputs and outputs and what they are). 2=gate specific information
+	//map<int, int> codingRegions;  //indicates coding regions. maps genome index to usage of nucleotide in gate. 0=start codon. 1=wiring(defines # of inputs and outputs and what they are). 2=gate specific information
 
-  // functions used in genome translation
-  //void movePastStartCodeon(int& genomeIndex, shared_ptr<Genome> genome);  // simply addvances genomeIndex by the size of a start codeon (2)
-  int getIOAddress(shared_ptr<Genome::Index> genomeIndex, shared_ptr<Genome> genome);  // extracts one brain state value address from a genome
-  void getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, shared_ptr<Genome::Index> genome_index, shared_ptr<Genome> genome, int codeNumber);  // extracts many brain state value addresses from a genome
-  void getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, shared_ptr<Genome::Index> genomeIndex, shared_ptr<Genome> genome);  // extracts the input and output brain state value addresses for this gate
+	// functions used in genome translation
+	//void movePastStartCodeon(int& genomeIndex, shared_ptr<Genome> genome);  // simply addvances genomeIndex by the size of a start codeon (2)
+	int getIOAddress(shared_ptr<Genome::Index> genomeIndex, shared_ptr<Genome> genome, int gateID);  // extracts one brain state value address from a genome
+	void getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, shared_ptr<Genome::Index> genome_index, shared_ptr<Genome> genome, int code, int gateID);  // extracts many brain state value addresses from a genome
+	void getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, shared_ptr<Genome::Index> genomeIndex, shared_ptr<Genome> genome, int gateID);  // extracts the input and output brain state value addresses for this gate
 
-  int getIndexFromInputs(vector<double> &brainState);  // used during update to convert gate input into table indexes
+	int getIndexFromInputs(vector<double> &brainState);  // used during update to convert gate input into table indexes
 
 //  /*
 //   * build a table of size range[0],range[1] which is the upper left subset of a table rangeMax[0],rangeMax[1]
@@ -76,77 +79,76 @@ class Gate {  // abstact class. Assumes that a standard genome is being used.
 //    genome->advanceIndex(genomeIndex, (maxY - Y) * maxX);  // advance genomeIndex to account for extra rows in the max sized table
 //  }
 
-  virtual void applyNodeMap(vector<int> nodeMap, int maxNodes);  // converts genome values into brain state value addresses
-  virtual void resetGate(void);  // this is empty here. Some gates so not need to reset, they can use this method.
-  virtual vector<int> getIns();  // returns a vector of int with the adress for this gates input brain state value addresses
-  virtual vector<int> getOuts();  // returns a vector of int with the adress for this gates onput brain state value addresses
-  //virtual string getCodingRegions();  // return a string with the codingRegions
+	virtual void applyNodeMap(vector<int> nodeMap, int maxNodes);  // converts genome values into brain state value addresses
+	virtual void resetGate(void);  // this is empty here. Some gates so not need to reset, they can use this method.
+	virtual vector<int> getIns();  // returns a vector of int with the adress for this gates input brain state value addresses
+	virtual vector<int> getOuts();  // returns a vector of int with the adress for this gates onput brain state value addresses
+	//virtual string getCodingRegions();  // return a string with the codingRegions
 
-  // functions which must be provided with each gate
-  virtual void update(vector<double> & states, vector<double> & nextStates) = 0;  // the function is empty, and must be provided in any derived gates
-  virtual string description() = 0;  // returns a description of the gate. This method can be used in derived gates description method to return ins and outs and coding regions
+	// functions which must be provided with each gate
+	virtual void update(vector<double> & states, vector<double> & nextStates) = 0;  // the function is empty, and must be provided in any derived gates
+	virtual string description() = 0;  // returns a description of the gate. This method can be used in derived gates description method to return ins and outs and coding regions
 
 };
 
 class ProbabilisticGate : public Gate {  //conventional probabilistic gate
  public:
 
-  vector<vector<double>> table;
+	vector<vector<double>> table;
 
-  ProbabilisticGate() = delete;
-  ProbabilisticGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> index);
+	ProbabilisticGate() = delete;
+	ProbabilisticGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> index, int gateID);
 
-  virtual ~ProbabilisticGate() = default;
+	virtual ~ProbabilisticGate() = default;
 
-  virtual void update(vector<double> & states, vector<double> & nextStates);
+	virtual void update(vector<double> & states, vector<double> & nextStates);
 
-  virtual string description();
+	virtual string description();
 
 };
 
 class DeterministicGate : public Gate {
  public:
-  vector<vector<int>> table;
+	vector<vector<int>> table;
 
-  DeterministicGate() = delete;
-  DeterministicGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> index);
-  virtual ~DeterministicGate() = default;
-  virtual void update(vector<double> & states, vector<double> & nextStates);
+	DeterministicGate() = delete;
+	DeterministicGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> index, int gateID);
+	virtual ~DeterministicGate() = default;
+	virtual void update(vector<double> & states, vector<double> & nextStates);
 
-  void setupForBits(int* Ins, int nrOfIns, int Out, int logic);
+	void setupForBits(int* Ins, int nrOfIns, int Out, int logic);
 
-  virtual string description();
+	virtual string description();
 
-  //double voidOutput;
+	//double voidOutput;
 };
-
 
 class FixedEpsilonGate : public DeterministicGate {
  private:
  public:
-  static double& FixedEpsilonGate_Probability;
+	static double& FixedEpsilonGate_Probability;
 
-  vector<int> defaultOutput;
-  double epsilon;
-  FixedEpsilonGate() = delete;
-  FixedEpsilonGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> index);
-  virtual ~FixedEpsilonGate() = default;
-  virtual void update(vector<double> & states, vector<double> & nextStates);
-  virtual string description();
+	vector<int> defaultOutput;
+	double epsilon;
+	FixedEpsilonGate() = delete;
+	FixedEpsilonGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> index, int gateID);
+	virtual ~FixedEpsilonGate() = default;
+	virtual void update(vector<double> & states, vector<double> & nextStates);
+	virtual string description();
 };
 
 class VoidGate : public DeterministicGate {
-  static double& voidGate_Probability;
+	static double& voidGate_Probability;
 
  private:
  public:
-  vector<int> defaultOutput;
-  double epsilon;
-  VoidGate() = delete;
-  VoidGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> index);
-  virtual ~VoidGate() = default;
-  virtual void update(vector<double> & states, vector<double> & nextStates);
-  virtual string description();
+	vector<int> defaultOutput;
+	double epsilon;
+	VoidGate() = delete;
+	VoidGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> index, int gateID);
+	virtual ~VoidGate() = default;
+	virtual void update(vector<double> & states, vector<double> & nextStates);
+	virtual string description();
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Gate__) */

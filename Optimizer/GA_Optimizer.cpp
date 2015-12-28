@@ -24,36 +24,36 @@ using namespace std;
  * which is good enough.
  */
 void GA::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
-  vector<shared_ptr<Organism>> nextPopulation;
+	vector<shared_ptr<Organism>> nextPopulation;
 
-  vector<double> Scores;
-  for (auto org : population) {
-    Scores.push_back(org->score);
-  }
+	vector<double> Scores;
+	for (auto org : population) {
+		Scores.push_back(org->score);
+	}
 
-  int best = findGreatestInVector(Scores);
-  maxFitness = Scores[best];
+	int best = findGreatestInVector(Scores);
+	maxFitness = Scores[best];
 
-  //now to roulette wheel selection:
-  while (nextPopulation.size() < population.size()) {
-    int who;
-    if ((int) nextPopulation.size() < BaseOptimizer::elitism) {
-      who = best;
-    } else {
-      if (maxFitness > 0.0) {  // if anyone has fitness > 0
-        do {
-          who = Random::getIndex(population.size());  //keep choosing a random genome from population until we get one that's good enough
-        } while (pow(1.05, Random::getDouble(1)) > pow(1.05, (Scores[who] / maxFitness)));
-      } else {
-        who = Random::getIndex(population.size());  // otherwise, just pick a random genome from population
-      }
-    }
-    nextPopulation.push_back(population[who]->makeMutatedOffspring(population[who]));
+	//now to roulette wheel selection:
+	while (nextPopulation.size() < population.size()) {
+		int who;
+		if ((int) nextPopulation.size() < BaseOptimizer::elitism) {
+			who = best;
+		} else {
+			if (maxFitness > 0.0) {  // if anyone has fitness > 0
+				do {
+					who = Random::getIndex(population.size());  //keep choosing a random genome from population until we get one that's good enough
+				} while (pow(1.05, Random::getDouble(1)) > pow(1.05, (Scores[who] / maxFitness)));
+			} else {
+				who = Random::getIndex(population.size());  // otherwise, just pick a random genome from population
+			}
+		}
+		nextPopulation.push_back(population[who]->makeMutatedOffspring(population[who]));
 
-  }
-  for (size_t i = 0; i < population.size(); i++) {
-    population[i]->kill();  // set org.alive = 0 and delete the organism if it has no offspring
-  }
-  population = nextPopulation;
+	}
+	for (size_t i = 0; i < population.size(); i++) {
+		population[i]->kill();  // set org.alive = 0 and delete the organism if it has no offspring
+	}
+	population = nextPopulation;
 }
 
