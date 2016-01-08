@@ -12,6 +12,8 @@
 #include <stdlib.h>
 #include <vector>
 
+#include "Chromosome.h"
+
 #include "../Utilities/Utilities.h"
 #include "../Utilities/Data.h"
 #include "../Utilities/Parameters.h"
@@ -80,7 +82,7 @@ class Genome {
 			site = Random::getInt(safe[0], genomeSize - safe[1] - 1);
 		}
 
-		virtual void copy(shared_ptr<Index> to) {
+		virtual void copyTo(shared_ptr<Index> to) {
 			to->site = site;
 			to->genomeSize = genomeSize;
 			to->eog = eog;
@@ -140,6 +142,9 @@ class Genome {
 // randomize this genomes contents
 // the undefined action is to take no action
 	virtual void fillRandom() {
+	}
+
+	virtual void fillRandom(int sites) {
 	}
 
 // assign a value at a given location

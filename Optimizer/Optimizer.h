@@ -27,7 +27,9 @@ class BaseOptimizer {
 
  public:
 	double maxFitness;
-	BaseOptimizer() = default;
+	BaseOptimizer() {
+		maxFitness = 0;
+	}
 	virtual ~BaseOptimizer() = default;
 	virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
 };

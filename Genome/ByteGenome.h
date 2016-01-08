@@ -32,8 +32,8 @@ class ByteGenome : public Genome {
 	virtual ~ByteGenome() = default;
 
 	virtual void fillRandom(int size = ByteGenome::initialGenomeSize);
-	virtual inline void assignValue(int loc, int value) {
-		sites[loc % (int) sites.size()] = value;
+	virtual inline void assignValue(Index index, int value) {
+		//sites[index.current[0]] = value;
 	}
 
 	// copy functions

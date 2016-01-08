@@ -44,15 +44,15 @@ class Classic_GateListBuilder : public Base_GateListBuilder {
 		if (genome->getSize() == 0) {
 			translation_Complete = true;
 		}
-		shared_ptr<Genome::Index> genomeIndex = genome->getIndex();
 
+		shared_ptr<Genome::Index> genomeIndex = genome->getIndex();
 		shared_ptr<Genome::Index> saveIndex = genome->getIndex();
 		shared_ptr<Genome::Index> testIndex = genome->getIndex();
 		int gateCount = 0;
 		while (!translation_Complete) {  // while there are sites in the genome
-			genomeIndex->copy(testIndex);  // get to values from genome to test for start codns
+			genomeIndex->copyTo(testIndex);  // get to values from genome to test for start codns
 			const int testSite1Value = genome->extractValue(testIndex, { 0, 255 });  // extract first 1/2 of startcodon
-			testIndex->copy(saveIndex);  // save this index, this is where we pick up when we come back from building a gate.
+			testIndex->copyTo(saveIndex);  // save this index, this is where we pick up when we come back from building a gate.
 			const int testSite2Value = genome->extractValue(testIndex, { 0, 255 });  // extract second 1/2 of startcodon
 			if (saveIndex->eog) {  // if genomeIndex > testIndex, testIndex has wrapped and we are done translating
 				translation_Complete = true;
@@ -64,7 +64,7 @@ class Classic_GateListBuilder : public Base_GateListBuilder {
 					gateCount++;
 				}
 			}
-			saveIndex->copy(genomeIndex);
+			saveIndex->copyTo(genomeIndex);
 		}
 		return gates;
 	}

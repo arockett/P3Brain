@@ -45,6 +45,49 @@ using namespace std;
 
 int main(int argc, const char * argv[]) {
 
+	Chromosome<int> cINT(8);			// chromosome of int with value 0 to 7
+	Chromosome<bool> cBOOL;				// chromosome of bool (default 0 and 1)
+	Chromosome<unsigned char> cCHAR;	// chromosome of char (default 0 to 255)
+	Chromosome<double> cDOUBLE(10);		// chromosome of double with values [0,10)
+
+	cINT.fillRandom(5);
+	cBOOL.fillRandom(6);
+	cCHAR.fillRandom(5);
+	cDOUBLE.fillRandom(5);
+
+	cout << cINT.chromosomeToStr();
+	cout << cBOOL.chromosomeToStr();
+	cout << cCHAR.chromosomeToStr();
+	cout << cDOUBLE.chromosomeToStr();
+
+	int index = 0;
+	cout << cINT.siteToDouble(index, 1,5,1,0) << "\n";
+	 index = 0;
+	cout << cBOOL.siteToDouble(index, 1,5,1,0) << "\n";
+	cout << cBOOL.siteToDouble(index, 1,5,1,0) << "\n";
+	cout << cBOOL.siteToDouble(index, 1,5,1,0) << "\n";
+	 index = 0;
+	cout << cCHAR.siteToDouble(index, 1,4,1,0) << "\n";
+	 index = 0;
+	cout << cDOUBLE.siteToDouble(index, 1,4,1,0) << "\n";
+	cout << cDOUBLE.siteToDouble(index, 1,4,1,0) << "\n";
+	cout << cDOUBLE.siteToDouble(index, 1,4,1,0) << "\n";
+	cout << cDOUBLE.siteToDouble(index, 1,4,1,0) << "\n";
+	cout << cDOUBLE.siteToDouble(index, 1,4,1,0) << "\n";
+
+	cout << "\n\n\n";
+	index = 0;
+	int x = cINT.readInt(index, 1,5,1,0);
+	 x = cINT.readInt(index, 1,5,2,0);
+	 x = cINT.readInt(index, 1,5,3,0);
+	 x = cINT.readInt(index, 1,5,1,1);
+	 x = cINT.readInt(index, 1,5,2,4);
+
+	cout << cINT.codingRegions.codingRegionsToString() << "\n";
+
+	cout << x << "\n";
+	exit(0);
+
 	Parameters::initialize_parameters(argc, argv);  // loads command line and configFile values into registered parameters
 	                                                // also writes out a config file if requested
 

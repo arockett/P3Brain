@@ -12,6 +12,7 @@
 #include "../Utilities/Random.h"
 #include "../Utilities/Utilities.h"
 
+
 vector<vector<int>> Genome::extractTable(shared_ptr<Index> index, vector<int> tableSize, vector<int> tableMaxSize, vector<int> valueRange, int code, int gateID) {
 	vector<vector<int>> table;
 	int x = 0;
