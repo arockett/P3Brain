@@ -8,11 +8,11 @@
 
 // A single run of optimization
 Record single_run(generator& rand, Configuration& config,
-                  evaluation::pointer problem, optimize::pointer solver,
+                  evaluation::pointer world, optimize::pointer solver,
                   int run) {
   size_t limit = config.get<int>("eval_limit");
   // Middle Layer's sit between the problem and the solver, tracking optimization
-  shared_ptr<Middle_Layer> recorder(new Middle_Layer(config, problem(config, run)));
+  shared_ptr<Middle_Layer> recorder(new Middle_Layer(config, make_shared<MarkovWorld>(config, run)));
 
   // Start the clock before any evaluations can be performed
   recorder->results.start_clock();
