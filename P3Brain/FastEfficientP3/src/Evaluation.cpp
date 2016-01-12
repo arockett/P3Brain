@@ -5,7 +5,7 @@
 
 #include "Evaluation.h"
 #include "Tools.h"
-#include "BitAgent.h"
+#include "BitBrain.h"
 
 using namespace std;
 
@@ -17,29 +17,30 @@ evaluation::pointer Configuration::get(const string key) {
 }
 
 /*
-* Make sure you set trainingGround to an instance of the World you
-* want to evaluate your BitAgents in.
+* For this integration of P3 with Markov Brains, a MarkovWorld is the only
+* evaluator that is possible and the specific world to test in is a 
+* configurable option.
 */
 MarkovWorld::MarkovWorld( Configuration& config, int run_number )
 {
-    trainingGround = config.get<evaluation::pointer>("World")();
+    trainingGround = config.get<evaluation::pointer>("world")();
 
     string type = config.get<string>( "decoder" );
     if( type == "Unstructured" )
     {
-        decoderType = BitAgent::Unstructured;
+        decoderType = BitBrain::Unstructured;
     }
     else if( type == "FixedInput" )
     {
-        decoderType = BitAgent::FixedInput;
+        decoderType = BitBrain::FixedInput;
     }
     else if( type == "FixedLogic" )
     {
-        decoderType = BitAgent::FixedLogic;
+        decoderType = BitBrain::FixedLogic;
     }
     else if( type == "Hypercube" )
     {
-        decoderType = BitAgent::Hypercube;
+        decoderType = BitBrain::Hypercube;
     }
     else
     {
@@ -57,13 +58,13 @@ MarkovWorld::MarkovWorld( Configuration& config, int run_number )
 float MarkovWorld::evaluate(const vector<bool>& solution)
 {
     auto org = make_shared<Organism>();
-    if( decoderType != BitAgent::Unstructured )
+    if( decoderType != BitBrain::Unstructured )
     {
-      org->brain = make_shared<BitAgent>(solution, 11, 2, decoderType);
+      org->brain = make_shared<BitBrain>(solution, 11, 2, decoderType);
     }
     else
     {
-      org->brain = make_shared<BitAgent>(solution, 11, 10, 3, 2);
+      org->brain = make_shared<BitBrain>(solution, 11, 10, 3, 2);
     }
     return (float)trainingGround->testIndividual(org, false);
 }
