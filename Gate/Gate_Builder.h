@@ -9,22 +9,21 @@
 class Gate_Builder {  // manages what kinds of gates can be built
  public:
 
-  static bool& usingProbGate;
-  static bool& usingDetGate;
-  static bool& usingEpsiGate;
-  static bool& usingVoidGate;
+	static bool& usingProbGate;
+	static bool& usingDetGate;
+	static bool& usingEpsiGate;
+	static bool& usingVoidGate;
 
-  static bool& usingFBGate;
-  static bool& usingGPGate;
-  static bool& usingThGate;
+	static bool& usingFBGate;
+	static bool& usingGPGate;
+	static bool& usingThGate;
 
+	static void AddGate(int ID, function<shared_ptr<Gate>(shared_ptr<Genome>, shared_ptr<Genome::Index>, int gateID)> theFunction);
+	static void setupGates();
+	static function<shared_ptr<Gate>(shared_ptr<Genome>, shared_ptr<Genome::Index>, int gateID)> makeGate[256];
 
-  static void AddGate(int ID, function<shared_ptr<Gate>(shared_ptr<Genome>, int)> theFunction);
-  static void setupGates();
-  static function<shared_ptr<Gate>(shared_ptr<Genome>, int)> makeGate[256];
-
-  Gate_Builder() = delete;
-  ~Gate_Builder();
+	Gate_Builder() = delete;
+	~Gate_Builder();
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Gate_Builder__) */

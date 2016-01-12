@@ -15,16 +15,16 @@
 
 class Group {
  public:
-  vector<shared_ptr<Organism>> population;
-  shared_ptr<Default_Archivist> archivist;
-  shared_ptr<Optimizer> optimizer;
+	vector<shared_ptr<Organism>> population;
+	shared_ptr<Archivist> archivist;
+	shared_ptr<BaseOptimizer> optimizer;
 
-  Group();
-  Group(vector<shared_ptr<Organism>> _population, shared_ptr<Optimizer> _optimizer, shared_ptr<Default_Archivist> _archivist);
-  ~Group();
+	Group();
+	Group(vector<shared_ptr<Organism>> _population, shared_ptr<BaseOptimizer> _optimizer, shared_ptr<Archivist> _archivist);
+	~Group();
 
-  bool archive(int flush = 0);
-  void optimize();
+	bool archive(int flush = 0);
+	void optimize();
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Group__) */

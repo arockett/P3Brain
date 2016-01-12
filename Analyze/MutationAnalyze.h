@@ -16,7 +16,6 @@
 #include <stdlib.h>
 #include <vector>
 
-#include "../Brain/Brain.h"
 #include "../Genome/Genome.h"
 #include "../World/World.h"
 #include "../World/BerryWorld.h"
@@ -25,6 +24,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include "../Brain/ClassicBrain.h"
 
 using namespace std;
 //class MutationAnalyse {
