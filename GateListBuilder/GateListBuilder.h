@@ -45,9 +45,9 @@ class Classic_GateListBuilder : public Base_GateListBuilder {
 			translation_Complete = true;
 		}
 
-		shared_ptr<Genome::Index> genomeIndex = genome->getIndex();
-		shared_ptr<Genome::Index> saveIndex = genome->getIndex();
-		shared_ptr<Genome::Index> testIndex = genome->getIndex();
+		shared_ptr<AbstractGenomeHandler> genomeIndex = genome->newHandler(genome);
+		shared_ptr<AbstractGenomeHandler> saveIndex = genome->newHandler(genome);
+		shared_ptr<AbstractGenomeHandler> testIndex = genome->newHandler(genome);
 		int gateCount = 0;
 		while (!translation_Complete) {  // while there are sites in the genome
 			genomeIndex->copyTo(testIndex);  // get to values from genome to test for start codns
@@ -58,8 +58,8 @@ class Classic_GateListBuilder : public Base_GateListBuilder {
 				translation_Complete = true;
 			} else if (testSite1Value + testSite2Value == 255) {  // if we found a start codon
 				if (Gate_Builder::makeGate[testSite1Value] != nullptr) {  // and that start codon codes to an in use gate class
-					genome->extractValue(genomeIndex, { 0, 255 }, Genome::CodingRegion::START_CODE, gateCount);  // mark start codon in genomes coding region
-					genome->extractValue(genomeIndex, { 0, 255 }, Genome::CodingRegion::START_CODE, gateCount);  // mark start codon in genomes coding region
+					genome->extractValue(genomeIndex, { 0, 255 }, Gate::START_CODE, gateCount);  // mark start codon in genomes coding region
+					genome->extractValue(genomeIndex, { 0, 255 }, Gate::START_CODE, gateCount);  // mark start codon in genomes coding region
 					gates.push_back(Gate_Builder::makeGate[testSite1Value](genome, genomeIndex, gateCount));  // make a gate of the type associated with the value in testSite1Value
 					gateCount++;
 				}

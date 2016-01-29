@@ -27,6 +27,13 @@ class Gate {  // abstact class. Assumes that a standard genome is being used.
  public:
 	int ID;
 
+	static const int START_CODE = 0;
+	static const int IN_COUNT_CODE = 10;
+	static const int IN_ADDRESS_CODE = 11;
+	static const int OUT_COUNT_CODE = 20;
+	static const int OUT_ADDRESS_CODE = 21;
+	static const int DATA_CODE = 30;
+
 	static void AddGate(int ID, function<shared_ptr<Gate>(shared_ptr<Genome>, int)> theFunction);
 	static void setupGates();
 	static function<shared_ptr<Gate>(shared_ptr<Genome>, int)> makeGate[256];

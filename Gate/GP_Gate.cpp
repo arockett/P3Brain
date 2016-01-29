@@ -32,7 +32,7 @@ GPGate::GPGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> genomeIndex,
 	getInputsAndOutputs( { 1, 4 }, { 1, 4 }, genomeIndex, genome, gateID);  // (insRange, outsRange,currentIndexInGenome,genome,codingRegions)
 	numOutputs = outputs.size();
 
-	myGateType = genome->extractValue(genomeIndex, { 0, 8 }, Genome::CodingRegion::DATA_CODE, gateID);  //genome->sites[(genomeIndex++) % genome->sites.size()] % 8;
+	myGateType = genome->extractValue(genomeIndex, { 0, 8 }, Gate::DATA_CODE, gateID);  //genome->sites[(genomeIndex++) % genome->sites.size()] % 8;
 	myValues.clear();
 	for (i = 0; i < numOutputs; i++) {
 		intToFloatBitByBit V;
@@ -43,7 +43,7 @@ GPGate::GPGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> genomeIndex,
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		        // was : V.I = (V.I << (int) 8) + (int) genome->sites[(genomeIndex++) % genome->sites.size()];
-			V.I = (V.I << (int) 8) + genome->extractValue(genomeIndex, { 0, 8 }, Genome::CodingRegion::DATA_CODE, gateID);
+			V.I = (V.I << (int) 8) + genome->extractValue(genomeIndex, { 0, 8 }, Gate::DATA_CODE, gateID);
 		}
 		myValues.push_back(V.F);
 	}

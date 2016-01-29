@@ -30,8 +30,8 @@ FeedbackGate::FeedbackGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> 
 	int _xDim, _yDim;
 
 	//get the dimensions of the table
-	_xDim = genome->extractValue(genomeIndex, { 1, 4 }, Genome::CodingRegion::IN_COUNT_CODE, gateID);
-	_yDim = genome->extractValue(genomeIndex, { 1, 4 }, Genome::CodingRegion::OUT_COUNT_CODE, gateID);
+	_xDim = genome->extractValue(genomeIndex, { 1, 4 }, Gate::IN_COUNT_CODE, gateID);
+	_yDim = genome->extractValue(genomeIndex, { 1, 4 }, Gate::OUT_COUNT_CODE, gateID);
 
 	//get the dimensions of the feedback buffer
 	//was :
@@ -39,10 +39,10 @@ FeedbackGate::FeedbackGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> 
 	//negFBNode = genome->sites[(k++) % genome->sites.size()];
 	//nrPos = genome->sites[(k++) % genome->sites.size()] & 3;
 	//nrNeg = genome->sites[(k++) % genome->sites.size()] & 3;
-	posFBNode = genome->extractValue(genomeIndex, { 0, 255 }, Genome::CodingRegion::DATA_CODE, gateID);
-	negFBNode = genome->extractValue(genomeIndex, { 0, 255 }, Genome::CodingRegion::DATA_CODE, gateID);
-	nrPos = genome->extractValue(genomeIndex, { 0, 3 }, Genome::CodingRegion::DATA_CODE, gateID);
-	nrNeg = genome->extractValue(genomeIndex, { 0, 3 }, Genome::CodingRegion::DATA_CODE, gateID);
+	posFBNode = genome->extractValue(genomeIndex, { 0, 255 }, Gate::DATA_CODE, gateID);
+	negFBNode = genome->extractValue(genomeIndex, { 0, 255 }, Gate::DATA_CODE, gateID);
+	nrPos = genome->extractValue(genomeIndex, { 0, 3 }, Gate::DATA_CODE, gateID);
+	nrNeg = genome->extractValue(genomeIndex, { 0, 3 }, Gate::DATA_CODE, gateID);
 
 	//prepare the containers for the inputsand outputs addresses
 	inputs.resize(_yDim);
@@ -55,13 +55,13 @@ FeedbackGate::FeedbackGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> 
 	//get the Ioutputs addresses
 
 	for (i = 0; i < _yDim; i++) {
-		inputs[i] = genome->extractValue(genomeIndex, { 0, 255 }, Genome::CodingRegion::IN_ADDRESS_CODE, gateID);
+		inputs[i] = genome->extractValue(genomeIndex, { 0, 255 }, Gate::IN_ADDRESS_CODE, gateID);
 	}
 	for (; i < 4; i++) {
 		genome->extractValue(genomeIndex, { 0, 255 });
 	}
 	for (i = 0; i < _xDim; i++) {
-		outputs[i] = genome->extractValue(genomeIndex, { 0, 255 }, Genome::CodingRegion::OUT_ADDRESS_CODE, gateID);
+		outputs[i] = genome->extractValue(genomeIndex, { 0, 255 }, Gate::OUT_ADDRESS_CODE, gateID);
 	}
 	for (; i < 4; i++) {
 		genome->extractValue(genomeIndex, { 0, 255 });
@@ -69,13 +69,13 @@ FeedbackGate::FeedbackGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> 
 
 	//get the Feedback forces
 	for (i = 0; i < nrPos; i++) {
-		posLevelOfFB[i] = ((double) (1 + genome->extractValue(genomeIndex, { 0, 255 }, Genome::CodingRegion::DATA_CODE, gateID))) / 256.0;
+		posLevelOfFB[i] = ((double) (1 + genome->extractValue(genomeIndex, { 0, 255 }, Gate::DATA_CODE, gateID))) / 256.0;
 	}
 	for (; i < 4; i++) {
 		genome->extractValue(genomeIndex, { 0, 255 });
 	}
 	for (i = 0; i < nrNeg; i++) {
-		negLevelOfFB[i] = ((double) (1 + genome->extractValue(genomeIndex, { 0, 255 }, Genome::CodingRegion::DATA_CODE, gateID))) / 256.0;
+		negLevelOfFB[i] = ((double) (1 + genome->extractValue(genomeIndex, { 0, 255 }, Gate::DATA_CODE, gateID))) / 256.0;
 	}
 	for (; i < 4; i++) {
 		genome->extractValue(genomeIndex, { 0, 255 });
@@ -89,7 +89,7 @@ FeedbackGate::FeedbackGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> 
 		originalTable[i].resize(1 << _xDim);
 		double S = 0.0;
 		for (j = 0; j < (1 << _xDim); j++) {
-			table[i][j] = (double) genome->extractValue(genomeIndex, { 0, 255 }, Genome::CodingRegion::DATA_CODE, gateID);
+			table[i][j] = (double) genome->extractValue(genomeIndex, { 0, 255 }, Gate::DATA_CODE, gateID);
 			S += table[i][j];
 		}
 		//normalize the row

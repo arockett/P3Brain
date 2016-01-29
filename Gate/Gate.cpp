@@ -37,18 +37,18 @@ void Gate::getSomeBrainAddresses(const int& howMany, const int& howManyMax, vect
 // if number of inputs or outputs is less then the max possible inputs or outputs skip the unused sites in the genome
 void Gate::getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, shared_ptr<Genome::Index> genomeIndex, shared_ptr<Genome> genome, int gateID) {  // (max#in, max#out,currentIndexInGenome,genome,codingRegions)
 
-	int numInputs = genome->extractValue(genomeIndex, { insRange[0], insRange[1] }, Genome::CodingRegion::IN_COUNT_CODE, gateID);
+	int numInputs = genome->extractValue(genomeIndex, { insRange[0], insRange[1] }, Gate::IN_COUNT_CODE, gateID);
 	//cout << "num_Inputs: " << numInputs << "\n";
-	int numOutputs = genome->extractValue(genomeIndex, { outsRange[0], outsRange[1] }, Genome::CodingRegion::OUT_COUNT_CODE, gateID);
+	int numOutputs = genome->extractValue(genomeIndex, { outsRange[0], outsRange[1] }, Gate::OUT_COUNT_CODE, gateID);
 	//cout << "num_Outputs: " << numOutputs << "\n";
 
 	inputs.resize(numInputs);
 	outputs.resize(numOutputs);
 	if (insRange[1] > 0) {
-		getSomeBrainAddresses(numInputs, insRange[1], inputs, genomeIndex, genome, Genome::CodingRegion::IN_ADDRESS_CODE, gateID);
+		getSomeBrainAddresses(numInputs, insRange[1], inputs, genomeIndex, genome, Gate::IN_ADDRESS_CODE, gateID);
 	}
 	if (outsRange[1] > 0) {
-		getSomeBrainAddresses(numOutputs, outsRange[1], outputs, genomeIndex, genome, Genome::CodingRegion::OUT_ADDRESS_CODE, gateID);
+		getSomeBrainAddresses(numOutputs, outsRange[1], outputs, genomeIndex, genome, Gate::OUT_ADDRESS_CODE, gateID);
 	}
 }
 
@@ -124,7 +124,7 @@ ProbabilisticGate::ProbabilisticGate(shared_ptr<Genome> genome, shared_ptr<Genom
 
 	// get a table filled with values from the genome that has
 	// rows = (the number of possible combinations of input values) and columns = (the number of possible combinations of output values)
-	vector<vector<int>> rawTable = genome->extractTable(genomeIndex, { 1 << numInputs, 1 << numOutputs }, { 16, 16 }, { 0, 255 }, Genome::CodingRegion::DATA_CODE, gateID);
+	vector<vector<int>> rawTable = genome->extractTable(genomeIndex, { 1 << numInputs, 1 << numOutputs }, { 16, 16 }, { 0, 255 }, Gate::DATA_CODE, gateID);
 
 	table.resize(1 << numInputs);
 	//normalize each row
@@ -184,7 +184,7 @@ DeterministicGate::DeterministicGate(shared_ptr<Genome> genome, shared_ptr<Genom
 
 	// get a table filled with values from the genome that has
 	// rows = (the number of possible combinations of input values) and columns = (the number of possible combinations of output values)
-	table = genome->extractTable(genomeIndex, { 1 << numInputs, numOutputs }, { 16, 4 }, { 0, 1 }, Genome::CodingRegion::DATA_CODE, gateID);
+	table = genome->extractTable(genomeIndex, { 1 << numInputs, numOutputs }, { 16, 4 }, { 0, 1 }, Gate::DATA_CODE, gateID);
 }
 
 void DeterministicGate::setupForBits(int* Ins, int nrOfIns, int Out, int logic) {
