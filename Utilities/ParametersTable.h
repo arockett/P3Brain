@@ -72,10 +72,8 @@ class ParameterTable {
 	double get(string key) {
 		double returnValue;
 		if (localTable->count(key) > 0) {
-			cout << "HERE1\n";
 			returnValue = localTable->at(key);
 		} else if (globalTable->count(key) > 0) {
-			cout << "HERE2\n";
 			returnValue = globalTable->at(key);
 		} else {
 			throw 51;

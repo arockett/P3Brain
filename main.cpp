@@ -100,7 +100,7 @@ int getTemp(string key) {
 //};
 
 int main(int argc, const char * argv[]) {
-	shared_ptr<AbstractChromosome> chromosome1 = make_shared<Chromosome<double>>(10);
+	auto chromosome1 = make_shared<Chromosome<double>>(10);
 	chromosome1->resize(5);
 	cout << chromosome1->chromosomeToStr() << "\n";
 	chromosome1->fillRandom();
@@ -114,7 +114,7 @@ int main(int argc, const char * argv[]) {
 	}
 	cout << "\n\n\n";
 
-	auto genome1 = make_shared<Genome>(make_shared<Chromosome<double>>(10), 3, 5);
+	auto genome1 = make_shared<Genome>(make_shared<Chromosome<int>>(10), 3, 5);
 	//shared_ptr<AbstractGenome> genome1 = make_shared<AbstractGenome>();
 	cout << genome1->genomeToStr() << "\n";
 	genome1->fillRandom();
@@ -130,35 +130,35 @@ int main(int argc, const char * argv[]) {
 	auto GH2 = genome1->newHandler(genome1);
 	double X;
 	int siteIndex = 0;
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, 0, 12);
+	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
+	cout << X << " A\n";
+	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, false, 0, 12);
+	cout << X << " B\n";
+	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
 	cout << X << "\n";
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, 0, 12);
+	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
 	cout << X << "\n";
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, 0, 12);
+	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
 	cout << X << "\n";
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, 0, 12);
+	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
 	cout << X << "\n";
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, 0, 12);
+	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 111120, true, 0, 12);
 	cout << X << "\n";
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, 0, 12);
+	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
 	cout << X << "\n";
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 1236558, 0, 12);
+	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
 	cout << X << "\n";
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, 0, 12);
+	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
 	cout << X << "\n";
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, 0, 12);
+	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
 	cout << X << "\n";
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, 0, 12);
-	cout << X << "\n";
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, 0, 12);
-	cout << X << "\n";
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, 0, 12);
+	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
 	cout << X << "\n";
 
 	siteIndex = 2;
-	genome1->chromosomes[1]->writeDouble(siteIndex, 5.6, 4.6, 6.6);
+	genome1->chromosomes[1]->writeDouble(siteIndex, 5.6, 4.6, 6.6,true);
 	siteIndex = 2;
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, 0, 12);
+	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, 0, 12,true);
 	cout << X << "\n";
 
 	double A = 20;
@@ -216,6 +216,27 @@ int main(int argc, const char * argv[]) {
 
 	PT.showTables();
 	PT2.showTables();
+
+
+	genome1->chromosomes[0]->getSegment(5,5);
+	genome1->chromosomes[0]->getSegment(1,1);
+	genome1->chromosomes[0]->getSegment(1,1);
+	genome1->chromosomes[0]->getSegment(1,1);
+	genome1->chromosomes[0]->getSegment(1,1);
+	genome1->chromosomes[0]->getSegment(1,1);
+	genome1->chromosomes[0]->getSegment(1,1);
+	auto chromosome2 = genome1->chromosomes[0]->getSegment(1,3);
+
+	genome1->chromosomes[1]->insertSegment(chromosome2);
+	genome1->chromosomes[1]->insertSegment(chromosome2);
+	genome1->chromosomes[1]->insertSegment(chromosome2);
+	genome1->chromosomes[1]->insertSegment(chromosome2);
+
+
+	genome1->chromosomes[1]->mutatePoint();
+	genome1->chromosomes[1]->mutateCopy(2,4);
+	genome1->chromosomes[1]->mutateDelete(2,4);
+
 
 	return 0;
 }
