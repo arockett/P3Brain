@@ -114,7 +114,7 @@ int main(int argc, const char * argv[]) {
 	}
 	cout << "\n\n\n";
 
-	auto genome1 = make_shared<Genome>(make_shared<Chromosome<int>>(10), 3, 5);
+	auto genome1 = make_shared<Genome>(make_shared<Chromosome<int>>(10), 7, 5);
 	//shared_ptr<AbstractGenome> genome1 = make_shared<AbstractGenome>();
 	cout << genome1->genomeToStr() << "\n";
 	genome1->fillRandom();
@@ -217,21 +217,91 @@ int main(int argc, const char * argv[]) {
 	PT.showTables();
 	PT2.showTables();
 
-
-	genome1->chromosomes[0]->getSegment(5,5);
-	genome1->chromosomes[0]->getSegment(1,1);
-	genome1->chromosomes[0]->getSegment(1,1);
-	genome1->chromosomes[0]->getSegment(1,1);
-	genome1->chromosomes[0]->getSegment(1,1);
-	genome1->chromosomes[0]->getSegment(1,1);
-	genome1->chromosomes[0]->getSegment(1,1);
 	auto chromosome2 = genome1->chromosomes[0]->getSegment(1,3);
 
+	chromosome2 = genome1->chromosomes[0]->getSegment(1,1);
+	genome1->chromosomes[1]->resize(0);
+	genome1->chromosomes[1]->insertSegment(chromosome2);
+	genome1->chromosomes[1]->insertSegment(chromosome2);
+	genome1->chromosomes[1]->insertSegment(chromosome2);
+	genome1->chromosomes[1]->insertSegment(chromosome2);
+	genome1->chromosomes[1]->insertSegment(chromosome2);
+	genome1->chromosomes[1]->insertSegment(chromosome2);
 	genome1->chromosomes[1]->insertSegment(chromosome2);
 	genome1->chromosomes[1]->insertSegment(chromosome2);
 	genome1->chromosomes[1]->insertSegment(chromosome2);
 	genome1->chromosomes[1]->insertSegment(chromosome2);
 
+	chromosome2 = genome1->chromosomes[0]->getSegment(1,1);
+	genome1->chromosomes[2]->resize(0);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+	genome1->chromosomes[2]->insertSegment(chromosome2);
+
+	genome1->chromosomes[0]->crossover({genome1->chromosomes[4],genome1->chromosomes[1],genome1->chromosomes[2]},13);
+
+	cout << "\n\n\n---XXX\n";
+	cout << genome1->genomeToStr() << "\n";
+	cout << "---XXX\n\n\n";
+
+	genome1->chromosomes[0]->crossover({genome1->chromosomes[1],genome1->chromosomes[2]},6);
+
+	cout << "\n\n\n---XXX\n";
+	cout << genome1->genomeToStr() << "\n";
+	cout << "---XXX\n\n\n";
+
+	genome1->chromosomes[0]->crossover({genome1->chromosomes[1]},20);
+
+	cout << "\n\n\n---XXX\n";
+	cout << genome1->genomeToStr() << "\n";
+	cout << "---XXX\n\n\n";
 
 	genome1->chromosomes[1]->mutatePoint();
 	genome1->chromosomes[1]->mutateCopy(2,4);

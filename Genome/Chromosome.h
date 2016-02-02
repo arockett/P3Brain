@@ -9,6 +9,8 @@
 #ifndef __BasicMarkovBrainTemplate__Chromosome__
 #define __BasicMarkovBrainTemplate__Chromosome__
 
+#include <algorithm>
+#include <set>
 #include <stdlib.h>
 #include <vector>
 
@@ -93,33 +95,33 @@ class AbstractChromosome {
 		return data;
 	}
 
-	virtual shared_ptr<AbstractChromosome> getSegment(int minSize, int maxSize){
+	virtual shared_ptr<AbstractChromosome> getSegment(int minSize, int maxSize) {
 		cout << "method getSegment() in AbstractChromosome was called!\n This class only exists for polymorphism.\n";
 		exit(1);
 		return nullptr;
 	}
 
-	virtual void insertSegment(shared_ptr<AbstractChromosome> segment){
+	virtual void insertSegment(shared_ptr<AbstractChromosome> segment) {
 		cout << "method insertSegment() in AbstractChromosome was called!\n This class only exists for polymorphism.\n";
 		exit(1);
 	}
 
-	virtual void mutatePoint(){
+	virtual void mutatePoint() {
 		cout << "method mutatePoint() in AbstractChromosome was called!\n This class only exists for polymorphism.\n";
 		exit(1);
 	}
 
-	virtual void mutateCopy(int minSize, int maxSize){
+	virtual void mutateCopy(int minSize, int maxSize) {
 		cout << "method mutateCopy() in AbstractChromosome was called!\n This class only exists for polymorphism.\n";
 		exit(1);
 	}
 
-	virtual void mutateDelete(int minSize, int maxSize){
+	virtual void mutateDelete(int minSize, int maxSize) {
 		cout << "method mutateDelete() in AbstractChromosome was called!\n This class only exists for polymorphism.\n";
 		exit(1);
 	}
 
-	virtual void crossover(shared_ptr<AbstractChromosome> other, int crossCount){
+	virtual void crossover(vector<shared_ptr<AbstractChromosome>> parents, int crossCount) {
 		cout << "method crossover() in AbstractChromosome was called!\n This class only exists for polymorphism.\n";
 		exit(1);
 	}
@@ -192,8 +194,8 @@ template<class T> class Chromosome : public AbstractChromosome {
 
 	// advance a site index 1 or distance sites and check that new index is valid
 	virtual inline bool advanceIndex(int &siteIndex,bool readDirection, int distance = 1) {
-		siteIndex += (readDirection)?distance:(-1*distance); //move index
-		return modulateIndex(siteIndex); // confirm that new index is in range
+		siteIndex += (readDirection)?distance:(-1*distance);  //move index
+		return modulateIndex(siteIndex);// confirm that new index is in range
 	}
 
 	// read an int value in range [valueMin,valueMax] from chromosome starting at index.
@@ -337,9 +339,9 @@ template<class T> class Chromosome : public AbstractChromosome {
 	// create a new chromosome with a copied peice of this chromosome. The size of the copy
 	// will be random between minSize and maxSize. the copy location will be determined randomly
 	// but will at lease segmentSize before the end of the chromosome.
-	virtual shared_ptr<AbstractChromosome> getSegment(int minSize, int maxSize){
+	virtual shared_ptr<AbstractChromosome> getSegment(int minSize, int maxSize) {
 		int segmentSize = Random::getInt(maxSize-minSize)+minSize;
-		if (segmentSize > sites.size()){
+		if (segmentSize > sites.size()) {
 			cout << "ERROR: in Chromosome::getSegement, segmentSize is > then sites.size()!\nExitting!\n";
 			exit(1);
 		}
@@ -357,30 +359,30 @@ template<class T> class Chromosome : public AbstractChromosome {
 	}
 
 	// insert from segement into this chromosome. The insertion location is random.
-	virtual void insertSegment(shared_ptr<AbstractChromosome> segment){
+	virtual void insertSegment(shared_ptr<AbstractChromosome> segment) {
 		auto it = sites.begin();
 		auto castSegment = dynamic_pointer_cast<Chromosome<T>>(segment);
 		sites.insert(it+Random::getInt(sites.size()),castSegment->sites.begin(),castSegment->sites.end());
 	}
 
-	virtual void mutatePoint(){
+	virtual void mutatePoint() {
 		cout << "mutatePoint:\n"<<chromosomeToStr();
 		sites[Random::getIndex(sites.size())]=Random::getIndex(alphabetSize);
 		cout << chromosomeToStr()<<"----\n";
 
 	}
 
-	virtual void mutateCopy(int minSize, int maxSize){
+	virtual void mutateCopy(int minSize, int maxSize) {
 		cout << "mutateCopy:\n"<<chromosomeToStr();
 		shared_ptr<Chromosome<T>> segment = dynamic_pointer_cast<Chromosome<T>>(getSegment(minSize, maxSize));
 		insertSegment(segment);
 		cout << chromosomeToStr()<<"----\n";
 	}
 
-	virtual void mutateDelete(int minSize, int maxSize){
+	virtual void mutateDelete(int minSize, int maxSize) {
 		cout << "mutateDelete:\n"<<chromosomeToStr();
 		int segmentSize = Random::getInt(maxSize-minSize)+minSize;
-		if (segmentSize > sites.size()){
+		if (segmentSize > sites.size()) {
 			cout << "ERROR: in Chromosome::getSegement, segmentSize is > then sites.size()!\nExitting!\n";
 			exit(1);
 		}
@@ -389,10 +391,53 @@ template<class T> class Chromosome : public AbstractChromosome {
 		cout << chromosomeToStr()<<"----\n";
 	}
 
-	virtual void crossover(shared_ptr<AbstractChromosome> other, int crossCount){
-		cout << "method crossover() in AbstractChromosome was called!\n This class only exists for polymorphism.\n";
-		exit(1);
+	// alter the sites of this chromosome to a crossed over chromosome made up of parents
+	virtual void crossover(vector<shared_ptr<AbstractChromosome>> parents, int crossCount) {
+		sites.resize(0);  // clear sites for this chromosome
+
+		if (parents.size() == 0) {
+			cout << "ERROR! in Chromosome crossover... attempt to cross 0 parents\nExiting!\n";
+			exit(1);
+		}
+		if (parents.size() == 1) {  // if there is only one parent, we are done.
+			sites = dynamic_pointer_cast<Chromosome<T>>(parents[0])->sites;
+		} else {
+
+			// extract the sites list from each parent
+			vector<vector<T>> parentSites;
+			for (auto parent:parents) {
+				parentSites.push_back(dynamic_pointer_cast<Chromosome<T>>(parent)->sites);
+			}
+
+			// randomly determine crossCount number crossLocations
+			vector<double> crossLocations;
+			for (int i = 0; i<crossCount; i++) {	// get some cross locations (% of length of chromosome)
+				crossLocations.push_back(Random::getDouble(1.0));
+			}
+			crossLocations.push_back(0.0);
+			crossLocations.push_back(1.0);
+
+			sort(crossLocations.begin(), crossLocations.end());  // sort crossLocations
+
+			int pick;
+			int lastPick = 0;
+			for(int c = 0; c < crossLocations.size()-1; c++) {
+				pick = Random::getIndex(parents.size()-1);
+				if (pick == lastPick) {
+					pick++;
+				}
+				lastPick = pick;
+				sites.insert(sites.end(),
+						parentSites[pick].begin()+(int)((double)parentSites[pick].size()*crossLocations[c]),
+						parentSites[pick].begin()+(int)((double)parentSites[pick].size()*crossLocations[c+1]));
+				cout << "pick: " << pick << "  lastPick: " << lastPick << "\n";
+				cout << crossLocations[c] << " to " << crossLocations[c+1] << "\n";
+				cout << (int)((double)parentSites[pick].size()*crossLocations[c]) << " to " << (int)((double)parentSites[pick].size()*crossLocations[c+1]) << "\n";
+				cout << chromosomeToStr();
+			}
+		}
 	}
+
 };
 
 ////////////////////////
@@ -407,6 +452,12 @@ template<> inline void Chromosome<double>::fillRandom(int length) {
 }
 template<> inline void Chromosome<double>::fillRandom() {
 	Chromosome<double>::fillRandom(sites.size());
+}
+
+template<> inline void Chromosome<double>::mutatePoint() {
+	cout << "mutatePoint:\n" << chromosomeToStr();
+	sites[Random::getIndex(sites.size())] = Random::getDouble(alphabetSize);
+	cout << chromosomeToStr() << "----\n";
 }
 
 #endif /* defined(__BasicMarkovBrainTemplate__Chromosome__) */
