@@ -232,7 +232,7 @@ template<class T> class Chromosome : public AbstractChromosome {
 		vector<T> decomposedValue;
 		int writeValueSize = valueMax - valueMin + 1;
 		if (writeValueSize < value) {
-			cout << "ERROR : attempting to write value to chromosome. \n (valueMax - valueMin + 1) < value!";
+			cout << "ERROR : attempting to write value to chromosome. \n value is too large :: (valueMax - valueMin + 1) < value!";
 		}
 		while (writeValueSize > alphabetSize) {  // load value in alphabetSize chunks into decomposedValue
 			decomposedValue.push_back(value%((int)alphabetSize));
@@ -266,7 +266,7 @@ template<class T> class Chromosome : public AbstractChromosome {
 			valueMin = temp;
 		}
 		if ((value - valueMin) > (valueMax - valueMin)) {
-			cout << "Error: attempting to write double. range is to small, value: " << value << " is not < valueMax: " << valueMin << " - valueMin: << valueMin\n";
+			cout << "Error: attempting to write double. given range is to small, value: " << value << " is not < valueMax: " << valueMin << " - valueMin: << valueMin\n";
 			exit(1);
 		}
 		value = ((value - valueMin) / (valueMax - valueMin)) * alphabetSize;
@@ -346,15 +346,11 @@ template<class T> class Chromosome : public AbstractChromosome {
 			exit(1);
 		}
 		int segmentStart = Random::getInt(sites.size()-segmentSize);
-		cout << "start: " << segmentStart << "   size: " << segmentSize << "\n";
 		shared_ptr<Chromosome<T>> segment = make_shared<Chromosome<T>>(alphabetSize);
 		auto it = sites.begin();
 		segment->sites.insert(segment->sites.begin(),it+segmentStart,it+segmentStart+segmentSize);
 		// copy sites from this to segment (the new chromosome)
 		// starting at segementStart and ending at segementStart+segmentSize
-
-		cout << chromosomeToStr();
-		cout << segment->chromosomeToStr();
 		return segment;
 	}
 
@@ -366,17 +362,13 @@ template<class T> class Chromosome : public AbstractChromosome {
 	}
 
 	virtual void mutatePoint() {
-		cout << "mutatePoint:\n"<<chromosomeToStr();
 		sites[Random::getIndex(sites.size())]=Random::getIndex(alphabetSize);
-		cout << chromosomeToStr()<<"----\n";
 
 	}
 
 	virtual void mutateCopy(int minSize, int maxSize) {
-		cout << "mutateCopy:\n"<<chromosomeToStr();
 		shared_ptr<Chromosome<T>> segment = dynamic_pointer_cast<Chromosome<T>>(getSegment(minSize, maxSize));
 		insertSegment(segment);
-		cout << chromosomeToStr()<<"----\n";
 	}
 
 	virtual void mutateDelete(int minSize, int maxSize) {
@@ -388,7 +380,6 @@ template<class T> class Chromosome : public AbstractChromosome {
 		}
 		int segmentStart = Random::getInt(sites.size()-segmentSize);
 		sites.erase(sites.begin()+segmentStart,sites.begin()+segmentStart+segmentSize);
-		cout << chromosomeToStr()<<"----\n";
 	}
 
 	// alter the sites of this chromosome to a crossed over chromosome made up of parents
@@ -414,7 +405,7 @@ template<class T> class Chromosome : public AbstractChromosome {
 			for (int i = 0; i<crossCount; i++) {	// get some cross locations (% of length of chromosome)
 				crossLocations.push_back(Random::getDouble(1.0));
 			}
-			crossLocations.push_back(0.0);
+			crossLocations.push_back(0.0); // add start and end
 			crossLocations.push_back(1.0);
 
 			sort(crossLocations.begin(), crossLocations.end());  // sort crossLocations
@@ -430,10 +421,6 @@ template<class T> class Chromosome : public AbstractChromosome {
 				sites.insert(sites.end(),
 						parentSites[pick].begin()+(int)((double)parentSites[pick].size()*crossLocations[c]),
 						parentSites[pick].begin()+(int)((double)parentSites[pick].size()*crossLocations[c+1]));
-				cout << "pick: " << pick << "  lastPick: " << lastPick << "\n";
-				cout << crossLocations[c] << " to " << crossLocations[c+1] << "\n";
-				cout << (int)((double)parentSites[pick].size()*crossLocations[c]) << " to " << (int)((double)parentSites[pick].size()*crossLocations[c+1]) << "\n";
-				cout << chromosomeToStr();
 			}
 		}
 	}
