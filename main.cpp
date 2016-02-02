@@ -114,7 +114,7 @@ int main(int argc, const char * argv[]) {
 	}
 	cout << "\n\n\n";
 
-	auto genome1 = make_shared<Genome>(make_shared<Chromosome<int>>(10), 7, 5);
+	auto genome1 = make_shared<Genome>(make_shared<Chromosome<double>>(10), 7, 5);
 	//shared_ptr<AbstractGenome> genome1 = make_shared<AbstractGenome>();
 	cout << genome1->genomeToStr() << "\n";
 	genome1->fillRandom();
@@ -303,7 +303,9 @@ int main(int argc, const char * argv[]) {
 	cout << genome1->genomeToStr() << "\n";
 	cout << "---XXX\n\n\n";
 
+	cout << genome1->genomeToStr() << "\n";
 	genome1->chromosomes[1]->mutatePoint();
+	cout << genome1->genomeToStr() << "\n";
 	genome1->chromosomes[1]->mutateCopy(2,4);
 	genome1->chromosomes[1]->mutateDelete(2,4);
 

@@ -372,7 +372,6 @@ template<class T> class Chromosome : public AbstractChromosome {
 	}
 
 	virtual void mutateDelete(int minSize, int maxSize) {
-		cout << "mutateDelete:\n"<<chromosomeToStr();
 		int segmentSize = Random::getInt(maxSize-minSize)+minSize;
 		if (segmentSize > sites.size()) {
 			cout << "ERROR: in Chromosome::getSegement, segmentSize is > then sites.size()!\nExitting!\n";
@@ -442,9 +441,7 @@ template<> inline void Chromosome<double>::fillRandom() {
 }
 
 template<> inline void Chromosome<double>::mutatePoint() {
-	cout << "mutatePoint:\n" << chromosomeToStr();
 	sites[Random::getIndex(sites.size())] = Random::getDouble(alphabetSize);
-	cout << chromosomeToStr() << "----\n";
 }
 
 #endif /* defined(__BasicMarkovBrainTemplate__Chromosome__) */
