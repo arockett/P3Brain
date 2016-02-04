@@ -23,6 +23,8 @@
 
 using namespace std;
 
+const int& pointMutationRate = Parameters::register_parameter("pointMutationRate", .5, "starting size for genomes", "GENOME");
+
 int getTemp(string key) {
 	if (key == "moo") {
 		return 10;
@@ -39,7 +41,8 @@ int getTemp(string key) {
 //	shared_ptr<map<string, double>> localTable;
 //
 // public:
-//
+//  Parameters::initialize_parameters(argc, argv);  // loads command line and configFile values into registered parameters
+
 //	ParameterTable() {
 //		globalTable = make_shared<map<string, double>>();
 //		localTable = make_shared<map<string, double>>();
@@ -100,6 +103,10 @@ int getTemp(string key) {
 //};
 
 int main(int argc, const char * argv[]) {
+
+	  Parameters::initialize_parameters(argc, argv);  // loads command line and configFile values into registered parameters
+
+
 	auto chromosome1 = make_shared<Chromosome<double>>(10);
 	chromosome1->resize(5);
 	cout << chromosome1->chromosomeToStr() << "\n";
@@ -114,8 +121,7 @@ int main(int argc, const char * argv[]) {
 	}
 	cout << "\n\n\n";
 
-	auto genome1 = make_shared<Genome>(make_shared<Chromosome<double>>(10), 7, 5);
-	//shared_ptr<AbstractGenome> genome1 = make_shared<AbstractGenome>();
+	auto genome1 = make_shared<Genome>(make_shared<Chromosome<double>>(10,5), 7);
 	cout << genome1->genomeToStr() << "\n";
 	genome1->fillRandom();
 	cout << genome1->genomeToStr() << "\n";
@@ -174,7 +180,7 @@ int main(int argc, const char * argv[]) {
 	}
 	cout << "\n" << A << "\n";
 
-	ParameterTable PT;
+	ParametersTable PT;
 	cout << "111\n";
 
 	PT.setGlobal("moo", 1.0);
@@ -186,13 +192,14 @@ int main(int argc, const char * argv[]) {
 	cout << PT.get("cow") << "\n";
 	try {
 		cout << PT.get("no") << "\n";
-	} catch (const int errorCode) {
+	} catch (const exception &errorCode) {
+		cout << "here?\n";
 		PT.setGlobal("no", 3.0);
 		cout << PT.get("no") << "\n";
 
 	}
 
-	ParameterTable PT2(PT);
+	ParametersTable PT2(PT);
 
 	cout << PT2.get("moo") << "\n";
 	cout << PT2.get("cow") << "\n";
@@ -217,97 +224,132 @@ int main(int argc, const char * argv[]) {
 	PT.showTables();
 	PT2.showTables();
 
-	auto chromosome2 = genome1->chromosomes[0]->getSegment(1,3);
+//	auto chromosome2 = genome1->chromosomes[0]->getSegment(1,3);
+//
+//	chromosome2 = genome1->chromosomes[0]->getSegment(1,1);
+//	genome1->chromosomes[1]->resize(0);
+//	genome1->chromosomes[1]->insertSegment(chromosome2);
+//	genome1->chromosomes[1]->insertSegment(chromosome2);
+//	genome1->chromosomes[1]->insertSegment(chromosome2);
+//	genome1->chromosomes[1]->insertSegment(chromosome2);
+//	genome1->chromosomes[1]->insertSegment(chromosome2);
+//	genome1->chromosomes[1]->insertSegment(chromosome2);
+//	genome1->chromosomes[1]->insertSegment(chromosome2);
+//	genome1->chromosomes[1]->insertSegment(chromosome2);
+//	genome1->chromosomes[1]->insertSegment(chromosome2);
+//	genome1->chromosomes[1]->insertSegment(chromosome2);
+//
+//	chromosome2 = genome1->chromosomes[0]->getSegment(1,1);
+//	genome1->chromosomes[2]->resize(0);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//	genome1->chromosomes[2]->insertSegment(chromosome2);
+//
+//	genome1->chromosomes[0]->crossover({genome1->chromosomes[4],genome1->chromosomes[1],genome1->chromosomes[2]},13);
+//
+//	cout << "\n\n\n---XXX\n";
+//	cout << genome1->genomeToStr() << "\n";
+//	cout << "---XXX\n\n\n";
+//
+//	genome1->chromosomes[0]->crossover({genome1->chromosomes[1],genome1->chromosomes[2]},6);
+//
+//	cout << "\n\n\n---XXX\n";
+//	cout << genome1->genomeToStr() << "\n";
+//	cout << "---XXX\n\n\n";
+//
+//	genome1->chromosomes[0]->crossover({genome1->chromosomes[1]},20);
+//
+//	cout << "\n\n\n---XXX\n";
+//	cout << genome1->genomeToStr() << "\n";
+//	cout << "---XXX\n\n\n";
+//
+//	cout << genome1->genomeToStr() << "\n";
+//	genome1->chromosomes[1]->mutatePoint();
+//	cout << genome1->genomeToStr() << "\n";
+//	genome1->chromosomes[1]->mutateCopy(2,4);
+//	genome1->chromosomes[1]->mutateDelete(2,4);
 
-	chromosome2 = genome1->chromosomes[0]->getSegment(1,1);
-	genome1->chromosomes[1]->resize(0);
-	genome1->chromosomes[1]->insertSegment(chromosome2);
-	genome1->chromosomes[1]->insertSegment(chromosome2);
-	genome1->chromosomes[1]->insertSegment(chromosome2);
-	genome1->chromosomes[1]->insertSegment(chromosome2);
-	genome1->chromosomes[1]->insertSegment(chromosome2);
-	genome1->chromosomes[1]->insertSegment(chromosome2);
-	genome1->chromosomes[1]->insertSegment(chromosome2);
-	genome1->chromosomes[1]->insertSegment(chromosome2);
-	genome1->chromosomes[1]->insertSegment(chromosome2);
-	genome1->chromosomes[1]->insertSegment(chromosome2);
 
-	chromosome2 = genome1->chromosomes[0]->getSegment(1,1);
-	genome1->chromosomes[2]->resize(0);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
-	genome1->chromosomes[2]->insertSegment(chromosome2);
 
-	genome1->chromosomes[0]->crossover({genome1->chromosomes[4],genome1->chromosomes[1],genome1->chromosomes[2]},13);
+	cout << "------------------------------------------------\n";
+	auto grogTheGenome = make_shared<Genome>(make_shared<Chromosome<int>>(5,10), 2);
+	cout << grogTheGenome->genomeToStr() << "\n";
 
-	cout << "\n\n\n---XXX\n";
-	cout << genome1->genomeToStr() << "\n";
-	cout << "---XXX\n\n\n";
+	auto grogsHandler = grogTheGenome->newHandler(grogTheGenome,true);
 
-	genome1->chromosomes[0]->crossover({genome1->chromosomes[1],genome1->chromosomes[2]},6);
+	int grogsTestValue;
 
-	cout << "\n\n\n---XXX\n";
-	cout << genome1->genomeToStr() << "\n";
-	cout << "---XXX\n\n\n";
+	grogsHandler->printIndex();
+	grogsTestValue = grogsHandler->readInt(0,3);
+	cout << grogsTestValue << "\n\n";
+	grogsHandler->printIndex();
 
-	genome1->chromosomes[0]->crossover({genome1->chromosomes[1]},20);
+	grogsHandler->advanceIndex(1);
+	grogsHandler->printIndex();
 
-	cout << "\n\n\n---XXX\n";
-	cout << genome1->genomeToStr() << "\n";
-	cout << "---XXX\n\n\n";
+	grogsHandler->advanceIndex(20);
+	grogsHandler->printIndex();
 
-	cout << genome1->genomeToStr() << "\n";
-	genome1->chromosomes[1]->mutatePoint();
-	cout << genome1->genomeToStr() << "\n";
-	genome1->chromosomes[1]->mutateCopy(2,4);
-	genome1->chromosomes[1]->mutateDelete(2,4);
+	grogsHandler->setReadDirection(false);
+
+	grogsHandler->advanceIndex(20);
+	grogsHandler->printIndex();
+
+	//grogsHandler->setReadDirection(true);
+
+	grogsHandler->resetHandler();
+	grogsHandler->printIndex();
+
+	cout << "------------------------------------------------\n";
+
+	grogTheGenome->mutate();
 
 
 	return 0;

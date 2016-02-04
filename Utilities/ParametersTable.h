@@ -13,6 +13,9 @@
 #include <iostream>
 #include <map>
 #include <sstream>
+#include <unordered_map>
+
+#include "Parameters.h"
 
 using namespace std;
 // Parameters tables is used to store experimental parameters.
@@ -26,49 +29,54 @@ using namespace std;
 // key is not in the local table, it will attempt to return a value from the globalTable. If the key does
 // not exist in either local or global tables, then an exception is thrown.
 
-class ParameterTable {
-	shared_ptr<map<string, double>> globalTable;
-	shared_ptr<map<string, double>> localTable;
+class ParametersTable {
+	shared_ptr<unordered_map<string, double>> globalTable;
+	shared_ptr<unordered_map<string, double>> localTable;
 
  public:
 
-	ParameterTable() {
-		globalTable = make_shared<map<string, double>>();
-		localTable = make_shared<map<string, double>>();
+	ParametersTable() {
+		globalTable = make_shared<unordered_map<string, double>>();
+		localTable = make_shared<unordered_map<string, double>>();
 	}
 
-	ParameterTable(const ParameterTable &PT) {
+	// constructor will use global table from PT, but create a unique local table
+	ParametersTable(const ParametersTable &PT) {
 		globalTable = PT.globalTable;
-		localTable = make_shared<map<string, double>>();
+		localTable = make_shared<unordered_map<string, double>>();
 		for (auto e : *PT.localTable) {
 			localTable->insert( { e.first, e.second });
 		}
 	}
 
+	// set a value in the global table
+	// if this key exists in the global table, it is overwritten.
 	void setGlobal(string key, double value) {
 		globalTable->erase(key);
 		globalTable->insert( { key, value });
 		localTable->erase(key);
 	}
 
-	// add
+	// set a value in the local table
+	// if this key exists in the local table, it is overwritten.
 	void setLocal(string key, double value) {
 		localTable->erase(key);
 		localTable->insert( { key, value });
 	}
 
-	// remove a key / value from the global table (the global value will now be used)
+	// remove a key / value from the local table (the global value will now be used if it exists)
 	void eraseLocal(string key) {
 		localTable->erase(key);
 	}
 
-	// remove a key / value from the global table (the may be part of forcing this value to be reset to default)
+	// remove a key / value from the global table (may be part of forcing this value to be reset to default)
 	void eraseGlobal(string key) {
 		globalTable->erase(key);
 	}
 
-	// read a value from the ParameterTable. If the key is in the local table, use that. If not,
-	// use the global table. If neither table contains the key, throw an exception.
+	// read a value from the ParameterTable. If the key is in the local table, use that.
+	// If not, use the global table.
+	// If neither table contains the key, throw an exception.
 	double get(string key) {
 		double returnValue;
 		if (localTable->count(key) > 0) {
@@ -76,7 +84,7 @@ class ParameterTable {
 		} else if (globalTable->count(key) > 0) {
 			returnValue = globalTable->at(key);
 		} else {
-			throw 51;
+			throw std::invalid_argument("In ParametersTable::get(), can not find key in local or global table\n");
 		}
 		return returnValue;
 	}
@@ -92,6 +100,17 @@ class ParameterTable {
 		for (auto e : *localTable) {
 			cout << "   " << e.first << " = " << e.second << "\n";
 		}
+	}
+
+	double lookup(string key) {
+		double value;
+		try {
+			value = get(key);
+		} catch (const exception &errorMessage) {
+			value = Parameters::lookupDouble(key);
+			globalTable->insert( { key, value });
+		}
+		return value;
 	}
 
 };

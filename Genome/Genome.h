@@ -22,155 +22,6 @@
 
 using namespace std;
 
-//class Genome {
-// public:
-
-////////////// class Index
-
-//	class Index {
-// 	private:
-//		int site;  // index->site is what this index is looking at
-//
-// 	public:
-//		bool eog;  // set to true when end of genome is reached
-//
-//		// make a blank index
-//		Index() {
-//			site = 0;
-//			eog = false;
-//		}
-//
-//		// make a new index pointing at site (first site by default);
-//		Index(int _genomeSize) {
-//			site = 0;
-//			eog = false;
-//		}
-//
-//		// advance index by some number of sites.
-//		// if end of genome is reached (new index > old index), set eog = true.
-//		virtual void advanceIndex(int by = 1) {
-//			int oldSite = site;
-//			chromosome.advanceIndex(site,by);
-//			if (site <= oldSite) {
-//				eog = true;
-//			}
-//		}
-//
-//		virtual vector<int> current() {
-//			vector<int> currIndex;
-//			currIndex.push_back(site);
-//			//currIndex.push_back(chromosome);
-//			return currIndex;
-//		}
-//
-//		// did we get to (or pass) the end of the genome?
-//		virtual bool atEnd() {
-//			return eog;
-//		}
-//
-//		virtual void resetEOG() {
-//			eog = false;
-//		}
-//
-//		virtual void setSite(int _site = 0) {
-//			site = _site;
-//		}
-//
-//		virtual void randomize(vector<int> safe = { 0, 0 }) {
-//			site = Random::getInt(safe[0], genomeSize - safe[1] - 1);
-//		}
-//
-//		virtual void copyTo(shared_ptr<Index> to) {
-//			to->site = site;
-//			to->genomeSize = genomeSize;
-//			to->eog = eog;
-//		}
-//
-//		virtual Index mkCopy() {
-//			Index to;
-//			to.site = site;
-//			to.genomeSize = genomeSize;
-//			to.eog = eog;
-//			return to;
-//		}
-//
-//		virtual inline string showIndex() {
-//			return to_string(site);
-//		}
-//
-//	};
-//	////////////// end of class Index
-//
-//	shared_ptr<Index> getIndex() {
-//		return make_shared<Index>(getSize());
-//	}
-//
-//	class CodingRegion {
-// 	private:
-//		vector<pair<Index, int>> codingRegion;
-//
-// 	public:
-//
-//		virtual void assign(shared_ptr<Index> index, int code) {
-//			codingRegion.push_back( { index->mkCopy(), code });
-//		}
-//
-//		virtual inline string showCodingRegion() {
-//			string S = "";
-//			for (auto site : codingRegion) {
-//				S = S + site.first.showIndex() + ":" + to_string(site.second) + "  ";
-//			}
-//			S += "\n";
-//			return S;
-//		}
-//	};
-//
-//	map<int, CodingRegion> codingRegions;
-//
-//	Genome() = default;
-//	virtual ~Genome() = default;
-//
-//// randomize this genomes contents
-//// the undefined action is to take no action
-//	virtual void fillRandom() {
-//	}
-//
-//	virtual void fillRandom(int sites) {
-//	}
-//
-//// assign a value at a given location
-//// the undefined action is to take no action
-//	virtual void assignValue(Index index, int value) {
-//	}
-//
-//// Copy functions
-//
-//// copy the contents of another genome to this genome
-//// no undefined action, this function must be defined
-//	virtual void copyGenome(shared_ptr<Genome> from) {
-//	}
-//
-//// make a mutated genome. from this genome
-//// the undefined action is to return a new genome
-//	virtual shared_ptr<Genome> makeMutatedGenome() {
-//		shared_ptr<Genome> genome;
-//		return genome;
-//	}
-//
-//// make a mutated genome. from a vector or genomes
-//// the undefined action is to return a new genome
-//	virtual shared_ptr<Genome> makeMutatedGenome(vector<shared_ptr<Genome>> from) {
-//		shared_ptr<Genome> genome;
-//		return genome;
-//	}
-//
-//// Mutation functions
-//
-//// apply mutations to this genome
-//// the undefined action is to take no action
-//	virtual void mutate() {
-//	}
-//
 //// IO and Data Management functions
 //
 //// gets data about genome which can be added to a data map
@@ -229,14 +80,37 @@ using namespace std;
 class AbstractGenome {
  public:
 
+	// Handlers are how you access Genomes for reading and writting.
+	// to get a handle for a genome call that that genomes newHandler() method
 	class Handler {
  	public:
-		shared_ptr<AbstractGenome> genome;
+		//shared_ptr<AbstractGenome> genome;
+		int readDirection;  // true = forward, false = backwards
+		bool EOG;  // end of genome
 
-		Handler() = default;
+		Handler() {
+			readDirection = true;
+			EOG = true;
+		}
 
-		Handler(shared_ptr<AbstractGenome> _genome) {
-			genome = _genome;
+		Handler(shared_ptr<AbstractGenome> _genome, bool _readDirection = 1) {
+			readDirection = _readDirection;
+			EOG = true;
+		}
+
+		virtual void resetEOG() {
+			EOG = false;
+		}
+
+		virtual void setReadDirection(bool _readDirection) {
+			readDirection = _readDirection;
+		}
+
+		virtual void resetHandler() {
+			if (readDirection) {  // if reading forward
+			} else {  // if reading backwards
+			}
+			resetEOG();
 		}
 
 		virtual ~Handler() {
@@ -259,6 +133,10 @@ class AbstractGenome {
 		void printIndex() {
 		}
 
+		virtual bool inTelomere(int length) {
+			return 0;
+		}
+
 		////virtual int newHandle() // make a new handle in this genome, return the index for that handle
 		////virtual int advanceIndex(int handle, int distance = 1)
 
@@ -271,13 +149,17 @@ class AbstractGenome {
 
 	virtual ~AbstractGenome() = default;
 
-	virtual shared_ptr<Handler> newHandler(shared_ptr<AbstractGenome> _genome) {
+	virtual shared_ptr<Handler> newHandler(shared_ptr<AbstractGenome> _genome, bool _readDirection = 1) {
 		return nullptr;		//make_shared<Handler>(_genome);
 	}
 
 	virtual void fillRandom() = 0;		//{
 //		cout << "In AbstractGenome::fillRandom()...\n";
 //	}
+
+	virtual void mutate(int length) {
+
+	}
 
 	virtual vector<string> getStats() {
 		vector<string> data;
@@ -315,45 +197,125 @@ class Genome : public AbstractGenome {
 		shared_ptr<Genome> genome;
 		int siteIndex;
 		int chromosomeIndex;
+//		bool readDirection;
+//		bool EOG;
 
-		bool EOG;
+		virtual void resetHandler() {
+			if (readDirection) {  // if reading forward
+				chromosomeIndex = 0;
+				siteIndex = 0;
+			} else {  // if reading backwards
+				chromosomeIndex = ((int) genome->chromosomes.size()) - 1;  // set to last chromosome
+				siteIndex = genome->chromosomes[chromosomeIndex]->size() - 1;  // set to last site in last chromosome
+			}
+			resetEOG();
+		}
 
 		// constructor
-		Handler(shared_ptr<Genome> _genome) {
+		Handler(shared_ptr<Genome> _genome, bool _readDirection = 1) {
 			genome = _genome;
-			siteIndex = 0;
-			chromosomeIndex = 0;
-			EOG = false;
+			setReadDirection(_readDirection);
+			resetHandler();
 		}
 
 		// destructor
 		virtual ~Handler() = default;
 
+		// modulateIndex checks to see if the current chromosomeIndex and siteIndex are out of range. if they are
+		// it uses readDirection to resolve them.
+		//  modulate index truncates nonexistant sites. i.e. if the current addres is chromosome 1, site 10 and
+		// chromosome 10 is 8 long, modulateIndex will set the index to chromosome 2, site 0 (not site 2).
+		// If this behavior is required, use advance Index instead.
+		// If the chromosomeIndex has past the last chromosome (or the first
+		// if read direction = -1) then EOG (end of genome) is set true.
 		virtual void modulateIndex() {
-			// first see if we are past last chromosome
-			if (chromosomeIndex >= (int) genome->chromosomes.size()) {
-				chromosomeIndex = 0;  // reset chromosomeIndex
-				EOG = true;  // if we are past the last chromosome then EOG = true
+			if (readDirection) {
+				// first see if we are past last chromosome
+				if (chromosomeIndex >= (int) genome->chromosomes.size()) {
+					chromosomeIndex = 0;  // reset chromosomeIndex
+					EOG = true;  // if we are past the last chromosome then EOG = true
+				}
+
+				// now that we know that the chromosome index is in range, check the site index
+				if (genome->chromosomes[chromosomeIndex]->modulateIndex(siteIndex)) {
+					chromosomeIndex++;	// if the site index is out of range, increment the chromosomeIndex
+					siteIndex = 0;		// ... and reset the site index
+					// now that we know that the site index is also in range, we have to check the chromosome index again!
+					if (chromosomeIndex >= (int) genome->chromosomes.size()) {
+						chromosomeIndex = 0;	// if the site index is out of range, increment the chromosomeIndex
+						siteIndex = 0;			// ... and reset the site index
+						EOG = true;
+					};
+				}
+			} else {  //reading backwards!
+				// first see if we are past last chromosome
+				if (chromosomeIndex < 0) {
+					chromosomeIndex = ((int) genome->chromosomes.size()) - 1;  // reset chromosomeIndex (to last chromosome)
+					siteIndex = genome->chromosomes[chromosomeIndex]->size() - 1;  // reset siteIndex (to last site in this chromosome)
+					EOG = true;  // if we are past the last chromosome then EOG = true
+				}
+
+				// now that we know that the chromosome index is in range, check the site index
+				if (genome->chromosomes[chromosomeIndex]->modulateIndex(siteIndex)) {
+					chromosomeIndex--;	// if the site index is out of range, increment the chromosomeIndex
+					// now that we know that the site index is also in range, we have to check the chromosome index again!
+					if (chromosomeIndex < 0) {
+						chromosomeIndex = ((int) genome->chromosomes.size()) - 1;	// if the site index is out of range, decrement the chromosomeIndex
+						EOG = true;
+					}
+					siteIndex = genome->chromosomes[chromosomeIndex]->size() - 1;	// reset siteIndex (to last site in this chromosome)
+				}
+
+			}
+		}
+
+		// advanceIndex will move the index forward distance sites.
+		// if there are too few sites, it will advance to the next chromosome and then advance addtional sites (if needed)
+		// NOTE: if the advance is > the current chromosome size, it will be modded to the chromosome size.
+		// i.e. if the chromosome was length 10, and the current siteIndex = 0, advanceIndex(15) will advance to
+		// site 5 of the next chromosome. Should this be fixed?!??
+		virtual void advanceIndex(int distance = 1) {
+			modulateIndex();
+			if (readDirection) {	// reading forward
+				if ((genome->chromosomes[chromosomeIndex]->size() - siteIndex) > distance) {
+					siteIndex += distance;	// if there are enough sites left in the current chromosome, just move siteIndex
+				} else {	// there are not enough sites in the current chromosome, must move to next chromosome
+					distance = distance - (genome->chromosomes[chromosomeIndex]->size() - siteIndex);
+					// reduce distance by the number of sites between siteIndex and end of Chromosome
+					advanceChromosome();	// advance to the next chromosome;
+					advanceIndex(distance);  // advanceIndex by remaining distance
+				}
+
+			} else { 				// reading backwards
+
+				if (siteIndex > distance) {
+					siteIndex -= distance;	// if there are enough sites in the current chromosome (between siteIndex and start of chromosome) just move siteIndex
+				} else {	// there are not enough sites in the current chromosome, must move to next chromosome
+					distance = distance - siteIndex;	// reduce distance by the number of sites between siteIndex and start of Chromosome
+					advanceChromosome();	// advance to the next chromosome;
+					advanceIndex(distance);  // advanceIndex by remaining distance
+				}
+
 			}
 
-			// now that we know that the chromosome index is in range, check the site index
-			if (genome->chromosomes[chromosomeIndex]->modulateIndex(siteIndex)) {
-				chromosomeIndex++;
-				siteIndex = 0;
-			}
-			// now that we know that the site index is also in range, we have to check the chromosome index again!
-			if (chromosomeIndex >= (int) genome->chromosomes.size()) {
-				chromosomeIndex = 0;  // reset chromosomeIndex
-				siteIndex = 0;
-				EOG = true;
-			};
+		}
+
+		// returns true if this Handler has reached the end of genome (or start if direction is backwards).
+		virtual bool atEOG() {
+			modulateIndex();
+			return EOG;
 		}
 
 		virtual void advanceChromosome() {
-			chromosomeIndex++;
-			siteIndex = 0;
+			chromosomeIndex += (readDirection) ? 1 : (-1);  //move index
+			siteIndex = 0;	// set siteIndex to 0 so modulateIndex can not advance again
+			                // if we are reading forward, siteIndex should = 0 at this time
 			modulateIndex();
+			if (!readDirection) {  // if we are reading backwards, set siteIndex to the last site
+				siteIndex = genome->chromosomes[chromosomeIndex]->size() - 1;
+			}
 		}
+
 		virtual void printIndex() {
 			cout << "chromosomeIndex: " << chromosomeIndex << "  siteIndex: " << siteIndex << "  EOG: " << EOG << "\n";
 		}
@@ -361,27 +323,19 @@ class Genome : public AbstractGenome {
 		virtual int readInt(int valueMin, int valueMax, int code = -1, int CodingRegionIndex = 0) {
 			int value;
 			modulateIndex();
-			if (genome->chromosomes[chromosomeIndex]->readInt(siteIndex, value, valueMin, valueMax, code, CodingRegionIndex)) {
+			if (genome->chromosomes[chromosomeIndex]->readInt(siteIndex, value, valueMin, valueMax, readDirection, code, CodingRegionIndex)) {
 				advanceChromosome();
 			}
 			return value;
 		}
 
 		virtual void writeInt(int value, int valueMin, int valueMax) {
+			modulateIndex();
+			if (genome->chromosomes[chromosomeIndex]->writeInt(siteIndex, value, valueMin, valueMax, readDirection)) {
+				advanceChromosome();
+			}
 		}
 		;
-
-		////virtual int newHandle() // make a new handle in this genome, return the index for that handle
-		virtual bool advanceIndex(int distance = 1) {
-			siteIndex = siteIndex + distance;
-			modulateIndex();  // return EOG = false
-			return EOG;
-		}
-
-		virtual bool atEOG() {
-			modulateIndex();
-			return EOG;
-		}
 
 		virtual void copyTo(shared_ptr<Handler> to) {
 			to->genome = genome;
@@ -390,38 +344,46 @@ class Genome : public AbstractGenome {
 			to->EOG = EOG;
 		}
 
+		virtual bool inTelomere(int length) {
+			modulateIndex();
+			if (readDirection) {  // if reading forward
+				return (siteIndex >= (genome->chromosomes[chromosomeIndex]->size() - length));
+			} else {
+				return (siteIndex - 1 < length);
+			}
+		}
+
 		//virtual vector<vector<int>> readTable(shared_ptr<Index> index, vector<int> tableSize, vector<int> tableMaxSize, vector<int> valueRange, int code = -1, int gateID = 0);
 
 	};
  public:
+	ParametersTable PT;
+
 	vector<shared_ptr<AbstractChromosome>> chromosomes;
 
 	Genome() {
 	}
 
 	Genome(shared_ptr<AbstractChromosome> _chromosome) {
-		chromosomes.resize(2);
-		chromosomes[0] = _chromosome->makeCopy();
-		chromosomes[0]->resize(10);
-		chromosomes[1] = _chromosome->makeCopy();
-		chromosomes[1]->resize(5);
+		chromosomes.push_back(_chromosome->makeLike());
+		chromosomes[0]->fillRandom();  // resize and set with random values
 	}
 
-	Genome(shared_ptr<AbstractChromosome> _chromosome, int chromosomeCount, int initalChromosomeSize) {
+	Genome(shared_ptr<AbstractChromosome> _chromosome, int chromosomeCount) {
 		if (chromosomeCount < 1) {
-			cout << "Error: Genome must have atleast one chromosome";
+			cout << "Error: Genome must have at least one chromosome";
 			exit(1);
 		}
 		for (int i = 0; i < chromosomeCount; i++) {
-			chromosomes.push_back(_chromosome->makeCopy());
-			chromosomes[i]->fillRandom(initalChromosomeSize); // resize and set with random values
+			chromosomes.push_back(_chromosome->makeLike());
+			chromosomes[i]->fillRandom();  // resize and set with random values
 		}
 	}
 
 	virtual ~Genome() = default;
 
-	virtual shared_ptr<Handler> newHandler(shared_ptr<Genome> _genome) {
-		return make_shared<Handler>(_genome);
+	virtual shared_ptr<Handler> newHandler(shared_ptr<Genome> _genome, bool _readDirection = true) {
+		return make_shared<Handler>(_genome, _readDirection);
 	}
 
 // randomize this genomes contents
@@ -458,6 +420,60 @@ class Genome : public AbstractGenome {
 // apply mutations to this genome
 // the undefined action is to take no action
 	virtual void mutate() {
+		int nucleotides = 0;
+		for (auto chromosome : chromosomes){
+			nucleotides += chromosome->size();
+		}
+		// do some point mutations
+		int howMany = Random::getBinomial(nucleotides,PT.lookup("pointMutationRate"));
+		for (int i = 0; i<howMany; i++){
+			chromosomes[Random::getIndex(chromosomes.size())]->mutatePoint();
+		}
+		//int howMany = Random::getBinomial(nucleotides,PT.lookup("pointMutationRate"));
+
+
+//		if (pointMutationRate > 0.0) {
+//			int nucleotides = (int) sites.size();
+//			int i, s, o, w;
+//			vector<unsigned char> buffer;
+//			int localMutations = Random::getBinomial(nucleotides, pointMutationRate);
+//			for (i = 0; i < localMutations; i++) {
+//				sites[Random::getIndex(nucleotides)] = Random::getIndex(256);
+//			}
+//			int numInsertions = Random::getBinomial((int) sites.size(), (insertionRate / 1000));
+//			while (numInsertions > 0) {
+//				if ((int) nucleotides < maxGenomeSize) {
+//					//duplication
+//					w = 128 + Random::getIndex(512 - 128);  // w is between 128 and 512 (size of the chunk to be duplicated)
+//					if (w >= nucleotides) {  // if w is >= the size of the genome, make w smaller!
+//						w = nucleotides - 1;
+//					}
+//					s = Random::getIndex(nucleotides - w);  // s is where to start copying from.
+//					o = Random::getIndex(nucleotides);  // o is where the chunk will be written
+//					buffer.clear();
+//					buffer.insert(buffer.begin(), sites.begin() + s, sites.begin() + s + w);  // put s to (s+w) in buffer
+//					sites.insert(sites.begin() + o, buffer.begin(), buffer.end());  // insert buffer into genome
+//				}
+//				nucleotides = (int) sites.size();
+//				numInsertions--;
+//			}
+//
+//			int numDels = Random::getBinomial(nucleotides, (deletionRate / 1000));
+//			while (numDels > 0) {
+//
+//				if (nucleotides > minGenomeSize) {
+//					//deletion
+//					w = 128 + Random::getIndex(512 - 128);  //  w is between 128 and 255 (size of the chunk to be deleted)
+//					if (w >= nucleotides) {  // if w is >= the size of the genome, make w smaller!
+//						w = nucleotides - 1;
+//					}
+//					s = Random::getIndex(nucleotides - w);  // s is where to start deleting from.
+//					sites.erase(sites.begin() + s, sites.begin() + s + w);  // erase everything between s and (s+w)
+//				}
+//				nucleotides = (int) sites.size();
+//				numDels--;
+//			}
+//		}
 	}
 
 // IO and Data Management functions

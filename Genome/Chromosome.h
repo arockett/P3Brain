@@ -35,7 +35,7 @@ class AbstractChromosome {
 		cout << "method writeInt() in AbstractChromosome was called!\n This class only exists for polymorphism.\n";
 		exit(1);
 	}
-	virtual void writeDouble(int &siteIndex, double value, double valueMin, double valueMax, bool readDirection) {
+	virtual bool writeDouble(int &siteIndex, double value, double valueMin, double valueMax, bool readDirection) {
 		cout << "method writeDouble() in AbstractChromosome was called!\n This class only exists for polymorphism.\n";
 		exit(1);
 	}
@@ -46,7 +46,7 @@ class AbstractChromosome {
 		return false;  // not at end of chromosome
 	}
 
-	virtual shared_ptr<AbstractChromosome> makeCopy() {
+	virtual shared_ptr<AbstractChromosome> makeLike() {
 		cout << "method makeCopy() in AbstractChromosome was called!\n This class only exists for polymorphism.\n";
 		exit(1);
 		return nullptr;
@@ -82,7 +82,7 @@ class AbstractChromosome {
 		exit(1);
 		return false;  // not at end of chromosome
 	}
-	virtual inline bool advanceIndex(int &siteIndex, int distance = 1) {
+	virtual inline bool advanceIndex(int &siteIndex, bool readDirection = 1, int distance = 1) {
 		cout << "method advanceIndex() in AbstractChromosome was called!\n This class only exists for polymorphism.\n";
 		exit(1);
 		return false;  // not at end of chromosome
@@ -170,36 +170,48 @@ template<class T> class Chromosome : public AbstractChromosome {
 	                      // default fail constructor - if alphebetSize default has not been explicitly defined, this is run.
 	Chromosome() {
 		alphabetSize = 0;
-		cout << "ERROR : default alphabetSize for this type being used with Chromosome has not been defined.\nUse Constructor with alphabetSize argument.\n";
+		cout << "ERROR : Chromosome constructor must specify chromosome length\n";
 		exit(1);
 	}
 
-	// make a Chromosome of any type with a defined alpabetSize
-	Chromosome(double _alphabetSize) {
-		alphabetSize = _alphabetSize;
+
+	Chromosome(int chromosomeLength) {
+		alphabetSize = 0;
+		cout << "ERROR : TYPE specified for Chromosome is not supported.\nTypes supported are: int, double, bool, unsigned char\n";
+		exit(1);
+	}
+
+	Chromosome(int chromosomeLength, double _alphabetSize) {
+		alphabetSize = 0;
+		cout << "ERROR : TYPE specified for Chromosome is not supported.\nTypes supported are: int, double, bool, unsigned char\n";
+		exit(1);
 	}
 
 	virtual ~Chromosome () = default;
 
-	virtual shared_ptr<AbstractChromosome> makeCopy() {
-		return make_shared<Chromosome<T>>(alphabetSize);
+	// return a shared_ptr to a new chromosome like this one (same alphabetSize and sites.size())
+	virtual shared_ptr<AbstractChromosome> makeLike() {
+		return make_shared<Chromosome<T>>(sites.size(),alphabetSize);
 	}
 
 	// insures that a site index is valid, if in index is > sites.size(), mod it.
+	// return true if siteIndex went out of range
 	virtual inline bool modulateIndex(int &siteIndex) {
 		bool EOC= (siteIndex >= (int)sites.size() || siteIndex<0);
 		siteIndex = loopMod(siteIndex,(int)sites.size());
 		return EOC;
 	}
 
-	// advance a site index 1 or distance sites and check that new index is valid
-	virtual inline bool advanceIndex(int &siteIndex,bool readDirection, int distance = 1) {
+	// advance or reverse (if readDirection = false) a site index 1 or distance sites and check that new index is valid
+	// return true if siteIndex went out of range
+	virtual inline bool advanceIndex(int &siteIndex, bool readDirection = 1, int distance = 1) {
 		siteIndex += (readDirection)?distance:(-1*distance);  //move index
 		return modulateIndex(siteIndex);// confirm that new index is in range
 	}
 
 	// read an int value in range [valueMin,valueMax] from chromosome starting at index.
 	// will use as many sites as needed. works in base alphabetSize
+	// return true if siteIndex went out of range
 	virtual bool readInt(int &siteIndex, int &value, int valueMin, int valueMax, bool readDirection, int code = -1, int CodingRegionIndex = 0) {
 		if (valueMin > valueMax) {
 			int temp = valueMin;
@@ -222,6 +234,7 @@ template<class T> class Chromosome : public AbstractChromosome {
 	}
 
 	// writes a value into a chromosome, uses a number of sites baised on valueMin and valueMax);
+	// return true if siteIndex went out of range
 	virtual bool writeInt(int &siteIndex, int value, int valueMin, int valueMax, bool readDirection) {
 		bool EOC;
 		if (valueMin > valueMax) {
@@ -240,7 +253,7 @@ template<class T> class Chromosome : public AbstractChromosome {
 			writeValueSize = writeValueSize/alphabetSize;
 		}
 
-		modulateIndex(siteIndex);  // make sure that the index is in range
+		EOC = modulateIndex(siteIndex);  // make sure that the index is in range
 		while ( decomposedValue.size()>0 ) {  // starting with the last element in decomposedValue, copy into genome.
 			sites[siteIndex] = decomposedValue[decomposedValue.size()-1];
 			EOC = EOC | advanceIndex(siteIndex,readDirection);
@@ -249,17 +262,20 @@ template<class T> class Chromosome : public AbstractChromosome {
 		return EOC;
 	}
 
+	// read one site of type T
+	// return true if siteIndex went out of range
 	virtual bool readSite(int &siteIndex, T &value, bool readDirection, int code = -1, int CodingRegionIndex = 0) {
-		modulateIndex(siteIndex);
+		bool EOC = modulateIndex(siteIndex);
 		value = sites[siteIndex];
-		bool EOC = advanceIndex(siteIndex,readDirection);
+		EOC = EOC | advanceIndex(siteIndex,readDirection);
 		codingRegions.assignCode(code, siteIndex, CodingRegionIndex);
 		return EOC;
 	}
 
 	// scale value using valueMin and valueMax to alphabetSize and write at siteIndex
 	// value - MIN(valueMin,valueMax) must be < ABS(valueMax - valueMin)
-	virtual void writeDouble(int &siteIndex, double value, double valueMin, double valueMax, bool readDirection) {
+	virtual bool writeDouble(int &siteIndex, double value, double valueMin, double valueMax, bool readDirection) {
+		bool EOC = modulateIndex(siteIndex);
 		if (valueMin > valueMax) {
 			double temp = valueMin;
 			valueMax = valueMin;
@@ -271,7 +287,8 @@ template<class T> class Chromosome : public AbstractChromosome {
 		}
 		value = ((value - valueMin) / (valueMax - valueMin)) * alphabetSize;
 		sites[siteIndex] = value;
-
+		EOC = EOC | advanceIndex(siteIndex,readDirection);
+		return EOC;
 	}
 
 	// this is a scaling function - while it will work with other types it should only be used with double and float
@@ -281,10 +298,10 @@ template<class T> class Chromosome : public AbstractChromosome {
 			valueMax = valueMin;
 			valueMin = temp;
 		}
-		modulateIndex(siteIndex);
+		bool EOC = modulateIndex(siteIndex);
 		value = (double) sites[siteIndex];
 		codingRegions.assignCode(code, siteIndex, CodingRegionIndex);
-		int EOC = advanceIndex(siteIndex,readDirection);
+		EOC = EOC | advanceIndex(siteIndex,readDirection);
 		//scale the value
 		value = (value * ((valueMax - valueMin) / alphabetSize)) + valueMin;
 		return EOC;
@@ -320,7 +337,7 @@ template<class T> class Chromosome : public AbstractChromosome {
 		sites.resize(size);
 	}
 	virtual int size() {
-		return sites.size();
+		return (int)sites.size();
 	}
 
 	virtual vector<string> getStats() {
@@ -366,11 +383,14 @@ template<class T> class Chromosome : public AbstractChromosome {
 
 	}
 
+	// mutate chromosome by getting a copy of a segment of this chromosome and
+	// inserting that segment randomly into this chromosome
 	virtual void mutateCopy(int minSize, int maxSize) {
 		shared_ptr<Chromosome<T>> segment = dynamic_pointer_cast<Chromosome<T>>(getSegment(minSize, maxSize));
 		insertSegment(segment);
 	}
 
+	// delete a random segement from the chromosome
 	virtual void mutateDelete(int minSize, int maxSize) {
 		int segmentSize = Random::getInt(maxSize-minSize)+minSize;
 		if (segmentSize > sites.size()) {
@@ -381,7 +401,7 @@ template<class T> class Chromosome : public AbstractChromosome {
 		sites.erase(sites.begin()+segmentStart,sites.begin()+segmentStart+segmentSize);
 	}
 
-	// alter the sites of this chromosome to a crossed over chromosome made up of parents
+	// delete the sites of this chromosome. Then set sites to a crossed over chromosome made up of parents
 	virtual void crossover(vector<shared_ptr<AbstractChromosome>> parents, int crossCount) {
 		sites.resize(0);  // clear sites for this chromosome
 
