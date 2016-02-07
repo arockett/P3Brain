@@ -23,19 +23,6 @@
 
 using namespace std;
 
-const int& pointMutationRate = Parameters::register_parameter("pointMutationRate", .5, "starting size for genomes", "GENOME");
-
-int getTemp(string key) {
-	if (key == "moo") {
-		return 10;
-	} else if (key == "foo") {
-		return 2;
-	} else {
-		throw 20;
-	}
-	return 0;
-}
-
 //class ParameterTable {
 //	shared_ptr<map<string, double>> globalTable;
 //	shared_ptr<map<string, double>> localTable;
@@ -107,122 +94,122 @@ int main(int argc, const char * argv[]) {
 	  Parameters::initialize_parameters(argc, argv);  // loads command line and configFile values into registered parameters
 
 
-	auto chromosome1 = make_shared<Chromosome<double>>(10);
-	chromosome1->resize(5);
-	cout << chromosome1->chromosomeToStr() << "\n";
-	chromosome1->fillRandom();
-	cout << chromosome1->chromosomeToStr() << "\n";
-	chromosome1->fillRandom(11);
-	cout << chromosome1->chromosomeToStr() << "\n";
-
-	vector<string> stats = chromosome1->getStats();
-	for (auto stat : stats) {
-		cout << stat << "  ";
-	}
-	cout << "\n\n\n";
-
-	auto genome1 = make_shared<Genome>(make_shared<Chromosome<double>>(10,5), 7);
-	cout << genome1->genomeToStr() << "\n";
-	genome1->fillRandom();
-	cout << genome1->genomeToStr() << "\n";
-
-	auto GH = genome1->newHandler(genome1);
-	genome1->getStats();
-	while (!GH->atEOG()) {
-		cout << GH->readInt(0, 99) << "\n";
-	}
-	cout << "\n";
-
-	auto GH2 = genome1->newHandler(genome1);
-	double X;
-	int siteIndex = 0;
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
-	cout << X << " A\n";
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, false, 0, 12);
-	cout << X << " B\n";
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
-	cout << X << "\n";
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
-	cout << X << "\n";
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
-	cout << X << "\n";
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
-	cout << X << "\n";
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 111120, true, 0, 12);
-	cout << X << "\n";
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
-	cout << X << "\n";
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
-	cout << X << "\n";
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
-	cout << X << "\n";
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
-	cout << X << "\n";
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
-	cout << X << "\n";
-
-	siteIndex = 2;
-	genome1->chromosomes[1]->writeDouble(siteIndex, 5.6, 4.6, 6.6,true);
-	siteIndex = 2;
-	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, 0, 12,true);
-	cout << X << "\n";
-
-	double A = 20;
-	cout << A << "\n";
-	string key = "baa";
-
-	try {
-		cout << "key: " << key << " \n->";
-		cout << getTemp(key) << "\n";
-	} catch (int e) {
-		cout << "An exception occurred. Exception Nr. " << e << '\n';
-		A = 10;
-	}
-	cout << "\n" << A << "\n";
-
-	ParametersTable PT;
-	cout << "111\n";
-
-	PT.setGlobal("moo", 1.0);
-	cout << "222\n";
-	PT.setLocal("cow", 2.0);
-
-	cout << "AAA\n";
-	cout << PT.get("moo") << "\n";
-	cout << PT.get("cow") << "\n";
-	try {
-		cout << PT.get("no") << "\n";
-	} catch (const exception &errorCode) {
-		cout << "here?\n";
-		PT.setGlobal("no", 3.0);
-		cout << PT.get("no") << "\n";
-
-	}
-
-	ParametersTable PT2(PT);
-
-	cout << PT2.get("moo") << "\n";
-	cout << PT2.get("cow") << "\n";
-	cout << PT2.get("no") << "\n";
-
-	PT.showTables();
-	PT2.showTables();
-
-	int test = 990;
-
-	cout << "------\n";
-	PT2.setGlobal("heck", 0);
-	PT2.setGlobal("no", 10000);
-	PT.setLocal("cow", 100.0);
-	PT2.setLocal("cow", 45.0);
-	PT.setLocal("test", test);
-	cout << PT2.get("moo") << "\n";
-	PT2.setLocal("moo", 88787);
-
-	cout << PT2.get("moo") << "\n";
-
-	PT.showTables();
-	PT2.showTables();
+//	auto chromosome1 = make_shared<Chromosome<double>>(Genome::minGenomeSize,10);
+//	chromosome1->resize(5);
+//	cout << chromosome1->chromosomeToStr() << "\n";
+//	chromosome1->fillRandom();
+//	cout << chromosome1->chromosomeToStr() << "\n";
+//	chromosome1->fillRandom(11);
+//	cout << chromosome1->chromosomeToStr() << "\n";
+//
+//	vector<string> stats = chromosome1->getStats();
+//	for (auto stat : stats) {
+//		cout << stat << "  ";
+//	}
+//	cout << "\n\n\n";
+//
+//	auto genome1 = make_shared<Genome>(make_shared<Chromosome<double>>(Genome::minGenomeSize,5), 7);
+//	cout << genome1->genomeToStr() << "\n";
+//	genome1->fillRandom();
+//	cout << genome1->genomeToStr() << "\n";
+//
+//	auto GH = genome1->newHandler(genome1);
+//	genome1->getStats();
+//	while (!GH->atEOG()) {
+//		cout << GH->readInt(0, 99) << "\n";
+//	}
+//	cout << "\n";
+//
+//	auto GH2 = genome1->newHandler(genome1);
+//	double X;
+//	int siteIndex = 0;
+//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
+//	cout << X << " A\n";
+//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, false, 0, 12);
+//	cout << X << " B\n";
+//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
+//	cout << X << "\n";
+//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
+//	cout << X << "\n";
+//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
+//	cout << X << "\n";
+//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
+//	cout << X << "\n";
+//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 111120, true, 0, 12);
+//	cout << X << "\n";
+//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
+//	cout << X << "\n";
+//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
+//	cout << X << "\n";
+//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
+//	cout << X << "\n";
+//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
+//	cout << X << "\n";
+//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
+//	cout << X << "\n";
+//
+//	siteIndex = 2;
+//	genome1->chromosomes[1]->writeDouble(siteIndex, 5.6, 4.6, 6.6,true);
+//	siteIndex = 2;
+//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, 0, 12,true);
+//	cout << X << "\n";
+//
+//	double A = 20;
+//	cout << A << "\n";
+//	string key = "baa";
+//
+//	try {
+//		cout << "key: " << key << " \n->";
+//		cout << getTemp(key) << "\n";
+//	} catch (int e) {
+//		cout << "An exception occurred. Exception Nr. " << e << '\n';
+//		A = 10;
+//	}
+//	cout << "\n" << A << "\n";
+//
+//	ParametersTable PT;
+//	cout << "111\n";
+//
+//	PT.setGlobal("moo", 1.0);
+//	cout << "222\n";
+//	PT.setLocal("cow", 2.0);
+//
+//	cout << "AAA\n";
+//	cout << PT.get("moo") << "\n";
+//	cout << PT.get("cow") << "\n";
+//	try {
+//		cout << PT.get("no") << "\n";
+//	} catch (const exception &errorCode) {
+//		cout << "here?\n";
+//		PT.setGlobal("no", 3.0);
+//		cout << PT.get("no") << "\n";
+//
+//	}
+//
+//	ParametersTable PT2(PT);
+//
+//	cout << PT2.get("moo") << "\n";
+//	cout << PT2.get("cow") << "\n";
+//	cout << PT2.get("no") << "\n";
+//
+//	PT.showTables();
+//	PT2.showTables();
+//
+//	int test = 990;
+//
+//	cout << "------\n";
+//	PT2.setGlobal("heck", 0);
+//	PT2.setGlobal("no", 10000);
+//	PT.setLocal("cow", 100.0);
+//	PT2.setLocal("cow", 45.0);
+//	PT.setLocal("test", test);
+//	cout << PT2.get("moo") << "\n";
+//	PT2.setLocal("moo", 88787);
+//
+//	cout << PT2.get("moo") << "\n";
+//
+//	PT.showTables();
+//	PT2.showTables();
 
 //	auto chromosome2 = genome1->chromosomes[0]->getSegment(1,3);
 //
@@ -318,38 +305,72 @@ int main(int argc, const char * argv[]) {
 
 
 
-	cout << "------------------------------------------------\n";
-	auto grogTheGenome = make_shared<Genome>(make_shared<Chromosome<int>>(5,10), 2);
-	cout << grogTheGenome->genomeToStr() << "\n";
-
+	auto grogTheGenome = make_shared<Genome>(make_shared<Chromosome<int>>(10,100), 2,2);
 	auto grogsHandler = grogTheGenome->newHandler(grogTheGenome,true);
+	grogTheGenome->fillConstant(0,true);
 
-	int grogsTestValue;
+	auto fredTheGenome = make_shared<Genome>(make_shared<Chromosome<int>>(10,100), 2,2);
+	fredTheGenome->fillConstant(4,true);
 
-	grogsHandler->printIndex();
-	grogsTestValue = grogsHandler->readInt(0,3);
-	cout << grogsTestValue << "\n\n";
-	grogsHandler->printIndex();
+	auto tedTheGenome = grogTheGenome->makeMutatedGenome({grogTheGenome,fredTheGenome});
 
-	grogsHandler->advanceIndex(1);
-	grogsHandler->printIndex();
+	cout << "grogTheGenome\n"<< grogTheGenome->genomeToStr() << "\n\n";
+	cout << "fredTheGenome\n"<< fredTheGenome->genomeToStr() << "\n\n";
+	cout << "tedTheGenome\n"<< tedTheGenome->genomeToStr() << "\n\n";
 
-	grogsHandler->advanceIndex(20);
-	grogsHandler->printIndex();
 
-	grogsHandler->setReadDirection(false);
+//	//// WTF
+//	grogsHandler->resetHandler();
+//	grogsHandler->writeInt(56,0,99);
+//	cout << grogTheGenome->genomeToStr() << "grogsHandler->writeInt(56,0,99) \n";
+//
+//	grogsHandler->writeInt(7,0,999);
+//	cout << grogTheGenome->genomeToStr() << "grogsHandler->writeInt(7,0,999) \n";
+//
+//	grogsHandler->writeInt(333,0,999);
+//	cout << grogTheGenome->genomeToStr() << "grogsHandler->writeInt(333,0,999) \n";
+//
+//	grogsHandler->resetHandler();
+//	grogsHandler->printIndex();
+//	cout << grogsHandler->readInt(0,99) << "\n";
+//	cout << grogsHandler->readInt(0,999) << "\n";
+//	cout << grogsHandler->readInt(0,999) << "\n";
+//	grogsHandler->printIndex();
+//
+//	grogsHandler->resetHandler();
+//	grogsHandler->printIndex();
+//	cout << grogsHandler->readInt(0,99) << "  " << grogsHandler->readInt(0,999) << "  " << grogsHandler->readInt(0,999) << "\n";
+//	grogsHandler->printIndex();
+//	//// END WTF
 
-	grogsHandler->advanceIndex(20);
-	grogsHandler->printIndex();
+//	int grogsTestValue;
+//
+//	grogsHandler->printIndex();
+//	grogsTestValue = grogsHandler->readInt(0,3);
+//	cout << grogsTestValue << "\n\n";
+//	grogsHandler->printIndex();
+//
+//	grogsHandler->advanceIndex(1);
+//	grogsHandler->printIndex();
+//
+//	grogsHandler->advanceIndex(20);
+//	grogsHandler->printIndex();
+//
+//	grogsHandler->setReadDirection(false);
+//
+//	grogsHandler->advanceIndex(20);
+//	grogsHandler->printIndex();
+//
+//	//grogsHandler->setReadDirection(true);
+//
+//	grogsHandler->resetHandler();
+//	grogsHandler->printIndex();
+//
+//	cout << "------------------------------------------------\n";
+//
+//	//grogTheGenome->mutate();
 
-	//grogsHandler->setReadDirection(true);
 
-	grogsHandler->resetHandler();
-	grogsHandler->printIndex();
-
-	cout << "------------------------------------------------\n";
-
-	grogTheGenome->mutate();
 
 
 	return 0;

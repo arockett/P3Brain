@@ -51,6 +51,13 @@ class AbstractChromosome {
 		exit(1);
 		return nullptr;
 	}
+
+	virtual shared_ptr<AbstractChromosome> makeCopy() {
+		cout << "method makeCopy() in AbstractChromosome was called!\n This class only exists for polymorphism.\n";
+		exit(1);
+		return nullptr;
+	}
+
 	virtual void fillRandom() {
 		cout << "method fillRandom() in AbstractChromosome was called!\n This class only exists for polymorphism.\n";
 		exit(1);
@@ -59,6 +66,17 @@ class AbstractChromosome {
 		cout << "method fillRandom(int length) in AbstractChromosome was called!\n This class only exists for polymorphism.\n";
 		exit(1);
 	}
+
+	virtual void fillAcending(int &start) {
+		cout << "method fillAcending(int &start) in AbstractChromosome was called!\n This class only exists for polymorphism.\n";
+		exit(1);
+	}
+
+	virtual void fillConstant(const int value) {
+		cout << "method fillConstant(const int value) in AbstractChromosome was called!\n This class only exists for polymorphism.\n";
+		exit(1);
+	}
+
 
 	virtual string chromosomeToStr() {
 		cout << "method chromosomeToStr() in AbstractChromosome was called!\n This class only exists for polymorphism.\n";
@@ -194,6 +212,12 @@ template<class T> class Chromosome : public AbstractChromosome {
 		return make_shared<Chromosome<T>>(sites.size(),alphabetSize);
 	}
 
+	virtual shared_ptr<AbstractChromosome> makeCopy() {
+		shared_ptr<Chromosome> newChromosome =  make_shared<Chromosome<T>>(sites.size(),alphabetSize);
+		newChromosome->sites = sites;
+		return newChromosome;
+	}
+
 	// insures that a site index is valid, if in index is > sites.size(), mod it.
 	// return true if siteIndex went out of range
 	virtual inline bool modulateIndex(int &siteIndex) {
@@ -245,14 +269,15 @@ template<class T> class Chromosome : public AbstractChromosome {
 		vector<T> decomposedValue;
 		int writeValueSize = valueMax - valueMin + 1;
 		if (writeValueSize < value) {
-			cout << "ERROR : attempting to write value to chromosome. \n value is too large :: (valueMax - valueMin + 1) < value!";
+			cout << "ERROR : attempting to write value to chromosome. \n value is too large :: (valueMax - valueMin + 1) < value!\n";
+			exit(1);
 		}
 		while (writeValueSize > alphabetSize) {  // load value in alphabetSize chunks into decomposedValue
 			decomposedValue.push_back(value%((int)alphabetSize));
 			value = value/alphabetSize;
 			writeValueSize = writeValueSize/alphabetSize;
 		}
-
+		decomposedValue.push_back(value);
 		EOC = modulateIndex(siteIndex);  // make sure that the index is in range
 		while ( decomposedValue.size()>0 ) {  // starting with the last element in decomposedValue, copy into genome.
 			sites[siteIndex] = decomposedValue[decomposedValue.size()-1];
@@ -322,6 +347,23 @@ template<class T> class Chromosome : public AbstractChromosome {
 		fillRandom(sites.size());
 	}
 
+	// starting with value start, fill this chromosome with acending values.
+	// This function is to make testing easy.
+	virtual void fillAcending(int &start) override {
+		for (int i = 0; i < sites.size(); i++) {
+			sites[i] = (T)(start%(int)alphabetSize);
+			start++;
+		}
+	}
+
+	// fill all the sites of this chromosome with value.
+	// This function is to make testing easy.
+	virtual void fillConstant(const int value) override {
+		for (int i = 0; i < sites.size(); i++) {
+			sites[i] = (T)(value%(int)alphabetSize);
+		}
+	}
+
 	// convert a chromosome to a string
 	virtual string chromosomeToStr() {
 		string S = "";
@@ -363,7 +405,7 @@ template<class T> class Chromosome : public AbstractChromosome {
 			exit(1);
 		}
 		int segmentStart = Random::getInt(sites.size()-segmentSize);
-		shared_ptr<Chromosome<T>> segment = make_shared<Chromosome<T>>(alphabetSize);
+		shared_ptr<Chromosome<T>> segment = make_shared<Chromosome<T>>(0,alphabetSize);
 		auto it = sites.begin();
 		segment->sites.insert(segment->sites.begin(),it+segmentStart,it+segmentStart+segmentSize);
 		// copy sites from this to segment (the new chromosome)
@@ -432,11 +474,13 @@ template<class T> class Chromosome : public AbstractChromosome {
 			int pick;
 			int lastPick = 0;
 			for(int c = 0; c < crossLocations.size()-1; c++) {
+				// pick a chromosome to cross with. Make sure it's not the same chromosome!
 				pick = Random::getIndex(parents.size()-1);
 				if (pick == lastPick) {
 					pick++;
 				}
 				lastPick = pick;
+				// add the segment to this chromosome
 				sites.insert(sites.end(),
 						parentSites[pick].begin()+(int)((double)parentSites[pick].size()*crossLocations[c]),
 						parentSites[pick].begin()+(int)((double)parentSites[pick].size()*crossLocations[c+1]));

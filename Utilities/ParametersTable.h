@@ -49,6 +49,15 @@ class ParametersTable {
 		}
 	}
 
+	// copy from PT to this table
+	void copy(const ParametersTable &PT){
+		globalTable = PT.globalTable;
+		localTable = make_shared<unordered_map<string, double>>();
+		for (auto e : *PT.localTable) {
+			localTable->insert( { e.first, e.second });
+		}
+	}
+
 	// set a value in the global table
 	// if this key exists in the global table, it is overwritten.
 	void setGlobal(string key, double value) {

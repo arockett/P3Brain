@@ -78,6 +78,7 @@ using namespace std;
 //	}
 
 class AbstractGenome {
+
  public:
 
 	// Handlers are how you access Genomes for reading and writting.
@@ -117,7 +118,7 @@ class AbstractGenome {
 		}
 
 		virtual int readInt(int valueMin, int valueMax, int code = -1, int CodingRegionIndex = 0) {
-			return false;
+			return 0;
 		}
 
 		virtual void writeInt(int value, int valueMin, int valueMax) {
@@ -192,13 +193,22 @@ class AbstractGenome {
 class Genome : public AbstractGenome {
  public:
 
+	static int& initialGenomeSize;
+	static double& pointMutationRate;
+	static double& insertionRate;
+	static int& insertionMinSize;
+	static int& insertionMaxSize;
+	static double& deletionRate;
+	static int& deletionMinSize;
+	static int& deletionMaxSize;
+	static int& minGenomeSize;
+	static int& maxGenomeSize;
+	static int& crossCount;
 	class Handler : public AbstractGenome::Handler {
  	public:
 		shared_ptr<Genome> genome;
 		int siteIndex;
 		int chromosomeIndex;
-//		bool readDirection;
-//		bool EOG;
 
 		virtual void resetHandler() {
 			if (readDirection) {  // if reading forward
@@ -335,7 +345,6 @@ class Genome : public AbstractGenome {
 				advanceChromosome();
 			}
 		}
-		;
 
 		virtual void copyTo(shared_ptr<Handler> to) {
 			to->genome = genome;
@@ -358,23 +367,30 @@ class Genome : public AbstractGenome {
 	};
  public:
 	ParametersTable PT;
-
+	int ploidy;
 	vector<shared_ptr<AbstractChromosome>> chromosomes;
 
 	Genome() {
+		ploidy = 1;
 	}
 
 	Genome(shared_ptr<AbstractChromosome> _chromosome) {
+		ploidy = 1;
 		chromosomes.push_back(_chromosome->makeLike());
 		chromosomes[0]->fillRandom();  // resize and set with random values
 	}
 
-	Genome(shared_ptr<AbstractChromosome> _chromosome, int chromosomeCount) {
+	Genome(shared_ptr<AbstractChromosome> _chromosome, int chromosomeCount, int _plodiy = 1) {
+		if (_plodiy < 1) {
+			cout << "Error: Genome must have plodiy >= 1";
+			exit(1);
+		}
+		ploidy = _plodiy;
 		if (chromosomeCount < 1) {
 			cout << "Error: Genome must have at least one chromosome";
 			exit(1);
 		}
-		for (int i = 0; i < chromosomeCount; i++) {
+		for (int i = 0; i < (chromosomeCount * _plodiy); i++) {
 			chromosomes.push_back(_chromosome->makeLike());
 			chromosomes[i]->fillRandom();  // resize and set with random values
 		}
@@ -386,11 +402,31 @@ class Genome : public AbstractGenome {
 		return make_shared<Handler>(_genome, _readDirection);
 	}
 
-// randomize this genomes contents
-// the undefined action is to take no action
+	// randomize this genomes contents
 	virtual void fillRandom() {
 		for (auto chromosome : chromosomes) {
 			chromosome->fillRandom();
+		}
+	}
+
+	// fill all sites of this genome with ascending values
+	// This function is to make testing easy.
+	virtual void fillAcending() {
+		int start = 0;
+		for (int i = 0; i < (int) chromosomes.size(); i++) {
+			chromosomes[i]->fillAcending(start);
+		}
+	}
+
+	// fill all sites of this genome with value
+	// if "acendingChromosomes" = true, then increment value after each chromosome
+	// This function is to make testing easy.
+	virtual void fillConstant(int value, bool acendingChromosomes = false) {
+		for (int i = 0; i < (int) chromosomes.size(); i++) {
+			chromosomes[i]->fillConstant(value);
+			if (acendingChromosomes) {
+				value++;
+			}
 		}
 	}
 
@@ -398,82 +434,112 @@ class Genome : public AbstractGenome {
 
 // copy the contents of another genome to this genome
 // no undefined action, this function must be defined
-	virtual void copyGenome(shared_ptr<Genome> from) {
-	}
-
-// make a mutated genome. from this genome
-// the undefined action is to return a new genome
-	virtual shared_ptr<Genome> makeMutatedGenome() {
-		shared_ptr<Genome> genome;
-		return genome;
-	}
-
-// make a mutated genome. from a vector or genomes
-// the undefined action is to return a new genome
-	virtual shared_ptr<Genome> makeMutatedGenome(vector<shared_ptr<Genome>> from) {
-		shared_ptr<Genome> genome;
-		return genome;
+	virtual void copyFrom(shared_ptr<Genome> from) {
+		// deep copy chromosomes
+		// copy PT
+		chromosomes.resize(0);
+		for (auto chromosome : from->chromosomes) {
+			chromosomes.push_back(chromosome->makeCopy());
+		}
+		PT.copy(from->PT);
+		ploidy = from->ploidy;
 	}
 
 // Mutation functions
 
 // apply mutations to this genome
-// the undefined action is to take no action
 	virtual void mutate() {
 		int nucleotides = 0;
-		for (auto chromosome : chromosomes){
+		for (auto chromosome : chromosomes) {
 			nucleotides += chromosome->size();
 		}
 		// do some point mutations
-		int howMany = Random::getBinomial(nucleotides,PT.lookup("pointMutationRate"));
-		for (int i = 0; i<howMany; i++){
+		int howMany = Random::getBinomial(nucleotides, PT.lookup("pointMutationRate"));
+		for (int i = 0; i < howMany; i++) {
 			chromosomes[Random::getIndex(chromosomes.size())]->mutatePoint();
 		}
-		//int howMany = Random::getBinomial(nucleotides,PT.lookup("pointMutationRate"));
+		// do some copy mutations
+		if (nucleotides < PT.lookup("genomeSizeMax")) {
+			howMany = Random::getBinomial(nucleotides, PT.lookup("mutationCopyRate"));
+			for (int i = 0; i < howMany; i++) {
+				chromosomes[Random::getIndex(chromosomes.size())]->mutateCopy(PT.lookup("mutationCopyMinSize"), PT.lookup("mutationCopyMaxSize"));
+			}
+		}
+		// do some deletion mutations
+		if (nucleotides > PT.lookup("genomeSizeMin")) {
+			howMany = Random::getBinomial(nucleotides, PT.lookup("mutationDeletionRate"));
+			for (int i = 0; i < howMany; i++) {
+				chromosomes[Random::getIndex(chromosomes.size())]->mutateDelete(PT.lookup("mutationDeletionMinSize"), PT.lookup("mutationDeletionMaxSize"));
+			}
+		}
+	}
 
+	// make a mutated genome. from this genome
+	// the undefined action is to return a new genome
+	virtual shared_ptr<Genome> makeMutatedGenome(shared_ptr<Genome> parent) {
+		auto newGenome = make_shared<Genome>();
+		newGenome->copyFrom(parent);
+		newGenome->mutate();
+		return newGenome;
+	}
 
-//		if (pointMutationRate > 0.0) {
-//			int nucleotides = (int) sites.size();
-//			int i, s, o, w;
-//			vector<unsigned char> buffer;
-//			int localMutations = Random::getBinomial(nucleotides, pointMutationRate);
-//			for (i = 0; i < localMutations; i++) {
-//				sites[Random::getIndex(nucleotides)] = Random::getIndex(256);
-//			}
-//			int numInsertions = Random::getBinomial((int) sites.size(), (insertionRate / 1000));
-//			while (numInsertions > 0) {
-//				if ((int) nucleotides < maxGenomeSize) {
-//					//duplication
-//					w = 128 + Random::getIndex(512 - 128);  // w is between 128 and 512 (size of the chunk to be duplicated)
-//					if (w >= nucleotides) {  // if w is >= the size of the genome, make w smaller!
-//						w = nucleotides - 1;
-//					}
-//					s = Random::getIndex(nucleotides - w);  // s is where to start copying from.
-//					o = Random::getIndex(nucleotides);  // o is where the chunk will be written
-//					buffer.clear();
-//					buffer.insert(buffer.begin(), sites.begin() + s, sites.begin() + s + w);  // put s to (s+w) in buffer
-//					sites.insert(sites.begin() + o, buffer.begin(), buffer.end());  // insert buffer into genome
-//				}
-//				nucleotides = (int) sites.size();
-//				numInsertions--;
-//			}
-//
-//			int numDels = Random::getBinomial(nucleotides, (deletionRate / 1000));
-//			while (numDels > 0) {
-//
-//				if (nucleotides > minGenomeSize) {
-//					//deletion
-//					w = 128 + Random::getIndex(512 - 128);  //  w is between 128 and 255 (size of the chunk to be deleted)
-//					if (w >= nucleotides) {  // if w is >= the size of the genome, make w smaller!
-//						w = nucleotides - 1;
-//					}
-//					s = Random::getIndex(nucleotides - w);  // s is where to start deleting from.
-//					sites.erase(sites.begin() + s, sites.begin() + s + w);  // erase everything between s and (s+w)
-//				}
-//				nucleotides = (int) sites.size();
-//				numDels--;
-//			}
-//		}
+	// make a mutated genome from a vector or genomes
+	// inherit the ParamatersTable from the 0th parent
+	// assumes all genomes have the same number of chromosomes and same ploidy
+	// if haploid, then all chromosomes are directly crossed (i.e. if there are 4 parents,
+	// each parents 0 chromosome is crossed to make a new 0 chromosome, then each parents 1 chromosome...
+	// if ploidy > 1 then the number of parents must match ploidy (this may be extended in the future)
+	// in this case, each parent crosses all of its chromosomes and contributs the result as a new chromosome
+	virtual shared_ptr<Genome> makeMutatedGenome(vector<shared_ptr<Genome>> parents) {
+		// first, check to make sure that parent genomes are conpatable.
+		int testPloidy = parents[0]->ploidy;
+		size_t testChromosomeCount = parents[0]->chromosomes.size();
+		for (auto parent:parents){
+			if (parent->ploidy!=testPloidy){
+				cout << "ERROR! In Genome::makeMutatedGenome(vector<shared_ptr<Genome>> parents). Parents are incompatible due to mismatched ploidy!\nExiting!\n";
+				exit(1);
+			}
+			if (parent->chromosomes.size()!=testChromosomeCount){
+				cout << "ERROR! In Genome::makeMutatedGenome(vector<shared_ptr<Genome>> parents). Parents are incompatible due to mismatched number of Chromosomes!\nExiting!\n";
+				exit(1);
+			}
+
+		}
+		auto newGenome = make_shared<Genome>();
+		newGenome->PT.copy(parents[0]->PT);  // copy ParametersTable from 0th parent
+		newGenome->ploidy = parents[0]->ploidy;  // copy ploidy from 0th parent
+
+		if (ploidy == 1) {  // if haploid then cross chromosomes from all parents
+			for (size_t i = 0; i < parents[0]->chromosomes.size(); i++) {
+				newGenome->chromosomes.push_back(parents[0]->chromosomes[0]->makeLike());
+				vector<shared_ptr<AbstractChromosome>> parentChromosomes;
+				for (auto parent : parents) {
+					parentChromosomes.push_back(parent->chromosomes[i]);  // make a vector that contains the nth chromosome from each parent
+				}
+				newGenome->chromosomes[newGenome->chromosomes.size() - 1]->crossover(parentChromosomes, newGenome->PT.lookup("genomecrossCount"));  // create a crossover chromosome
+			}
+		} else if (ploidy == (int) parents.size()) {  // if diploid than cross chromosomes from all parents
+			int setCount = parents[0]->chromosomes.size() / ploidy;  // number of sets of chromosomes
+			for (int currSet = 0; currSet < setCount; currSet++) {
+				int parentCount = 0;
+				for (auto parent : parents) {
+
+					newGenome->chromosomes.push_back(parents[0]->chromosomes[0]->makeLike());  // add a chromosome to this genome
+					vector<shared_ptr<AbstractChromosome>> parentChromosomes;
+					for (int pCount = 0; pCount < ploidy; pCount++) {  // make a vector containing all the chromosomes in this chromosome set from this parent
+						parentChromosomes.push_back(parent->chromosomes[(currSet * ploidy) + pCount]);
+					}
+					newGenome->chromosomes[newGenome->chromosomes.size() - 1]->crossover(parentChromosomes, newGenome->PT.lookup("genomecrossCount"));
+					parentCount++;
+				}
+			}
+		} else {  // ploidy does not match number of parents...
+			cout << "In Genome::makeMutatedGenome(). ploidy > 1 and ploidy != number of parents... this is not supported (yet)!\nWhat does it even mean?\nExiting!";
+			exit(1);
+		}
+
+		newGenome->mutate();
+		return newGenome;
 	}
 
 // IO and Data Management functions
@@ -503,6 +569,9 @@ class Genome : public AbstractGenome {
 	// convert a chromosome to a string
 	virtual string genomeToStr() {
 		string S = "";
+		if (ploidy > 1) {
+			S = S + "ploidy: " + to_string(ploidy) + "\n";
+		}
 		for (auto chromosome : chromosomes) {
 			S = S + chromosome->chromosomeToStr();
 		}

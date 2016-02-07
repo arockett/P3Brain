@@ -13,8 +13,8 @@ template<> Chromosome<unsigned char>::Chromosome(int chromosomeLength) {
 }
 
 template<> Chromosome<unsigned char>::Chromosome(int chromosomeLength, double _alphabetSize) {
-	if (_alphabetSize > 256){
-		cout << "ERROR: alphabetSize for unsigned char must be 256 or less!\n";
+	if (_alphabetSize > 256 || _alphabetSize < 2){
+		cout << "ERROR: alphabetSize for unsigned char must be 2 or greater and 256 or less!\n";
 		exit(1);
 	}
 	alphabetSize = _alphabetSize;
@@ -50,6 +50,10 @@ template<> Chromosome<int>::Chromosome(int chromosomeLength) {
 }
 
 template<> Chromosome<int>::Chromosome(int chromosomeLength, double _alphabetSize) {
+	if (_alphabetSize < 2){
+		cout << "ERROR: alphabetSize for int must be 2 or greater!\n";
+		exit(1);
+	}
 	alphabetSize = _alphabetSize;
 	sites.resize(chromosomeLength);
 }
