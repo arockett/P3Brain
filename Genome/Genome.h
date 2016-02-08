@@ -124,6 +124,11 @@ class AbstractGenome {
 		virtual void writeInt(int value, int valueMin, int valueMax) {
 		}
 
+		virtual vector<vector<int>> readTable(vector<int> tableSize, vector<int> tableMaxSize, vector<int> valueRange, int code = -1, int CodingRegionIndex = 0) {
+			vector<vector<int>> temp;
+			return temp;
+		}
+
 		virtual void copyTo(shared_ptr<Handler> to) {
 		}
 
@@ -173,20 +178,8 @@ class AbstractGenome {
 		return "";
 	}
 
-//	virtual vector<vector<int>> readTable(vector<int> tableSize, vector<int> tableMaxSize, vector<int> valueRange, int code = -1, int gateID = 0){
-//		vector<vector<int>> tempTable;
-//		return tempTable;
-//	}
-
-	//virtual void loadGenome(string fileName, string key, string keyValue) {
-
-	//virtual void mutate()
-	//virtual void fillRandom()
-	//virtual shared_ptr<Genome> makeMutatedGenome()
-	//virtual shared_ptr<Genome> makeMutatedGenome(vector<shared_ptr<Genome>> from)
-
-	//virtual vector<string> getStats() {
-	//virtual string convert_to_string() {
+	virtual void loadGenome(string fileName, string key, string keyValue) {
+	}
 
 };
 
@@ -331,6 +324,7 @@ class Genome : public AbstractGenome {
 		}
 
 		virtual int readInt(int valueMin, int valueMax, int code = -1, int CodingRegionIndex = 0) {
+			////cout << "readInt() " << valueMin << " " << valueMax << "\n";
 			int value;
 			modulateIndex();
 			if (genome->chromosomes[chromosomeIndex]->readInt(siteIndex, value, valueMin, valueMax, readDirection, code, CodingRegionIndex)) {
@@ -362,7 +356,34 @@ class Genome : public AbstractGenome {
 			}
 		}
 
-		//virtual vector<vector<int>> readTable(shared_ptr<Index> index, vector<int> tableSize, vector<int> tableMaxSize, vector<int> valueRange, int code = -1, int gateID = 0);
+		virtual vector<vector<int>> readTable(vector<int> tableSize, vector<int> tableMaxSize, vector<int> valueRange, int code = -1, int CodingRegionIndex = 0) {
+			vector<vector<int>> table;
+			int x = 0;
+			int y = 0;
+			int Y = tableSize[0];
+			int X = tableSize[1];
+			int maxY = tableMaxSize[0];
+			int maxX = tableMaxSize[1];
+
+			table.resize(Y);  // set the number of rows in the table
+
+			for (; y < (Y); y++) {
+				table[y].resize(X);  // set the number of columns in this row
+				for (x = 0; x < X; x++) {
+					//table[y][x] = (Type) (sites[index]);
+					table[y][x] = readInt(valueRange[0], valueRange[1], code, CodingRegionIndex);
+				}
+				for (; x < maxX; x++) {
+					readInt(valueRange[0], valueRange[1]);  // advance genomeIndex to account for unused entries in the max sized table for this row
+				}
+			}
+			for (; y < (maxY); y++) {
+				for (x = 0; x < maxX; x++) {
+					readInt(valueRange[0], valueRange[1]);  // advance to account for unused rows
+				}
+			}
+			return table;
+		}
 
 	};
  public:
@@ -447,12 +468,16 @@ class Genome : public AbstractGenome {
 
 // Mutation functions
 
-// apply mutations to this genome
-	virtual void mutate() {
+	virtual int countSites() {
 		int nucleotides = 0;
 		for (auto chromosome : chromosomes) {
 			nucleotides += chromosome->size();
 		}
+		return nucleotides;
+	}
+// apply mutations to this genome
+	virtual void mutate() {
+		int nucleotides = countSites();
 		// do some point mutations
 		int howMany = Random::getBinomial(nucleotides, PT.lookup("pointMutationRate"));
 		for (int i = 0; i < howMany; i++) {
@@ -461,15 +486,17 @@ class Genome : public AbstractGenome {
 		// do some copy mutations
 		if (nucleotides < PT.lookup("genomeSizeMax")) {
 			howMany = Random::getBinomial(nucleotides, PT.lookup("mutationCopyRate"));
-			for (int i = 0; i < howMany; i++) {
+			for (int i = 0; i < howMany && (nucleotides < PT.lookup("genomeSizeMax")); i++) {
 				chromosomes[Random::getIndex(chromosomes.size())]->mutateCopy(PT.lookup("mutationCopyMinSize"), PT.lookup("mutationCopyMaxSize"));
+				nucleotides = countSites();
 			}
 		}
 		// do some deletion mutations
 		if (nucleotides > PT.lookup("genomeSizeMin")) {
 			howMany = Random::getBinomial(nucleotides, PT.lookup("mutationDeletionRate"));
-			for (int i = 0; i < howMany; i++) {
+			for (int i = 0; i < howMany && (nucleotides > PT.lookup("genomeSizeMin")); i++) {
 				chromosomes[Random::getIndex(chromosomes.size())]->mutateDelete(PT.lookup("mutationDeletionMinSize"), PT.lookup("mutationDeletionMaxSize"));
+				nucleotides = countSites();
 			}
 		}
 	}
@@ -494,12 +521,12 @@ class Genome : public AbstractGenome {
 		// first, check to make sure that parent genomes are conpatable.
 		int testPloidy = parents[0]->ploidy;
 		size_t testChromosomeCount = parents[0]->chromosomes.size();
-		for (auto parent:parents){
-			if (parent->ploidy!=testPloidy){
+		for (auto parent : parents) {
+			if (parent->ploidy != testPloidy) {
 				cout << "ERROR! In Genome::makeMutatedGenome(vector<shared_ptr<Genome>> parents). Parents are incompatible due to mismatched ploidy!\nExiting!\n";
 				exit(1);
 			}
-			if (parent->chromosomes.size()!=testChromosomeCount){
+			if (parent->chromosomes.size() != testChromosomeCount) {
 				cout << "ERROR! In Genome::makeMutatedGenome(vector<shared_ptr<Genome>> parents). Parents are incompatible due to mismatched number of Chromosomes!\nExiting!\n";
 				exit(1);
 			}
@@ -549,6 +576,8 @@ class Genome : public AbstractGenome {
 // the undefined action is to return an empty vector
 	virtual vector<string> getStats() {
 		vector<string> dataPairs;
+		dataPairs.push_back("SitesCount");
+		dataPairs.push_back(to_string(countSites()));
 		dataPairs.push_back("ChromosomeCount");
 		dataPairs.push_back(to_string(chromosomes.size()));
 		return (dataPairs);
@@ -560,11 +589,6 @@ class Genome : public AbstractGenome {
 	}
 
 // Translation functions - convert genomes into usefull stuff
-
-// return total number of sites in this genome
-	virtual int getSize() {
-		return 0;
-	}
 
 	// convert a chromosome to a string
 	virtual string genomeToStr() {

@@ -14,7 +14,27 @@
 
 #include "Global.h"
 
+#include "Archivist/Archivist.h"
+#include "Archivist/LODwAP_Archivist.h"
+#include "Archivist/snapshot_Archivist.h"
+#include "Archivist/SSwD_Archivist.h"
+#include "Brain/ClassicBrain.h"
+
 #include "Genome/Genome.h"
+//#include "Genome/ByteGenome.h"
+
+#include "GateListBuilder/GateListBuilder.h"
+
+#include "Group/Group.h"
+
+#include "Optimizer/Optimizer.h"
+#include "Optimizer/GA_Optimizer.h"
+#include "Optimizer/Tournament_Optimizer.h"
+#include "Optimizer/Tournament2_Optimizer.h"
+
+#include "Organism/Organism.h"
+#include "World/World.h"
+#include "World/BerryWorld.h"
 
 #include "Utilities/Parameters.h"
 #include "Utilities/Random.h"
@@ -23,356 +43,115 @@
 
 using namespace std;
 
-//class ParameterTable {
-//	shared_ptr<map<string, double>> globalTable;
-//	shared_ptr<map<string, double>> localTable;
-//
-// public:
-//  Parameters::initialize_parameters(argc, argv);  // loads command line and configFile values into registered parameters
-
-//	ParameterTable() {
-//		globalTable = make_shared<map<string, double>>();
-//		localTable = make_shared<map<string, double>>();
-//	}
-//
-//	ParameterTable(const ParameterTable &PT) {
-//		globalTable = PT.globalTable;
-//		localTable = make_shared<map<string, double>>();
-//		for (auto e : *PT.localTable) {
-//			localTable->insert( { e.first, e.second });
-//		}
-//	}
-//
-//	void setGlobal(string key, double value) {
-//		globalTable->erase(key);
-//		globalTable->insert( { key, value });
-//		localTable->erase(key);
-//	}
-//
-//	void setLocal(string key, double value) {
-//		localTable->erase(key);
-//		localTable->insert( { key, value });
-//	}
-//
-//	void eraseLocal(string key) {
-//		localTable->erase(key);
-//	}
-//
-//	void eraseGlobal(string key) {
-//		globalTable->erase(key);
-//	}
-//
-//	double get(string key) {
-//		double returnValue;
-//		if (localTable->count(key) > 0) {
-//			cout << "HERE1\n";
-//			returnValue = localTable->at(key);
-//		} else if (globalTable->count(key) > 0) {
-//			cout << "HERE2\n";
-//			returnValue = globalTable->at(key);
-//		} else {
-//			throw 51;
-//		}
-//		return returnValue;
-//	}
-//
-//	void showTables() {
-//		cout << "globalTable:\n";
-//		for (auto e : *globalTable) {
-//			cout << "   " << e.first << " = " << e.second << "\n";
-//		}
-//		cout << "localTable:\n";
-//		for (auto e : *localTable) {
-//			cout << "   " << e.first << " = " << e.second << "\n";
-//		}
-//	}
-//
-//};
-
 int main(int argc, const char * argv[]) {
 
-	  Parameters::initialize_parameters(argc, argv);  // loads command line and configFile values into registered parameters
+	Parameters::initialize_parameters(argc, argv);  // loads command line and configFile values into registered parameters
+	                                                // also writes out a config file if requested
 
+	//make a node map to handle genome value to brain state address look up.
+	ClassicBrain::makeNodeMap(ClassicBrain::defaultNodeMap, Global::bitsPerBrainAddress, ClassicBrain::defaultNrOfBrainStates);
 
-//	auto chromosome1 = make_shared<Chromosome<double>>(Genome::minGenomeSize,10);
-//	chromosome1->resize(5);
-//	cout << chromosome1->chromosomeToStr() << "\n";
-//	chromosome1->fillRandom();
-//	cout << chromosome1->chromosomeToStr() << "\n";
-//	chromosome1->fillRandom(11);
-//	cout << chromosome1->chromosomeToStr() << "\n";
-//
-//	vector<string> stats = chromosome1->getStats();
-//	for (auto stat : stats) {
-//		cout << stat << "  ";
-//	}
-//	cout << "\n\n\n";
-//
-//	auto genome1 = make_shared<Genome>(make_shared<Chromosome<double>>(Genome::minGenomeSize,5), 7);
-//	cout << genome1->genomeToStr() << "\n";
-//	genome1->fillRandom();
-//	cout << genome1->genomeToStr() << "\n";
-//
-//	auto GH = genome1->newHandler(genome1);
-//	genome1->getStats();
-//	while (!GH->atEOG()) {
-//		cout << GH->readInt(0, 99) << "\n";
-//	}
-//	cout << "\n";
-//
-//	auto GH2 = genome1->newHandler(genome1);
-//	double X;
-//	int siteIndex = 0;
-//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
-//	cout << X << " A\n";
-//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, false, 0, 12);
-//	cout << X << " B\n";
-//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
-//	cout << X << "\n";
-//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
-//	cout << X << "\n";
-//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
-//	cout << X << "\n";
-//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
-//	cout << X << "\n";
-//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 111120, true, 0, 12);
-//	cout << X << "\n";
-//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
-//	cout << X << "\n";
-//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
-//	cout << X << "\n";
-//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
-//	cout << X << "\n";
-//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
-//	cout << X << "\n";
-//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, true, 0, 12);
-//	cout << X << "\n";
-//
-//	siteIndex = 2;
-//	genome1->chromosomes[1]->writeDouble(siteIndex, 5.6, 4.6, 6.6,true);
-//	siteIndex = 2;
-//	genome1->chromosomes[1]->siteToDouble(siteIndex, X, 0, 10, 0, 12,true);
-//	cout << X << "\n";
-//
-//	double A = 20;
-//	cout << A << "\n";
-//	string key = "baa";
-//
-//	try {
-//		cout << "key: " << key << " \n->";
-//		cout << getTemp(key) << "\n";
-//	} catch (int e) {
-//		cout << "An exception occurred. Exception Nr. " << e << '\n';
-//		A = 10;
-//	}
-//	cout << "\n" << A << "\n";
-//
-//	ParametersTable PT;
-//	cout << "111\n";
-//
-//	PT.setGlobal("moo", 1.0);
-//	cout << "222\n";
-//	PT.setLocal("cow", 2.0);
-//
-//	cout << "AAA\n";
-//	cout << PT.get("moo") << "\n";
-//	cout << PT.get("cow") << "\n";
-//	try {
-//		cout << PT.get("no") << "\n";
-//	} catch (const exception &errorCode) {
-//		cout << "here?\n";
-//		PT.setGlobal("no", 3.0);
-//		cout << PT.get("no") << "\n";
-//
-//	}
-//
-//	ParametersTable PT2(PT);
-//
-//	cout << PT2.get("moo") << "\n";
-//	cout << PT2.get("cow") << "\n";
-//	cout << PT2.get("no") << "\n";
-//
-//	PT.showTables();
-//	PT2.showTables();
-//
-//	int test = 990;
-//
-//	cout << "------\n";
-//	PT2.setGlobal("heck", 0);
-//	PT2.setGlobal("no", 10000);
-//	PT.setLocal("cow", 100.0);
-//	PT2.setLocal("cow", 45.0);
-//	PT.setLocal("test", test);
-//	cout << PT2.get("moo") << "\n";
-//	PT2.setLocal("moo", 88787);
-//
-//	cout << PT2.get("moo") << "\n";
-//
-//	PT.showTables();
-//	PT2.showTables();
+	Gate_Builder::setupGates();  // determines which gate types will be in use.
 
-//	auto chromosome2 = genome1->chromosomes[0]->getSegment(1,3);
-//
-//	chromosome2 = genome1->chromosomes[0]->getSegment(1,1);
-//	genome1->chromosomes[1]->resize(0);
-//	genome1->chromosomes[1]->insertSegment(chromosome2);
-//	genome1->chromosomes[1]->insertSegment(chromosome2);
-//	genome1->chromosomes[1]->insertSegment(chromosome2);
-//	genome1->chromosomes[1]->insertSegment(chromosome2);
-//	genome1->chromosomes[1]->insertSegment(chromosome2);
-//	genome1->chromosomes[1]->insertSegment(chromosome2);
-//	genome1->chromosomes[1]->insertSegment(chromosome2);
-//	genome1->chromosomes[1]->insertSegment(chromosome2);
-//	genome1->chromosomes[1]->insertSegment(chromosome2);
-//	genome1->chromosomes[1]->insertSegment(chromosome2);
-//
-//	chromosome2 = genome1->chromosomes[0]->getSegment(1,1);
-//	genome1->chromosomes[2]->resize(0);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//	genome1->chromosomes[2]->insertSegment(chromosome2);
-//
-//	genome1->chromosomes[0]->crossover({genome1->chromosomes[4],genome1->chromosomes[1],genome1->chromosomes[2]},13);
-//
-//	cout << "\n\n\n---XXX\n";
-//	cout << genome1->genomeToStr() << "\n";
-//	cout << "---XXX\n\n\n";
-//
-//	genome1->chromosomes[0]->crossover({genome1->chromosomes[1],genome1->chromosomes[2]},6);
-//
-//	cout << "\n\n\n---XXX\n";
-//	cout << genome1->genomeToStr() << "\n";
-//	cout << "---XXX\n\n\n";
-//
-//	genome1->chromosomes[0]->crossover({genome1->chromosomes[1]},20);
-//
-//	cout << "\n\n\n---XXX\n";
-//	cout << genome1->genomeToStr() << "\n";
-//	cout << "---XXX\n\n\n";
-//
-//	cout << genome1->genomeToStr() << "\n";
-//	genome1->chromosomes[1]->mutatePoint();
-//	cout << genome1->genomeToStr() << "\n";
-//	genome1->chromosomes[1]->mutateCopy(2,4);
-//	genome1->chromosomes[1]->mutateDelete(2,4);
+	// outputDirectory must exist. If outputDirectory does not exist, no error will occur, but no data will be writen.
+	FileManager::outputDirectory = Global::outputDirectory;
 
+	if (Global::randomSeed == -1) {
+		random_device rd;
+		Random::getCommonGenerator().seed(rd());
+	} else {
+		Random::getCommonGenerator().seed(Global::randomSeed);
+	}
 
+	World *world = (World*) new BerryWorld();  //new World();
 
-	auto grogTheGenome = make_shared<Genome>(make_shared<Chromosome<int>>(10,100), 2,2);
-	auto grogsHandler = grogTheGenome->newHandler(grogTheGenome,true);
-	grogTheGenome->fillConstant(0,true);
+////  ///// to show org in world
+//  shared_ptr<Genome> testGenome = make_shared<Genome>();
+//  testGenome->loadSites("genome.csv",1000);
+//  shared_ptr<Organism> testOrg = make_shared<Organism>(testGenome, make_shared<Brain>());
+//  world->testIndividual(testOrg,0,1);
+//  exit(0);
+////  ///// end to show org in world
 
-	auto fredTheGenome = make_shared<Genome>(make_shared<Chromosome<int>>(10,100), 2,2);
-	fredTheGenome->fillConstant(4,true);
+	//////////////////
+	// define population
+	//////////////////
 
-	auto tedTheGenome = grogTheGenome->makeMutatedGenome({grogTheGenome,fredTheGenome});
+	shared_ptr<Group> group;
 
-	cout << "grogTheGenome\n"<< grogTheGenome->genomeToStr() << "\n\n";
-	cout << "fredTheGenome\n"<< fredTheGenome->genomeToStr() << "\n\n";
-	cout << "tedTheGenome\n"<< tedTheGenome->genomeToStr() << "\n\n";
+	{
+		// a progenitor must exist - that is, one ancestor genome
+		Global::update = -1;  // before there was time, there was a progenitor
+		shared_ptr<ClassicBrain> tesBrain = make_shared<ClassicBrain>(make_shared<Classic_GateListBuilder>());
+		cout << "AA\n";
 
+		shared_ptr<Organism> progenitor = make_shared<Organism>(make_shared<Genome>(make_shared<Chromosome<unsigned char>>(5000,256),1,1), make_shared<ClassicBrain>(make_shared<Classic_GateListBuilder>()));  // make a organism with a genome and brain (if you need to change the types here is where you do it)
+		cout << "AA\n";
 
-//	//// WTF
-//	grogsHandler->resetHandler();
-//	grogsHandler->writeInt(56,0,99);
-//	cout << grogTheGenome->genomeToStr() << "grogsHandler->writeInt(56,0,99) \n";
-//
-//	grogsHandler->writeInt(7,0,999);
-//	cout << grogTheGenome->genomeToStr() << "grogsHandler->writeInt(7,0,999) \n";
-//
-//	grogsHandler->writeInt(333,0,999);
-//	cout << grogTheGenome->genomeToStr() << "grogsHandler->writeInt(333,0,999) \n";
-//
-//	grogsHandler->resetHandler();
-//	grogsHandler->printIndex();
-//	cout << grogsHandler->readInt(0,99) << "\n";
-//	cout << grogsHandler->readInt(0,999) << "\n";
-//	cout << grogsHandler->readInt(0,999) << "\n";
-//	grogsHandler->printIndex();
-//
-//	grogsHandler->resetHandler();
-//	grogsHandler->printIndex();
-//	cout << grogsHandler->readInt(0,99) << "  " << grogsHandler->readInt(0,999) << "  " << grogsHandler->readInt(0,999) << "\n";
-//	grogsHandler->printIndex();
-//	//// END WTF
+		Global::update = 0;  // the beginning of time - now we construct the first population
+		vector<shared_ptr<Organism>> population;
+		for (int i = 0; i < Global::popSize; i++) {
+			shared_ptr<Genome> genome = make_shared<Genome>(make_shared<Chromosome<unsigned char>>(5000,256),1,1);
+			cout << "CC\n";
 
-//	int grogsTestValue;
-//
-//	grogsHandler->printIndex();
-//	grogsTestValue = grogsHandler->readInt(0,3);
-//	cout << grogsTestValue << "\n\n";
-//	grogsHandler->printIndex();
-//
-//	grogsHandler->advanceIndex(1);
-//	grogsHandler->printIndex();
-//
-//	grogsHandler->advanceIndex(20);
-//	grogsHandler->printIndex();
-//
-//	grogsHandler->setReadDirection(false);
-//
-//	grogsHandler->advanceIndex(20);
-//	grogsHandler->printIndex();
-//
-//	//grogsHandler->setReadDirection(true);
-//
-//	grogsHandler->resetHandler();
-//	grogsHandler->printIndex();
-//
-//	cout << "------------------------------------------------\n";
-//
-//	//grogTheGenome->mutate();
+			genome->fillRandom();
+			shared_ptr<Organism> org = make_shared<Organism>(progenitor, genome);
+			population.push_back(org);  // add a new org to population using progenitors template and a new random genome
+			population[population.size() - 1]->gender = Random::getInt(0, 1);  // assign a random gender to the new org
+		}
+		progenitor->kill();  // the progenitor has served it's purpose.
 
+		shared_ptr<Archivist> archivist;
 
+		if (Archivist::Arch_outputMethodStr == "default") {
+			archivist = make_shared<Archivist>();
+		}
+		if (Archivist::Arch_outputMethodStr == "LODwAP") {
+			archivist = make_shared<LODwAP_Archivist>();
+		}
+		if (Archivist::Arch_outputMethodStr == "snapshot") {
+			archivist = make_shared<Snapshot_Archivist>();
+		}
+		if (Archivist::Arch_outputMethodStr == "SSwD") {
+			archivist = make_shared<SSwD_Archivist>();
+		}
 
+		group = make_shared<Group>(population, make_shared<Tournament>(), archivist);
+	}
 
+//////////////////
+// evolution loop
+//////////////////
+
+//  if (Archivist::outputMethod == -1) {  // this is the first time archive is called. get the output method
+//    if (Archivist::outputMethodStr == "LODwAP") {
+//      Archivist::outputMethod = 0;
+//    } else if (Archivist::outputMethodStr == "SSwD") {
+//      Archivist::outputMethod = 1;
+//    } else {
+//      cout << "unrecognized archive method \"" << Archivist::outputMethodStr << "\". Should be either \"LODwAP\" or \"SSwD\"\nExiting.\n";
+//      exit(1);
+//    }
+//  }
+	bool finished = false;  // when the archivist says we are done, we can stop!
+
+	while (!finished) {
+		world->evaluateFitness(group->population, false);  // evaluate each organism in the population using a World
+		finished = group->archive();  // save data, update memory and delete any unneeded data;
+
+		Global::update++;
+
+		group->optimize();  // update the population (reproduction and death)
+
+		cout << "update: " << Global::update - 1 << "   maxFitness: " << group->optimizer->maxFitness << "\n";
+	}
+
+	group->archive(1);  // flush any data that has not been output yet
+
+	if (Archivist::Arch_outputMethodStr == "LODwAP") {  // if using LODwAP, write out some info about MRCA
+		shared_ptr<Organism> FinalMRCA = group->population[0]->getMostRecentCommonAncestor(group->population[0]);
+		cout << "MRCA - ID: " << FinalMRCA->ID << " born on: " << FinalMRCA->timeOfBirth << "\n" << FinalMRCA->brain->description();
+		//cout << "\n\n" << FinalMRCA->genome->showCodingRegions();
+	}
 	return 0;
 }
-

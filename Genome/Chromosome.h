@@ -366,7 +366,7 @@ template<class T> class Chromosome : public AbstractChromosome {
 
 	// convert a chromosome to a string
 	virtual string chromosomeToStr() {
-		string S = "";
+		string S = to_string(alphabetSize) + " ";
 
 		for (int i = 0; i < sites.size(); i++) {
 			S = S + to_string(sites[i]) + " ";
@@ -401,7 +401,9 @@ template<class T> class Chromosome : public AbstractChromosome {
 	virtual shared_ptr<AbstractChromosome> getSegment(int minSize, int maxSize) {
 		int segmentSize = Random::getInt(maxSize-minSize)+minSize;
 		if (segmentSize > sites.size()) {
-			cout << "ERROR: in Chromosome::getSegement, segmentSize is > then sites.size()!\nExitting!\n";
+			cout << "segmentSize = " << segmentSize << "  sites.size() = " << sites.size() << endl;
+			cout << "maxSize:minSize" << maxSize << ":" << minSize << endl;
+			cout << "ERROR: in Chromosome::getSegement, segmentSize is > then sites.size()!\nExitting!"<<endl;
 			exit(1);
 		}
 		int segmentStart = Random::getInt(sites.size()-segmentSize);
@@ -435,12 +437,16 @@ template<class T> class Chromosome : public AbstractChromosome {
 	// delete a random segement from the chromosome
 	virtual void mutateDelete(int minSize, int maxSize) {
 		int segmentSize = Random::getInt(maxSize-minSize)+minSize;
+		////cout << "In Chromosome::mutateDelete ::: segmentSize = " << segmentSize << "  sites.size() = " << sites.size() << endl;
 		if (segmentSize > sites.size()) {
-			cout << "ERROR: in Chromosome::getSegement, segmentSize is > then sites.size()!\nExitting!\n";
+			cout << "segmentSize = " << segmentSize << "  sites.size() = " << sites.size() << endl;
+			cout << "maxSize : minSize   " << maxSize << " : " << minSize << endl;
+			cout << "ERROR: in Chromosome::mutateDelete, segmentSize is > then sites.size()!\nExitting!\n";
 			exit(1);
 		}
 		int segmentStart = Random::getInt(sites.size()-segmentSize);
 		sites.erase(sites.begin()+segmentStart,sites.begin()+segmentStart+segmentSize);
+		////cout << "   after sites.size() = " << sites.size() << endl;
 	}
 
 	// delete the sites of this chromosome. Then set sites to a crossed over chromosome made up of parents

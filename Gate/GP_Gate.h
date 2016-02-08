@@ -20,7 +20,7 @@ class GPGate : public Gate {
 	vector<double> myValues;								//<link>
  public:
 	GPGate() = delete;
-	GPGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> index, int gateID);
+	GPGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
 	virtual ~GPGate() = default;
 	virtual void update(vector<double> & states, vector<double> & nextStates);
 	virtual string description();

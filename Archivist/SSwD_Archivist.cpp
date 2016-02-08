@@ -122,7 +122,7 @@ bool SSwD_Archivist::archive(vector<shared_ptr<Organism>> population, int flush)
 			size_t index = 0;
 			while (index < checkpoints[nextGenomeWrite].size()) {
 				if (auto org = checkpoints[nextGenomeWrite][index].lock()) {  // this ptr is still good
-					dataString = to_string(org->ID) + FileManager::separator + org->snapShotDataMaps[nextGenomeWrite].Get("genomeAncestors") + FileManager::separator + "\"[" + org->genome->convert_to_string() + "]\"";  // add interval update, genome ancestors, and genome with padding to string
+					dataString = to_string(org->ID) + FileManager::separator + org->snapShotDataMaps[nextGenomeWrite].Get("genomeAncestors") + FileManager::separator + "\"[" + org->genome->genomeToStr() + "]\"";  // add interval update, genome ancestors, and genome with padding to string
 					FileManager::writeToFile(genomeFileName, dataString, "ID,genomeAncestors,genome");  // write data to file
 					index++;  // advance to nex element
 				} else {  // this ptr is expired - cut it out of the vector

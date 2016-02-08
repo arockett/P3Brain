@@ -170,7 +170,7 @@ void Organism::kill() {
 }
 
 shared_ptr<Organism> Organism::makeMutatedOffspring(shared_ptr<Organism> parent) {
-	shared_ptr<Organism> newOrg = make_shared<Organism>(parent, genome->makeMutatedGenome());
+	shared_ptr<Organism> newOrg = make_shared<Organism>(parent, genome->makeMutatedGenome(genome));
 	return newOrg;
 }
 

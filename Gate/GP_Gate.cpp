@@ -19,7 +19,7 @@ union intToFloatBitByBit {
 	float F;
 };
 
-GPGate::GPGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> genomeIndex, int gateID) {
+GPGate::GPGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
 
 	ID = gateID;
 
@@ -29,10 +29,10 @@ GPGate::GPGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> genomeIndex,
 	int numOutputs;
 
 	// get numInputs inputs and numOutputs outputs, advance k (genomeIndex) as if we had gotten 4 of each and record this in codingRegions
-	getInputsAndOutputs( { 1, 4 }, { 1, 4 }, genomeIndex, genome, gateID);  // (insRange, outsRange,currentIndexInGenome,genome,codingRegions)
+	getInputsAndOutputs( { 1, 4 }, { 1, 4 }, genomeHandler, genome, gateID);  // (insRange, outsRange,currentIndexInGenome,genome,codingRegions)
 	numOutputs = outputs.size();
 
-	myGateType = genome->extractValue(genomeIndex, { 0, 8 }, Gate::DATA_CODE, gateID);  //genome->sites[(genomeIndex++) % genome->sites.size()] % 8;
+	myGateType = genomeHandler->readInt(0, 8, Gate::DATA_CODE, gateID);  //genome->sites[(genomeIndex++) % genome->sites.size()] % 8;
 	myValues.clear();
 	for (i = 0; i < numOutputs; i++) {
 		intToFloatBitByBit V;
@@ -43,7 +43,7 @@ GPGate::GPGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> genomeIndex,
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		        // was : V.I = (V.I << (int) 8) + (int) genome->sites[(genomeIndex++) % genome->sites.size()];
-			V.I = (V.I << (int) 8) + genome->extractValue(genomeIndex, { 0, 8 }, Gate::DATA_CODE, gateID);
+			V.I = (V.I << (int) 8) + genomeHandler->readInt(0, 8, Gate::DATA_CODE, gateID);
 		}
 		myValues.push_back(V.F);
 	}

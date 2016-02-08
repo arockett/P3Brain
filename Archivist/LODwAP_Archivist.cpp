@@ -66,7 +66,7 @@ bool LODwAP_Archivist::archive(vector<shared_ptr<Organism>> population, int flus
 
 			while ((effective_MRCA->timeOfBirth >= nextGenomeWrite) && (nextGenomeWrite <= Global::updates)) {  // if there is convergence before the next data interval
 				shared_ptr<Organism> current = LOD[nextGenomeWrite - lastPrune];
-				string dataString = to_string(nextGenomeWrite) + FileManager::separator + "\"[" + current->genome->convert_to_string() + "]\"";  // add write update and padding to genome string
+				string dataString = to_string(nextGenomeWrite) + FileManager::separator + "\"[" + current->genome->genomeToStr() + "]\"";  // add write update and padding to genome string
 				FileManager::writeToFile(GenomeFileName, dataString, "update,genome");  // write data to file
 				nextGenomeWrite += genomeInterval;
 			}
