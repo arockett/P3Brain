@@ -55,12 +55,13 @@ class Classic_GateListBuilder : public Base_GateListBuilder {
 			genomeHandler->copyTo(testHandler);  // get to values from genome to test for start codns
 			const int testSite1Value = testHandler->readInt(0, 255);  // extract first 1/2 of startcodon
 			testHandler->copyTo(saveHandler);  // save this index, this is where we pick up when we come back from building a gate.
-			const int testSite2Value = genomeHandler->readInt(0, 255);  // extract second 1/2 of startcodon
+			const int testSite2Value = testHandler->readInt(0, 255);  // extract second 1/2 of startcodon
+			//cout << "testValues: " << testSite1Value << "  " << testSite2Value << "\n";
 			if (saveHandler->atEOG()) {  // if genomeIndex > testIndex, testIndex has wrapped and we are done translating
 				translation_Complete = true;
 			} else if (testSite1Value + testSite2Value == 255) {  // if we found a start codon
 				if (Gate_Builder::makeGate[testSite1Value] != nullptr) {  // and that start codon codes to an in use gate class
-					cout << "found gate : " << testSite1Value << " " << testSite2Value << endl;
+					//cout << "found gate : " << testSite1Value << " " << testSite2Value << endl;
 					genomeHandler->readInt(0, 255, Gate::START_CODE, gateCount);  // mark start codon in genomes coding region
 					genomeHandler->readInt(0, 255, Gate::START_CODE, gateCount);  // mark start codon in genomes coding region
 					gates.push_back(Gate_Builder::makeGate[testSite1Value](genome, genomeHandler, gateCount));  // make a gate of the type associated with the value in testSite1Value

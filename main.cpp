@@ -92,7 +92,6 @@ int main(int argc, const char * argv[]) {
 		vector<shared_ptr<Organism>> population;
 		for (int i = 0; i < Global::popSize; i++) {
 			shared_ptr<Genome> genome = make_shared<Genome>(make_shared<Chromosome<unsigned char>>(5000,256),1,1);
-			cout << "CC\n";
 
 			genome->fillRandom();
 			shared_ptr<Organism> org = make_shared<Organism>(progenitor, genome);
