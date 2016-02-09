@@ -106,6 +106,13 @@ class AbstractChromosome {
 		return false;  // not at end of chromosome
 	}
 
+	virtual vector<string> getFixedStats() {
+		cout << "method getStatsFixed() in AbstractChromosome was called!\n This class only exists for polymorphism.\n";
+		exit(1);
+		vector<string> data;
+		return data;
+	}
+
 	virtual vector<string> getStats() {
 		cout << "method getStats() in AbstractChromosome was called!\n This class only exists for polymorphism.\n";
 		exit(1);
@@ -366,12 +373,11 @@ template<class T> class Chromosome : public AbstractChromosome {
 
 	// convert a chromosome to a string
 	virtual string chromosomeToStr() {
-		string S = to_string(alphabetSize) + " ";
+		string S = "";
 
 		for (int i = 0; i < sites.size(); i++) {
-			S = S + to_string(sites[i]) + " ";
+			S = S + to_string(sites[i]) + FileManager::separator;
 		}
-		S = S + "\n";
 		return S;
 	}
 
@@ -380,6 +386,13 @@ template<class T> class Chromosome : public AbstractChromosome {
 	}
 	virtual int size() {
 		return (int)sites.size();
+	}
+
+	virtual vector<string> getFixedStats() {
+		vector<string> dataPairs;
+		dataPairs.push_back("alphabetSize");
+		dataPairs.push_back(to_string(alphabetSize));
+		return (dataPairs);
 	}
 
 	virtual vector<string> getStats() {

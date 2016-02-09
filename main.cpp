@@ -83,15 +83,13 @@ int main(int argc, const char * argv[]) {
 		// a progenitor must exist - that is, one ancestor genome
 		Global::update = -1;  // before there was time, there was a progenitor
 		shared_ptr<ClassicBrain> tesBrain = make_shared<ClassicBrain>(make_shared<Classic_GateListBuilder>());
-		cout << "AA\n";
 
-		shared_ptr<Organism> progenitor = make_shared<Organism>(make_shared<Genome>(make_shared<Chromosome<unsigned char>>(5000,256),1,1), make_shared<ClassicBrain>(make_shared<Classic_GateListBuilder>()));  // make a organism with a genome and brain (if you need to change the types here is where you do it)
-		cout << "AA\n";
+		shared_ptr<Organism> progenitor = make_shared<Organism>(make_shared<Genome>(make_shared<Chromosome<bool>>(5000,2),3,2), make_shared<ClassicBrain>(make_shared<Classic_GateListBuilder>()));  // make a organism with a genome and brain (if you need to change the types here is where you do it)
 
 		Global::update = 0;  // the beginning of time - now we construct the first population
 		vector<shared_ptr<Organism>> population;
 		for (int i = 0; i < Global::popSize; i++) {
-			shared_ptr<Genome> genome = make_shared<Genome>(make_shared<Chromosome<unsigned char>>(5000,256),1,1);
+			shared_ptr<Genome> genome = make_shared<Genome>(make_shared<Chromosome<bool>>(5000,2),3,2);
 
 			genome->fillRandom();
 			shared_ptr<Organism> org = make_shared<Organism>(progenitor, genome);

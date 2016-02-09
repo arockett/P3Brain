@@ -44,7 +44,7 @@ bool LODwAP_Archivist::archive(vector<shared_ptr<Organism>> population, int flus
 		vector<shared_ptr<Organism>> LOD = population[0]->getLOD(population[0]);  // get line of decent
 		shared_ptr<Organism> effective_MRCA;
 		if (flush) {  // if flush then we don't care about coalescence
-			cout << "flushing LODwAP: using population[0] as MRCA\n";
+			cout << "flushing LODwAP: using population[0] as Most Recent Common Ancestor (MRCA)\n";
 			effective_MRCA = population[0]->parents[0];  // this assumes that a population was created, but not tested at the end of the evolution loop!
 		} else {
 			effective_MRCA = population[0]->getMostRecentCommonAncestor(LOD);  // find the convergance point in the LOD.
@@ -66,8 +66,10 @@ bool LODwAP_Archivist::archive(vector<shared_ptr<Organism>> population, int flus
 
 			while ((effective_MRCA->timeOfBirth >= nextGenomeWrite) && (nextGenomeWrite <= Global::updates)) {  // if there is convergence before the next data interval
 				shared_ptr<Organism> current = LOD[nextGenomeWrite - lastPrune];
-				string dataString = to_string(nextGenomeWrite) + FileManager::separator + "\"[" + current->genome->genomeToStr() + "]\"";  // add write update and padding to genome string
-				FileManager::writeToFile(GenomeFileName, dataString, "update,genome");  // write data to file
+				//string dataString = to_string(nextGenomeWrite) + FileManager::separator + "\"[" + current->genome->genomeToStr() + "]\"";  // add write update and padding to genome string
+				//FileManager::writeToFile(GenomeFileName, dataString, "update,genome");  // write data to file
+				current->genome->dataMap.Set("update",current->dataMap.Get("update"));
+				current->genome->dataMap.writeToFile(GenomeFileName, current->genome->dataMap.getKeys());  // append new data to the file
 				nextGenomeWrite += genomeInterval;
 			}
 		}
