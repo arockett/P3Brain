@@ -20,42 +20,18 @@
 
 using namespace std;
 
-class Optimizer {
+class BaseOptimizer {
  public:
-  static int& elitism;
-  static int& tournamentSize;
+	static int& elitism;
+	static int& tournamentSize;
 
  public:
-  double maxFitness;
-  Optimizer() = default;
-  virtual ~Optimizer() = default;
-  virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
-};
-
-class GA : public Optimizer {
- public:
-  virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
-};
-
-class P3 : public Optimizer {
-
-};
-
-class Tournament : public Optimizer {
- public:
-  virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
-};
-
-//
-//****************************************************************************
-//* code below this line is for testing - it will be deleted at some point.
-//****************************************************************************
-//
-//
-
-class Tournament2 : public Optimizer {
- public:
-  virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
+	double maxFitness;
+	BaseOptimizer() {
+		maxFitness = 0;
+	}
+	virtual ~BaseOptimizer() = default;
+	virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Optimizer__) */

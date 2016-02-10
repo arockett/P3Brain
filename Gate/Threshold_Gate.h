@@ -14,13 +14,13 @@ using namespace std;
 
 class Thresholdgate : public Gate {
  private:
-  int threshold;
+	int threshold;
  public:
-  Thresholdgate() = delete;
-  Thresholdgate(shared_ptr<Genome> genome, int startCodonAt);
-  virtual ~Thresholdgate() = default;
-  virtual void update(vector<double> & states, vector<double> & nextStates);
-  virtual string description();
+	Thresholdgate() = delete;
+	Thresholdgate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
+	virtual ~Thresholdgate() = default;
+	virtual void update(vector<double> & states, vector<double> & nextStates);
+	virtual string description();
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Threshold_Gate__) */
