@@ -36,8 +36,10 @@ void Snapshot_Archivist::saveSnapshotGenomes(vector<shared_ptr<Organism>> popula
 
 	string dataString;
 	for (auto org : population) {
-		dataString = to_string(org->ID) + FileManager::separator + "\"[" + org->genome->genomeToStr() + "]\"";  // add interval update, genome ancestors, and genome with padding to string
-		FileManager::writeToFile(genomeFileName, dataString, "ID,genome");  // write data to file
+		//dataString = to_string(org->ID) + FileManager::separator + "\"[" + org->genome->genomeToStr() + "]\"";  // add interval update, genome ancestors, and genome with padding to string
+		//FileManager::writeToFile(genomeFileName, dataString, "ID,genome");  // write data to file
+		org->genome->dataMap.Set("ID",org->dataMap.Get("ID"));
+		org->genome->dataMap.writeToFile(genomeFileName, org->genome->dataMap.getKeys());  // append new data to the file
 	}
 }
 

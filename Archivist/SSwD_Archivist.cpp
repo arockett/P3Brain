@@ -122,8 +122,13 @@ bool SSwD_Archivist::archive(vector<shared_ptr<Organism>> population, int flush)
 			size_t index = 0;
 			while (index < checkpoints[nextGenomeWrite].size()) {
 				if (auto org = checkpoints[nextGenomeWrite][index].lock()) {  // this ptr is still good
-					dataString = to_string(org->ID) + FileManager::separator + org->snapShotDataMaps[nextGenomeWrite].Get("genomeAncestors") + FileManager::separator + "\"[" + org->genome->genomeToStr() + "]\"";  // add interval update, genome ancestors, and genome with padding to string
-					FileManager::writeToFile(genomeFileName, dataString, "ID,genomeAncestors,genome");  // write data to file
+					//dataString = to_string(org->ID) + FileManager::separator + org->snapShotDataMaps[nextGenomeWrite].Get("genomeAncestors") + FileManager::separator + "\"[" + org->genome->genomeToStr() + "]\"";  // add interval update, genome ancestors, and genome with padding to string
+					//FileManager::writeToFile(genomeFileName, dataString, "ID,genomeAncestors,genome");  // write data to file
+
+					org->genome->dataMap.Set("genomeAncestors",org->dataMap.Get("genomeAncestors"));
+					org->genome->dataMap.Set("ID",org->dataMap.Get("ID"));
+					org->genome->dataMap.writeToFile(genomeFileName, org->genome->dataMap.getKeys());  // append new data to the file
+
 					index++;  // advance to nex element
 				} else {  // this ptr is expired - cut it out of the vector
 					swap(checkpoints[nextGenomeWrite][index], checkpoints[nextGenomeWrite].back());  // swap expired ptr to back of vector

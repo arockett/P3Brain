@@ -21,7 +21,6 @@
 #include "Brain/ClassicBrain.h"
 
 #include "Genome/Genome.h"
-//#include "Genome/ByteGenome.h"
 
 #include "GateListBuilder/GateListBuilder.h"
 
@@ -83,19 +82,22 @@ int main(int argc, const char * argv[]) {
 		// a progenitor must exist - that is, one ancestor genome
 		Global::update = -1;  // before there was time, there was a progenitor
 		shared_ptr<ClassicBrain> tesBrain = make_shared<ClassicBrain>(make_shared<Classic_GateListBuilder>());
-
-		shared_ptr<Organism> progenitor = make_shared<Organism>(make_shared<Genome>(make_shared<Chromosome<bool>>(5000,2),3,2), make_shared<ClassicBrain>(make_shared<Classic_GateListBuilder>()));  // make a organism with a genome and brain (if you need to change the types here is where you do it)
+		shared_ptr<Chromosome<bool>> initalChromosome = make_shared<Chromosome<bool>>(Genome::initialChromosomeSize,2);
+		shared_ptr<Organism> progenitor = make_shared<Organism>(make_shared<Genome>(initalChromosome,3,2), make_shared<ClassicBrain>(make_shared<Classic_GateListBuilder>()));  // make a organism with a genome and brain (if you need to change the types here is where you do it)
 
 		Global::update = 0;  // the beginning of time - now we construct the first population
 		vector<shared_ptr<Organism>> population;
-		for (int i = 0; i < Global::popSize; i++) {
-			shared_ptr<Genome> genome = make_shared<Genome>(make_shared<Chromosome<bool>>(5000,2),3,2);
+		cout << "building initial population" << flush;
 
+		for (int i = 0; i < Global::popSize; i++) {
+			shared_ptr<Genome> genome = make_shared<Genome>(initalChromosome,3,2);
 			genome->fillRandom();
 			shared_ptr<Organism> org = make_shared<Organism>(progenitor, genome);
 			population.push_back(org);  // add a new org to population using progenitors template and a new random genome
 			population[population.size() - 1]->gender = Random::getInt(0, 1);  // assign a random gender to the new org
+			cout << "." << flush;
 		}
+		cout << "\nmade population of " << population.size() << " organisms." << endl;
 		progenitor->kill();  // the progenitor has served it's purpose.
 
 		shared_ptr<Archivist> archivist;
@@ -115,6 +117,7 @@ int main(int argc, const char * argv[]) {
 
 		group = make_shared<Group>(population, make_shared<Tournament>(), archivist);
 	}
+	cout << "made group" << endl;
 
 //////////////////
 // evolution loop
@@ -133,12 +136,17 @@ int main(int argc, const char * argv[]) {
 	bool finished = false;  // when the archivist says we are done, we can stop!
 
 	while (!finished) {
+		cout << "begin evo loop" << endl;
+
 		world->evaluateFitness(group->population, false);  // evaluate each organism in the population using a World
+		cout << "  eval complete" << endl;
 		finished = group->archive();  // save data, update memory and delete any unneeded data;
+		cout << "  archive complete" << endl;
 
 		Global::update++;
 
 		group->optimize();  // update the population (reproduction and death)
+		cout << "  optimize complete" << endl;
 
 		cout << "update: " << Global::update - 1 << "   maxFitness: " << group->optimizer->maxFitness << "\n";
 	}

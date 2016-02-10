@@ -188,7 +188,7 @@ class AbstractGenome {
 class Genome : public AbstractGenome {
  public:
 
-	static int& initialGenomeSize;
+	static int& initialChromosomeSize;
 	static double& pointMutationRate;
 	static double& insertionRate;
 	static int& insertionMinSize;
@@ -198,7 +198,10 @@ class Genome : public AbstractGenome {
 	static int& deletionMaxSize;
 	static int& minGenomeSize;
 	static int& maxGenomeSize;
-	static int& crossCount;
+	static int& maxChromosomeSize;
+	static int& minChromosomeSize;
+	static int& crossCount; // number of crosses to make when performing crossover
+
 	class Handler : public AbstractGenome::Handler {
  	public:
 		shared_ptr<Genome> genome;
@@ -492,14 +495,14 @@ class Genome : public AbstractGenome {
 		// do some copy mutations
 		if (nucleotides < PT.lookup("genomeSizeMax")) {
 			for (int i = 0; i < howManyCopy && (nucleotides < PT.lookup("genomeSizeMax")); i++) {
-				chromosomes[Random::getIndex(chromosomes.size())]->mutateCopy(PT.lookup("mutationCopyMinSize"), PT.lookup("mutationCopyMaxSize"));
+				chromosomes[Random::getIndex(chromosomes.size())]->mutateCopy(PT.lookup("mutationCopyMinSize"), PT.lookup("mutationCopyMaxSize"), PT.lookup("chromosomeSizeMax"));
 				nucleotides = countSites();
 			}
 		}
 		// do some deletion mutations
 		if (nucleotides > PT.lookup("genomeSizeMin")) {
 			for (int i = 0; i < howManyDelete && (nucleotides > PT.lookup("genomeSizeMin")); i++) {
-				chromosomes[Random::getIndex(chromosomes.size())]->mutateDelete(PT.lookup("mutationDeletionMinSize"), PT.lookup("mutationDeletionMaxSize"));
+				chromosomes[Random::getIndex(chromosomes.size())]->mutateDelete(PT.lookup("mutationDeletionMinSize"), PT.lookup("mutationDeletionMaxSize"), PT.lookup("chromosomeSizeMin"));
 				nucleotides = countSites();
 			}
 		}
@@ -582,10 +585,8 @@ class Genome : public AbstractGenome {
 // the undefined action is to return an empty vector
 	virtual vector<string> getStats() {
 		vector<string> dataPairs;
-		dataPairs.push_back("sitesCount");
+		dataPairs.push_back("genomeLength");
 		dataPairs.push_back(to_string(countSites()));
-		dataPairs.push_back("chromosomeCount");
-		dataPairs.push_back(to_string(chromosomes.size()));
 		return (dataPairs);
 	}
 
