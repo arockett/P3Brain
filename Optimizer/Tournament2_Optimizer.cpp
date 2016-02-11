@@ -16,7 +16,7 @@ void Tournament2::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
 	set<shared_ptr<Organism>> survivors;
 	int p1, p2;  // parent1 and 2
 	int challanger;  // used when picking best of
-	double surviveChance = .1;
+	double surviveChance = 0;
 	bool orgSurvived = 0;
 
 	vector<double> Scores;
@@ -72,7 +72,9 @@ void Tournament2::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
 					}
 				}
 			}
+			cout << "*" << flush;
 			nextPopulation.push_back(population[p1]->makeMutatedOffspring( { population[p1], population[p2] }));
+			cout << "." << flush;
 		}
 
 	}
@@ -81,6 +83,7 @@ void Tournament2::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
 			org->kill();
 		}
 	}
+	cout << endl;
 	population = nextPopulation;
 }
 

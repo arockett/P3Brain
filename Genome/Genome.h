@@ -200,7 +200,7 @@ class Genome : public AbstractGenome {
 	static int& maxGenomeSize;
 	static int& maxChromosomeSize;
 	static int& minChromosomeSize;
-	static int& crossCount; // number of crosses to make when performing crossover
+	static int& crossCount;  // number of crosses to make when performing crossover
 
 	class Handler : public AbstractGenome::Handler {
  	public:
@@ -482,28 +482,59 @@ class Genome : public AbstractGenome {
 		}
 		return nucleotides;
 	}
-// apply mutations to this genome
+
+// old version gets numbers for number of events from entire genome sites count
+//// apply mutations to this genome
+//	virtual void mutate() {
+//		int nucleotides = countSites();
+//		int howManyPoint = Random::getBinomial(nucleotides, PT.lookup("pointMutationRate"));
+//		int howManyCopy = Random::getBinomial(nucleotides, PT.lookup("mutationCopyRate"));
+//		int howManyDelete = Random::getBinomial(nucleotides, PT.lookup("mutationDeletionRate"));
+//		// do some point mutations
+//		for (int i = 0; i < howManyPoint; i++) {
+//			chromosomes[Random::getIndex(chromosomes.size())]->mutatePoint();
+//		}
+//		// do some copy mutations
+//		if (nucleotides < PT.lookup("genomeSizeMax")) {
+//			for (int i = 0; i < howManyCopy && (nucleotides < PT.lookup("genomeSizeMax")); i++) {
+//				chromosomes[Random::getIndex(chromosomes.size())]->mutateCopy(PT.lookup("mutationCopyMinSize"), PT.lookup("mutationCopyMaxSize"), PT.lookup("chromosomeSizeMax"));
+//				nucleotides = countSites();
+//			}
+//		}
+//		// do some deletion mutations
+//		if (nucleotides > PT.lookup("genomeSizeMin")) {
+//			for (int i = 0; i < howManyDelete && (nucleotides > PT.lookup("genomeSizeMin")); i++) {
+//				chromosomes[Random::getIndex(chromosomes.size())]->mutateDelete(PT.lookup("mutationDeletionMinSize"), PT.lookup("mutationDeletionMaxSize"), PT.lookup("chromosomeSizeMin"));
+//				nucleotides = countSites();
+//			}
+//		}
+//	}
+
+	// new version gets numbers for number of events from sites count in each chromosome
+	// apply mutations to this genome
 	virtual void mutate() {
-		int nucleotides = countSites();
-		int howManyPoint = Random::getBinomial(nucleotides, PT.lookup("pointMutationRate"));
-		int howManyCopy = Random::getBinomial(nucleotides, PT.lookup("mutationCopyRate"));
-		int howManyDelete = Random::getBinomial(nucleotides, PT.lookup("mutationDeletionRate"));
-		// do some point mutations
-		for (int i = 0; i < howManyPoint; i++) {
-			chromosomes[Random::getIndex(chromosomes.size())]->mutatePoint();
-		}
-		// do some copy mutations
-		if (nucleotides < PT.lookup("genomeSizeMax")) {
-			for (int i = 0; i < howManyCopy && (nucleotides < PT.lookup("genomeSizeMax")); i++) {
-				chromosomes[Random::getIndex(chromosomes.size())]->mutateCopy(PT.lookup("mutationCopyMinSize"), PT.lookup("mutationCopyMaxSize"), PT.lookup("chromosomeSizeMax"));
-				nucleotides = countSites();
+		for (auto chromosome : chromosomes) {
+			int nucleotides = chromosome->size();
+			int howManyPoint = Random::getBinomial(nucleotides, PT.lookup("pointMutationRate"));
+			int howManyCopy = Random::getBinomial(nucleotides, PT.lookup("mutationCopyRate"));
+			int howManyDelete = Random::getBinomial(nucleotides, PT.lookup("mutationDeletionRate"));
+			// do some point mutations
+			for (int i = 0; i < howManyPoint; i++) {
+				chromosome->mutatePoint();
 			}
-		}
-		// do some deletion mutations
-		if (nucleotides > PT.lookup("genomeSizeMin")) {
-			for (int i = 0; i < howManyDelete && (nucleotides > PT.lookup("genomeSizeMin")); i++) {
-				chromosomes[Random::getIndex(chromosomes.size())]->mutateDelete(PT.lookup("mutationDeletionMinSize"), PT.lookup("mutationDeletionMaxSize"), PT.lookup("chromosomeSizeMin"));
-				nucleotides = countSites();
+			// do some copy mutations
+			if (nucleotides < PT.lookup("genomeSizeMax")) {
+				for (int i = 0; i < howManyCopy && (nucleotides < PT.lookup("genomeSizeMax")); i++) {
+					chromosome->mutateCopy(PT.lookup("mutationCopyMinSize"), PT.lookup("mutationCopyMaxSize"), PT.lookup("chromosomeSizeMax"));
+					nucleotides = chromosome->size();
+				}
+			}
+			// do some deletion mutations
+			if (nucleotides > PT.lookup("genomeSizeMin")) {
+				for (int i = 0; i < howManyDelete && (nucleotides > PT.lookup("genomeSizeMin")); i++) {
+					chromosome->mutateDelete(PT.lookup("mutationDeletionMinSize"), PT.lookup("mutationDeletionMaxSize"), PT.lookup("chromosomeSizeMin"));
+					nucleotides = chromosome->size();
+				}
 			}
 		}
 	}
@@ -592,18 +623,18 @@ class Genome : public AbstractGenome {
 
 	virtual void recordDataMap() {
 		dataMap.SetMany(chromosomes[0]->getFixedStats());
-		dataMap.Set("ploidy",ploidy);
-		dataMap.Set("chromosomeCount",chromosomes.size());
-		dataMap.Set("sitesCount",countSites());
+		dataMap.Set("ploidy", ploidy);
+		dataMap.Set("chromosomeCount", chromosomes.size());
+		dataMap.Set("sitesCount", countSites());
 		dataMap.Clear("chromosomeLengths");
 		string allSites = "\"[";
-		for (size_t c = 0; c<chromosomes.size();c++){
-			dataMap.Append("chromosomeLengths",chromosomes[c]->size());
-			allSites+=chromosomes[c]->chromosomeToStr();
+		for (size_t c = 0; c < chromosomes.size(); c++) {
+			dataMap.Append("chromosomeLengths", chromosomes[c]->size());
+			allSites += chromosomes[c]->chromosomeToStr();
 		}
-		allSites.pop_back(); // remove extra separator at end
-		allSites+="]\"";
-		dataMap.Set("sites",allSites);
+		allSites.pop_back();  // remove extra separator at end
+		allSites += "]\"";
+		dataMap.Set("sites", allSites);
 	}
 
 // load a genome from CSV file with headers - will return genome from saved organism with key / keyvalue pair

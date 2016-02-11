@@ -497,11 +497,11 @@ template<class T> class Chromosome : public AbstractChromosome {
 
 			sort(crossLocations.begin(), crossLocations.end());// sort crossLocations
 
-			cout << "crossing: ";
-			for (auto location:crossLocations){
-				cout << location << "\t";
-			}
-			cout << endl << size() << "\t->\t";
+//			cout << "crossing: ";
+//			for (auto location:crossLocations){
+//				cout << location << "\t";
+//			}
+//			cout << endl << size() << "\t->\t";
 
 			int pick;
 			int lastPick = 0;
@@ -517,7 +517,7 @@ template<class T> class Chromosome : public AbstractChromosome {
 						parentSites[pick].begin()+(int)((double)parentSites[pick].size()*crossLocations[c]),
 						parentSites[pick].begin()+(int)((double)parentSites[pick].size()*crossLocations[c+1]));
 			}
-			cout << size() << endl;
+//			cout << size() << endl;
 		}
 	}
 

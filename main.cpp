@@ -115,7 +115,7 @@ int main(int argc, const char * argv[]) {
 			archivist = make_shared<SSwD_Archivist>();
 		}
 
-		group = make_shared<Group>(population, make_shared<Tournament>(), archivist);
+		group = make_shared<Group>(population, make_shared<Tournament2>(), archivist);
 	}
 	cout << "made group" << endl;
 
