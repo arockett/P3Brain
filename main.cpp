@@ -18,7 +18,7 @@
 #include "Archivist/LODwAP_Archivist.h"
 #include "Archivist/snapshot_Archivist.h"
 #include "Archivist/SSwD_Archivist.h"
-#include "Brain/ClassicBrain.h"
+#include "Brain/MarkovBrain.h"
 
 #include "Genome/Genome.h"
 
@@ -46,9 +46,10 @@ int main(int argc, const char * argv[]) {
 
 	Parameters::initialize_parameters(argc, argv);  // loads command line and configFile values into registered parameters
 	                                                // also writes out a config file if requested
-
+	cout << "making Node Map" << endl;
 	//make a node map to handle genome value to brain state address look up.
-	ClassicBrain::makeNodeMap(ClassicBrain::defaultNodeMap, Global::bitsPerBrainAddress, ClassicBrain::defaultNrOfBrainStates);
+	MarkovBrain::makeNodeMap(MarkovBrain::defaultNodeMap, Global::bitsPerBrainAddress, MarkovBrain::defaultNrOfBrainStates);
+	cout << "setting up gates" << endl;
 
 	Gate_Builder::setupGates();  // determines which gate types will be in use.
 
@@ -61,8 +62,50 @@ int main(int argc, const char * argv[]) {
 	} else {
 		Random::getCommonGenerator().seed(Global::randomSeed);
 	}
-
+	cout << "creating world" << endl;
 	World *world = (World*) new BerryWorld();  //new World();
+
+// test chromosome crossover speed
+//	auto C1 = make_shared<Chromosome<bool>>(10000, 2);
+//	C1->fillRandom();
+//	auto C2 = make_shared<Chromosome<bool>>(10000, 2);
+//	C2->fillRandom();
+//	auto C3 = make_shared<Chromosome<bool>>(0, 2);
+//
+//	for (int k = 0; k < 100; k++) {
+//		for (int j = 0; j < 500; j++) {
+//			for (int i = 0; i < 6; i++) {
+//				//cout << "." << flush;
+//				C3->crossover( { C1, C2 }, 3);
+//				//cout << "*" << flush;
+//			}
+//			cout << "--" << flush;
+//		}
+//		cout << k << endl;
+//	}
+//
+//	exit(0);
+
+	// test other speed
+
+
+//	auto testChromosome = make_shared<Chromosome<bool>>(5000, 2);
+//	auto testGenome = make_shared<Genome>(testChromosome, 3, 2);
+//	auto GLB = make_shared<Classic_GateListBuilder>();  // make a organism with a genome and brain (if you need to change the types here is where you do it)
+//	shared_ptr<Organism> testOrg = make_shared<Organism>(make_shared<Genome>(testChromosome, 3, 2), make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>()));  // make a organism with a genome and brain (if you need to change the types here is where you do it)
+//
+//	for (int k = 0; k < 100; k++) {
+//		for (int j = 0; j < 500; j++) {
+//			//GLB->buildGateList(testGenome, 16);
+//			//auto testMB = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
+//			auto testGenomeMany = make_shared<Genome>(testChromosome, 3, 2);
+//			//auto testOrgMany = make_shared<Organism>(testOrg, testGenome);
+//			cout << "*." << flush;
+//		}
+//		cout << k << endl;
+//	}
+//
+//	exit(0);
 
 ////  ///// to show org in world
 //  shared_ptr<Genome> testGenome = make_shared<Genome>();
@@ -76,21 +119,24 @@ int main(int argc, const char * argv[]) {
 	// define population
 	//////////////////
 
+	cout << "creating group" << endl;
 	shared_ptr<Group> group;
 
 	{
 		// a progenitor must exist - that is, one ancestor genome
 		Global::update = -1;  // before there was time, there was a progenitor
-		shared_ptr<ClassicBrain> tesBrain = make_shared<ClassicBrain>(make_shared<Classic_GateListBuilder>());
-		shared_ptr<Chromosome<bool>> initalChromosome = make_shared<Chromosome<bool>>(Genome::initialChromosomeSize,2);
-		shared_ptr<Organism> progenitor = make_shared<Organism>(make_shared<Genome>(initalChromosome,3,2), make_shared<ClassicBrain>(make_shared<Classic_GateListBuilder>()));  // make a organism with a genome and brain (if you need to change the types here is where you do it)
+		//shared_ptr<MarkovBrain> tesBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
+		shared_ptr<Chromosome<bool>> initalChromosome = make_shared<Chromosome<bool>>(Genome::initialChromosomeSize, 2);
+		cout << "made initalChromosome" << endl;
+		shared_ptr<Organism> progenitor = make_shared<Organism>(make_shared<Genome>(initalChromosome, 3, 2), make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>()));  // make a organism with a genome and brain (if you need to change the types here is where you do it)
+		cout << "made initalChromosome" << endl;
 
 		Global::update = 0;  // the beginning of time - now we construct the first population
 		vector<shared_ptr<Organism>> population;
 		cout << "building initial population" << flush;
 
 		for (int i = 0; i < Global::popSize; i++) {
-			shared_ptr<Genome> genome = make_shared<Genome>(initalChromosome,3,2);
+			shared_ptr<Genome> genome = make_shared<Genome>(initalChromosome, 3, 2);
 			genome->fillRandom();
 			shared_ptr<Organism> org = make_shared<Organism>(progenitor, genome);
 			population.push_back(org);  // add a new org to population using progenitors template and a new random genome

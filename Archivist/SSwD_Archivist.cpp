@@ -126,7 +126,7 @@ bool SSwD_Archivist::archive(vector<shared_ptr<Organism>> population, int flush)
 					//FileManager::writeToFile(genomeFileName, dataString, "ID,genomeAncestors,genome");  // write data to file
 
 					org->genome->dataMap.Set("genomeAncestors",org->snapShotDataMaps[nextGenomeWrite].Get("genomeAncestors"));
-					cout << "test: " << org->snapShotDataMaps[nextGenomeWrite].Get("genomeAncestors");
+					//cout << "test: " << org->snapShotDataMaps[nextGenomeWrite].Get("genomeAncestors");
 					org->genome->dataMap.Set("ID",org->dataMap.Get("ID"));
 					org->genome->dataMap.writeToFile(genomeFileName, org->genome->dataMap.getKeys());  // append new data to the file
 

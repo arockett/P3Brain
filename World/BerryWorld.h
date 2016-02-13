@@ -17,7 +17,7 @@
 #include "../Genome/Genome.h"
 #include "../World/World.h"
 #include "../Analyze/Analyze.h"
-#include "../Brain/ClassicBrain.h"
+#include "../Brain/Brain.h"
 #include "../Utilities/Parameters.h"
 #include "../Utilities/Utilities.h"
 #include "../Utilities/Random.h"

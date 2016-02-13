@@ -136,8 +136,7 @@ class AbstractGenome {
 			return false;
 		}
 
-		void printIndex() {
-		}
+		virtual void printIndex() = 0;
 
 		virtual bool inTelomere(int length) {
 			return 0;
@@ -156,10 +155,14 @@ class AbstractGenome {
 	}
 
 	virtual ~AbstractGenome() = default;
+	//virtual shared_ptr<AbstractGenome::Handler> newHandler(shared_ptr<AbstractGenome> _genome, bool _readDirection = true) override {
 
-	virtual shared_ptr<Handler> newHandler(shared_ptr<AbstractGenome> _genome, bool _readDirection = 1) {
+	virtual shared_ptr<AbstractGenome::Handler> newHandler(shared_ptr<AbstractGenome> _genome, bool _readDirection = true) {
+		cout << "This may be the problem" << endl;
 		return nullptr;		//make_shared<Handler>(_genome);
 	}
+
+	virtual void copyFrom(shared_ptr<AbstractGenome> from) = 0;
 
 	virtual void fillRandom() = 0;		//{
 //		cout << "In AbstractGenome::fillRandom()...\n";
@@ -182,6 +185,11 @@ class AbstractGenome {
 
 	virtual void loadGenome(string fileName, string key, string keyValue) {
 	}
+
+	virtual bool isEmpty() = 0;
+
+	virtual shared_ptr<AbstractGenome> makeMutatedGenome(shared_ptr<AbstractGenome> parent) = 0;
+	virtual shared_ptr<AbstractGenome> makeMutatedGenome(vector<shared_ptr<AbstractGenome>> parents) = 0;
 
 };
 
@@ -220,8 +228,8 @@ class Genome : public AbstractGenome {
 		}
 
 		// constructor
-		Handler(shared_ptr<Genome> _genome, bool _readDirection = 1) {
-			genome = _genome;
+		Handler(shared_ptr<AbstractGenome> _genome, bool _readDirection = 1) {
+			genome = dynamic_pointer_cast<Genome>(_genome);
 			setReadDirection(_readDirection);
 			resetHandler();
 		}
@@ -230,7 +238,8 @@ class Genome : public AbstractGenome {
 		virtual ~Handler() = default;
 
 		// modulateIndex checks to see if the current chromosomeIndex and siteIndex are out of range. if they are
-		// it uses readDirection to resolve them.
+		// it uses readDirection to resolve them.	virtual void copyFrom(shared_ptr<Genome> from) {
+
 		//  modulate index truncates nonexistant sites. i.e. if the current addres is chromosome 1, site 10 and
 		// chromosome 10 is 8 long, modulateIndex will set the index to chromosome 2, site 0 (not site 2).
 		// If this behavior is required, use advance Index instead.
@@ -345,11 +354,12 @@ class Genome : public AbstractGenome {
 			}
 		}
 
-		virtual void copyTo(shared_ptr<Handler> to) {
-			to->genome = genome;
-			to->chromosomeIndex = chromosomeIndex;
-			to->siteIndex = siteIndex;
-			to->EOG = EOG;
+		virtual void copyTo(shared_ptr<AbstractGenome::Handler> to) {
+			auto castTo = dynamic_pointer_cast<Genome::Handler>(to);  // we will be pulling all sorts of stuff from this genome so lets just cast it once.
+			castTo->genome = genome;
+			castTo->chromosomeIndex = chromosomeIndex;
+			castTo->siteIndex = siteIndex;
+			castTo->EOG = EOG;
 		}
 
 		virtual bool inTelomere(int length) {
@@ -403,7 +413,7 @@ class Genome : public AbstractGenome {
 	Genome(shared_ptr<AbstractChromosome> _chromosome) {
 		ploidy = 1;
 		chromosomes.push_back(_chromosome->makeLike());
-		chromosomes[0]->fillRandom();  // resize and set with random values
+		/////////chromosomes[0]->fillRandom();  // resize and set with random values
 		recordDataMap();
 	}
 
@@ -419,14 +429,15 @@ class Genome : public AbstractGenome {
 		}
 		for (int i = 0; i < (chromosomeCount * _plodiy); i++) {
 			chromosomes.push_back(_chromosome->makeLike());
-			chromosomes[i]->fillRandom();  // resize and set with random values
+			/////////chromosomes[i]->fillRandom();  // resize and set with random values
 		}
 		recordDataMap();
 	}
 
 	virtual ~Genome() = default;
 
-	virtual shared_ptr<Handler> newHandler(shared_ptr<Genome> _genome, bool _readDirection = true) {
+	virtual shared_ptr<AbstractGenome::Handler> newHandler(shared_ptr<AbstractGenome> _genome, bool _readDirection = true) override {
+		////////////////////////////////////cout << "In Genome::newHandler()" << endl;
 		return make_shared<Handler>(_genome, _readDirection);
 	}
 
@@ -462,15 +473,14 @@ class Genome : public AbstractGenome {
 
 // copy the contents of another genome to this genome
 // no undefined action, this function must be defined
-	virtual void copyFrom(shared_ptr<Genome> from) {
-		// deep copy chromosomes
-		// copy PT
+	virtual void copyFrom(shared_ptr<AbstractGenome> from) {
+		auto castFrom = dynamic_pointer_cast<Genome>(from);  // we will be pulling all sorts of stuff from this genome so lets just cast it once.
 		chromosomes.resize(0);
-		for (auto chromosome : from->chromosomes) {
+		for (auto chromosome : castFrom->chromosomes) {
 			chromosomes.push_back(chromosome->makeCopy());
 		}
-		PT.copy(from->PT);
-		ploidy = from->ploidy;
+		PT.copy(castFrom->PT);
+		ploidy = castFrom->ploidy;
 	}
 
 // Mutation functions
@@ -481,6 +491,11 @@ class Genome : public AbstractGenome {
 			nucleotides += chromosome->size();
 		}
 		return nucleotides;
+	}
+
+	virtual bool isEmpty() {
+		//cout << "in Genome::isEmpty(): " << to_string(countSites() == 0) << " : " << to_string(countSites()) << endl;
+		return (countSites() == 0);
 	}
 
 // old version gets numbers for number of events from entire genome sites count
@@ -541,7 +556,7 @@ class Genome : public AbstractGenome {
 
 	// make a mutated genome. from this genome
 	// the undefined action is to return a new genome
-	virtual shared_ptr<Genome> makeMutatedGenome(shared_ptr<Genome> parent) {
+	virtual shared_ptr<AbstractGenome> makeMutatedGenome(shared_ptr<AbstractGenome> parent) {
 		auto newGenome = make_shared<Genome>();
 		newGenome->copyFrom(parent);
 		newGenome->mutate();
@@ -556,11 +571,13 @@ class Genome : public AbstractGenome {
 	// each parents 0 chromosome is crossed to make a new 0 chromosome, then each parents 1 chromosome...
 	// if ploidy > 1 then the number of parents must match ploidy (this may be extended in the future)
 	// in this case, each parent crosses all of its chromosomes and contributs the result as a new chromosome
-	virtual shared_ptr<Genome> makeMutatedGenome(vector<shared_ptr<Genome>> parents) {
+	virtual shared_ptr<AbstractGenome> makeMutatedGenome(vector<shared_ptr<AbstractGenome>> parents) {
 		// first, check to make sure that parent genomes are conpatable.
-		int testPloidy = parents[0]->ploidy;
-		size_t testChromosomeCount = parents[0]->chromosomes.size();
-		for (auto parent : parents) {
+		auto castParent0 = dynamic_pointer_cast<Genome>(parents[0]);  // we will be pulling all sorts of stuff from this genome so lets just cast it once.
+		int testPloidy = castParent0->ploidy;
+		size_t testChromosomeCount = castParent0->chromosomes.size();
+		for (auto rawParent : parents) {
+			auto parent = dynamic_pointer_cast<Genome>(rawParent);
 			if (parent->ploidy != testPloidy) {
 				cout << "ERROR! In Genome::makeMutatedGenome(vector<shared_ptr<Genome>> parents). Parents are incompatible due to mismatched ploidy!\nExiting!\n";
 				exit(1);
@@ -572,28 +589,29 @@ class Genome : public AbstractGenome {
 
 		}
 		auto newGenome = make_shared<Genome>();
-		newGenome->PT.copy(parents[0]->PT);  // copy ParametersTable from 0th parent
-		newGenome->ploidy = parents[0]->ploidy;  // copy ploidy from 0th parent
+		newGenome->PT.copy(castParent0->PT);  // copy ParametersTable from 0th parent
+		newGenome->ploidy = castParent0->ploidy;  // copy ploidy from 0th parent
 
 		if (ploidy == 1) {  // if haploid then cross chromosomes from all parents
-			for (size_t i = 0; i < parents[0]->chromosomes.size(); i++) {
-				newGenome->chromosomes.push_back(parents[0]->chromosomes[0]->makeLike());
+			for (size_t i = 0; i < castParent0->chromosomes.size(); i++) {
+				newGenome->chromosomes.push_back(castParent0->chromosomes[0]->makeLike());
 				vector<shared_ptr<AbstractChromosome>> parentChromosomes;
-				for (auto parent : parents) {
+				for (auto rawParent : parents) {
+					auto parent = dynamic_pointer_cast<Genome>(rawParent);
 					parentChromosomes.push_back(parent->chromosomes[i]);  // make a vector that contains the nth chromosome from each parent
 				}
 				newGenome->chromosomes[newGenome->chromosomes.size() - 1]->crossover(parentChromosomes, newGenome->PT.lookup("genomecrossCount"));  // create a crossover chromosome
 			}
 		} else if (ploidy == (int) parents.size()) {  // if diploid than cross chromosomes from all parents
-			int setCount = parents[0]->chromosomes.size() / ploidy;  // number of sets of chromosomes
+			int setCount = castParent0->chromosomes.size() / ploidy;  // number of sets of chromosomes
 			for (int currSet = 0; currSet < setCount; currSet++) {
 				int parentCount = 0;
 				for (auto parent : parents) {
 
-					newGenome->chromosomes.push_back(parents[0]->chromosomes[0]->makeLike());  // add a chromosome to this genome
+					newGenome->chromosomes.push_back(castParent0->chromosomes[0]->makeLike());  // add a chromosome to this genome
 					vector<shared_ptr<AbstractChromosome>> parentChromosomes;
 					for (int pCount = 0; pCount < ploidy; pCount++) {  // make a vector containing all the chromosomes in this chromosome set from this parent
-						parentChromosomes.push_back(parent->chromosomes[(currSet * ploidy) + pCount]);
+						parentChromosomes.push_back(dynamic_pointer_cast<Genome>(parent)->chromosomes[(currSet * ploidy) + pCount]);
 					}
 					newGenome->chromosomes[newGenome->chromosomes.size() - 1]->crossover(parentChromosomes, newGenome->PT.lookup("genomecrossCount"));
 					parentCount++;
@@ -628,11 +646,11 @@ class Genome : public AbstractGenome {
 		dataMap.Set("sitesCount", countSites());
 		dataMap.Clear("chromosomeLengths");
 		string allSites = "\"[";
-		for (size_t c = 0; c < chromosomes.size(); c++) {
-			dataMap.Append("chromosomeLengths", chromosomes[c]->size());
-			allSites += chromosomes[c]->chromosomeToStr();
-		}
-		allSites.pop_back();  // remove extra separator at end
+//		for (size_t c = 0; c < chromosomes.size(); c++) {
+//			dataMap.Append("chromosomeLengths", chromosomes[c]->size());
+//			allSites += chromosomes[c]->chromosomeToStr();
+//		}
+//		allSites.pop_back();  // remove extra separator at end
 		allSites += "]\"";
 		dataMap.Set("sites", allSites);
 	}

@@ -56,7 +56,7 @@ Organism::Organism() {
  * create a new organism given only a genome - since we do not know the type of brain we are using, we can not make the brain yet
  * parents is left empty (this is organism has no parents!)
  */
-Organism::Organism(shared_ptr<Genome> _genome) {
+Organism::Organism(shared_ptr<AbstractGenome> _genome) {
 	genome = _genome;
 	brain = nullptr;
 	ID = registerOrganism();
@@ -73,9 +73,11 @@ Organism::Organism(shared_ptr<Genome> _genome) {
 	dataMap.SetMany(genome->getStats());
 }
 
-Organism::Organism(shared_ptr<Genome> _genome, shared_ptr<ClassicBrain> _brain) {
+Organism::Organism(shared_ptr<AbstractGenome> _genome, shared_ptr<AbstractBrain> _brain) {
 	genome = _genome;
+	//cout << "in Organism::Organism(shared_ptr<AbstractGenome> _genome, shared_ptr<AbstractBrain> _brain)\n\tabout to make brain from genome"<<endl;
 	brain = _brain->makeBrainFromGenome(genome);
+	//cout << "\tmade brain from genome"<<endl;
 	ID = registerOrganism();
 	alive = true;
 	gender = 0;  // by default all orgs are female.
@@ -94,7 +96,7 @@ Organism::Organism(shared_ptr<Genome> _genome, shared_ptr<ClassicBrain> _brain) 
  * create an organism with one parent
  * a brain is created with the assumption that the new brain should be of the same type as the parents brain
  */
-Organism::Organism(shared_ptr<Organism> from, shared_ptr<Genome> _genome) {
+Organism::Organism(shared_ptr<Organism> from, shared_ptr<AbstractGenome> _genome) {
 	genome = _genome;
 	brain = from->brain->makeBrainFromGenome(genome);
 	ID = registerOrganism();
@@ -125,7 +127,7 @@ Organism::Organism(shared_ptr<Organism> from, shared_ptr<Genome> _genome) {
  * a) all organisms in from are the same
  * b) and the new brain should be of the same type as the parents brain
  */
-Organism::Organism(const vector<shared_ptr<Organism>> from, shared_ptr<Genome> _genome) {
+Organism::Organism(const vector<shared_ptr<Organism>> from, shared_ptr<AbstractGenome> _genome) {
 	genome = _genome;
 	brain = from[0]->brain->makeBrainFromGenome(genome);
 	ID = registerOrganism();
@@ -175,11 +177,12 @@ shared_ptr<Organism> Organism::makeMutatedOffspring(shared_ptr<Organism> parent)
 }
 
 shared_ptr<Organism> Organism::makeMutatedOffspring(vector<shared_ptr<Organism>> from) {
-	vector<shared_ptr<Genome>> parentGenomes;
+	vector<shared_ptr<AbstractGenome>> parentGenomes;
 	for (auto p : from) {
 		parentGenomes.push_back(p->genome);
 	}
 	shared_ptr<Organism> newOrg = make_shared<Organism>(from, genome->makeMutatedGenome(parentGenomes));
+
 	newOrg->gender = from[Random::getIndex(from.size())]->gender;  // assign a gender to the new org randomly from one of it's parents
 	return newOrg;
 }
