@@ -221,6 +221,7 @@ vector<shared_ptr<Organism>> Organism::getLOD(shared_ptr<Organism> org) {
 	for (size_t i = 0; i < list.size(); i++) {
 	}
 	if (org->parents.size() > 1) {  // if more than one parent we have a problem!
+		cout << "In Organism::getLOD(shared_ptr<Organism> org)\n Looks like you have enabled sexual reproduction.\nLOD only works with asexual populations. i.e. an offspring may have at most one parent.\nExiting!\n";
 		exit(1);
 	}
 	return list;

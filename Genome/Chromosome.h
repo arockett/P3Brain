@@ -374,8 +374,9 @@ template<class T> class Chromosome : public AbstractChromosome {
 		string S = "";
 
 		for (int i = 0; i < sites.size(); i++) {
-			S = S + to_string(sites[i]) + FileManager::separator;
+			S = S + FileManager::separator + to_string(sites[i]);
 		}
+		S.erase(S.begin());  // clip off the leading separator
 		return S;
 	}
 

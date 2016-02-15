@@ -68,6 +68,7 @@ bool LODwAP_Archivist::archive(vector<shared_ptr<Organism>> population, int flus
 				shared_ptr<Organism> current = LOD[nextGenomeWrite - lastPrune];
 				//string dataString = to_string(nextGenomeWrite) + FileManager::separator + "\"[" + current->genome->genomeToStr() + "]\"";  // add write update and padding to genome string
 				//FileManager::writeToFile(GenomeFileName, dataString, "update,genome");  // write data to file
+				current->genome->dataMap.Set("sites",current->genome->genomeToStr());
 				current->genome->dataMap.Set("update",current->dataMap.Get("update"));
 				current->genome->dataMap.writeToFile(GenomeFileName, current->genome->dataMap.getKeys());  // append new data to the file
 				nextGenomeWrite += genomeInterval;

@@ -23,8 +23,10 @@ import pandas
 #
 ####
 
-def BuildMultiPlotFromDict(DataMap,NamesList,XCoordinateName='',Columns=1):
+def BuildMultiPlotFromDict(DataMap,NamesList,XCoordinateName='',Columns=1,title = ''):
   plt.figure()                                                # create a new figure
+  if (title!=''):
+    plt.suptitle(title, fontsize=14, fontweight='bold')
 
   Rows = math.ceil(float(len(NamesList))/float(Columns))      # calcualate how many rows we need
   
@@ -42,6 +44,7 @@ def BuildMultiPlotFromDict(DataMap,NamesList,XCoordinateName='',Columns=1):
                                                               # plot the data for each element in name in it's own plot
       plt.title(NamesList[count], fontsize=12)                # set the title for this plot
 
+	
   return plt.gcf()                                            # gcf = get current figure - return that.
 
 ####
@@ -59,10 +62,8 @@ def BuildMultiPlotFromDict(DataMap,NamesList,XCoordinateName='',Columns=1):
 #
 ####
 
-def BuildMultiPlotFromDict(DataMap,NamesList,XCoordinateName='',Columns=1,title = ''):
+def BuildPlotFromDict(DataMap,NamesList,XCoordinateName='',AddLegend='',title = ''):
   plt.figure()                                                # create a new figure
-  if (title!=''):
-    plt.suptitle(title, fontsize=14, fontweight='bold')
 
   if XCoordinateName=='':                                     # if there is no XCoordinateName
     for count in range(len(NamesList)):                       # for each name
@@ -79,7 +80,7 @@ def BuildMultiPlotFromDict(DataMap,NamesList,XCoordinateName='',Columns=1,title 
     plt.legend(loc=AddLegend, shadow=True)                    # add a legend
   
   if (title!=''):
-	plt.title(title)
+    plt.title(title)
 	
   return plt.gcf()                                            # gcf = get current figure - return that.
 

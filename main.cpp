@@ -129,7 +129,7 @@ int main(int argc, const char * argv[]) {
 		shared_ptr<Chromosome<bool>> initalChromosome = make_shared<Chromosome<bool>>(Genome::initialChromosomeSize, 2);
 		cout << "made initalChromosome" << endl;
 		shared_ptr<Organism> progenitor = make_shared<Organism>(make_shared<Genome>(initalChromosome, 3, 2), make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>()));  // make a organism with a genome and brain (if you need to change the types here is where you do it)
-		cout << "made initalChromosome" << endl;
+		cout << "made progenitor" << endl;
 
 		Global::update = 0;  // the beginning of time - now we construct the first population
 		vector<shared_ptr<Organism>> population;
@@ -161,7 +161,7 @@ int main(int argc, const char * argv[]) {
 			archivist = make_shared<SSwD_Archivist>();
 		}
 
-		group = make_shared<Group>(population, make_shared<Tournament2>(), archivist);
+		group = make_shared<Group>(population, make_shared<Tournament>(), archivist);
 	}
 	cout << "made group" << endl;
 

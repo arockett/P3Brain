@@ -125,6 +125,7 @@ bool SSwD_Archivist::archive(vector<shared_ptr<Organism>> population, int flush)
 					//dataString = to_string(org->ID) + FileManager::separator + org->snapShotDataMaps[nextGenomeWrite].Get("genomeAncestors") + FileManager::separator + "\"[" + org->genome->genomeToStr() + "]\"";  // add interval update, genome ancestors, and genome with padding to string
 					//FileManager::writeToFile(genomeFileName, dataString, "ID,genomeAncestors,genome");  // write data to file
 
+					org->genome->dataMap.Set("sites",org->genome->genomeToStr());
 					org->genome->dataMap.Set("genomeAncestors",org->snapShotDataMaps[nextGenomeWrite].Get("genomeAncestors"));
 					//cout << "test: " << org->snapShotDataMaps[nextGenomeWrite].Get("genomeAncestors");
 					org->genome->dataMap.Set("ID",org->dataMap.Get("ID"));

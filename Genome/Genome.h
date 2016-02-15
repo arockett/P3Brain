@@ -645,14 +645,9 @@ class Genome : public AbstractGenome {
 		dataMap.Set("chromosomeCount", chromosomes.size());
 		dataMap.Set("sitesCount", countSites());
 		dataMap.Clear("chromosomeLengths");
-		string allSites = "\"[";
-//		for (size_t c = 0; c < chromosomes.size(); c++) {
-//			dataMap.Append("chromosomeLengths", chromosomes[c]->size());
-//			allSites += chromosomes[c]->chromosomeToStr();
-//		}
-//		allSites.pop_back();  // remove extra separator at end
-		allSites += "]\"";
-		dataMap.Set("sites", allSites);
+		for (size_t c = 0; c < chromosomes.size(); c++) {
+			dataMap.Append("chromosomeLengths", chromosomes[c]->size());
+		}
 	}
 
 // load a genome from CSV file with headers - will return genome from saved organism with key / keyvalue pair
@@ -665,13 +660,12 @@ class Genome : public AbstractGenome {
 	// convert a chromosome to a string
 	virtual string genomeToStr() {
 		string S = "";
-		if (ploidy > 1) {
-			S = S + "ploidy: " + to_string(ploidy) + "\n";
+
+		for (size_t c = 0; c < chromosomes.size(); c++) {
+			S = S + FileManager::separator + chromosomes[c]->chromosomeToStr();
 		}
-		for (auto chromosome : chromosomes) {
-			S = S + chromosome->chromosomeToStr();
-		}
-		S = S + "\n";
+		S.erase(S.begin());  // clip off the leading separator
+		 S = "\"[" + S + "]\"";
 		return S;
 	}
 
