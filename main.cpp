@@ -88,7 +88,6 @@ int main(int argc, const char * argv[]) {
 
 	// test other speed
 
-
 //	auto testChromosome = make_shared<Chromosome<bool>>(5000, 2);
 //	auto testGenome = make_shared<Genome>(testChromosome, 3, 2);
 //	auto GLB = make_shared<Classic_GateListBuilder>();  // make a organism with a genome and brain (if you need to change the types here is where you do it)
@@ -126,7 +125,7 @@ int main(int argc, const char * argv[]) {
 		// a progenitor must exist - that is, one ancestor genome
 		Global::update = -1;  // before there was time, there was a progenitor
 		//shared_ptr<MarkovBrain> tesBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
-		shared_ptr<Chromosome<bool>> initalChromosome = make_shared<Chromosome<bool>>(Genome::initialChromosomeSize, 2);
+		auto initalChromosome = make_shared<Chromosome<int>>(Genome::initialChromosomeSize, 256);
 		cout << "made initalChromosome" << endl;
 		shared_ptr<Organism> progenitor = make_shared<Organism>(make_shared<Genome>(initalChromosome, 3, 2), make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>()));  // make a organism with a genome and brain (if you need to change the types here is where you do it)
 		cout << "made progenitor" << endl;
@@ -138,6 +137,12 @@ int main(int argc, const char * argv[]) {
 		for (int i = 0; i < Global::popSize; i++) {
 			shared_ptr<Genome> genome = make_shared<Genome>(initalChromosome, 3, 2);
 			genome->fillRandom();
+			auto genomeHandler = genome->newHandler(genome);
+			for (int i = 0; i < 5; i++) {
+				genomeHandler->randomize();
+				genomeHandler->writeInt(43, 0, 255);
+				genomeHandler->writeInt(255-43, 0, 255);
+			}
 			shared_ptr<Organism> org = make_shared<Organism>(progenitor, genome);
 			population.push_back(org);  // add a new org to population using progenitors template and a new random genome
 			population[population.size() - 1]->gender = Random::getInt(0, 1);  // assign a random gender to the new org
@@ -161,7 +166,7 @@ int main(int argc, const char * argv[]) {
 			archivist = make_shared<SSwD_Archivist>();
 		}
 
-		group = make_shared<Group>(population, make_shared<Tournament>(), archivist);
+		group = make_shared<Group>(population, make_shared<Tournament2>(), archivist);
 	}
 	cout << "made group" << endl;
 
@@ -169,16 +174,6 @@ int main(int argc, const char * argv[]) {
 // evolution loop
 //////////////////
 
-//  if (Archivist::outputMethod == -1) {  // this is the first time archive is called. get the output method
-//    if (Archivist::outputMethodStr == "LODwAP") {
-//      Archivist::outputMethod = 0;
-//    } else if (Archivist::outputMethodStr == "SSwD") {
-//      Archivist::outputMethod = 1;
-//    } else {
-//      cout << "unrecognized archive method \"" << Archivist::outputMethodStr << "\". Should be either \"LODwAP\" or \"SSwD\"\nExiting.\n";
-//      exit(1);
-//    }
-//  }
 	bool finished = false;  // when the archivist says we are done, we can stop!
 
 	while (!finished) {

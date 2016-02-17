@@ -54,6 +54,21 @@ void Tournament::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
 		population[i]->kill();  // set org.alive = 0 and delete the organism if it has no offspring
 	}
 	cout << endl;
+	cout << "A\n";
+	//population = nextPopulation;
+	//population.resize(0);
+//	while (population.size() > 0){
+//		cout << population.size() << " " << flush;
+//		auto keys = population[population.size()-1]->dataMap.getKeys();
+//		for (auto key:keys){
+//			cout << key << " = " << flush << population[population.size()-1]->dataMap.Get(key) << "   " << flush;
+//
+//		}
+//		cout << "   done keys" << endl;
+//		population.pop_back();
+//	}
 	population = nextPopulation;
+
+	cout << "B\n";
 
 }

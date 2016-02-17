@@ -24,7 +24,7 @@ using namespace std;
 class AbstractOrganism {
  public:
 	DataMap dataMap;  // holds all data (genome size, score, world data, etc.)
-	unordered_map<int, DataMap> snapShotDataMaps;  // Used only with SnapShot with Delay (SSwD) stores contents of dataMap when an ouput interval is reached so that
+	map<int, DataMap> snapShotDataMaps;  // Used only with SnapShot with Delay (SSwD) stores contents of dataMap when an ouput interval is reached so that
 	// after the delay we have the correct data for the given time. key is 'update'. This possibly should be wrapped into Archivist.
 
 	AbstractOrganism();

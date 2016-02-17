@@ -124,6 +124,15 @@ class BerryWorld : public World {
 			}
 		}
 
+		if ((randomWalls >= WorldX * WorldY) && !borderWalls){
+			cout << "In BerryWorld::makeTestGrid() To many random walls... exiting!"<<endl;
+			exit(1);
+		}
+		if ((randomWalls >= (WorldX-2) * (WorldY-2)) && borderWalls){
+			cout << "In BerryWorld::makeTestGrid() To many random walls... exiting!"<<endl;
+			exit(1);
+		}
+
 		for (int i = 0; i < randomWalls; i++) {  // add random walls
 			if (borderWalls) {
 				setGridValue(grid, { Random::getInt(1, WorldX - 2), Random::getInt(1, WorldY - 2) }, WALL);  // if borderWalls than don't place random walls on the outer edge

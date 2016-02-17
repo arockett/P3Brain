@@ -121,13 +121,8 @@ class AbstractGenome {
 			return 0;
 		}
 
-		virtual void writeInt(int value, int valueMin, int valueMax) {
-		}
-
-		virtual vector<vector<int>> readTable(vector<int> tableSize, vector<int> tableMaxSize, vector<int> valueRange, int code = -1, int CodingRegionIndex = 0) {
-			vector<vector<int>> temp;
-			return temp;
-		}
+		virtual void writeInt(int value, int valueMin, int valueMax) = 0;
+		virtual vector<vector<int>> readTable(vector<int> tableSize, vector<int> tableMaxSize, vector<int> valueRange, int code = -1, int CodingRegionIndex = 0) = 0;
 
 		virtual void copyTo(shared_ptr<Handler> to) {
 		}
@@ -141,6 +136,8 @@ class AbstractGenome {
 		virtual bool inTelomere(int length) {
 			return 0;
 		}
+
+		virtual void randomize()  = 0;
 
 		////virtual int newHandle() // make a new handle in this genome, return the index for that handle
 		////virtual int advanceIndex(int handle, int distance = 1)
@@ -369,6 +366,11 @@ class Genome : public AbstractGenome {
 			} else {
 				return (siteIndex - 1 < length);
 			}
+		}
+
+		virtual void randomize(){
+			chromosomeIndex = Random::getIndex(genome->chromosomes.size());
+			siteIndex = Random::getIndex(genome->chromosomes[chromosomeIndex]->size());
 		}
 
 		virtual vector<vector<int>> readTable(vector<int> tableSize, vector<int> tableMaxSize, vector<int> valueRange, int code = -1, int CodingRegionIndex = 0) {

@@ -81,7 +81,11 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 	vector<int> grid = makeTestGrid();
 
 	// organism starts in the center of the world, facing in a random direction.
-	pair<int, int> currentLocation = { WorldX / 2, WorldY / 2 };  // location of the organism
+	pair<int, int> currentLocation = { Random::getIndex(WorldX), Random::getIndex(WorldY) };  // location of the organism
+	//currentLocation = { WorldX/2, WorldY/2 };  // location of the organism
+	while (getGridValue(grid, currentLocation) == WALL){
+		currentLocation = { Random::getIndex(WorldX), Random::getIndex(WorldY) }; //
+	}
 	int facing = Random::getIndex(8);  // direction the agent is facing
 
 	// set up to track what food is eaten
@@ -124,7 +128,6 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 		rightFront = getGridValue(grid, moveOnGrid(currentLocation, turnRight(facing)));
 
 		statesAssignmentCounter = 0;  // get ready to start assigning inputs
-
 		if (senseWalls) {
 			if (senseDown) {
 				for (int i = 0; i < foodTypes; i++) {  // fill first states with food values at here location
