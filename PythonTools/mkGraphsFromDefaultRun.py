@@ -89,9 +89,11 @@ def BuildPlotFromDict(DataMap,NamesList,XCoordinateName='',AddLegend='',title = 
 
 ave_csv_file = pandas.read_csv(r'ave.csv')
 dominant_csv_file = pandas.read_csv(r'dominant.csv')
+#data_csv_file = pandas.read_csv(r'data_9750.csv')
 
 BuildMultiPlotFromDict(ave_csv_file,NamesList = ['score','gates','genomeLength'],XCoordinateName='update',Columns=2,title = 'Average')
-BuildMultiPlotFromDict(dominant_csv_file,NamesList = ['score','switches','food1','food2','gates','genomeLength'],XCoordinateName='update',Columns=2,title = 'Dominant')
+BuildMultiPlotFromDict(dominant_csv_file,NamesList = ['score','food1','switches','food2','gates','food3','genomeLength','food4'],XCoordinateName='update',Columns=2,title = 'Dominant')
+#BuildMultiPlotFromDict(data_csv_file,NamesList = ['score','food1','switches','food2','gates','food3','genomeLength','food4','total'],Columns=2,title = 'Dominant')
 
 #BuildPlotFromDict(DataMap = Data, NamesList = ['food1','food2','switches'],XCoordinateName = 'update',AddLegend='lower right')
 #BuildPlotFromDict(DataMap = Data, NamesList = ['food1','food2','switches'],XCoordinateName = 'update',AddLegend='lower right')

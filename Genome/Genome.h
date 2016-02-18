@@ -22,15 +22,6 @@
 
 using namespace std;
 
-//// IO and Data Management functions
-//
-//// gets data about genome which can be added to a data map
-//// data is in pairs of strings (key, value)
-//// the undefined action is to return an empty vector
-//	virtual vector<string> getStats() {
-//		vector<string> data;
-//		return data;
-//	}
 //// converts the sites vector to a FileManager::separator separated list in string format.
 //// the undefined action is to return an empty string
 //	virtual string convert_to_string() {
@@ -43,39 +34,8 @@ using namespace std;
 //	virtual void loadGenome(string fileName, string key, string keyValue) {
 //	}
 //
-//// Translation functions - convert genomes into usefull stuff
-//
-//// return total number of sites in this genome
-//	virtual int getSize() {
-//		return 0;
-//	}
-//
-//// convert genome sites at location index into a value in range [min,max] and advance index to the next unused site
-//// any sites used will be assigned code in codingRegions
-//// no undefined action, this function must be defined
-//	virtual int extractValue(shared_ptr<Index> index, vector<int> valueRange, int code = -1, int gateID = 0) = 0;
-//
-//// convert genome sites at location index into a table and advance index to next unused site
-//	virtual vector<vector<int>> extractTable(shared_ptr<Index> index, vector<int> tableSize, vector<int> tableMaxSize, vector<int> valueRange, int code = -1, int gateID = 0);
-//
-//// Coding Region functions
-//// add to the current coding region
-//	virtual inline void assignCodingRegionValue(shared_ptr<Index> index, int code, int gateID) {
-//		if (code != -1) {
-//			//cout << "assigning: [" << (int) codingRegions.size() - 1 << "][" << index << "] = " << code << "\n";
-//			codingRegions[gateID].assign(index, code);
-//		}
-//	}
-//
-//// display the getCodingRegions for a gate as (Index1,Type1,Index2,Type2...)
-//	virtual inline string showCodingRegions() {
-//		string S = "";
-//		for (auto codingRegion : codingRegions) {
-//			S = S + "gate: " + to_string(codingRegion.first) + " " + codingRegion.second.showCodingRegion();
-//		}
-//		S += "\n";
-//		return S;
-//	}
+
+
 
 class AbstractGenome {
 
@@ -117,9 +77,10 @@ class AbstractGenome {
 		virtual ~Handler() {
 		}
 
-		virtual int readInt(int valueMin, int valueMax, int code = -1, int CodingRegionIndex = 0) {
-			return 0;
-		}
+		//// convert genome sites at location index into a value in range [min,max] and advance index to the next unused site
+		//// any sites used will be assigned code in codingRegions
+		//// no undefined action, this function must be defined
+		virtual int readInt(int valueMin, int valueMax, int code = -1, int CodingRegionIndex = 0) = 0;
 
 		virtual void writeInt(int value, int valueMin, int valueMax) = 0;
 		virtual vector<vector<int>> readTable(vector<int> tableSize, vector<int> tableMaxSize, vector<int> valueRange, int code = -1, int CodingRegionIndex = 0) = 0;
@@ -169,6 +130,10 @@ class AbstractGenome {
 
 	}
 
+
+	//// gets data about genome which can be added to a data map
+	//// data is in pairs of strings (key, value)
+	//// the undefined action is to return an empty vector
 	virtual vector<string> getStats() {
 		vector<string> data;
 		cout << "In AbstractGenome::getStats()...\n";
@@ -201,8 +166,6 @@ class Genome : public AbstractGenome {
 	static double& deletionRate;
 	static int& deletionMinSize;
 	static int& deletionMaxSize;
-	static int& minGenomeSize;
-	static int& maxGenomeSize;
 	static int& maxChromosomeSize;
 	static int& minChromosomeSize;
 	static int& crossCount;  // number of crosses to make when performing crossover
@@ -540,15 +503,15 @@ class Genome : public AbstractGenome {
 				chromosome->mutatePoint();
 			}
 			// do some copy mutations
-			if (nucleotides < PT.lookup("genomeSizeMax")) {
-				for (int i = 0; i < howManyCopy && (nucleotides < PT.lookup("genomeSizeMax")); i++) {
+			if (nucleotides < PT.lookup("chromosomeSizeMax")) {
+				for (int i = 0; i < howManyCopy && (nucleotides < PT.lookup("chromosomeSizeMax")); i++) {
 					chromosome->mutateCopy(PT.lookup("mutationCopyMinSize"), PT.lookup("mutationCopyMaxSize"), PT.lookup("chromosomeSizeMax"));
 					nucleotides = chromosome->size();
 				}
 			}
 			// do some deletion mutations
-			if (nucleotides > PT.lookup("genomeSizeMin")) {
-				for (int i = 0; i < howManyDelete && (nucleotides > PT.lookup("genomeSizeMin")); i++) {
+			if (nucleotides > PT.lookup("chromosomeSizeMin")) {
+				for (int i = 0; i < howManyDelete && (nucleotides > PT.lookup("chromosomeSizeMin")); i++) {
 					chromosome->mutateDelete(PT.lookup("mutationDeletionMinSize"), PT.lookup("mutationDeletionMaxSize"), PT.lookup("chromosomeSizeMin"));
 					nucleotides = chromosome->size();
 				}

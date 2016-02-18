@@ -44,6 +44,14 @@ using namespace std;
 
 int main(int argc, const char * argv[]) {
 
+	cout << "\n\n" <<
+			"\tMM   MM      A      BBBBBB   EEEEEE\n"<<
+			"\tMMM MMM     AAA     BB   BB  EE\n" <<
+			"\tMMMMMMM    AA AA    BBBBBB   EEEEEE\n" <<
+			"\tMM M MM   AAAAAAA   BB   BB  EE\n" <<
+			"\tMM   MM  AA     AA  BBBBBB   EEEEEE\n" <<
+			"\n" <<
+			"\tModular    Agent    Based    Evolver\n\n\n\thttp://hintzelab.msu.edu/MABE\n\n\n";
 	Parameters::initialize_parameters(argc, argv);  // loads command line and configFile values into registered parameters
 	                                                // also writes out a config file if requested
 	cout << "making Node Map" << endl;
