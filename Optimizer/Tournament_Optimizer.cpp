@@ -45,16 +45,12 @@ void Tournament::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
 				}
 			}
 		}
-		cout << "*" << flush;
 		nextPopulation.push_back(population[winner]->makeMutatedOffspring(population[winner]));
 		//nextPopulation.push_back(population[winner]);
-		cout << "." << flush;
 	}
 	for (size_t i = 0; i < population.size(); i++) {
 		population[i]->kill();  // set org.alive = 0 and delete the organism if it has no offspring
 	}
-	cout << endl;
-	cout << "A\n";
 	//population = nextPopulation;
 	//population.resize(0);
 //	while (population.size() > 0){
@@ -68,7 +64,5 @@ void Tournament::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
 //		population.pop_back();
 //	}
 	population = nextPopulation;
-
-	cout << "B\n";
 
 }
