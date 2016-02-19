@@ -70,7 +70,10 @@ bool LODwAP_Archivist::archive(vector<shared_ptr<Organism>> population, int flus
 				//FileManager::writeToFile(GenomeFileName, dataString, "update,genome");  // write data to file
 				current->genome->dataMap.Set("sites",current->genome->genomeToStr());
 				current->genome->dataMap.Set("update",current->dataMap.Get("update"));
-				current->genome->dataMap.writeToFile(GenomeFileName, current->genome->dataMap.getKeys());  // append new data to the file
+				//current->genome->dataMap.writeToFile(GenomeFileName, current->genome->dataMap.getKeys());  // append new data to the file
+				vector<string> genomeFileColumns = Genome::genomeFileColumns;
+				genomeFileColumns.insert(genomeFileColumns.begin(),"update");
+				current->genome->dataMap.writeToFile(GenomeFileName, genomeFileColumns);  // append new data to the file
 				nextGenomeWrite += genomeInterval;
 			}
 		}

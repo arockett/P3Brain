@@ -41,6 +41,8 @@ class AbstractGenome {
 
  public:
 
+	static vector<string> genomeFileColumns;
+
 	// Handlers are how you access Genomes for reading and writting.
 	// to get a handle for a genome call that that genomes newHandler() method
 	class Handler {
@@ -169,6 +171,8 @@ class Genome : public AbstractGenome {
 	static int& maxChromosomeSize;
 	static int& minChromosomeSize;
 	static int& crossCount;  // number of crosses to make when performing crossover
+
+	static vector<string> genomeFileColumns;// = {"ID","alphabetSize","chromosomeCount","chromosomeLength","sitesCount","genomeAncestors","sites"};
 
 	class Handler : public AbstractGenome::Handler {
  	public:
