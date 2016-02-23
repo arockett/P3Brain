@@ -85,23 +85,6 @@ bool SSwD_Archivist::archive(vector<shared_ptr<Organism>> population, int flush)
 				checkpoints[Global::update].push_back(org);
 				org->snapShotDataMaps[Global::update] = org->dataMap;  // back up state of dataMap
 
-				//-///////////////////////////////////////////////////////////////////////////////////
-				//-// removed saving genome ancestors - this data can be reconstructed from data files
-				//-///////////////////////vv/////////////////////////////////vv///////////////////////
-				//-//
-				//-//if (Global::update == nextGenomeCheckPoint && Global::update <= Global::updates) {  // if this is a genome interval, add genomeAncestors to snapshot dataMap
-				//-//	for (auto ancestor : org->genomeAncestors) {
-				//-//		org->snapShotDataMaps[Global::update].Append("genomeAncestors", ancestor);
-				//-//	}
-				//-//	org->snapShotDataMaps[Global::update].Set("genomeAncestorsCount",org->genomeAncestors.size());
-				//-//	org->genomeAncestors.clear();  // clear genomeAncestors (this data is safe in the checkPoint)
-				//-//	org->genomeAncestors.insert(org->ID);  // now that we have saved the ancestor data, set ancestors to self (so that others will inherit correctly)
-				//-//	                                       // also, if this survives over intervals, it'll be pointing to self as ancestor in files (which is good)
-				//-//}
-				//-///////////////////////^^/////////////////////////////////^^/////////////////////
-				//-// removed saving genome ancestors - this data can be reconstructed from data files
-				//-////////////////////////////////////////////////////////////////////////////////
-
 				if (Global::update == nextDataCheckPoint && Global::update <= Global::updates) {  // if this is a data interval, add ancestors to snapshot dataMap
 					for (auto ancestor : org->ancestors) {
 						org->snapShotDataMaps[Global::update].Append("ancestors", ancestor);
@@ -130,24 +113,6 @@ bool SSwD_Archivist::archive(vector<shared_ptr<Organism>> population, int flush)
 			size_t index = 0;
 			while (index < checkpoints[nextGenomeWrite].size()) {
 				if (auto org = checkpoints[nextGenomeWrite][index].lock()) {  // this ptr is still good
-
-					// org->genome->dataMap is populated with the data to be written. The following few lines
-					// collect the data. genomeFileColumns is used to modify Genome::genomeFileColumns to add genomeAncestor information
-					// counts (genomeAncestorsCount, sitesCount, etc) are needed to help optimize file reading.
-
-					//-///////////////////////////////////////////////////////////////////////////////
-					//-// removed saving genome ancestors - this data can be reconstructed from data files
-					//-///////////////////////vv/////////////////////////////////vv///////////////////////
-					//-//
-					//-//org->genome->dataMap.Set("genomeAncestors",org->snapShotDataMaps[nextGenomeWrite].Get("genomeAncestors"));
-					//-//org->genome->dataMap.Set("genomeAncestorsCount",org->snapShotDataMaps[nextGenomeWrite].Get("genomeAncestorsCount"));
-					//-//vector<string> genomeFileColumns = Genome::genomeFileColumns;
-					//-//genomeFileColumns.push_back("genomeAncestorsCount");
-					//-//genomeFileColumns.push_back("genomeAncestors");
-					//-//
-					//-///////////////////////^^/////////////////////////////////^^/////////////////////
-					//-// removed saving genome ancestors - this data can be reconstructed from data files
-					//-////////////////////////////////////////////////////////////////////////////////
 
 					org->genome->dataMap.Set("ID", org->dataMap.Get("ID"));
 					org->genome->dataMap.Set("sites", org->genome->genomeToStr());
