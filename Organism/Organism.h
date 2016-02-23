@@ -48,7 +48,7 @@ class Organism : public AbstractOrganism {
 
 	vector<shared_ptr<Organism>> parents;  // parents are pointers to parents of this organism. In asexual populations this will have one element
 	unordered_set<int> genomeAncestors;  // list of the IDs of organisms in the last genome file who are ancestors of this organism (genomes saved on genome interval)
-	unordered_set<int> dataAncestors;  // list of the IDs of organisms in the last data files who are ancestors of this organism (i.e. all files saved on data interval)
+	unordered_set<int> ancestors;  // list of the IDs of organisms in the last data files who are ancestors of this organism (i.e. all files saved on data interval)
 
 	int ID;
 	int timeOfBirth;  // the time this organism was made

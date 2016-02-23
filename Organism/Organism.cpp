@@ -44,7 +44,7 @@ Organism::Organism() {
 	gender = 0;  // by default all orgs are female.
 	offspringCount = 0;  // because it's alive;
 	genomeAncestors.insert(ID);  // it is it's own Ancestor for genome tracking purposes
-	dataAncestors.insert(ID);  // it is it's own Ancestor for data tracking purposes
+	ancestors.insert(ID);  // it is it's own Ancestor for data tracking purposes
 	timeOfBirth = Global::update;  // happy birthday!
 	timeOfDeath = -1;  // still alive
 	dataMap.Set("ID", ID);
@@ -63,8 +63,7 @@ Organism::Organism(shared_ptr<AbstractGenome> _genome) {
 	alive = true;
 	gender = 0;  // by default all orgs are female.
 	offspringCount = 0;  // because it's alive;
-	genomeAncestors.insert(ID);  // it is it's own Ancestor for genome tracking purposes
-	dataAncestors.insert(ID);  // it is it's own Ancestor for data tracking purposes
+	ancestors.insert(ID);  // it is it's own Ancestor for data tracking purposes
 	timeOfBirth = Global::update;  // happy birthday!
 	timeOfDeath = -1;  // still alive
 	dataMap.Set("ID", ID);
@@ -82,8 +81,7 @@ Organism::Organism(shared_ptr<AbstractGenome> _genome, shared_ptr<AbstractBrain>
 	alive = true;
 	gender = 0;  // by default all orgs are female.
 	offspringCount = 0;  // because it's alive;
-	genomeAncestors.insert(ID);  // it is it's own Ancestor for genome tracking purposes
-	dataAncestors.insert(ID);  // it is it's own Ancestor for data tracking purposes
+	ancestors.insert(ID);  // it is it's own Ancestor for data tracking purposes
 	timeOfBirth = Global::update;  // happy birthday!
 	timeOfDeath = -1;  // still alive
 	dataMap.Set("ID", ID);
@@ -105,11 +103,8 @@ Organism::Organism(shared_ptr<Organism> from, shared_ptr<AbstractGenome> _genome
 	offspringCount = 0;
 	parents.push_back(from);
 	from->offspringCount++;  // this parent has an(other) offspring
-	for (auto ancestorID : from->genomeAncestors) {
-		genomeAncestors.insert(ancestorID);  // union all parents genomeAncestors into this organisms genomeAncestor set.
-	}
-	for (auto ancestorID : from->dataAncestors) {
-		dataAncestors.insert(ancestorID);  // union all parents dataAncestors into this organisms dataAncestor set.
+	for (auto ancestorID : from->ancestors) {
+		ancestors.insert(ancestorID);  // union all parents ancestors into this organisms ancestor set.
 	}
 	timeOfBirth = Global::update;  // happy birthday!
 	timeOfDeath = -1;  // still alive
@@ -137,11 +132,8 @@ Organism::Organism(const vector<shared_ptr<Organism>> from, shared_ptr<AbstractG
 	for (auto parent : from) {
 		parents.push_back(parent);  // add this parent to the parents set
 		parent->offspringCount++;  // this parent has an(other) offspring
-		for (auto ancestorID : parent->genomeAncestors) {
-			genomeAncestors.insert(ancestorID);  // union all parents genomeAncestors into this organisms genomeAncestor set.
-		}
-		for (auto ancestorID : parent->dataAncestors) {
-			dataAncestors.insert(ancestorID);  // union all parents dataAncestors into this organisms dataAncestor set.
+		for (auto ancestorID : parent->ancestors) {
+			ancestors.insert(ancestorID);  // union all parents ancestors into this organisms ancestor set
 		}
 	}
 	timeOfBirth = Global::update;  // happy birthday!
@@ -256,6 +248,4 @@ shared_ptr<Organism> Organism::getMostRecentCommonAncestor(vector<shared_ptr<Org
 // clear all historical data (used when only saving real time data)
 void Organism::clearHistory() {
 	parents.clear();
-	genomeAncestors.clear();
-	dataAncestors.clear();
 }

@@ -22,9 +22,16 @@ void Snapshot_Archivist::saveSnapshotData(vector<shared_ptr<Organism>> populatio
 	string dataFileName = DataFilePrefix + "_" + to_string(update) + ".csv";
 
 	if (files.find("data") == files.end()) {  // first make sure that the dataFile has been set up.
+		population[0]->dataMap.Set("ancestors", "placeHolder");
 		files["data"] = population[0]->dataMap.getKeys();  // get all keys from the valid orgs dataMap (all orgs should have the same keys in their dataMaps)
+		population[0]->dataMap.Clear("ancestors");
 	}
 	for (auto org : population) {
+		for (auto ancestor : org->ancestors) {
+			org->dataMap.Append("ancestors", ancestor);
+		}
+		org->ancestors.clear();
+		org->ancestors.insert(org->ID);  // now that we have saved the ancestor data, set ancestors to self (so that others will inherit correctly)
 		org->dataMap.writeToFile(dataFileName, files["data"]);  // append new data to the file
 	}
 }
@@ -38,6 +45,7 @@ void Snapshot_Archivist::saveSnapshotGenomes(vector<shared_ptr<Organism>> popula
 	for (auto org : population) {
 		//dataString = to_string(org->ID) + FileManager::separator + "\"[" + org->genome->genomeToStr() + "]\"";  // add interval update, genome ancestors, and genome with padding to string
 		//FileManager::writeToFile(genomeFileName, dataString, "ID,genome");  // write data to file
+
 		org->genome->dataMap.Set("sites",org->genome->genomeToStr());
 		org->genome->dataMap.Set("ID",org->dataMap.Get("ID"));
 		//org->genome->dataMap.writeToFile(genomeFileName, org->genome->dataMap.getKeys());  // append new data to the file

@@ -81,7 +81,6 @@ void Tournament2::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
 			org->kill();
 		}
 	}
-	cout << endl;
 	population = nextPopulation;
 }
 
