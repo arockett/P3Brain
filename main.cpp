@@ -25,12 +25,10 @@
 #include "GateListBuilder/GateListBuilder.h"
 
 #include "Group/Group.h"
-
-#include "Optimizer/Optimizer.h"
 #include "Optimizer/GA_Optimizer.h"
-#include "Optimizer/Tournament_Optimizer.h"
-#include "Optimizer/Tournament2_Optimizer.h"
-
+#include "Optimizer/Optimizer.h"
+#include "Optimizer/Tournament2Optimizer.h"
+#include "Optimizer/TournamentOptimizer.h"
 #include "Organism/Organism.h"
 #include "World/World.h"
 #include "World/BerryWorld.h"
@@ -45,19 +43,17 @@ using namespace std;
 int main(int argc, const char * argv[]) {
 
 	cout << "\n\n" <<
-			"\tMM   MM      A      BBBBBB   EEEEEE\n"<<
-			"\tMMM MMM     AAA     BB   BB  EE\n" <<
-			"\tMMMMMMM    AA AA    BBBBBB   EEEEEE\n" <<
-			"\tMM M MM   AAAAAAA   BB   BB  EE\n" <<
-			"\tMM   MM  AA     AA  BBBBBB   EEEEEE\n" <<
+			"\tMM   MM      A       BBBBBB    EEEEEE\n"<<
+			"\tMMM MMM     AAA      BB   BB   EE\n" <<
+			"\tMMMMMMM    AA AA     BBBBBB    EEEEEE\n" <<
+			"\tMM M MM   AAAAAAA    BB   BB   EE\n" <<
+			"\tMM   MM  AA     AA   BBBBBB    EEEEEE\n" <<
 			"\n" <<
-			"\tModular    Agent    Based    Evolver\n\n\n\thttp://hintzelab.msu.edu/MABE\n\n\n";
+			"\tModular    Agent      Based    Evolver\n\n\n\thttp://hintzelab.msu.edu/MABE\n\n\n";
 	Parameters::initialize_parameters(argc, argv);  // loads command line and configFile values into registered parameters
 	                                                // also writes out a config file if requested
-	cout << "making Node Map" << endl;
 	//make a node map to handle genome value to brain state address look up.
 	MarkovBrain::makeNodeMap(MarkovBrain::defaultNodeMap, Global::bitsPerBrainAddress, MarkovBrain::defaultNrOfBrainStates);
-	cout << "setting up gates" << endl;
 
 	Gate_Builder::setupGates();  // determines which gate types will be in use.
 
@@ -70,8 +66,8 @@ int main(int argc, const char * argv[]) {
 	} else {
 		Random::getCommonGenerator().seed(Global::randomSeed);
 	}
-	cout << "creating world" << endl;
 	World *world = (World*) new BerryWorld();  //new World();
+	//World *world = (World*) new World();  //new World();
 
 // test chromosome crossover speed
 //	auto C1 = make_shared<Chromosome<bool>>(10000, 2);
@@ -126,7 +122,6 @@ int main(int argc, const char * argv[]) {
 	// define population
 	//////////////////
 
-	cout << "creating group" << endl;
 	shared_ptr<Group> group;
 
 	{
@@ -134,13 +129,10 @@ int main(int argc, const char * argv[]) {
 		Global::update = -1;  // before there was time, there was a progenitor
 		//shared_ptr<MarkovBrain> tesBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
 		auto initalChromosome = make_shared<Chromosome<int>>(Genome::initialChromosomeSize, 256);
-		cout << "made initalChromosome" << endl;
 		shared_ptr<Organism> progenitor = make_shared<Organism>(make_shared<Genome>(initalChromosome, 3, 2), make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>()));  // make a organism with a genome and brain (if you need to change the types here is where you do it)
-		cout << "made progenitor" << endl;
 
 		Global::update = 0;  // the beginning of time - now we construct the first population
 		vector<shared_ptr<Organism>> population;
-		cout << "building initial population" << flush;
 
 		for (int i = 0; i < Global::popSize; i++) {
 			shared_ptr<Genome> genome = make_shared<Genome>(initalChromosome, 3, 2);
@@ -154,9 +146,7 @@ int main(int argc, const char * argv[]) {
 			shared_ptr<Organism> org = make_shared<Organism>(progenitor, genome);
 			population.push_back(org);  // add a new org to population using progenitors template and a new random genome
 			population[population.size() - 1]->gender = Random::getInt(0, 1);  // assign a random gender to the new org
-			cout << "." << flush;
 		}
-		cout << "\nmade population of " << population.size() << " organisms." << endl;
 		progenitor->kill();  // the progenitor has served it's purpose.
 
 		shared_ptr<Archivist> archivist;
@@ -174,9 +164,21 @@ int main(int argc, const char * argv[]) {
 			archivist = make_shared<SSwD_Archivist>();
 		}
 
-		group = make_shared<Group>(population, make_shared<Tournament2>(), archivist);
+		shared_ptr<BaseOptimizer> optimizer;
+
+		if (BaseOptimizer::Optimizer_MethodStr == "GA"){
+			optimizer = make_shared<GA_Optimizer>();
+		}
+		if (BaseOptimizer::Optimizer_MethodStr == "Tournament"){
+			optimizer = make_shared<TournamentOptimizer>();
+		}
+		if (BaseOptimizer::Optimizer_MethodStr == "Tournament2"){
+			optimizer = make_shared<Tournament2Optimizer>();
+		}
+
+		//optimizer = make_shared<BaseOptimizer>();
+		group = make_shared<Group>(population, optimizer, archivist);
 	}
-	cout << "made group" << endl;
 
 //////////////////
 // evolution loop
@@ -185,18 +187,10 @@ int main(int argc, const char * argv[]) {
 	bool finished = false;  // when the archivist says we are done, we can stop!
 
 	while (!finished) {
-		cout << "begin evo loop" << endl;
-
 		world->evaluateFitness(group->population, false);  // evaluate each organism in the population using a World
-		cout << "  eval complete" << endl;
 		finished = group->archive();  // save data, update memory and delete any unneeded data;
-		cout << "  archive complete" << endl;
-
 		Global::update++;
-
 		group->optimize();  // update the population (reproduction and death)
-		cout << "  optimize complete" << endl;
-
 		cout << "update: " << Global::update - 1 << "   maxFitness: " << group->optimizer->maxFitness << "\n";
 	}
 

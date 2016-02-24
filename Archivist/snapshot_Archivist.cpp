@@ -1,7 +1,7 @@
 #include "snapshot_Archivist.h"
 
-int& Snapshot_Archivist::SS_Arch_dataInterval = Parameters::register_parameter("dataInterval_SS", 10, "How often to save a data file", "ARCHIVIST_SNAPSHOT");
-int& Snapshot_Archivist::SS_Arch_genomeInterval = Parameters::register_parameter("genomeInterval_SS", 10, "How often to save a genome file", "ARCHIVIST_SNAPSHOT");
+int& Snapshot_Archivist::SS_Arch_dataInterval = Parameters::register_parameter("dataInterval_SS", 100, "How often to save a data file", "ARCHIVIST_SNAPSHOT");
+int& Snapshot_Archivist::SS_Arch_genomeInterval = Parameters::register_parameter("genomeInterval_SS", 1000, "How often to save a genome file", "ARCHIVIST_SNAPSHOT");
 string& Snapshot_Archivist::SS_Arch_DataFilePrefix = Parameters::register_parameter("dataFilePrefix_SS", (string) "data", "name of genome file (stores genomes)", "ARCHIVIST_SNAPSHOT");
 string& Snapshot_Archivist::SS_Arch_GenomeFilePrefix = Parameters::register_parameter("genomeFilePrefix_SS", (string) "genome", "name of data file (stores everything but genomes)", "ARCHIVIST_SNAPSHOT");
 bool& Snapshot_Archivist::SS_Arch_writeDataFiles = Parameters::register_parameter("writeDataFiles_SS", true, "if true, data files will be written", "ARCHIVIST_SNAPSHOT");
@@ -22,11 +22,11 @@ void Snapshot_Archivist::saveSnapshotData(vector<shared_ptr<Organism>> populatio
 	string dataFileName = DataFilePrefix + "_" + to_string(update) + ".csv";
 
 	if (files.find("data") == files.end()) {  // first make sure that the dataFile has been set up.
-		population[0]->dataMap.Set("ancestors", "placeHolder");
+		population[0]->dataMap.Set("ancestors", "placeHolder"); // add ancestors so it will be in files (holds columns to be output for each file)
 		files["data"] = population[0]->dataMap.getKeys();  // get all keys from the valid orgs dataMap (all orgs should have the same keys in their dataMaps)
-		population[0]->dataMap.Clear("ancestors");
 	}
 	for (auto org : population) {
+		population[0]->dataMap.Clear("ancestors");
 		for (auto ancestor : org->ancestors) {
 			org->dataMap.Append("ancestors", ancestor);
 		}
@@ -48,8 +48,11 @@ void Snapshot_Archivist::saveSnapshotGenomes(vector<shared_ptr<Organism>> popula
 
 		org->genome->dataMap.Set("sites",org->genome->genomeToStr());
 		org->genome->dataMap.Set("ID",org->dataMap.Get("ID"));
+		org->genome->dataMap.Set("update",org->dataMap.Get("update"));
+
 		//org->genome->dataMap.writeToFile(genomeFileName, org->genome->dataMap.getKeys());  // append new data to the file
 		org->genome->dataMap.writeToFile(genomeFileName,Genome::genomeFileColumns);  // append new data to the file
+		org->genome->dataMap.Clear("sites"); // this is large, clean it up now!
 	}
 }
 

@@ -226,9 +226,11 @@ template<class T> class Chromosome : public AbstractChromosome {
 	// insures that a site index is valid, if in index is > sites.size(), mod it.
 	// return true if siteIndex went out of range
 	virtual inline bool modulateIndex(int &siteIndex) {
-		bool EOC= (siteIndex >= (int)sites.size() || siteIndex<0);
-		siteIndex = loopMod(siteIndex,(int)sites.size());
-		return EOC;
+		if (siteIndex >= (int)sites.size() || siteIndex<0){
+			siteIndex = loopMod(siteIndex,(int)sites.size());
+			return true;
+		}
+		return false;
 	}
 
 	// advance or reverse (if readDirection = false) a site index 1 or distance sites and check that new index is valid

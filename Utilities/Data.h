@@ -31,6 +31,13 @@ class DataMap {
 	map<string, string> data;
 
  public:
+
+	DataMap() = default;
+
+	DataMap(shared_ptr<DataMap> source){
+		data = source->data;
+	}
+
 	/*
 	 * sets a value at "key" to a DataMap.data
 	 * Template Functions must be in a header

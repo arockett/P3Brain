@@ -12,6 +12,10 @@
 #include <stdlib.h>
 #include <vector>
 
+#include <fstream>
+#include <iostream>
+#include <sstream>
+
 #include "Chromosome.h"
 
 #include "../Utilities/Utilities.h"
@@ -67,6 +71,10 @@ class AbstractGenome {
 
 		virtual void setReadDirection(bool _readDirection) {
 			readDirection = _readDirection;
+		}
+
+		virtual void toggleReadDirection() {
+			readDirection = !readDirection;
 		}
 
 		virtual void resetHandler() {
@@ -302,9 +310,8 @@ class Genome : public AbstractGenome {
 		}
 
 		virtual int readInt(int valueMin, int valueMax, int code = -1, int CodingRegionIndex = 0) {
-			////cout << "readInt() " << valueMin << " " << valueMax << "\n";
 			int value;
-			modulateIndex();
+			//modulateIndex();
 			if (genome->chromosomes[chromosomeIndex]->readInt(siteIndex, value, valueMin, valueMax, readDirection, code, CodingRegionIndex)) {
 				advanceChromosome();
 			}
@@ -320,6 +327,7 @@ class Genome : public AbstractGenome {
 
 		virtual void copyTo(shared_ptr<AbstractGenome::Handler> to) {
 			auto castTo = dynamic_pointer_cast<Genome::Handler>(to);  // we will be pulling all sorts of stuff from this genome so lets just cast it once.
+			castTo->readDirection = readDirection;
 			castTo->genome = genome;
 			castTo->chromosomeIndex = chromosomeIndex;
 			castTo->siteIndex = siteIndex;
@@ -467,34 +475,7 @@ class Genome : public AbstractGenome {
 		return (countSites() == 0);
 	}
 
-// old version gets numbers for number of events from entire genome sites count
-//// apply mutations to this genome
-//	virtual void mutate() {
-//		int nucleotides = countSites();
-//		int howManyPoint = Random::getBinomial(nucleotides, PT.lookup("pointMutationRate"));
-//		int howManyCopy = Random::getBinomial(nucleotides, PT.lookup("mutationCopyRate"));
-//		int howManyDelete = Random::getBinomial(nucleotides, PT.lookup("mutationDeletionRate"));
-//		// do some point mutations
-//		for (int i = 0; i < howManyPoint; i++) {
-//			chromosomes[Random::getIndex(chromosomes.size())]->mutatePoint();
-//		}
-//		// do some copy mutations
-//		if (nucleotides < PT.lookup("genomeSizeMax")) {
-//			for (int i = 0; i < howManyCopy && (nucleotides < PT.lookup("genomeSizeMax")); i++) {
-//				chromosomes[Random::getIndex(chromosomes.size())]->mutateCopy(PT.lookup("mutationCopyMinSize"), PT.lookup("mutationCopyMaxSize"), PT.lookup("chromosomeSizeMax"));
-//				nucleotides = countSites();
-//			}
-//		}
-//		// do some deletion mutations
-//		if (nucleotides > PT.lookup("genomeSizeMin")) {
-//			for (int i = 0; i < howManyDelete && (nucleotides > PT.lookup("genomeSizeMin")); i++) {
-//				chromosomes[Random::getIndex(chromosomes.size())]->mutateDelete(PT.lookup("mutationDeletionMinSize"), PT.lookup("mutationDeletionMaxSize"), PT.lookup("chromosomeSizeMin"));
-//				nucleotides = countSites();
-//			}
-//		}
-//	}
 
-	// new version gets numbers for number of events from sites count in each chromosome
 	// apply mutations to this genome
 	virtual void mutate() {
 		for (auto chromosome : chromosomes) {
@@ -619,6 +600,39 @@ class Genome : public AbstractGenome {
 		}
 	}
 
+	// load all genomes from a file
+	virtual vector<AbstractGenome> loadGenomes(string fileName){
+		vector<AbstractGenome> genomes;
+
+		std::ifstream FILE(fileName);
+		string rawLine;
+		bool firstLine = true;
+
+
+
+//		if (FILE.is_open())  // if the file named by configFileName can be opened
+//		{
+//			while (getline(FILE, rawLine))  // keep loading one line from the file at a time into "line" until we get to the end of the file
+//			{
+//				dataLine = parseCSVLine(rawLine, separator);
+//				if (firstLine) {  // this is the first line, dataLine contains the keys... use them to build the map and loopUpTable
+//					for (auto key : dataLine) {
+//						lookUpTable.push_back(key);  // add the key so we can make sure we assign the right values to the right columns
+//						data[key] = {};  // add an empty vector for each key into the map data
+//					}
+//					firstLine = false;
+//				} else {  // we are not in the first line, dataLine has values
+//					for (size_t i = 0; i < dataLine.size(); i++) {  // for each entry in dataLine
+//						data[lookUpTable[i]].push_back(dataLine[i]);
+//					}
+//				}
+//			}
+//		}
+
+		return genomes;
+
+
+	}
 // load a genome from CSV file with headers - will return genome from saved organism with key / keyvalue pair
 // the undefined action is to take no action
 	virtual void loadGenome(string fileName, string key, string keyValue) {

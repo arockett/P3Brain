@@ -41,43 +41,40 @@ class Classic_GateListBuilder : public Base_GateListBuilder {
 	virtual vector<shared_ptr<Gate>> buildGateList(shared_ptr<AbstractGenome> genome, int nrOfBrainStates) {
 		//cout << "In virtual vector<shared_ptr<Gate>> buildGateList(shared_ptr<AbstractGenome> genome, int nrOfBrainStates)"<<endl;
 		vector<shared_ptr<Gate>> gates;
+
 		bool translation_Complete = false;
 		if (genome->isEmpty()) {
 			translation_Complete = true;
 		}
 
 		bool readForward = true;
-		auto genomeHandler = genome->newHandler(genome,readForward);
-		auto saveHandler = genome->newHandler(genome,readForward);
-		auto testHandler = genome->newHandler(genome,readForward);
+		auto genomeHandler = genome->newHandler(genome, readForward);
+		auto gateGenomeHandler = genome->newHandler(genome, readForward);
+
 		int gateCount = 0;
-		while (!translation_Complete) {  // while there are sites in the genome
-			//cout << "\tstart translation loop"<<endl;
-			genomeHandler->copyTo(testHandler);  // get to values from genome to test for start codns
-			const int testSite1Value = testHandler->readInt(0, 255);  // extract first 1/2 of startcodon
-			testHandler->copyTo(saveHandler);  // save this index, this is where we pick up when we come back from building a gate.
-			//saveHandler->printIndex();
-			const int testSite2Value = testHandler->readInt(0, 255);  // extract second 1/2 of startcodon
-			//cout << "/tfinished read testSite values:" << testSite1Value << "   " << testSite2Value << endl;
-			//cout << "testValues: " << testSite1Value << "  " << testSite2Value << "\n";
-			if (saveHandler->atEOG()) {  // if genomeIndex > testIndex, testIndex has wrapped and we are done translating
+
+		int testSite1Value, testSite2Value;
+		testSite1Value = genomeHandler->readInt(0, 255);
+		testSite2Value = genomeHandler->readInt(0, 255);
+		while (!translation_Complete) {
+			if (genomeHandler->atEOG()) {  // if genomeIndex > testIndex, testIndex has wrapped and we are done translating
 				translation_Complete = true;
-				//cout << "\treached EOG"<<endl;
 			} else if (testSite1Value + testSite2Value == 255) {  // if we found a start codon
-				//cout << "\tfound start codon" << endl;
 				if (Gate_Builder::makeGate[testSite1Value] != nullptr) {  // and that start codon codes to an in use gate class
-					//cout << "\tfound valid gate" << endl;
-					//cout << "found gate : " << testSite1Value << " " << testSite2Value << endl;
-					genomeHandler->readInt(0, 255, Gate::START_CODE, gateCount);  // mark start codon in genomes coding region
-					genomeHandler->readInt(0, 255, Gate::START_CODE, gateCount);  // mark start codon in genomes coding region
-					//cout << "\tcalling gate constructor"<<endl;
-					gates.push_back(Gate_Builder::makeGate[testSite1Value](genome, genomeHandler, gateCount));  // make a gate of the type associated with the value in testSite1Value
-					//cout << "\tback from gate constructor"<<endl;
+					genomeHandler->copyTo(gateGenomeHandler);
+					gateGenomeHandler->toggleReadDirection();
+					gateGenomeHandler->readInt(0, 255);  // move back 2 start codon values
+					gateGenomeHandler->readInt(0, 255);
+					gateGenomeHandler->toggleReadDirection();  // reverse the read direction again
+					gateGenomeHandler->readInt(0, 255, Gate::START_CODE, gateCount);  // mark start codon in genomes coding region
+					gateGenomeHandler->readInt(0, 255, Gate::START_CODE, gateCount);
+
+					gates.push_back(Gate_Builder::makeGate[testSite1Value](genome, gateGenomeHandler, gateCount));  // make a gate of the type associated with the value in testSite1Value
 					gateCount++;
 				}
+				testSite1Value = testSite2Value;
 			}
-			saveHandler->copyTo(genomeHandler);
-			//genomeHandler->printIndex();
+			testSite2Value = genomeHandler->readInt(0, 255);
 		}
 		return gates;
 	}

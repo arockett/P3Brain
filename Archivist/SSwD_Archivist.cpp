@@ -1,10 +1,10 @@
 #include "SSwD_Archivist.h"
 
-int& SSwD_Archivist::SSwD_Arch_dataInterval = Parameters::register_parameter("dataInterval_SSwD", 10, "How often to save a data file", "ARCHIVIST_SSWD");
-int& SSwD_Archivist::SSwD_Arch_genomeInterval = Parameters::register_parameter("genomeInterval_SSwD", 10, "How often to save a genome file", "ARCHIVIST_SSWD");
-int& SSwD_Archivist::SSwD_Arch_dataIntervalDelay = Parameters::register_parameter("dataIntervalDelay_SSwD", 3, "when using Snap Shot with Delay output Method, how long is the delay before saving data", "ARCHIVIST_SSWD");
-int& SSwD_Archivist::SSwD_Arch_genomeIntervalDelay = Parameters::register_parameter("genomeIntervalDelay_SSwD", 3, "when using Snap Shot with Delay output Method, how long is the delay before saving genomes ", "ARCHIVIST_SSWD");
-int& SSwD_Archivist::SSwD_Arch_cleanupInterval = Parameters::register_parameter("cleanupInterval_SSwD", 10, "How often to cleanup old checkpoints", "ARCHIVIST_SSWD");
+int& SSwD_Archivist::SSwD_Arch_dataInterval = Parameters::register_parameter("dataInterval_SSwD", 100, "How often to save a data file", "ARCHIVIST_SSWD");
+int& SSwD_Archivist::SSwD_Arch_genomeInterval = Parameters::register_parameter("genomeInterval_SSwD", 1000, "How often to save a genome file", "ARCHIVIST_SSWD");
+int& SSwD_Archivist::SSwD_Arch_dataIntervalDelay = Parameters::register_parameter("dataIntervalDelay_SSwD", 10, "when using Snap Shot with Delay output Method, how long is the delay before saving data", "ARCHIVIST_SSWD");
+int& SSwD_Archivist::SSwD_Arch_genomeIntervalDelay = Parameters::register_parameter("genomeIntervalDelay_SSwD", 10, "when using Snap Shot with Delay output Method, how long is the delay before saving genomes ", "ARCHIVIST_SSWD");
+int& SSwD_Archivist::SSwD_Arch_cleanupInterval = Parameters::register_parameter("cleanupInterval_SSwD", 100, "How often to cleanup old checkpoints", "ARCHIVIST_SSWD");
 string& SSwD_Archivist::SSwD_Arch_DataFilePrefix = Parameters::register_parameter("dataFilePrefix_SSwD", (string) "data", "name of genome file (stores genomes)", "ARCHIVIST_SSWD");
 string& SSwD_Archivist::SSwD_Arch_GenomeFilePrefix = Parameters::register_parameter("genomeFilePrefix_SSwD", (string) "genome", "name of data file (stores everything but genomes)", "ARCHIVIST_SSWD");
 bool& SSwD_Archivist::SSwD_Arch_writeDataFiles = Parameters::register_parameter("writeDataFiles_SSwD", true, "if true, data files will be written", "ARCHIVIST_SSWD");
@@ -83,7 +83,7 @@ bool SSwD_Archivist::archive(vector<shared_ptr<Organism>> population, int flush)
 			// we need to make a checkpoint of the current population
 			for (auto org : population) {  // add the current population to checkPointTracker
 				checkpoints[Global::update].push_back(org);
-				org->snapShotDataMaps[Global::update] = org->dataMap;  // back up state of dataMap
+				org->snapShotDataMaps[Global::update] = make_shared<DataMap>(org->dataMap);  // back up state of dataMap
 
 				if (Global::update == nextDataCheckPoint && Global::update <= Global::updates) {  // if this is a data interval, add ancestors to snapshot dataMap
 					for (auto ancestor : org->ancestors) {
@@ -115,10 +115,13 @@ bool SSwD_Archivist::archive(vector<shared_ptr<Organism>> population, int flush)
 				if (auto org = checkpoints[nextGenomeWrite][index].lock()) {  // this ptr is still good
 
 					org->genome->dataMap.Set("ID", org->dataMap.Get("ID"));
+					org->genome->dataMap.Set("update",org->dataMap.Get("update"));
+
 					org->genome->dataMap.Set("sites", org->genome->genomeToStr());
 
 					org->genome->dataMap.writeToFile(genomeFileName, Genome::genomeFileColumns);  // append new data to the file
-					index++;  // advance to nex element
+					org->genome->dataMap.Clear("sites"); // this is large, clean it up now!
+					index++;
 				} else {  // this ptr is expired - cut it out of the vector
 					swap(checkpoints[nextGenomeWrite][index], checkpoints[nextGenomeWrite].back());  // swap expired ptr to back of vector
 					checkpoints[nextGenomeWrite].pop_back();  // pop expired ptr from back of vector
