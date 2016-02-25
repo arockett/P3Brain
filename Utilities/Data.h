@@ -49,6 +49,12 @@ class DataMap {
 	void ClearMap() {
 		data.clear();
 	}
+	string Get(const string &key);  // retrieve the string from a dataMap with "key"
+	bool fieldExists(const string &key);  // return true if a data map contains "key"
+
+	void writeToFile(const string &fileName, const vector<string>& keys = { });  // write from this DataMap to fileName the data associated with keys
+	vector<string> getKeys();
+	//void clear();
 
 	/*
 	 * takes a vector of string with key value pairs. Calls set for each pair.
@@ -78,12 +84,6 @@ class DataMap {
 		}
 	}
 
-	string Get(const string &key);  // retrieve the string from a dataMap with "key"
-	bool fieldExists(const string &key);  // return true if a data map contains "key"
-
-	void writeToFile(const string &fileName, const vector<string>& keys = { });  // write from this DataMap to fileName the data associated with keys
-	vector<string> getKeys();
-	void clear();
 };
 
 class FileManager {

@@ -27,6 +27,13 @@ class Gate {  // abstact class. Assumes that a standard genome is being used.
  public:
 	int ID;
 
+	static const int START_CODE = 0;
+	static const int IN_COUNT_CODE = 10;
+	static const int IN_ADDRESS_CODE = 11;
+	static const int OUT_COUNT_CODE = 20;
+	static const int OUT_ADDRESS_CODE = 21;
+	static const int DATA_CODE = 30;
+
 	static void AddGate(int ID, function<shared_ptr<Gate>(shared_ptr<Genome>, int)> theFunction);
 	static void setupGates();
 	static function<shared_ptr<Gate>(shared_ptr<Genome>, int)> makeGate[256];
@@ -43,9 +50,9 @@ class Gate {  // abstact class. Assumes that a standard genome is being used.
 
 	// functions used in genome translation
 	//void movePastStartCodeon(int& genomeIndex, shared_ptr<Genome> genome);  // simply addvances genomeIndex by the size of a start codeon (2)
-	int getIOAddress(shared_ptr<Genome::Index> genomeIndex, shared_ptr<Genome> genome, int gateID);  // extracts one brain state value address from a genome
-	void getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, shared_ptr<Genome::Index> genome_index, shared_ptr<Genome> genome, int code, int gateID);  // extracts many brain state value addresses from a genome
-	void getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, shared_ptr<Genome::Index> genomeIndex, shared_ptr<Genome> genome, int gateID);  // extracts the input and output brain state value addresses for this gate
+	int getIOAddress(shared_ptr<AbstractGenome::Handler> genomeHandler, shared_ptr<AbstractGenome> genome, int gateID);  // extracts one brain state value address from a genome
+	void getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, shared_ptr<AbstractGenome::Handler> genomeHandler, shared_ptr<AbstractGenome> genome, int code, int gateID);  // extracts many brain state value addresses from a genome
+	void getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, shared_ptr<AbstractGenome::Handler> genomeHandle, shared_ptr<AbstractGenome> genome, int gateID);  // extracts the input and output brain state value addresses for this gate
 
 	int getIndexFromInputs(vector<double> &brainState);  // used during update to convert gate input into table indexes
 
@@ -97,7 +104,7 @@ class ProbabilisticGate : public Gate {  //conventional probabilistic gate
 	vector<vector<double>> table;
 
 	ProbabilisticGate() = delete;
-	ProbabilisticGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> index, int gateID);
+	ProbabilisticGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
 
 	virtual ~ProbabilisticGate() = default;
 
@@ -112,7 +119,7 @@ class DeterministicGate : public Gate {
 	vector<vector<int>> table;
 
 	DeterministicGate() = delete;
-	DeterministicGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> index, int gateID);
+	DeterministicGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
 	virtual ~DeterministicGate() = default;
 	virtual void update(vector<double> & states, vector<double> & nextStates);
 
@@ -131,7 +138,7 @@ class FixedEpsilonGate : public DeterministicGate {
 	vector<int> defaultOutput;
 	double epsilon;
 	FixedEpsilonGate() = delete;
-	FixedEpsilonGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> index, int gateID);
+	FixedEpsilonGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
 	virtual ~FixedEpsilonGate() = default;
 	virtual void update(vector<double> & states, vector<double> & nextStates);
 	virtual string description();
@@ -145,7 +152,7 @@ class VoidGate : public DeterministicGate {
 	vector<int> defaultOutput;
 	double epsilon;
 	VoidGate() = delete;
-	VoidGate(shared_ptr<Genome> genome, shared_ptr<Genome::Index> index, int gateID);
+	VoidGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
 	virtual ~VoidGate() = default;
 	virtual void update(vector<double> & states, vector<double> & nextStates);
 	virtual string description();

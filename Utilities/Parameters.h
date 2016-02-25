@@ -194,11 +194,58 @@ class Parameters {
 		}
 	}
 
+// Loads all of the parameters for a given type of variable from the key_value map
+	template<class T>
+	static bool lookup_parameter_of_type(string key, T &value) {
+		if (registry<T>().find(key) != registry<T>().end()) {
+			value = registry<T>()[key].variable;
+			return true;  // we found the value
+		} else {
+			return false;  // we did not find it!
+		}
+	}
+
 	static void load_parameters(unordered_map<string, string> & key_value) {
 		load_parameters_of_type<int>(key_value);
 		load_parameters_of_type<double>(key_value);
 		load_parameters_of_type<bool>(key_value);
 		load_parameters_of_type<string>(key_value);
+	}
+
+	static double lookupDouble(string key) {
+		double value;
+		bool valueSet = false;
+		// look for double
+		valueSet = lookup_parameter_of_type(key, value);
+		if (!valueSet) {
+			int intValue;
+			valueSet = lookup_parameter_of_type(key, intValue);
+			if (valueSet){
+				value = intValue;
+			}
+		}
+		if (!valueSet) {
+			bool boolValue;
+			valueSet = lookup_parameter_of_type(key, boolValue);
+			if (valueSet){
+				value = boolValue;
+			}
+		}
+		if (!valueSet) {
+			string stringValue;
+			valueSet = lookup_parameter_of_type(key, stringValue);
+			if (valueSet){
+				bool success = load_value(stringValue,value);
+				if (!success) {
+					throw std::invalid_argument("In Parameters::lookupDouble, for key \"" + key + "\" a string was found which can not be converted to double.\n");
+				}
+			}
+		}
+		if (!valueSet){
+			cout << "ERROR! lookupDouble could not find key \"" << key << "\"\nExiting\n";
+			exit(1);
+		}
+		return value;
 	}
 
 	static void initialize_parameters(int argc, const char** argv) {

@@ -1,30 +1,71 @@
-
 #include "Chromosome.h"
 #include <limits>
 
-template <> Chromosome<unsigned char>::Chromosome(){
-		alphabetSize = 256;
-	}
+// unsigned char constructors
 
-template <> Chromosome<bool>::Chromosome(){
-		alphabetSize = 2;
-	}
+template<> Chromosome<unsigned char>::Chromosome() {
+	alphabetSize = 256;
+}
 
-template <> Chromosome<int>::Chromosome(){
-		alphabetSize = numeric_limits<int>::max();
-	}
+template<> Chromosome<unsigned char>::Chromosome(int chromosomeLength) {
+	alphabetSize = 256;
+	sites.resize(chromosomeLength);
+}
 
-template <> Chromosome<long>::Chromosome(){
-		alphabetSize = numeric_limits<long>::max();
+template<> Chromosome<unsigned char>::Chromosome(int chromosomeLength, double _alphabetSize) {
+	if (_alphabetSize > 256 || _alphabetSize < 2){
+		cout << "ERROR: alphabetSize for unsigned char must be 2 or greater and 256 or less!\n";
+		exit(1);
 	}
+	alphabetSize = _alphabetSize;
+	sites.resize(chromosomeLength);
+}
 
-template <> Chromosome<double>::Chromosome(){
-		alphabetSize = numeric_limits<double>::max();
-	}
+// bool constructors
 
-template <> void Chromosome<double>::fillRandom(int length) {
-	sites.resize(length);
-	for (int i = 0; i < length; i++) {
-		sites[i] = Random::getDouble(0,alphabetSize);
+template<> Chromosome<bool>::Chromosome() {
+	alphabetSize = 2;
+}
+
+template<> Chromosome<bool>::Chromosome(int chromosomeLength) {
+	alphabetSize = 2;
+	sites.resize(chromosomeLength);
+}
+
+template<> Chromosome<bool>::Chromosome(int chromosomeLength, double _alphabetSize) {
+	if (_alphabetSize !=2){
+		cout << "ERROR: alphabetSize for bool must be 2!\n";
+		exit(1);
 	}
+	alphabetSize = 2;
+	sites.resize(chromosomeLength);
+}
+
+// int constructors
+
+template<> Chromosome<int>::Chromosome(int chromosomeLength) {
+	alphabetSize = 0;
+	cout << "for Chromosome<int>, you must specify both chromosomeLength and alphabetSize\n";
+	exit(1);
+}
+
+template<> Chromosome<int>::Chromosome(int chromosomeLength, double _alphabetSize) {
+	if (_alphabetSize < 2){
+		cout << "ERROR: alphabetSize for int must be 2 or greater!\n";
+		exit(1);
+	}
+	alphabetSize = _alphabetSize;
+	sites.resize(chromosomeLength);
+}
+
+// double constructors
+
+template<> Chromosome<double>::Chromosome(int chromosomeLength) {
+	alphabetSize = 0;
+	cout << "for Chromosome<double>, you must specify both chromosomeLength and alphabetSize\n";
+}
+
+template<> Chromosome<double>::Chromosome(int chromosomeLength, double _alphabetSize) {
+	alphabetSize = _alphabetSize;
+	sites.resize(chromosomeLength);
 }

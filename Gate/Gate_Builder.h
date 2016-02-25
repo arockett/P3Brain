@@ -18,9 +18,9 @@ class Gate_Builder {  // manages what kinds of gates can be built
 	static bool& usingGPGate;
 	static bool& usingThGate;
 
-	static void AddGate(int ID, function<shared_ptr<Gate>(shared_ptr<Genome>, shared_ptr<Genome::Index>, int gateID)> theFunction);
+	static void AddGate(int ID, function<shared_ptr<Gate>(shared_ptr<AbstractGenome>, shared_ptr<AbstractGenome::Handler>, int gateID)> theFunction);
 	static void setupGates();
-	static function<shared_ptr<Gate>(shared_ptr<Genome>, shared_ptr<Genome::Index>, int gateID)> makeGate[256];
+	static function<shared_ptr<Gate>(shared_ptr<AbstractGenome>, shared_ptr<AbstractGenome::Handler>, int gateID)> makeGate[256];
 
 	Gate_Builder() = delete;
 	~Gate_Builder();

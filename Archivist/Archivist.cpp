@@ -7,7 +7,7 @@ bool& Archivist::Arch_writeAveFile = Parameters::register_parameter("writeAveFil
 bool& Archivist::Arch_writeDominantFile = Parameters::register_parameter("writeDominantFile", true, "Save data to dominant file?", "ARCHIVIST");
 string& Archivist::Arch_AveFileName = Parameters::register_parameter("aveFileName", (string) "ave.csv", "name of average file (saves population averages)", "ARCHIVIST");
 string& Archivist::Arch_DominantFileName = Parameters::register_parameter("dominantFileName", (string) "dominant.csv", "name of dominant file (saves data on dominant organism)", "ARCHIVIST");
-string& Archivist::Arch_DefaultAveFileColumnNames = Parameters::register_parameter("aveFileColumns", (string) "[update,score,genomeSize,gates]", "data to be saved into average file (must be values that can generate an average)", "ARCHIVIST");
+string& Archivist::Arch_DefaultAveFileColumnNames = Parameters::register_parameter("aveFileColumns", (string) "[update,score,genomeLength,gates]", "data to be saved into average file (must be values that can generate an average)", "ARCHIVIST");
 
 Archivist::Archivist() {
 	realtimeFilesInterval = Arch_realtimeFilesInterval;

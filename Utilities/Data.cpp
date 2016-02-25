@@ -71,9 +71,10 @@ vector<string> DataMap::getKeys() {
 	return (keys);
 }
 
-void DataMap::clear() {
-	data.clear();
-}
+
+//void DataMap::clear() {
+//	data.clear();
+//}
 
 void FileManager::writeToFile(const string& fileName, const string& data, const string& header) {
 	ofstream FILE;

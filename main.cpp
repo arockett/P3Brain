@@ -21,7 +21,6 @@
 #include "Brain/ClassicBrain.h"
 
 #include "Genome/Genome.h"
-#include "Genome/ByteGenome.h"
 
 #include "GateListBuilder/GateListBuilder.h"
 
@@ -44,49 +43,6 @@
 using namespace std;
 
 int main(int argc, const char * argv[]) {
-
-	Chromosome<int> cINT(8);			// chromosome of int with value 0 to 7
-	Chromosome<bool> cBOOL;				// chromosome of bool (default 0 and 1)
-	Chromosome<unsigned char> cCHAR;	// chromosome of char (default 0 to 255)
-	Chromosome<double> cDOUBLE(10);		// chromosome of double with values [0,10)
-
-	cINT.fillRandom(5);
-	cBOOL.fillRandom(6);
-	cCHAR.fillRandom(5);
-	cDOUBLE.fillRandom(5);
-
-	cout << cINT.chromosomeToStr();
-	cout << cBOOL.chromosomeToStr();
-	cout << cCHAR.chromosomeToStr();
-	cout << cDOUBLE.chromosomeToStr();
-
-	int index = 0;
-	cout << cINT.siteToDouble(index, 1,5,1,0) << "\n";
-	 index = 0;
-	cout << cBOOL.siteToDouble(index, 1,5,1,0) << "\n";
-	cout << cBOOL.siteToDouble(index, 1,5,1,0) << "\n";
-	cout << cBOOL.siteToDouble(index, 1,5,1,0) << "\n";
-	 index = 0;
-	cout << cCHAR.siteToDouble(index, 1,4,1,0) << "\n";
-	 index = 0;
-	cout << cDOUBLE.siteToDouble(index, 1,4,1,0) << "\n";
-	cout << cDOUBLE.siteToDouble(index, 1,4,1,0) << "\n";
-	cout << cDOUBLE.siteToDouble(index, 1,4,1,0) << "\n";
-	cout << cDOUBLE.siteToDouble(index, 1,4,1,0) << "\n";
-	cout << cDOUBLE.siteToDouble(index, 1,4,1,0) << "\n";
-
-	cout << "\n\n\n";
-	index = 0;
-	int x = cINT.readInt(index, 1,5,1,0);
-	 x = cINT.readInt(index, 1,5,2,0);
-	 x = cINT.readInt(index, 1,5,3,0);
-	 x = cINT.readInt(index, 1,5,1,1);
-	 x = cINT.readInt(index, 1,5,2,4);
-
-	cout << cINT.codingRegions.codingRegionsToString() << "\n";
-
-	cout << x << "\n";
-	exit(0);
 
 	Parameters::initialize_parameters(argc, argv);  // loads command line and configFile values into registered parameters
 	                                                // also writes out a config file if requested
@@ -126,18 +82,22 @@ int main(int argc, const char * argv[]) {
 		// a progenitor must exist - that is, one ancestor genome
 		Global::update = -1;  // before there was time, there was a progenitor
 		shared_ptr<ClassicBrain> tesBrain = make_shared<ClassicBrain>(make_shared<Classic_GateListBuilder>());
-
-		shared_ptr<Organism> progenitor = make_shared<Organism>(make_shared<ByteGenome>(), make_shared<ClassicBrain>(make_shared<Classic_GateListBuilder>()));  // make a organism with a genome and brain (if you need to change the types here is where you do it)
+		shared_ptr<Chromosome<bool>> initalChromosome = make_shared<Chromosome<bool>>(Genome::initialChromosomeSize,2);
+		shared_ptr<Organism> progenitor = make_shared<Organism>(make_shared<Genome>(initalChromosome,3,2), make_shared<ClassicBrain>(make_shared<Classic_GateListBuilder>()));  // make a organism with a genome and brain (if you need to change the types here is where you do it)
 
 		Global::update = 0;  // the beginning of time - now we construct the first population
 		vector<shared_ptr<Organism>> population;
+		cout << "building initial population" << flush;
+
 		for (int i = 0; i < Global::popSize; i++) {
-			shared_ptr<ByteGenome> genome = make_shared<ByteGenome>();
+			shared_ptr<Genome> genome = make_shared<Genome>(initalChromosome,3,2);
 			genome->fillRandom();
 			shared_ptr<Organism> org = make_shared<Organism>(progenitor, genome);
 			population.push_back(org);  // add a new org to population using progenitors template and a new random genome
 			population[population.size() - 1]->gender = Random::getInt(0, 1);  // assign a random gender to the new org
+			cout << "." << flush;
 		}
+		cout << "\nmade population of " << population.size() << " organisms." << endl;
 		progenitor->kill();  // the progenitor has served it's purpose.
 
 		shared_ptr<Archivist> archivist;
@@ -157,6 +117,7 @@ int main(int argc, const char * argv[]) {
 
 		group = make_shared<Group>(population, make_shared<Tournament>(), archivist);
 	}
+	cout << "made group" << endl;
 
 //////////////////
 // evolution loop
@@ -175,12 +136,17 @@ int main(int argc, const char * argv[]) {
 	bool finished = false;  // when the archivist says we are done, we can stop!
 
 	while (!finished) {
+		cout << "begin evo loop" << endl;
+
 		world->evaluateFitness(group->population, false);  // evaluate each organism in the population using a World
+		cout << "  eval complete" << endl;
 		finished = group->archive();  // save data, update memory and delete any unneeded data;
+		cout << "  archive complete" << endl;
 
 		Global::update++;
 
 		group->optimize();  // update the population (reproduction and death)
+		cout << "  optimize complete" << endl;
 
 		cout << "update: " << Global::update - 1 << "   maxFitness: " << group->optimizer->maxFitness << "\n";
 	}
@@ -190,8 +156,7 @@ int main(int argc, const char * argv[]) {
 	if (Archivist::Arch_outputMethodStr == "LODwAP") {  // if using LODwAP, write out some info about MRCA
 		shared_ptr<Organism> FinalMRCA = group->population[0]->getMostRecentCommonAncestor(group->population[0]);
 		cout << "MRCA - ID: " << FinalMRCA->ID << " born on: " << FinalMRCA->timeOfBirth << "\n" << FinalMRCA->brain->description();
-		cout << "\n\n" << FinalMRCA->genome->showCodingRegions();
+		//cout << "\n\n" << FinalMRCA->genome->showCodingRegions();
 	}
 	return 0;
 }
-
