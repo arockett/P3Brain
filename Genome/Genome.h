@@ -39,8 +39,6 @@ using namespace std;
 //	}
 //
 
-
-
 class AbstractGenome {
 
  public:
@@ -108,7 +106,7 @@ class AbstractGenome {
 			return 0;
 		}
 
-		virtual void randomize()  = 0;
+		virtual void randomize() = 0;
 
 		////virtual int newHandle() // make a new handle in this genome, return the index for that handle
 		////virtual int advanceIndex(int handle, int distance = 1)
@@ -140,7 +138,6 @@ class AbstractGenome {
 
 	}
 
-
 	//// gets data about genome which can be added to a data map
 	//// data is in pairs of strings (key, value)
 	//// the undefined action is to return an empty vector
@@ -156,6 +153,9 @@ class AbstractGenome {
 	}
 
 	virtual void loadGenome(string fileName, string key, string keyValue) {
+	}
+
+	virtual void loadGenomes(string fileName, vector<shared_ptr<AbstractGenome>> genomes) {
 	}
 
 	virtual bool isEmpty() = 0;
@@ -180,7 +180,7 @@ class Genome : public AbstractGenome {
 	static int& minChromosomeSize;
 	static int& crossCount;  // number of crosses to make when performing crossover
 
-	static vector<string> genomeFileColumns;// = {"ID","alphabetSize","chromosomeCount","chromosomeLength","sitesCount","genomeAncestors","sites"};
+	static vector<string> genomeFileColumns;  // = {"ID","alphabetSize","chromosomeCount","chromosomeLength","sitesCount","genomeAncestors","sites"};
 
 	class Handler : public AbstractGenome::Handler {
  	public:
@@ -343,7 +343,7 @@ class Genome : public AbstractGenome {
 			}
 		}
 
-		virtual void randomize(){
+		virtual void randomize() {
 			chromosomeIndex = Random::getIndex(genome->chromosomes.size());
 			siteIndex = Random::getIndex(genome->chromosomes[chromosomeIndex]->size());
 		}
@@ -475,7 +475,6 @@ class Genome : public AbstractGenome {
 		return (countSites() == 0);
 	}
 
-
 	// apply mutations to this genome
 	virtual void mutate() {
 		for (auto chromosome : chromosomes) {
@@ -601,36 +600,59 @@ class Genome : public AbstractGenome {
 	}
 
 	// load all genomes from a file
-	virtual vector<AbstractGenome> loadGenomes(string fileName){
-		vector<AbstractGenome> genomes;
-
+	virtual void loadGenomes(string fileName, vector<shared_ptr<AbstractGenome>> genomes) {
+		genomes.clear();
 		std::ifstream FILE(fileName);
 		string rawLine;
-		bool firstLine = true;
-
-
-
-//		if (FILE.is_open())  // if the file named by configFileName can be opened
-//		{
-//			while (getline(FILE, rawLine))  // keep loading one line from the file at a time into "line" until we get to the end of the file
-//			{
-//				dataLine = parseCSVLine(rawLine, separator);
-//				if (firstLine) {  // this is the first line, dataLine contains the keys... use them to build the map and loopUpTable
-//					for (auto key : dataLine) {
-//						lookUpTable.push_back(key);  // add the key so we can make sure we assign the right values to the right columns
-//						data[key] = {};  // add an empty vector for each key into the map data
-//					}
-//					firstLine = false;
-//				} else {  // we are not in the first line, dataLine has values
-//					for (size_t i = 0; i < dataLine.size(); i++) {  // for each entry in dataLine
-//						data[lookUpTable[i]].push_back(dataLine[i]);
-//					}
+		int _update, _ID, _sitesCount, _chromosomeCount, _alphabetSize, _ploidy;
+		vector<int> _chromosomeLengths;
+		char rubbish;
+		if (FILE.is_open()) {  // if the file named by configFileName can be opened
+			getline(FILE, rawLine);  // bypass first line
+			while (getline(FILE, rawLine)) {  // keep loading one line from the file at a time into "line" until we get to the end of the file
+				std::stringstream ss(rawLine);
+//				ss >> target;
+//				if (ss.fail()) {
+//					return false;
+//				} else {
+//					string remaining;
+//					ss >> remaining;
+//					// stream failure means nothing left in stream, which is what we want
+//					return ss.fail();
 //				}
-//			}
-//		}
+				cout << "A" << endl;
+				ss >> _update >> rubbish >> _ID >> rubbish >> _sitesCount >> rubbish >> _chromosomeCount >> rubbish >> _alphabetSize >> rubbish >> _ploidy >> rubbish >> rubbish >> rubbish;
+				_chromosomeLengths.resize(_chromosomeCount);
+				cout << "B" << endl;
+				for (int i = 0; i < _chromosomeCount; i++) {
+					ss >> _chromosomeLengths[i] >> rubbish;
+				}
+				cout << "C" << endl;
+				ss >> rubbish >> rubbish >> rubbish >> rubbish;
+				cout << "D" << endl;
 
-		return genomes;
+				genomes.push_back(make_shared<Genome>(chromosomes[0], _chromosomeCount, _ploidy));
+				cout << "E" << endl;
 
+				cout << _update << " " << _ID << " " << _sitesCount << " " << _chromosomeCount << " " << _alphabetSize << " " << _ploidy << "\n";
+
+				for (int i = 0; i < _chromosomeCount; i++) {
+					chromosomes[i]->readChromosomeFromSS(ss, _chromosomeLengths[i]);
+				}
+
+				for (int i = 0; i < _chromosomeCount; i++) {
+					cout << _chromosomeLengths[i] << " = " << chromosomes[i]->size() << chromosomes[i]->chromosomeToStr() << "\n";
+				}
+				cout << "\n";
+				exit(2);
+				// read sitesCount
+				// read chromosomeCount
+				// read chromosomeLengths
+				// read sites
+				// alphabetSize
+				// read ploidy
+			}
+		}
 
 	}
 // load a genome from CSV file with headers - will return genome from saved organism with key / keyvalue pair
@@ -648,7 +670,7 @@ class Genome : public AbstractGenome {
 			S = S + FileManager::separator + chromosomes[c]->chromosomeToStr();
 		}
 		S.erase(S.begin());  // clip off the leading separator
-		 S = "\"[" + S + "]\"";
+		S = "\"[" + S + "]\"";
 		return S;
 	}
 

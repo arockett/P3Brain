@@ -129,7 +129,14 @@ int main(int argc, const char * argv[]) {
 		Global::update = -1;  // before there was time, there was a progenitor
 		//shared_ptr<MarkovBrain> tesBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
 		auto initalChromosome = make_shared<Chromosome<int>>(Genome::initialChromosomeSize, 256);
-		shared_ptr<Organism> progenitor = make_shared<Organism>(make_shared<Genome>(initalChromosome, 3, 2), make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>()));  // make a organism with a genome and brain (if you need to change the types here is where you do it)
+		auto initalGenome = make_shared<Genome>(initalChromosome, 3, 2);
+		cout << "AA\n";
+		//vector<shared_ptr<AbstractGenome>> genomes;
+		//initalGenome->loadGenomes("genome_10.csv", genomes);
+
+		auto initalBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
+		shared_ptr<Organism> progenitor = make_shared<Organism>(initalGenome, initalBrain);  // make a organism with a genome and brain (if you need to change the types here is where you do it)
+		cout << "AA\n";
 
 		Global::update = 0;  // the beginning of time - now we construct the first population
 		vector<shared_ptr<Organism>> population;

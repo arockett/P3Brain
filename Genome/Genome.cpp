@@ -25,5 +25,5 @@ int& Genome::minChromosomeSize = Parameters::register_parameter("chromosomeSizeM
 
 int& Genome::crossCount = Parameters::register_parameter("genomecrossCount", 3, "number of crosses when performing crossover", "GENOME");
 
-vector<string> Genome::genomeFileColumns = { "update", "ID", "sitesCount", "chromosomeCount", "chromosomeLengths", "sites", "alphabetSize", "ploidy" };
+vector<string> Genome::genomeFileColumns = { "update", "ID", "sitesCount", "chromosomeCount", "alphabetSize", "ploidy" , "chromosomeLengths", "sites"};
 

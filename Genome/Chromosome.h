@@ -77,6 +77,11 @@ class AbstractChromosome {
 		exit(1);
 	}
 
+	virtual void readChromosomeFromSS(stringstream &ss, int _chromosomeLength){
+		cout << "method readChromosomeFromFile() in AbstractChromosome was called!\n This class only exists for polymorphism.\n";
+		exit(1);
+	}
+
 	virtual string chromosomeToStr() {
 		cout << "method chromosomeToStr() in AbstractChromosome was called!\n This class only exists for polymorphism.\n";
 		exit(1);
@@ -214,7 +219,7 @@ template<class T> class Chromosome : public AbstractChromosome {
 
 	// return a shared_ptr to a new chromosome like this one (same alphabetSize and sites.size())
 	virtual shared_ptr<AbstractChromosome> makeLike() {
-		return make_shared<Chromosome<T>>(sites.size(),alphabetSize);
+		return make_shared<Chromosome<T>>(0,alphabetSize);
 	}
 
 	virtual shared_ptr<AbstractChromosome> makeCopy() {
@@ -368,6 +373,17 @@ template<class T> class Chromosome : public AbstractChromosome {
 	virtual void fillConstant(const int value) override {
 		for (int i = 0; i < sites.size(); i++) {
 			sites[i] = (T)(value%(int)alphabetSize);
+		}
+	}
+
+	virtual void readChromosomeFromSS(std::stringstream &ss, int _chromosomeLength){
+		int value;
+		char rubbish;
+		cout << _chromosomeLength << "/n";
+		for (int i = 0; i<_chromosomeLength;i++){
+			cout << i << endl;
+			ss >> value >> rubbish;
+			sites.push_back(value);
 		}
 	}
 

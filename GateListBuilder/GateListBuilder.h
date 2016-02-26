@@ -39,7 +39,7 @@ class Classic_GateListBuilder : public Base_GateListBuilder {
 	virtual ~Classic_GateListBuilder() = default;
 
 	virtual vector<shared_ptr<Gate>> buildGateList(shared_ptr<AbstractGenome> genome, int nrOfBrainStates) {
-		//cout << "In virtual vector<shared_ptr<Gate>> buildGateList(shared_ptr<AbstractGenome> genome, int nrOfBrainStates)"<<endl;
+		cout << "In virtual vector<shared_ptr<Gate>> buildGateList(shared_ptr<AbstractGenome> genome, int nrOfBrainStates)"<<endl;
 		vector<shared_ptr<Gate>> gates;
 
 		bool translation_Complete = false;
@@ -76,6 +76,8 @@ class Classic_GateListBuilder : public Base_GateListBuilder {
 			}
 			testSite2Value = genomeHandler->readInt(0, 255);
 		}
+		cout << "Leaving BLG\n";
+
 		return gates;
 	}
 
