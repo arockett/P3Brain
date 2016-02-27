@@ -130,13 +130,15 @@ int main(int argc, const char * argv[]) {
 		//shared_ptr<MarkovBrain> tesBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
 		auto initalChromosome = make_shared<Chromosome<int>>(Genome::initialChromosomeSize, 256);
 		auto initalGenome = make_shared<Genome>(initalChromosome, 3, 2);
-		cout << "AA\n";
-		//vector<shared_ptr<AbstractGenome>> genomes;
-		//initalGenome->loadGenomes("genome_10.csv", genomes);
+		vector<shared_ptr<AbstractGenome>> genomes;
+		initalGenome->loadGenomes("genome_10.csv", genomes);
+		for (auto g : genomes){
+			cout << g->genomeToStr() << "\n";
+		}
+		exit (17);
 
 		auto initalBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
 		shared_ptr<Organism> progenitor = make_shared<Organism>(initalGenome, initalBrain);  // make a organism with a genome and brain (if you need to change the types here is where you do it)
-		cout << "AA\n";
 
 		Global::update = 0;  // the beginning of time - now we construct the first population
 		vector<shared_ptr<Organism>> population;
@@ -145,11 +147,13 @@ int main(int argc, const char * argv[]) {
 			shared_ptr<Genome> genome = make_shared<Genome>(initalChromosome, 3, 2);
 			genome->fillRandom();
 			auto genomeHandler = genome->newHandler(genome);
+
 			for (int i = 0; i < 5; i++) {
 				genomeHandler->randomize();
 				genomeHandler->writeInt(43, 0, 255);
 				genomeHandler->writeInt(255-43, 0, 255);
 			}
+
 			shared_ptr<Organism> org = make_shared<Organism>(progenitor, genome);
 			population.push_back(org);  // add a new org to population using progenitors template and a new random genome
 			population[population.size() - 1]->gender = Random::getInt(0, 1);  // assign a random gender to the new org

@@ -219,7 +219,7 @@ template<class T> class Chromosome : public AbstractChromosome {
 
 	// return a shared_ptr to a new chromosome like this one (same alphabetSize and sites.size())
 	virtual shared_ptr<AbstractChromosome> makeLike() {
-		return make_shared<Chromosome<T>>(0,alphabetSize);
+		return make_shared<Chromosome<T>>(sites.size(),alphabetSize);
 	}
 
 	virtual shared_ptr<AbstractChromosome> makeCopy() {
@@ -379,9 +379,8 @@ template<class T> class Chromosome : public AbstractChromosome {
 	virtual void readChromosomeFromSS(std::stringstream &ss, int _chromosomeLength){
 		int value;
 		char rubbish;
-		cout << _chromosomeLength << "/n";
+		sites.clear();
 		for (int i = 0; i<_chromosomeLength;i++){
-			cout << i << endl;
 			ss >> value >> rubbish;
 			sites.push_back(value);
 		}

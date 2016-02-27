@@ -415,6 +415,13 @@ class Genome : public AbstractGenome {
 
 	virtual shared_ptr<AbstractGenome::Handler> newHandler(shared_ptr<AbstractGenome> _genome, bool _readDirection = true) override {
 		////////////////////////////////////cout << "In Genome::newHandler()" << endl;
+		for (auto chromosome : chromosomes) {
+			if (chromosome->size() == 0) {
+				cout << "Warning! :: you are creating a grenome handler to a genome with and empty chromosome. This is not allowed!\nExiting!\n\n";
+				exit(1);
+			}
+		}
+
 		return make_shared<Handler>(_genome, _readDirection);
 	}
 
@@ -600,11 +607,12 @@ class Genome : public AbstractGenome {
 	}
 
 	// load all genomes from a file
-	virtual void loadGenomes(string fileName, vector<shared_ptr<AbstractGenome>> genomes) {
+	virtual void loadGenomes(string fileName, vector<shared_ptr<AbstractGenome>> &genomes) {
 		genomes.clear();
 		std::ifstream FILE(fileName);
 		string rawLine;
-		int _update, _ID, _sitesCount, _chromosomeCount, _alphabetSize, _ploidy;
+		int _update, _ID, _sitesCount, _chromosomeCount, _ploidy;
+		double _alphabetSize;
 		vector<int> _chromosomeLengths;
 		char rubbish;
 		if (FILE.is_open()) {  // if the file named by configFileName can be opened
@@ -620,37 +628,21 @@ class Genome : public AbstractGenome {
 //					// stream failure means nothing left in stream, which is what we want
 //					return ss.fail();
 //				}
-				cout << "A" << endl;
 				ss >> _update >> rubbish >> _ID >> rubbish >> _sitesCount >> rubbish >> _chromosomeCount >> rubbish >> _alphabetSize >> rubbish >> _ploidy >> rubbish >> rubbish >> rubbish;
 				_chromosomeLengths.resize(_chromosomeCount);
-				cout << "B" << endl;
 				for (int i = 0; i < _chromosomeCount; i++) {
 					ss >> _chromosomeLengths[i] >> rubbish;
 				}
-				cout << "C" << endl;
 				ss >> rubbish >> rubbish >> rubbish >> rubbish;
-				cout << "D" << endl;
 
-				genomes.push_back(make_shared<Genome>(chromosomes[0], _chromosomeCount, _ploidy));
-				cout << "E" << endl;
-
-				cout << _update << " " << _ID << " " << _sitesCount << " " << _chromosomeCount << " " << _alphabetSize << " " << _ploidy << "\n";
-
+				shared_ptr<Genome> newGenome = make_shared<Genome>(chromosomes[0], _chromosomeCount/_ploidy, _ploidy);
 				for (int i = 0; i < _chromosomeCount; i++) {
-					chromosomes[i]->readChromosomeFromSS(ss, _chromosomeLengths[i]);
+					newGenome->chromosomes[i]->readChromosomeFromSS(ss, _chromosomeLengths[i]);
 				}
-
-				for (int i = 0; i < _chromosomeCount; i++) {
-					cout << _chromosomeLengths[i] << " = " << chromosomes[i]->size() << chromosomes[i]->chromosomeToStr() << "\n";
-				}
-				cout << "\n";
-				exit(2);
-				// read sitesCount
-				// read chromosomeCount
-				// read chromosomeLengths
-				// read sites
-				// alphabetSize
-				// read ploidy
+				newGenome->dataMap.Set("update",_update);
+				newGenome->dataMap.Set("ID",_ID);
+				newGenome->ploidy = _ploidy;
+				genomes.push_back(newGenome);
 			}
 		}
 
