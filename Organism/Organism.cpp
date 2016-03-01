@@ -174,6 +174,7 @@ shared_ptr<Organism> Organism::makeMutatedOffspring(vector<shared_ptr<Organism>>
 		parentGenomes.push_back(p->genome);
 	}
 	shared_ptr<Organism> newOrg = make_shared<Organism>(from, genome->makeMutatedGenome(parentGenomes));
+	//shared_ptr<Organism> newOrg = make_shared<Organism>(from[1], genome->makeMutatedGenome(genome));
 
 	newOrg->gender = from[Random::getIndex(from.size())]->gender;  // assign a gender to the new org randomly from one of it's parents
 	return newOrg;

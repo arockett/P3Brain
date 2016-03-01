@@ -42,14 +42,7 @@ using namespace std;
 
 int main(int argc, const char * argv[]) {
 
-	cout << "\n\n" <<
-			"\tMM   MM      A       BBBBBB    EEEEEE\n"<<
-			"\tMMM MMM     AAA      BB   BB   EE\n" <<
-			"\tMMMMMMM    AA AA     BBBBBB    EEEEEE\n" <<
-			"\tMM M MM   AAAAAAA    BB   BB   EE\n" <<
-			"\tMM   MM  AA     AA   BBBBBB    EEEEEE\n" <<
-			"\n" <<
-			"\tModular    Agent      Based    Evolver\n\n\n\thttp://hintzelab.msu.edu/MABE\n\n\n";
+	cout << "\n\n" << "\tMM   MM      A       BBBBBB    EEEEEE\n" << "\tMMM MMM     AAA      BB   BB   EE\n" << "\tMMMMMMM    AA AA     BBBBBB    EEEEEE\n" << "\tMM M MM   AAAAAAA    BB   BB   EE\n" << "\tMM   MM  AA     AA   BBBBBB    EEEEEE\n" << "\n" << "\tModular    Agent      Based    Evolver\n\n\n\thttp://hintzelab.msu.edu/MABE\n\n\n";
 	Parameters::initialize_parameters(argc, argv);  // loads command line and configFile values into registered parameters
 	                                                // also writes out a config file if requested
 	//make a node map to handle genome value to brain state address look up.
@@ -129,13 +122,16 @@ int main(int argc, const char * argv[]) {
 		Global::update = -1;  // before there was time, there was a progenitor
 		//shared_ptr<MarkovBrain> tesBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
 		auto initalChromosome = make_shared<Chromosome<int>>(Genome::initialChromosomeSize, 256);
-		auto initalGenome = make_shared<Genome>(initalChromosome, 3, 2);
-		vector<shared_ptr<AbstractGenome>> genomes;
-		initalGenome->loadGenomes("genome_10.csv", genomes);
-		for (auto g : genomes){
-			cout << g->genomeToStr() << "\n";
-		}
-		exit (17);
+		auto initalGenome = make_shared<Genome>(initalChromosome, Genome::initialChromosomes, Genome::initialPloidy);
+//		vector<shared_ptr<AbstractGenome>> genomes;
+//		for (int i = 0; i < 500; i++) {
+//			cout << i << " " << flush;
+//			initalGenome->loadGenomes("genome_10.csv", genomes);
+////--//		for (auto g : genomes){
+////--//			cout << g->genomeToStr() << "\n";
+////--//		}
+//		}
+//		exit(17);
 
 		auto initalBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
 		shared_ptr<Organism> progenitor = make_shared<Organism>(initalGenome, initalBrain);  // make a organism with a genome and brain (if you need to change the types here is where you do it)
@@ -144,14 +140,14 @@ int main(int argc, const char * argv[]) {
 		vector<shared_ptr<Organism>> population;
 
 		for (int i = 0; i < Global::popSize; i++) {
-			shared_ptr<Genome> genome = make_shared<Genome>(initalChromosome, 3, 2);
+			shared_ptr<Genome> genome = make_shared<Genome>(initalChromosome, Genome::initialChromosomes, Genome::initialPloidy);
 			genome->fillRandom();
 			auto genomeHandler = genome->newHandler(genome);
 
 			for (int i = 0; i < 5; i++) {
 				genomeHandler->randomize();
 				genomeHandler->writeInt(43, 0, 255);
-				genomeHandler->writeInt(255-43, 0, 255);
+				genomeHandler->writeInt(255 - 43, 0, 255);
 			}
 
 			shared_ptr<Organism> org = make_shared<Organism>(progenitor, genome);
@@ -177,13 +173,13 @@ int main(int argc, const char * argv[]) {
 
 		shared_ptr<BaseOptimizer> optimizer;
 
-		if (BaseOptimizer::Optimizer_MethodStr == "GA"){
+		if (BaseOptimizer::Optimizer_MethodStr == "GA") {
 			optimizer = make_shared<GA_Optimizer>();
 		}
-		if (BaseOptimizer::Optimizer_MethodStr == "Tournament"){
+		if (BaseOptimizer::Optimizer_MethodStr == "Tournament") {
 			optimizer = make_shared<TournamentOptimizer>();
 		}
-		if (BaseOptimizer::Optimizer_MethodStr == "Tournament2"){
+		if (BaseOptimizer::Optimizer_MethodStr == "Tournament2") {
 			optimizer = make_shared<Tournament2Optimizer>();
 		}
 
@@ -199,9 +195,12 @@ int main(int argc, const char * argv[]) {
 
 	while (!finished) {
 		world->evaluateFitness(group->population, false);  // evaluate each organism in the population using a World
+		cout << "  evaluation done\n";
 		finished = group->archive();  // save data, update memory and delete any unneeded data;
+		cout << "  archive done\n";
 		Global::update++;
 		group->optimize();  // update the population (reproduction and death)
+		cout << "  optimize done\n";
 		cout << "update: " << Global::update - 1 << "   maxFitness: " << group->optimizer->maxFitness << "\n";
 	}
 

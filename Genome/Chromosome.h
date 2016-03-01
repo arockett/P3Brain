@@ -517,12 +517,12 @@ template<class T> class Chromosome : public AbstractChromosome {
 
 //			cout << "crossing: ";
 //			for (auto location:crossLocations){
-//				cout << location << "\t";
+//				cout << location << "  ";
 //			}
-//			cout << endl << size() << "\t->\t";
+//			cout << "size init: " << size() << " -> ";
 
 			int pick;
-			int lastPick = 0;
+			int lastPick = Random::getIndex(parents.size());
 			for(int c = 0; c < crossLocations.size()-1; c++) {
 				// pick a chromosome to cross with. Make sure it's not the same chromosome!
 				pick = Random::getIndex(parents.size()-1);
@@ -531,12 +531,15 @@ template<class T> class Chromosome : public AbstractChromosome {
 				}
 				lastPick = pick;
 				// add the segment to this chromosome
+//				cout << "(" << parentSites[pick].size() << ") "<< (int)((double)parentSites[pick].size()*crossLocations[c]) << " " << (int)((double)parentSites[pick].size()*crossLocations[c+1]) << " ";
 				sites.insert(sites.end(),
 						parentSites[pick].begin()+(int)((double)parentSites[pick].size()*crossLocations[c]),
 						parentSites[pick].begin()+(int)((double)parentSites[pick].size()*crossLocations[c+1]));
 			}
-//			cout << size() << endl;
+//			cout << "size post: " << size() << endl;
+//			cout << "      " << chromosomeToStr() << "\nfrom: " << parents[0]->chromosomeToStr() << "\n+\n and: " << parents[1]->chromosomeToStr() << endl << endl;
 		}
+		 //sites = dynamic_pointer_cast<Chromosome<T>>(parents[0])->sites; // uncomment to turn of crossover
 	}
 
 };

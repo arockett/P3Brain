@@ -168,6 +168,8 @@ class AbstractGenome {
 class Genome : public AbstractGenome {
  public:
 
+	static int& initialPloidy;
+	static int& initialChromosomes;
 	static int& initialChromosomeSize;
 	static double& pointMutationRate;
 	static double& insertionRate;
