@@ -144,7 +144,7 @@ int main(int argc, const char * argv[]) {
 			genome->fillRandom();
 			auto genomeHandler = genome->newHandler(genome);
 
-			for (int i = 0; i < 5; i++) {
+			for (int i = 0; i < 10; i++) {
 				genomeHandler->randomize();
 				genomeHandler->writeInt(43, 0, 255);
 				genomeHandler->writeInt(255 - 43, 0, 255);
