@@ -11,7 +11,7 @@
 
 #include "Optimizer.h"
 
-class Tournament2 : public BaseOptimizer {
+class Tournament2Optimizer : public BaseOptimizer {
  public:
 	virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
 };

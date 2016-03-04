@@ -3,7 +3,7 @@
 
 //global variables that should be accessible to all
 int& Global::randomSeed = Parameters::register_parameter("randomSeed", 101, "seed for random number generator, if -1 random number generator will be seeded randomly", "GLOBAL");
-int& Global::updates = Parameters::register_parameter("updates", 200, "how long the program will run", "GLOBAL");
+int& Global::updates = Parameters::register_parameter("updates", 2000, "how long the program will run", "GLOBAL");
 int& Global::popSize = Parameters::register_parameter("popSize", 150, "number of genomes in the populaiton", "GLOBAL");
 
 string& Global::outputDirectory = Parameters::register_parameter("outputDirectory", (string) "./", "where files will be written", "GLOBAL");

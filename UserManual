@@ -1,12 +1,16 @@
 Hello and Welcome to Markov Brains! This guide will walk you though everything you need to know about running Markov Brains.
 
-This document is divided into four sections.
+This document is divided into five sections.
+		0) Introduction to MABE
         1) What is a Markov Brain.
         2) How do you use this software.
         3) Implementation Details (things like how is the genome mutated and used to create Agents, 
                 how do worlds interface with agents and how do agents update, etc.) 
-        4) reference for anyone interested in working on the code (Including creating worlds)
+        4) reference for anyone interested in working on the code (Including creating worlds, gates, brains, etc.)
 
+Section 0.
+What is MABE?
+MABE (Modular Agent Based Evolver) is a digital evolution tool. MABE can be used to create populations of digital agents, evaluate these agents and generate new populations by means of natural or artifical selection.
 Section 1. 
 What is a Markov Brain
 

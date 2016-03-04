@@ -19,7 +19,7 @@
 #include <sstream>
 #include <stdlib.h>
 #include <string>
-#include <unordered_map>
+#include <map>
 #include <vector>
 
 #include "Utilities.h"
@@ -28,9 +28,16 @@ using namespace std;
 
 class DataMap {
  private:
-	unordered_map<string, string> data;
+	map<string, string> data;
 
  public:
+
+	DataMap() = default;
+
+	DataMap(shared_ptr<DataMap> source){
+		data = source->data;
+	}
+
 	/*
 	 * sets a value at "key" to a DataMap.data
 	 * Template Functions must be in a header

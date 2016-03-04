@@ -13,7 +13,7 @@
 
 using namespace std;
 
-class Tournament : public BaseOptimizer {
+class TournamentOptimizer : public BaseOptimizer {
  public:
 	virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
 };

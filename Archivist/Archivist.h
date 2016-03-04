@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <vector>
 
-#include "../Brain/ClassicBrain.h"
+#include "../Brain/MarkovBrain.h"
 #include "../Genome/Genome.h"
 #include "../Global.h"
 #include "../Organism/Organism.h"

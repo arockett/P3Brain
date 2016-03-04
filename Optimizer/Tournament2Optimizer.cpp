@@ -6,17 +6,18 @@
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
 //
 
-#include "Tournament2_Optimizer.h"
+#include "Tournament2Optimizer.h"
+
 #include "../Utilities/Random.h"
 
 using namespace std;
 
-void Tournament2::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
+void Tournament2Optimizer::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
 	vector<shared_ptr<Organism>> nextPopulation;
 	set<shared_ptr<Organism>> survivors;
 	int p1, p2;  // parent1 and 2
 	int challanger;  // used when picking best of
-	double surviveChance = .1;
+	double surviveChance = 0;
 	bool orgSurvived = 0;
 
 	vector<double> Scores;
@@ -40,7 +41,7 @@ void Tournament2::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
 
 	while (nextPopulation.size() < population.size()) {  // while we have not filled up the next generation
 		// chance for each pick that this org survives to the next population
-
+		//cout << "picking p1..." << flush;
 		if ((int) nextPopulation.size() < BaseOptimizer::elitism) {  // if next population has less members then elitism, then p1 is best.
 			p1 = best;
 		} else {  // otherwise, p1 is the best of tournamentSize random picks
@@ -52,6 +53,8 @@ void Tournament2::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
 				}
 			}
 		}
+		//cout << p1 << flush;
+		//cout << "  picking p2..." << flush;
 
 		orgSurvived = 0;  // clear orgSurvived. if population[p1] survives this will become 1 and we will not pick a mate
 		if (Random::P(surviveChance)) {  // if this org survives
@@ -63,16 +66,25 @@ void Tournament2::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
 		}
 		if (!orgSurvived) {
 			p2 = p1;  // make these the same to prime the while loop
-			while ((p1 == p2) || (population[p1]->gender == population[p2]->gender)) {  // keep picking until you have 2 diffrent parents with 2 diffrent genders
+			//while ((p1 == p2) || (population[p1]->gender == population[p2]->gender)) {  // keep picking until you have 2 diffrent parents with 2 diffrent genders
+			while ((p1 == p2)) {  // keep picking until you have 2 diffrent parents with 2 diffrent genders
+				//cout << p2 << " " << p1 << endl;
 				p2 = Random::getIndex(population.size());
+				//cout << "  " << p2 << " " << p1 << endl;
+
 				for (int i = 0; i < BaseOptimizer::tournamentSize - 1; i++) {
 					challanger = Random::getIndex(population.size());
+					//cout << "  ch = " << challanger << "\n";
 					if (Scores[challanger] > Scores[p2]) {
+						//cout << "p2 assigned" << endl;
 						p2 = challanger;
 					}
 				}
 			}
 			nextPopulation.push_back(population[p1]->makeMutatedOffspring( { population[p1], population[p2] }));
+			//cout << p1 << " " << p2 << endl;
+			//nextPopulation.push_back(population[p1]->makeMutatedOffspring(population[p1]));
+			//cout << " " << nextPopulation.size() << " " << population.size() << endl;
 		}
 
 	}

@@ -6,31 +6,31 @@
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
 //
 
-#include "ClassicBrain.h"
+#include "MarkovBrain.h"
 
 #include "../Utilities/Random.h"
 #include "../Utilities/Utilities.h"
 
-vector<int> ClassicBrain::defaultNodeMap;
+vector<int> MarkovBrain::defaultNodeMap;
 
-int& ClassicBrain::defaultNrOfBrainStates = Parameters::register_parameter("brainSize", 15, "number of Brain Values", "BRAIN");
+int& MarkovBrain::defaultNrOfBrainStates = Parameters::register_parameter("brainSize", 15, "number of Brain Values", "BRAIN");
 
-bool& ClassicBrain::serialProcessing = Parameters::register_parameter("serialProcessing", false, "sets brains to overwrite... right?", "BRAIN");
+bool& MarkovBrain::serialProcessing = Parameters::register_parameter("serialProcessing", false, "sets brains to overwrite... right?", "BRAIN");
 
-ClassicBrain::ClassicBrain(shared_ptr<Base_GateListBuilder> _GLB, int _nrOfStates) {
+MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, int _nrOfStates) {
 	GLB = _GLB;
 	nrOfBrainStates = _nrOfStates;
 }
 
-ClassicBrain::ClassicBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<Genome> genome, int _nrOfBrainStates) {  //this is a constructor. it is run whenever a new brain is created.
+MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrOfBrainStates) {  //this is a constructor. it is run whenever a new brain is created.
 	nrOfBrainStates = _nrOfBrainStates;
 	states.resize(nrOfBrainStates);
 	nextStates.resize(nrOfBrainStates);
 
 	GLB = _GLB;
-
+	//cout << "in MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrOfBrainStates)\n\tabout to - gates = GLB->buildGateList(genome, nrOfBrainStates);" << endl;
 	gates = GLB->buildGateList(genome, nrOfBrainStates);
-
+	//cout << "\tback"<<endl;
 //  bool translation_Complete = false;
 //  if (genome->getSize() == 0){
 //    translation_Complete = true;
@@ -57,19 +57,19 @@ ClassicBrain::ClassicBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<Gen
 	inOutReMap();  // map ins and outs from genome values to brain states
 }
 
-shared_ptr<ClassicBrain> ClassicBrain::makeBrainFromGenome(shared_ptr<Genome> _genome) {
-	shared_ptr<ClassicBrain> newBrain = make_shared<ClassicBrain>(GLB, _genome, ClassicBrain::defaultNrOfBrainStates);
+shared_ptr<AbstractBrain> MarkovBrain::makeBrainFromGenome(shared_ptr<AbstractGenome> _genome) {
+	shared_ptr<MarkovBrain> newBrain = make_shared<MarkovBrain>(GLB, _genome, MarkovBrain::defaultNrOfBrainStates);
 	return newBrain;
 }
 
-void ClassicBrain::resetBrain() {
+void MarkovBrain::resetBrain() {
 	for (int i = 0; i < nrOfBrainStates; i++)
 		states[i] = 0.0;
 	for (size_t i = 0; i < gates.size(); i++)
 		gates[i]->resetGate();
 }
 
-void ClassicBrain::update() {
+void MarkovBrain::update() {
 	/*
 	 if(Agent::serialProcessing){
 	 //this is a special way of serialized updating
@@ -87,21 +87,21 @@ void ClassicBrain::update() {
 	swap(states, nextStates);
 }
 
-void ClassicBrain::inOutReMap() {  // remaps genome site values to valid brain state addresses
+void MarkovBrain::inOutReMap() {  // remaps genome site values to valid brain state addresses
 	for (size_t i = 0; i < gates.size(); i++) {
 		gates[i]->applyNodeMap(defaultNodeMap, nrOfBrainStates);
 	}
 
 }
 
-int ClassicBrain::IntFromState(vector<int> I) {
+int MarkovBrain::IntFromState(vector<int> I) {
 	int r = 0;
 	for (size_t i = 0; i < I.size(); i++)
 		r = (r << 1) + Bit(states[I[i]]);
 	return r;
 }
 
-int ClassicBrain::IntFromAllStates() {
+int MarkovBrain::IntFromAllStates() {
 	int r = 0;
 	for (int i = 0; i < nrOfBrainStates; i++)
 		r = (r << 1) + Bit(states[i]);
@@ -109,19 +109,19 @@ int ClassicBrain::IntFromAllStates() {
 
 }
 
-string ClassicBrain::description() {
+string MarkovBrain::description() {
 	string S = "Markov Briain\n" + gateList();
 	return S;
 }
 
-vector<string> ClassicBrain::getStats() {
+vector<string> MarkovBrain::getStats() {
 	vector<string> dataPairs;
 	dataPairs.push_back("gates");
 	dataPairs.push_back(to_string(gates.size()));
 	return (dataPairs);
 }
 
-string ClassicBrain::gateList() {
+string MarkovBrain::gateList() {
 	string S = "";
 	for (size_t i = 0; i < gates.size(); i++) {
 		S = S + gates[i]->description();
@@ -129,7 +129,7 @@ string ClassicBrain::gateList() {
 	return S;
 }
 
-vector<vector<int>> ClassicBrain::getConnectivityMatrix() {
+vector<vector<int>> MarkovBrain::getConnectivityMatrix() {
 	vector<vector<int>> M;
 	M.resize(nrOfBrainStates);
 	for (int i = 0; i < nrOfBrainStates; i++) {
@@ -159,11 +159,11 @@ vector<vector<int>> ClassicBrain::getConnectivityMatrix() {
 //  return allCodingRegions;
 //}
 
-int ClassicBrain::brainSize() {
+int MarkovBrain::brainSize() {
 	return (int) gates.size();
 }
 
-int ClassicBrain::numGates() {
+int MarkovBrain::numGates() {
 	return brainSize();
 }
 
