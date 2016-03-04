@@ -56,7 +56,7 @@ class MarkovBrain : public AbstractBrain {
 	MarkovBrain() = delete;
 
 	MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, int _nrOfStates = defaultNrOfBrainStates);
-	MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> startGenome, int _nrOfStates = defaultNrOfBrainStates);
+	MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrOfBrainStates = defaultNrOfBrainStates);
 	virtual ~MarkovBrain() = default;
 
 	virtual void update();
