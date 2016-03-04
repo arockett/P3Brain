@@ -144,10 +144,13 @@ int main(int argc, const char * argv[]) {
 			genome->fillRandom();
 			auto genomeHandler = genome->newHandler(genome);
 
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < 5; i++) {
 				genomeHandler->randomize();
 				genomeHandler->writeInt(43, 0, 255);
 				genomeHandler->writeInt(255 - 43, 0, 255);
+				genomeHandler->writeInt(1, 0, 255);
+				genomeHandler->writeInt(2, 0, 255);
+				genomeHandler->writeInt(3, 0, 255);
 			}
 
 			shared_ptr<Organism> org = make_shared<Organism>(progenitor, genome);
@@ -155,6 +158,26 @@ int main(int argc, const char * argv[]) {
 			population[population.size() - 1]->gender = Random::getInt(0, 1);  // assign a random gender to the new org
 		}
 		progenitor->kill();  // the progenitor has served it's purpose.
+
+/////// to test genome to brain conversion and coding regions, set popsize = 1 and uncomment the block below this comment
+//		shared_ptr<Organism> test_org = dynamic_pointer_cast<Organism>(population[0]);
+//		shared_ptr<Genome> test_genome = dynamic_pointer_cast<Genome>(test_org->genome);
+//		shared_ptr<MarkovBrain> test_brain = dynamic_pointer_cast<MarkovBrain>(test_org->brain);
+//
+//		cout << test_genome->genomeToStr();
+//
+//		for (int i = 0; i < 6; i++) {
+//			shared_ptr<Chromosome<int>> ch = dynamic_pointer_cast<Chromosome<int>>(test_genome->chromosomes[i]);
+//			cout << "chromosome " << i << endl;
+//			cout << ch->chromosomeToStr() << endl;
+//			cout << ch->codingRegionsToString() << endl;
+//		}
+//
+//		cout << endl << endl;
+//
+//		cout << test_brain->description();
+//		exit(1);
+/////// to test genome to brain conversion and coding regions, set popsize = 1 and uncomment the block above this comment
 
 		shared_ptr<Archivist> archivist;
 

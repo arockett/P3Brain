@@ -229,6 +229,8 @@ template<class T> class Chromosome : public AbstractChromosome {
 	virtual int size();
 	virtual vector<string> getFixedStats();
 	virtual vector<string> getStats();
+	virtual string codingRegionsToString();
+
 	//////////////////////////////
 	// MUTATION RELATED METHODS //
 	//////////////////////////////
@@ -248,24 +250,6 @@ template<class T> class Chromosome : public AbstractChromosome {
 	// delete the sites of this chromosome. Then set sites to a crossed over chromosome made up of parents
 	virtual void crossover(vector<shared_ptr<AbstractChromosome>> parents, int crossCount);
 };
-
-////////////////////////// now in .cpp
-//// SUPPORT FOR DOUBLE //
-//////////////////////////
-//
-//template<> inline void Chromosome<double>::fillRandom(int length) {
-//	sites.resize(length);
-//	for (int i = 0; i < length; i++) {
-//		sites[i] = Random::getDouble(0, alphabetSize);
-//	}
-//}
-//template<> inline void Chromosome<double>::fillRandom() {
-//	Chromosome<double>::fillRandom(sites.size());
-//}
-//
-//template<> inline void Chromosome<double>::mutatePoint() {
-//	sites[Random::getIndex(sites.size())] = Random::getDouble(alphabetSize);
-//}
 
 #endif /* defined(__BasicMarkovBrainTemplate__Chromosome__) */
 

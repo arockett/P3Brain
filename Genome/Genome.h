@@ -267,7 +267,7 @@ class Genome : public AbstractGenome {
 
 // Translation functions - convert genomes into usefull stuff
 
-	// convert a chromosome to a string
+	// convert a genome to a string
 	virtual string genomeToStr();
 
 }

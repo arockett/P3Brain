@@ -350,6 +350,12 @@ template<class T> void Chromosome<T>::crossover(vector<shared_ptr<AbstractChromo
 	//sites = dynamic_pointer_cast<Chromosome<T>>(parents[0])->sites; // uncomment to turn of crossover
 }
 
+
+template<class T> string Chromosome<T>::codingRegionsToString() {
+	return codingRegions.codingRegionsToString();
+}
+
+
 ////////////////////////
 // SUPPORT FOR DOUBLE //
 ////////////////////////
