@@ -122,7 +122,7 @@ int main(int argc, const char * argv[]) {
 		// a progenitor must exist - that is, one ancestor genome
 		Global::update = -1;  // before there was time, there was a progenitor
 		//shared_ptr<MarkovBrain> tesBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
-		auto initalChromosome = make_shared<Chromosome<int>>(Genome::initialChromosomeSize, 256);
+		auto initalChromosome = make_shared<Chromosome<bool>>(Genome::initialChromosomeSize, 2);
 		auto initalGenome = make_shared<Genome>(initalChromosome, Genome::initialChromosomes, Genome::initialPloidy);
 //		vector<shared_ptr<AbstractGenome>> genomes;
 //		for (int i = 0; i < 500; i++) {
@@ -219,6 +219,7 @@ int main(int argc, const char * argv[]) {
 	bool finished = false;  // when the archivist says we are done, we can stop!
 
 	while (!finished) {
+
 		world->evaluateFitness(group->population, false);  // evaluate each organism in the population using a World
 		cout << "  evaluation done\n";
 		finished = group->archive();  // save data, update memory and delete any unneeded data;

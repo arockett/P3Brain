@@ -221,11 +221,14 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 					break;
 				case 1:  //turn left
 					facing = turnLeft(facing);
+					score+=.001;
 					break;
 				case 2:  //turn right
 					facing = turnRight(facing);
+					score+=.001;
 					break;
 				case 3:  //move forward
+					score+=.02;
 					if (getGridValue(grid, moveOnGrid(currentLocation, facing)) != WALL) {  // if the proposed move is not a wall
 						if (getGridValue(grid, currentLocation) == EMPTY) {  // if the current location is empty
 							setGridValue(grid, currentLocation, Random::getInt(1, foodTypes));  // plant a red or blue food
