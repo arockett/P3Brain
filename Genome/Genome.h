@@ -77,6 +77,12 @@ class AbstractGenome {
 		//// no undefined action, this function must be defined
 		virtual int readInt(int valueMin, int valueMax, int code = -1, int CodingRegionIndex = 0) = 0;
 
+		virtual double readDouble(double valueMin, double valueMax, int code = -1, int CodingRegionIndex = 0){
+			cout << "ERROR: readDouble(double valueMin, double valueMax, int code = -1, int CodingRegionIndex = 0) in AbstractGenome::Handler was called!\n This has not been implemented yet the chromosome class you are using!\n";
+			exit(1);
+			return 0.0;
+		}
+
 		virtual void writeInt(int value, int valueMin, int valueMax) = 0;
 		virtual vector<vector<int>> readTable(vector<int> tableSize, vector<int> tableMaxSize, vector<int> valueRange, int code = -1, int CodingRegionIndex = 0) = 0;
 
@@ -89,7 +95,7 @@ class AbstractGenome {
 		virtual void printIndex() = 0;
 
 		virtual bool inTelomere(int length) {
-			return 0;
+			return false;
 		}
 
 		virtual void randomize() = 0;
@@ -188,6 +194,8 @@ class Genome : public AbstractGenome {
 		virtual void advanceChromosome();
 		virtual void printIndex();
 		virtual int readInt(int valueMin, int valueMax, int code = -1, int CodingRegionIndex = 0);
+		virtual double readDouble(double valueMin, double valueMax, int code = -1, int CodingRegionIndex = 0);
+
 		virtual void writeInt(int value, int valueMin, int valueMax);
 		// copy contents of this handler to "to"
 		virtual void copyTo(shared_ptr<AbstractGenome::Handler> to);

@@ -13,9 +13,9 @@
 
 vector<int> MarkovBrain::defaultNodeMap;
 
-int& MarkovBrain::defaultNrOfBrainStates = Parameters::register_parameter("brainSize", 15, "number of Brain Values", "BRAIN");
+int& MarkovBrain::defaultNrOfBrainStates = Parameters::register_parameter("brainSize", 15, "number of Brain Values", "BRAIN - MARKOV");
 
-bool& MarkovBrain::serialProcessing = Parameters::register_parameter("serialProcessing", false, "sets brains to overwrite... right?", "BRAIN");
+bool& MarkovBrain::serialProcessing = Parameters::register_parameter("serialProcessing", false, "sets brains to overwrite... right?", "BRAIN - MARKOV");
 
 MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, int _nrOfStates) {
 	GLB = _GLB;

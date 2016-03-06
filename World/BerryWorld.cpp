@@ -170,6 +170,7 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 		if (show) {
 			cout << "\n----------------------------\n";
 			cout << "\ngeneration update: " << Global::update << "  world update: " << t << "\n";
+			cout << "currentLocation: " << currentLocation.first << "," << currentLocation.second << "  :  " << facing << "\n";
 			cout << "inStates: ";
 			for (int i = 0; i < inputStatesCount; i++) {
 				cout << org->brain->getState(i);
@@ -177,7 +178,7 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 			cout << "\n\n  -- brain update --\n\n";
 		}
 
-		// inputStatesCount is not set to the first output Brain State Address. we will not move it until the next world update!
+		// inputStatesCount is now set to the first output Brain State Address. we will not move it until the next world update!
 		if (clearOutputs) {
 			org->brain->setState(inputStatesCount, 0.0);
 			org->brain->setState(inputStatesCount + 1, 0.0);

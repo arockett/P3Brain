@@ -119,10 +119,39 @@ int main(int argc, const char * argv[]) {
 	shared_ptr<Group> group;
 
 	{
+
+		shared_ptr<Archivist> archivist;
+
+		if (Archivist::Arch_outputMethodStr == "default") {
+			archivist = make_shared<Archivist>();
+		} else if (Archivist::Arch_outputMethodStr == "LODwAP") {
+			archivist = make_shared<LODwAP_Archivist>();
+		} else if (Archivist::Arch_outputMethodStr == "snapshot") {
+			archivist = make_shared<Snapshot_Archivist>();
+		} else if (Archivist::Arch_outputMethodStr == "SSwD") {
+			archivist = make_shared<SSwD_Archivist>();
+		} else {
+			cout << "\n\nERROR: Unrecognized archivist type in configuration!\n  \"" << Archivist::Arch_outputMethodStr << "\" is not defined.\n\nExiting.\n\n";
+			exit(1);
+		}
+
+		shared_ptr<BaseOptimizer> optimizer;
+
+		if (BaseOptimizer::Optimizer_MethodStr == "GA") {
+			optimizer = make_shared<GA_Optimizer>();
+		} else if (BaseOptimizer::Optimizer_MethodStr == "Tournament") {
+			optimizer = make_shared<TournamentOptimizer>();
+		} else if (BaseOptimizer::Optimizer_MethodStr == "Tournament2") {
+			optimizer = make_shared<Tournament2Optimizer>();
+		} else {
+			cout << "\n\nERROR: Unrecognized optimizer type in configuration!\n  \"" << BaseOptimizer::Optimizer_MethodStr << "\" is not defined.\n\nExiting.\n\n";
+			exit(1);
+		}
+
 		// a progenitor must exist - that is, one ancestor genome
 		Global::update = -1;  // before there was time, there was a progenitor
 		//shared_ptr<MarkovBrain> tesBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
-		auto initalChromosome = make_shared<Chromosome<bool>>(Genome::initialChromosomeSize, 2);
+		auto initalChromosome = make_shared<Chromosome<unsigned char>>(Genome::initialChromosomeSize, 256);
 		auto initalGenome = make_shared<Genome>(initalChromosome, Genome::initialChromosomes, Genome::initialPloidy);
 //		vector<shared_ptr<AbstractGenome>> genomes;
 //		for (int i = 0; i < 500; i++) {
@@ -135,7 +164,7 @@ int main(int argc, const char * argv[]) {
 //		exit(17);
 
 		//auto initalBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
-		auto initalBrain = make_shared<WireBrain>();
+		auto initalBrain = make_shared<WireBrain2>();
 		shared_ptr<Organism> progenitor = make_shared<Organism>(initalGenome, initalBrain);  // make a organism with a genome and brain (if you need to change the types here is where you do it)
 
 		Global::update = 0;  // the beginning of time - now we construct the first population
@@ -181,34 +210,7 @@ int main(int argc, const char * argv[]) {
 //		exit(1);
 /////// to test genome to brain conversion and coding regions, set popsize = 1 and uncomment the block above this comment
 
-		shared_ptr<Archivist> archivist;
 
-		if (Archivist::Arch_outputMethodStr == "default") {
-			archivist = make_shared<Archivist>();
-		}
-		if (Archivist::Arch_outputMethodStr == "LODwAP") {
-			archivist = make_shared<LODwAP_Archivist>();
-		}
-		if (Archivist::Arch_outputMethodStr == "snapshot") {
-			archivist = make_shared<Snapshot_Archivist>();
-		}
-		if (Archivist::Arch_outputMethodStr == "SSwD") {
-			archivist = make_shared<SSwD_Archivist>();
-		}
-
-		shared_ptr<BaseOptimizer> optimizer;
-
-		if (BaseOptimizer::Optimizer_MethodStr == "GA") {
-			optimizer = make_shared<GA_Optimizer>();
-		}
-		if (BaseOptimizer::Optimizer_MethodStr == "Tournament") {
-			optimizer = make_shared<TournamentOptimizer>();
-		}
-		if (BaseOptimizer::Optimizer_MethodStr == "Tournament2") {
-			optimizer = make_shared<Tournament2Optimizer>();
-		}
-
-		//optimizer = make_shared<BaseOptimizer>();
 		group = make_shared<Group>(population, optimizer, archivist);
 	}
 

@@ -51,7 +51,6 @@ void Genome::Handler::resetHandler() {
 	resetEOG();
 }
 
-
 // modulateIndex checks to see if the current chromosomeIndex and siteIndex are out of range. if they are
 // it uses readDirection to resolve them.	virtual void copyFrom(shared_ptr<Genome> from) {
 
@@ -161,6 +160,15 @@ int Genome::Handler::readInt(int valueMin, int valueMax, int code, int CodingReg
 	return value;
 }
 
+double Genome::Handler::readDouble(double valueMin, double valueMax, int code, int CodingRegionIndex) {
+	double value;
+	if (genome->chromosomes[chromosomeIndex]->siteToDouble(siteIndex, value, valueMin, valueMax, readDirection, code, CodingRegionIndex)) {
+		advanceChromosome();
+	}
+	return value;
+
+}
+
 void Genome::Handler::writeInt(int value, int valueMin, int valueMax) {
 	modulateIndex();
 	if (genome->chromosomes[chromosomeIndex]->writeInt(siteIndex, value, valueMin, valueMax, readDirection)) {
@@ -248,7 +256,7 @@ Genome::Genome(shared_ptr<AbstractChromosome> _chromosome, int chromosomeCount, 
 	recordDataMap();
 }
 
-shared_ptr<AbstractGenome::Handler> Genome::newHandler(shared_ptr<AbstractGenome> _genome, bool _readDirection){
+shared_ptr<AbstractGenome::Handler> Genome::newHandler(shared_ptr<AbstractGenome> _genome, bool _readDirection) {
 	////////////////////////////////////cout << "In Genome::newHandler()" << endl;
 	for (auto chromosome : chromosomes) {
 		if (chromosome->size() == 0) {
@@ -500,5 +508,4 @@ string Genome::genomeToStr() {
 	S = "\"[" + S + "]\"";
 	return S;
 }
-
 

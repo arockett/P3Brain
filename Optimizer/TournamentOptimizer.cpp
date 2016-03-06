@@ -23,6 +23,7 @@ using namespace std;
  * copy to the next generation and mutate the copy.
  */
 void TournamentOptimizer::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
+	//cout << "In TournamentOptimizer::makeNextGeneration\n";
 	vector<shared_ptr<Organism>> nextPopulation;
 
 	vector<double> Scores;
@@ -65,5 +66,7 @@ void TournamentOptimizer::makeNextGeneration(vector<shared_ptr<Organism>> &popul
 //		population.pop_back();
 //	}
 	population = nextPopulation;
+	//cout << "Leaving TournamentOptimizer::makeNextGeneration\n";
+
 
 }
