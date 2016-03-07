@@ -48,6 +48,19 @@ class BerryWorld : public World {
 	static double& rewardForFood7;
 	static double& rewardForFood8;
 
+	static double& rewardForTurn;
+	static double& rewardForMove;
+
+	static int& ratioFood0;
+	static int& ratioFood1;
+	static int& ratioFood2;
+	static int& ratioFood3;
+	static int& ratioFood4;
+	static int& ratioFood5;
+	static int& ratioFood6;
+	static int& ratioFood7;
+	static int& ratioFood8;
+
 	static int& WorldY;
 	static int& WorldX;
 	static bool& borderWalls;
@@ -61,8 +74,14 @@ class BerryWorld : public World {
 	static bool& senseWalls;
 	static bool& clearOutputs;
 
+	static int& replacement;
+
 	int inputStatesCount = 0;
 	int outputStatesCount = 0;
+
+	int foodRatioCount;  // sum of ratioFood for foods in use
+	vector<int> foodRatioLookup;
+	vector<double> foodRewards;
 
 	BerryWorld();
 
@@ -71,6 +90,46 @@ class BerryWorld : public World {
 	double testIndividual(shared_ptr<Organism> org, bool analyse, bool show);
 	double testIndividual(shared_ptr<Organism> org, bool analyse) {
 		return testIndividual(org, analyse, 0);
+	}
+
+	int pickFood(int lastfood) {
+		//cout << "In BerryWorld::pickFood(int lastfood)\n";
+		int lookup, counter, pick;
+		if (lastfood < 1) {  // if lastfood is < 0 (or was 0) then return a random food
+			lookup = Random::getInt(1, foodRatioCount);  // get a random int [1,sum of food ratios]
+			counter = foodRatioLookup[0];  // set the counter to the ratio of replace with empty (0)
+			pick = 0;  // set pick to empty (0)
+			while (counter < lookup) {
+				pick++;  // this is not our pick, so advance to the next pick and...
+				counter += foodRatioLookup[pick];  // add this new picks ratio to counter
+			}
+		} else {  // if given a last food, pick a food that is not that.
+			if (lastfood > foodTypes) {
+				cout << "ERROR: In BerryWorld::pickFood() - lastfood > foodTypes (i.e. last food eaten is not in foodTypes!)\nExiting.\n\n";
+				exit(1);
+			}
+			if (foodRatioCount - foodRatioLookup[lastfood] == 0){
+				cout << "ERROR: In BerryWorld::pickFood() - lastfood set, but there is only one foodType so pick can not be a diffrent foodType\n\nExiting";
+				exit(1);
+			}
+			lookup = Random::getInt(1, foodRatioCount - foodRatioLookup[lastfood]);  // get a random int [1,sum of food ratios] but leave out the ratio of last food
+			counter = foodRatioLookup[0];  // set the counter to the ratio of replace with empty (0)
+			pick = 0;  // set pick to empty (0)
+			if (lastfood == 0) {  // if the last food was empty...
+				counter = foodRatioLookup[1];  // set counter to ratio of food1 instead
+				pick = 1;  // set pick to food1 (1)
+			}
+			while (counter < lookup) {
+				pick++;  // this is not our pick, so advance to the next pick and...
+				if (pick == lastfood) {
+					pick++;  // if the new pick = lastfood, then skip it and...
+				}
+				counter += foodRatioLookup[pick];  // add this new picks ratio to counter
+			}
+		}
+		//cout << "  Leaving BerryWorld::pickFood(int lastfood)\n";
+		return pick;
+
 	}
 
 	// convert x,y into a grid index
@@ -119,17 +178,17 @@ class BerryWorld : public World {
 				if (borderWalls && (x == 0 || x == WorldX - 1 || y == 0 || y == WorldY - 1)) {
 					setGridValue(grid, { x, y }, WALL);  // place walls on edge
 				} else {
-					setGridValue(grid, { x, y }, Random::getInt(1, foodTypes));  // place random food where there is not a wall
+					setGridValue(grid, { x, y }, pickFood(-1));  // place random food where there is not a wall
 				}
 			}
 		}
 
-		if ((randomWalls >= WorldX * WorldY) && !borderWalls){
-			cout << "In BerryWorld::makeTestGrid() To many random walls... exiting!"<<endl;
+		if ((randomWalls >= WorldX * WorldY) && !borderWalls) {
+			cout << "In BerryWorld::makeTestGrid() To many random walls... exiting!" << endl;
 			exit(1);
 		}
-		if ((randomWalls >= (WorldX-2) * (WorldY-2)) && borderWalls){
-			cout << "In BerryWorld::makeTestGrid() To many random walls... exiting!"<<endl;
+		if ((randomWalls >= (WorldX - 2) * (WorldY - 2)) && borderWalls) {
+			cout << "In BerryWorld::makeTestGrid() To many random walls... exiting!" << endl;
 			exit(1);
 		}
 

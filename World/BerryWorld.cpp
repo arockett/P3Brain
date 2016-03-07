@@ -26,18 +26,32 @@ double& BerryWorld::rewardForFood6 = Parameters::register_parameter("BERRY_rewar
 double& BerryWorld::rewardForFood7 = Parameters::register_parameter("BERRY_rewardForFood7", 1.0, "reward for eating a Food7", "WORLD - BERRY");
 double& BerryWorld::rewardForFood8 = Parameters::register_parameter("BERRY_rewardForFood8", 1.0, "reward for eating a Food8", "WORLD - BERRY");
 
+double& BerryWorld::rewardForTurn = Parameters::register_parameter("BERRY_rewardForTurn", 0.0, "reward for turning", "WORLD - BERRY - ADVANCED");
+double& BerryWorld::rewardForMove = Parameters::register_parameter("BERRY_rewardForMove", 0.0, "reward for moving", "WORLD - BERRY - ADVANCED");
+
+int& BerryWorld::ratioFood0 = Parameters::register_parameter("BERRY_replacementRatioFood0", 0, "Relative likelihood to leave empty space empty", "WORLD - BERRY - ADVANCED");
+int& BerryWorld::ratioFood1 = Parameters::register_parameter("BERRY_replacementRatioFood1", 1, "Relative likelihood to place FOOD1", "WORLD - BERRY - ADVANCED");
+int& BerryWorld::ratioFood2 = Parameters::register_parameter("BERRY_replacementRatioFood2", 1, "Relative likelihood to place FOOD1", "WORLD - BERRY - ADVANCED");
+int& BerryWorld::ratioFood3 = Parameters::register_parameter("BERRY_replacementRatioFood3", 1, "Relative likelihood to place FOOD1", "WORLD - BERRY - ADVANCED");
+int& BerryWorld::ratioFood4 = Parameters::register_parameter("BERRY_replacementRatioFood4", 1, "Relative likelihood to place FOOD1", "WORLD - BERRY - ADVANCED");
+int& BerryWorld::ratioFood5 = Parameters::register_parameter("BERRY_replacementRatioFood5", 1, "Relative likelihood to place FOOD1", "WORLD - BERRY - ADVANCED");
+int& BerryWorld::ratioFood6 = Parameters::register_parameter("BERRY_replacementRatioFood6", 1, "Relative likelihood to place FOOD1", "WORLD - BERRY - ADVANCED");
+int& BerryWorld::ratioFood7 = Parameters::register_parameter("BERRY_replacementRatioFood7", 1, "Relative likelihood to place FOOD1", "WORLD - BERRY - ADVANCED");
+int& BerryWorld::ratioFood8 = Parameters::register_parameter("BERRY_replacementRatioFood8", 1, "Relative likelihood to place FOOD1", "WORLD - BERRY - ADVANCED");
+
 int& BerryWorld::WorldX = Parameters::register_parameter("BERRY_WorldX", 8, "world X size", "WORLD - BERRY");
 int& BerryWorld::WorldY = Parameters::register_parameter("BERRY_WorldY", 8, "world Y size", "WORLD - BERRY");
 bool& BerryWorld::borderWalls = Parameters::register_parameter("BERRY_makeBorderWalls", true, "if true world will have a bounding wall", "WORLD - BERRY");
-int& BerryWorld::randomWalls = Parameters::register_parameter("BERRY_makeRandomWalls", 0, "add this many walls to the world", "WORLD - BERRY");
+int& BerryWorld::randomWalls = Parameters::register_parameter("BERRY_makeRandomWalls", 0, "add this many walls to the world", "WORLD - BERRY - ADVANCED");
 
 bool& BerryWorld::clearOutputs = Parameters::register_parameter("BERRY_clearOutputs", false, "if true outputs will be cleared on each world update", "WORLD - BERRY");
 
-bool& BerryWorld::allowMoveAndEat = Parameters::register_parameter("BERRY_allowMoveAndEat", false, "if true, the brain can move and eat in the same world update", "WORLD - BERRY");
+bool& BerryWorld::allowMoveAndEat = Parameters::register_parameter("BERRY_allowMoveAndEat", false, "if true, the brain can move and eat in the same world update", "WORLD - BERRY - ADVANCED");
 bool& BerryWorld::senseDown = Parameters::register_parameter("BERRY_senseDown", true, "if true, Agent can sense what it's standing on", "WORLD - BERRY");
 bool& BerryWorld::senseFront = Parameters::register_parameter("BERRY_senseFront", true, "if true, Agent can sense what's in front of it", "WORLD - BERRY");
 bool& BerryWorld::senseFrontSides = Parameters::register_parameter("BERRY_senseFrontSides", true, "if true, Agent can sense what's in front to the left and right of it", "WORLD - BERRY");
 bool& BerryWorld::senseWalls = Parameters::register_parameter("BERRY_senseWalls", false, "if true, Agent can sense Walls", "WORLD - BERRY");
+int& BerryWorld::replacement = Parameters::register_parameter("BERRY_replacement", -1, "-1 = random, 0 = no replacement, 1 = replace other", "WORLD - BERRY - ADVANCED");
 
 BerryWorld::BerryWorld() {
 	senseWalls = senseWalls & (borderWalls | (randomWalls > 0));  // if there are no walls, there is no need to sense them!
@@ -54,6 +68,32 @@ BerryWorld::BerryWorld() {
 	}
 
 	cout << "  World using following BrainSates:\n    Inputs: 0 to " << inputStatesCount - 1 << "\n    Outputs: " << inputStatesCount << " to " << inputStatesCount + outputStatesCount - 1 << "\n";
+
+	foodRatioLookup.resize(9);  // stores reward of each type of food NOTE: food is indexed from 1 so 0th entry is chance to leave empty
+	foodRatioLookup[0] = ratioFood0;
+	foodRatioLookup[1] = ratioFood1;
+	foodRatioLookup[2] = ratioFood2;
+	foodRatioLookup[3] = ratioFood3;
+	foodRatioLookup[4] = ratioFood4;
+	foodRatioLookup[5] = ratioFood5;
+	foodRatioLookup[6] = ratioFood6;
+	foodRatioLookup[7] = ratioFood7;
+	foodRatioLookup[8] = ratioFood8;
+
+	for (int i = 0; i <= foodTypes; i++) {
+		foodRatioCount += foodRatioLookup[i];
+	}
+
+	foodRewards.resize(9);  // stores reward of each type of food NOTE: food is indexed from 1 so 0th entry is not used
+	foodRewards[1] = rewardForFood1;
+	foodRewards[2] = rewardForFood2;
+	foodRewards[3] = rewardForFood3;
+	foodRewards[4] = rewardForFood4;
+	foodRewards[5] = rewardForFood5;
+	foodRewards[6] = rewardForFood6;
+	foodRewards[7] = rewardForFood7;
+	foodRewards[8] = rewardForFood8;
+
 }
 
 void BerryWorld::printGrid(vector<int> grid, pair<int, int> loc, int facing) {
@@ -83,27 +123,36 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 	// organism starts in the center of the world, facing in a random direction.
 	pair<int, int> currentLocation = { Random::getIndex(WorldX), Random::getIndex(WorldY) };  // location of the organism
 	//currentLocation = { WorldX/2, WorldY/2 };  // location of the organism
-	while (getGridValue(grid, currentLocation) == WALL){
-		currentLocation = { Random::getIndex(WorldX), Random::getIndex(WorldY) }; //
+	while (getGridValue(grid, currentLocation) == WALL) {
+		currentLocation = {Random::getIndex(WorldX), Random::getIndex(WorldY)};  //
 	}
 	int facing = Random::getIndex(8);  // direction the agent is facing
+
+////////////////////////// uncomment to test world makeing and food picking
+//	printGrid(grid, currentLocation, facing);
+//	for (int x = 1; x < WorldX - 1; x++) {
+//		for (int y = 1; y < WorldY - 1; y++) {
+//			setGridValue(grid, { x, y }, pickFood(-1));
+//		}
+//	}
+//	cout << endl;
+//	printGrid(grid, currentLocation, facing);
+//	for (int x = 1; x < WorldX - 1; x++) {
+//		for (int y = 1; y < WorldY - 1; y++) {
+//			setGridValue(grid, { x, y }, pickFood(-1));
+//		}
+//	}
+//	cout << endl;
+//	printGrid(grid, currentLocation, facing);
+//
+//	exit(1);
+////////////////////////// uncomment to test world makeing and food picking
 
 	// set up to track what food is eaten
 	int switches = 0;  // number of times organism has switched food source
 	int lastFood = -1;  //nothing has been eaten yet!
 	vector<int> eaten;  // stores number of each type of food was eaten in total for this test NOTE: food is indexed from 1 so 0th entry is not used
 	eaten.resize(foodTypes + 1);
-
-	vector<double> foodRewards;
-	foodRewards.resize(9);  // stores reward of each type of food NOTE: food is indexed from 1 so 0th entry is not used
-	foodRewards[1] = rewardForFood1;
-	foodRewards[2] = rewardForFood2;
-	foodRewards[3] = rewardForFood3;
-	foodRewards[4] = rewardForFood4;
-	foodRewards[5] = rewardForFood5;
-	foodRewards[6] = rewardForFood6;
-	foodRewards[7] = rewardForFood7;
-	foodRewards[8] = rewardForFood8;
 
 	org->dataMap.Clear("foodList");  // since foodList is built with Append, if an org lives for more then one "generation update" it's foodList must be cleared
 
@@ -222,17 +271,22 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 					break;
 				case 1:  //turn left
 					facing = turnLeft(facing);
-					score+=.001;
+					score += rewardForTurn;
 					break;
 				case 2:  //turn right
 					facing = turnRight(facing);
-					score+=.001;
+					score += rewardForTurn;
 					break;
 				case 3:  //move forward
-					score+=.02;
 					if (getGridValue(grid, moveOnGrid(currentLocation, facing)) != WALL) {  // if the proposed move is not a wall
+					score += rewardForMove;
 						if (getGridValue(grid, currentLocation) == EMPTY) {  // if the current location is empty
-							setGridValue(grid, currentLocation, Random::getInt(1, foodTypes));  // plant a red or blue food
+							if (replacement == -1) {
+								setGridValue(grid, currentLocation, pickFood(-1));  // plant a random food
+							} else if (replacement == 1) {
+								setGridValue(grid, currentLocation, pickFood(lastFood));  // plant a different
+							}
+							// if 0, no replacment/do nothing
 						}
 						currentLocation = moveOnGrid(currentLocation, facing);
 					}
