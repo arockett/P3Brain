@@ -60,6 +60,7 @@ int main(int argc, const char * argv[]) {
 	} else {
 		Random::getCommonGenerator().seed(Global::randomSeed);
 	}
+
 	World *world = (World*) new BerryWorld();  //new World();
 	//World *world = (World*) new World();  //new World();
 
@@ -173,16 +174,14 @@ int main(int argc, const char * argv[]) {
 		for (int i = 0; i < Global::popSize; i++) {
 			shared_ptr<Genome> genome = make_shared<Genome>(initalChromosome, Genome::initialChromosomes, Genome::initialPloidy);
 			genome->fillRandom();
-//			auto genomeHandler = genome->newHandler(genome);
-//
-//			for (int i = 0; i < 5; i++) {
-//				genomeHandler->randomize();
-//				genomeHandler->writeInt(43, 0, 255);
-//				genomeHandler->writeInt(255 - 43, 0, 255);
-//				genomeHandler->writeInt(1, 0, 255);
-//				genomeHandler->writeInt(2, 0, 255);
-//				genomeHandler->writeInt(3, 0, 255);
-//			}
+
+			auto genomeHandler = genome->newHandler(genome);
+
+			for (int i = 0; i < 5; i++) {
+				genomeHandler->randomize();
+				genomeHandler->writeInt(43, 0, 255);
+				genomeHandler->writeInt(255 - 43, 0, 255);
+			}
 
 			shared_ptr<Organism> org = make_shared<Organism>(progenitor, genome);
 			population.push_back(org);  // add a new org to population using progenitors template and a new random genome

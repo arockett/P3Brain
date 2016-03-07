@@ -16,7 +16,7 @@
 double& BerryWorld::TSK = Parameters::register_parameter("BERRY_taskSwitchingCost", 1.4, "cost to change food sources", "WORLD - BERRY");
 int& BerryWorld::worldUpdates = Parameters::register_parameter("BERRY_WorldUpdates", 400, "amount of time an brain is tested", "WORLD - BERRY");
 
-int& BerryWorld::foodTypes = Parameters::register_parameter("BERRY_foodSourceTypes", 2, "number of types of food", "WORLD - BERRY");
+int& BerryWorld::foodTypes = Parameters::register_parameter("BERRY_foodTypes", 2, "number of types of food", "WORLD - BERRY");
 double& BerryWorld::rewardForFood1 = Parameters::register_parameter("BERRY_rewardForFood1", 1.0, "reward for eating a Food1", "WORLD - BERRY");
 double& BerryWorld::rewardForFood2 = Parameters::register_parameter("BERRY_rewardForFood2", 1.0, "reward for eating a Food2", "WORLD - BERRY");
 double& BerryWorld::rewardForFood3 = Parameters::register_parameter("BERRY_rewardForFood3", 1.0, "reward for eating a Food3", "WORLD - BERRY");
@@ -54,6 +54,11 @@ bool& BerryWorld::senseWalls = Parameters::register_parameter("BERRY_senseWalls"
 int& BerryWorld::replacement = Parameters::register_parameter("BERRY_replacement", -1, "-1 = random, 0 = no replacement, 1 = replace other", "WORLD - BERRY - ADVANCED");
 
 BerryWorld::BerryWorld() {
+
+	if (foodTypes < 1 || foodTypes > 8){
+		cout << "In BerryWorld you either have too few or too many foodTypes (must be >0 and <=8)\n\nExiting\n\n";
+		exit(1);
+	}
 	senseWalls = senseWalls & (borderWalls | (randomWalls > 0));  // if there are no walls, there is no need to sense them!
 
 	outputStatesCount = 3;  // number of brain states used for output, 2 for move, 1 for eat
@@ -67,8 +72,16 @@ BerryWorld::BerryWorld() {
 		// sense down * types of food, same for senseFront, same for senseFrontSides, but there are 2
 	}
 
-	cout << "  World using following BrainSates:\n    Inputs: 0 to " << inputStatesCount - 1 << "\n    Outputs: " << inputStatesCount << " to " << inputStatesCount + outputStatesCount - 1 << "\n";
 
+	cout << "BerryWorld requires brains with at least " << inputStatesCount + outputStatesCount << " nodes.\n";
+	if (inputStatesCount == 0){
+		cout << "    " << inputStatesCount << " Inputs\t No Inputs\n";
+		cout << "    " << outputStatesCount << " Outputs\t nodes 0 to " << outputStatesCount - 1 << "\n";
+	} else {
+		cout << "    " << inputStatesCount << " Inputs\t nodes 0 to " << inputStatesCount - 1 << "\n";
+		cout << "    " << outputStatesCount << " Outputs\t nodes " << inputStatesCount << " to " <<  inputStatesCount + outputStatesCount - 1 << "\n";
+
+	}
 	foodRatioLookup.resize(9);  // stores reward of each type of food NOTE: food is indexed from 1 so 0th entry is chance to leave empty
 	foodRatioLookup[0] = ratioFood0;
 	foodRatioLookup[1] = ratioFood1;

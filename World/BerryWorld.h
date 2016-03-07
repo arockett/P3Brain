@@ -87,10 +87,7 @@ class BerryWorld : public World {
 
 //  double testIndividual(shared_ptr<Organism> org, bool analyse);
 
-	double testIndividual(shared_ptr<Organism> org, bool analyse, bool show);
-	double testIndividual(shared_ptr<Organism> org, bool analyse) {
-		return testIndividual(org, analyse, 0);
-	}
+	double testIndividual(shared_ptr<Organism> org, bool analyse, bool show = 0);
 
 	int pickFood(int lastfood) {
 		//cout << "In BerryWorld::pickFood(int lastfood)\n";

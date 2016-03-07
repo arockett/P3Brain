@@ -199,14 +199,14 @@ void Genome::Handler::randomize() {
 	siteIndex = Random::getIndex(genome->chromosomes[chromosomeIndex]->size());
 }
 
-vector<vector<int>> Genome::Handler::readTable(vector<int> tableSize, vector<int> tableMaxSize, vector<int> valueRange, int code, int CodingRegionIndex) {
+vector<vector<int>> Genome::Handler::readTable(pair<int,int> tableSize, pair<int,int> tableMaxSize, pair<int,int> valueRange, int code, int CodingRegionIndex) {
 	vector<vector<int>> table;
 	int x = 0;
 	int y = 0;
-	int Y = tableSize[0];
-	int X = tableSize[1];
-	int maxY = tableMaxSize[0];
-	int maxX = tableMaxSize[1];
+	int Y = tableSize.first;
+	int X = tableSize.second;
+	int maxY = tableMaxSize.first;
+	int maxX = tableMaxSize.second;
 
 	table.resize(Y);  // set the number of rows in the table
 
@@ -214,15 +214,15 @@ vector<vector<int>> Genome::Handler::readTable(vector<int> tableSize, vector<int
 		table[y].resize(X);  // set the number of columns in this row
 		for (x = 0; x < X; x++) {
 			//table[y][x] = (Type) (sites[index]);
-			table[y][x] = readInt(valueRange[0], valueRange[1], code, CodingRegionIndex);
+			table[y][x] = readInt(valueRange.first, valueRange.second, code, CodingRegionIndex);
 		}
 		for (; x < maxX; x++) {
-			readInt(valueRange[0], valueRange[1]);  // advance genomeIndex to account for unused entries in the max sized table for this row
+			readInt(valueRange.first, valueRange.second);  // advance genomeIndex to account for unused entries in the max sized table for this row
 		}
 	}
 	for (; y < (maxY); y++) {
 		for (x = 0; x < maxX; x++) {
-			readInt(valueRange[0], valueRange[1]);  // advance to account for unused rows
+			readInt(valueRange.first, valueRange.second);  // advance to account for unused rows
 		}
 	}
 	return table;

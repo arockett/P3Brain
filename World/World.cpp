@@ -36,8 +36,13 @@ void World::evaluateFitness(vector<shared_ptr<Organism>> population, bool analys
 	cout << "\n";
 }
 
-double World::testIndividual(shared_ptr<Organism> org, bool analyse) {
-	return 1.0;
+double World::testIndividual(shared_ptr<Organism> org, bool analyse, bool show) {
+	org->brain->resetBrain();
+	org->brain->update();
+	double w=0.0;
+	for(int i=0;i < org->brain->nrOfBrainStates;i++)
+	w+=(double)(((int)org->brain->getState(i))&1);
+	return w*w;
 }
 
 ///* *** Example World Implementation *** */

@@ -15,6 +15,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <utility>
 
 #include "Chromosome.h"
 
@@ -37,7 +38,7 @@ class AbstractGenome {
 	class Handler {
  	public:
 		//shared_ptr<AbstractGenome> genome;
-		int readDirection;  // true = forward, false = backwards
+		bool readDirection;  // true = forward, false = backwards
 		bool EOG;  // end of genome
 
 		Handler() {
@@ -45,7 +46,7 @@ class AbstractGenome {
 			EOG = true;
 		}
 
-		Handler(shared_ptr<AbstractGenome> _genome, bool _readDirection = 1) {
+		Handler(shared_ptr<AbstractGenome> _genome, bool _readDirection = true) {
 			readDirection = _readDirection;
 			EOG = true;
 		}
@@ -62,12 +63,7 @@ class AbstractGenome {
 			readDirection = !readDirection;
 		}
 
-		virtual void resetHandler() {
-			if (readDirection) {  // if reading forward
-			} else {  // if reading backwards
-			}
-			resetEOG();
-		}
+		virtual void resetHandler() = 0;
 
 		virtual ~Handler() {
 		}
@@ -77,14 +73,14 @@ class AbstractGenome {
 		//// no undefined action, this function must be defined
 		virtual int readInt(int valueMin, int valueMax, int code = -1, int CodingRegionIndex = 0) = 0;
 
-		virtual double readDouble(double valueMin, double valueMax, int code = -1, int CodingRegionIndex = 0){
+		virtual double readDouble(double valueMin, double valueMax, int code = -1, int CodingRegionIndex = 0) {
 			cout << "ERROR: readDouble(double valueMin, double valueMax, int code = -1, int CodingRegionIndex = 0) in AbstractGenome::Handler was called!\n This has not been implemented yet the chromosome class you are using!\n";
 			exit(1);
 			return 0.0;
 		}
 
 		virtual void writeInt(int value, int valueMin, int valueMax) = 0;
-		virtual vector<vector<int>> readTable(vector<int> tableSize, vector<int> tableMaxSize, vector<int> valueRange, int code = -1, int CodingRegionIndex = 0) = 0;
+		virtual vector<vector<int>> readTable(pair<int,int> tableSize, pair<int,int> tableMaxSize, pair<int,int> valueRange, int code = -1, int CodingRegionIndex = 0)=0;
 
 		virtual void copyTo(shared_ptr<Handler> to) = 0;
 
@@ -167,6 +163,8 @@ class Genome : public AbstractGenome {
 		int siteIndex;
 		int chromosomeIndex;
 
+		Handler() = delete;
+
 		Handler(shared_ptr<AbstractGenome> _genome, bool _readDirection = 1);
 		virtual ~Handler() = default;
 
@@ -203,7 +201,7 @@ class Genome : public AbstractGenome {
 		virtual bool inTelomere(int length);
 		// move this handler to a random location in genome
 		virtual void randomize();
-		virtual vector<vector<int>> readTable(vector<int> tableSize, vector<int> tableMaxSize, vector<int> valueRange, int code = -1, int CodingRegionIndex = 0);
+		virtual vector<vector<int>> readTable(pair<int,int> tableSize, pair<int,int> tableMaxSize, pair<int,int> valueRange, int code = -1, int CodingRegionIndex = 0);
 
 	};
  public:
