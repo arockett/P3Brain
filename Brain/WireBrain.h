@@ -137,7 +137,7 @@ class WireBrain : public AbstractBrain {
 
 	virtual ~WireBrain() = default;
 
-	virtual shared_ptr<AbstractBrain> makeBrainFromGenome(shared_ptr<AbstractGenome> _genome) {
+	virtual shared_ptr<AbstractBrain> makeBrainFromGenome(shared_ptr<AbstractGenome> _genome) override{
 		shared_ptr<WireBrain> newBrain = make_shared<WireBrain>(_genome, defaultNrOfBrainNodes);
 		return newBrain;
 	}
@@ -203,7 +203,7 @@ class WireBrain : public AbstractBrain {
 
 	}
 
-	virtual void update() {
+	virtual void update() override{
 		//cout << "in update()\n";
 		for (int i = 0; i < (int) nodes.size(); i++) {  // set up
 			nodesNext[i] = 0;  // reset nodesNext
@@ -238,7 +238,7 @@ class WireBrain : public AbstractBrain {
 		//cout << "\n\n";
 	}
 
-	virtual string description() {
+	virtual string description() override{
 		int w = 0;
 		int inOutSpacing = width / (int) inputCells.size();  // space between inputs and outputs
 		for (int i = 0; i < width; i++) {
@@ -267,15 +267,15 @@ class WireBrain : public AbstractBrain {
 		cout << endl;
 		return "WireBrain\n";
 	}
-	virtual vector<string> getStats() {
+	virtual vector<string> getStats() override{
 		vector<string> stats;
 		return stats;
 	}
-	virtual void resetBrain() {
+	virtual void resetBrain() override{
 	}
 
  public:
-	inline void setState(const int& state, const double& value) {
+	inline void setState(const int& state, const double& value) override{
 		if (state < (int) nodes.size()) {
 			nodes[state] = value;
 		} else {
@@ -283,7 +283,7 @@ class WireBrain : public AbstractBrain {
 			exit(1);
 		}
 	}
-	inline double getState(const int& state) {
+	inline double getState(const int& state) override{
 		if (state < (int) nodes.size()) {
 			return nodes[state];
 		} else {
@@ -409,7 +409,7 @@ class WireBrain2 : public AbstractBrain {
 
 	virtual ~WireBrain2() = default;
 
-	virtual shared_ptr<AbstractBrain> makeBrainFromGenome(shared_ptr<AbstractGenome> _genome) {
+	virtual shared_ptr<AbstractBrain> makeBrainFromGenome(shared_ptr<AbstractGenome> _genome) override{
 		shared_ptr<WireBrain2> newBrain = make_shared<WireBrain2>(_genome, defaultNrOfBrainNodes);
 		return newBrain;
 	}
@@ -475,7 +475,7 @@ class WireBrain2 : public AbstractBrain {
 
 	}
 
-	virtual void update() {
+	virtual void update() override{
 		//cout << "in update()\n";
 		for (auto w : wireAddresses) {  // clear out anything in charged from last update
 			allCells[w] = 1;
@@ -508,7 +508,7 @@ class WireBrain2 : public AbstractBrain {
 		//cout << "\n\n";
 	}
 
-	virtual string description() {
+	virtual string description() override{
 		int w = 0;
 		int d = 0;
 		int inOutSpacing = worldConnectionsSeparation;  // space between inputs and outputs
@@ -545,15 +545,15 @@ class WireBrain2 : public AbstractBrain {
 		cout << endl;
 		return "WireBrain\n";
 	}
-	virtual vector<string> getStats() {
+	virtual vector<string> getStats() override{
 		vector<string> stats;
 		return stats;
 	}
-	virtual void resetBrain() {
+	virtual void resetBrain() override{
 	}
 
  public:
-	inline void setState(const int& state, const double& value) {
+	inline void setState(const int& state, const double& value) override{
 		if (state < (int) nodes.size()) {
 			nodes[state] = value;
 		} else {
@@ -561,7 +561,7 @@ class WireBrain2 : public AbstractBrain {
 			exit(1);
 		}
 	}
-	inline double getState(const int& state) {
+	inline double getState(const int& state) override{
 		if (state < (int) nodes.size()) {
 			return nodes[state];
 		} else {

@@ -108,9 +108,9 @@ class ProbabilisticGate : public Gate {  //conventional probabilistic gate
 
 	virtual ~ProbabilisticGate() = default;
 
-	virtual void update(vector<double> & states, vector<double> & nextStates);
+	virtual void update(vector<double> & states, vector<double> & nextStates) override;
 
-	virtual string description();
+	virtual string description() override;
 
 };
 
@@ -121,11 +121,11 @@ class DeterministicGate : public Gate {
 	DeterministicGate() = delete;
 	DeterministicGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
 	virtual ~DeterministicGate() = default;
-	virtual void update(vector<double> & states, vector<double> & nextStates);
+	virtual void update(vector<double> & states, vector<double> & nextStates) override;
 
 	void setupForBits(int* Ins, int nrOfIns, int Out, int logic);
 
-	virtual string description();
+	virtual string description() override;
 
 	//double voidOutput;
 };
@@ -140,8 +140,8 @@ class FixedEpsilonGate : public DeterministicGate {
 	FixedEpsilonGate() = delete;
 	FixedEpsilonGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
 	virtual ~FixedEpsilonGate() = default;
-	virtual void update(vector<double> & states, vector<double> & nextStates);
-	virtual string description();
+	virtual void update(vector<double> & states, vector<double> & nextStates) override;
+	virtual string description() override;
 };
 
 class VoidGate : public DeterministicGate {
@@ -154,8 +154,8 @@ class VoidGate : public DeterministicGate {
 	VoidGate() = delete;
 	VoidGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
 	virtual ~VoidGate() = default;
-	virtual void update(vector<double> & states, vector<double> & nextStates);
-	virtual string description();
+	virtual void update(vector<double> & states, vector<double> & nextStates) override;
+	virtual string description() override;
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Gate__) */

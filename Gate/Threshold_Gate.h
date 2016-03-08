@@ -19,8 +19,8 @@ class Thresholdgate : public Gate {
 	Thresholdgate() = delete;
 	Thresholdgate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
 	virtual ~Thresholdgate() = default;
-	virtual void update(vector<double> & states, vector<double> & nextStates);
-	virtual string description();
+	virtual void update(vector<double> & states, vector<double> & nextStates) override;
+	virtual string description() override;
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Threshold_Gate__) */

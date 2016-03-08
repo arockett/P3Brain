@@ -127,7 +127,7 @@ class AbstractGenome {
 	virtual void loadGenome(string fileName, string key, string keyValue) {
 	}
 
-	virtual void loadGenomes(string fileName, vector<shared_ptr<AbstractGenome>> genomes) {
+	virtual void loadGenomes(string fileName, vector<shared_ptr<AbstractGenome>> &genomes) {
 	}
 
 	virtual bool isEmpty() = 0;
@@ -168,7 +168,7 @@ class Genome : public AbstractGenome {
 		Handler(shared_ptr<AbstractGenome> _genome, bool _readDirection = 1);
 		virtual ~Handler() = default;
 
-		virtual void resetHandler();
+		virtual void resetHandler() override;
 
 		// modulateIndex checks to see if the current chromosomeIndex and siteIndex are out of range. if they are
 		// it uses readDirection to resolve them.	virtual void copyFrom(shared_ptr<Genome> from) {
@@ -188,20 +188,20 @@ class Genome : public AbstractGenome {
 		virtual void advanceIndex(int distance = 1);
 
 		// returns true if this Handler has reached the end of genome (or start if direction is backwards).
-		virtual bool atEOG();
+		virtual bool atEOG() override;
 		virtual void advanceChromosome();
-		virtual void printIndex();
-		virtual int readInt(int valueMin, int valueMax, int code = -1, int CodingRegionIndex = 0);
-		virtual double readDouble(double valueMin, double valueMax, int code = -1, int CodingRegionIndex = 0);
+		virtual void printIndex() override;
+		virtual int readInt(int valueMin, int valueMax, int code = -1, int CodingRegionIndex = 0) override;
+		virtual double readDouble(double valueMin, double valueMax, int code = -1, int CodingRegionIndex = 0) override;
 
-		virtual void writeInt(int value, int valueMin, int valueMax);
+		virtual void writeInt(int value, int valueMin, int valueMax) override;
 		// copy contents of this handler to "to"
-		virtual void copyTo(shared_ptr<AbstractGenome::Handler> to);
+		virtual void copyTo(shared_ptr<AbstractGenome::Handler> to) override;
 		// true if handler is within length sites from end of a chromosome
-		virtual bool inTelomere(int length);
+		virtual bool inTelomere(int length) override;
 		// move this handler to a random location in genome
-		virtual void randomize();
-		virtual vector<vector<int>> readTable(pair<int,int> tableSize, pair<int,int> tableMaxSize, pair<int,int> valueRange, int code = -1, int CodingRegionIndex = 0);
+		virtual void randomize() override;
+		virtual vector<vector<int>> readTable(pair<int,int> tableSize, pair<int,int> tableMaxSize, pair<int,int> valueRange, int code = -1, int CodingRegionIndex = 0) override;
 
 	};
  public:
@@ -217,7 +217,7 @@ class Genome : public AbstractGenome {
 	virtual shared_ptr<AbstractGenome::Handler> newHandler(shared_ptr<AbstractGenome> _genome, bool _readDirection = true) override;
 
 	// randomize this genomes contents
-	virtual void fillRandom();
+	virtual void fillRandom() override;
 
 	// fill all sites of this genome with ascending values
 	// This function is to make testing easy.
@@ -232,20 +232,20 @@ class Genome : public AbstractGenome {
 
 // copy the contents of another genome to this genome
 // no undefined action, this function must be defined
-	virtual void copyFrom(shared_ptr<AbstractGenome> from);
+	virtual void copyFrom(shared_ptr<AbstractGenome> from) override;
 
 // Mutation functions
 
 	virtual int countSites();
 
-	virtual bool isEmpty();
+	virtual bool isEmpty() override;
 
 	// apply mutations to this genome
-	virtual void mutate();
+	virtual void mutate() override;
 
 	// make a mutated genome. from this genome
 	// the undefined action is to return a new genome
-	virtual shared_ptr<AbstractGenome> makeMutatedGenome(shared_ptr<AbstractGenome> parent);
+	virtual shared_ptr<AbstractGenome> makeMutatedGenome(shared_ptr<AbstractGenome> parent) override;
 
 	// make a mutated genome from a vector or genomes
 	// inherit the ParamatersTable from the 0th parent
@@ -254,19 +254,19 @@ class Genome : public AbstractGenome {
 	// each parents 0 chromosome is crossed to make a new 0 chromosome, then each parents 1 chromosome...
 	// if ploidy > 1 then the number of parents must match ploidy (this may be extended in the future)
 	// in this case, each parent crosses all of its chromosomes and contributs the result as a new chromosome
-	virtual shared_ptr<AbstractGenome> makeMutatedGenome(vector<shared_ptr<AbstractGenome>> parents);
+	virtual shared_ptr<AbstractGenome> makeMutatedGenome(vector<shared_ptr<AbstractGenome>> parents) override;
 
 // IO and Data Management functions
 
 // gets data about genome which can be added to a data map
 // data is in pairs of strings (key, value)
 // the undefined action is to return an empty vector
-	virtual vector<string> getStats();
+	virtual vector<string> getStats() override;
 
 	virtual void recordDataMap();
 
 	// load all genomes from a file
-	virtual void loadGenomes(string fileName, vector<shared_ptr<AbstractGenome>> &genomes);
+	virtual void loadGenomes(string fileName, vector<shared_ptr<AbstractGenome>> &genomes) override;
 // load a genome from CSV file with headers - will return genome from saved organism with key / keyvalue pair
 // the undefined action is to take no action
 //	virtual void loadGenome(string fileName, string key, string keyValue);
@@ -274,7 +274,7 @@ class Genome : public AbstractGenome {
 // Translation functions - convert genomes into usefull stuff
 
 	// convert a genome to a string
-	virtual string genomeToStr();
+	virtual string genomeToStr() override;
 
 }
 ;

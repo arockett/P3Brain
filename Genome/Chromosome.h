@@ -176,7 +176,7 @@ template<class T> class Chromosome : public AbstractChromosome {
 
 	// insures that a site index is valid, if in index is > sites.size(), mod it.
 	// return true if siteIndex went out of range
-	virtual inline bool modulateIndex(int &siteIndex) {
+	virtual inline bool modulateIndex(int &siteIndex) override{
 		if (siteIndex >= (int)sites.size() || siteIndex<0) {
 			siteIndex = loopMod(siteIndex,(int)sites.size());
 			return true;
@@ -186,7 +186,7 @@ template<class T> class Chromosome : public AbstractChromosome {
 
 	// advance or reverse (if readDirection = false) a site index 1 or distance sites and check that new index is valid
 	// return true if siteIndex went out of range
-	virtual inline bool advanceIndex(int &siteIndex, bool readDirection = 1, int distance = 1) {
+	virtual inline bool advanceIndex(int &siteIndex, bool readDirection = 1, int distance = 1) override{
 		siteIndex += (readDirection)?distance:(-1*distance);  //move index
 		return modulateIndex(siteIndex);// confirm that new index is in range
 	}
@@ -194,21 +194,21 @@ template<class T> class Chromosome : public AbstractChromosome {
 	// read an int value in range [valueMin,valueMax] from chromosome starting at index.
 	// will use as many sites as needed. works in base alphabetSize
 	// return true if siteIndex went out of range
-	virtual bool readInt(int &siteIndex, int &value, int valueMin, int valueMax, bool readDirection, int code = -1, int CodingRegionIndex = 0);
+	virtual bool readInt(int &siteIndex, int &value, int valueMin, int valueMax, bool readDirection, int code = -1, int CodingRegionIndex = 0) override;
 
 	// writes a value into a chromosome, uses a number of sites baised on valueMin and valueMax);
 	// return true if siteIndex went out of range
-	virtual bool writeInt(int &siteIndex, int value, int valueMin, int valueMax, bool readDirection);
+	virtual bool writeInt(int &siteIndex, int value, int valueMin, int valueMax, bool readDirection) override;
 	// read one site of type T
 	// return true if siteIndex went out of range
 	virtual bool readSite(int &siteIndex, T &value, bool readDirection, int code = -1, int CodingRegionIndex = 0);
 
 	// scale value using valueMin and valueMax to alphabetSize and write at siteIndex
 	// value - MIN(valueMin,valueMax) must be < ABS(valueMax - valueMin)
-	virtual bool writeDouble(int &siteIndex, double value, double valueMin, double valueMax, bool readDirection);
+	virtual bool writeDouble(int &siteIndex, double value, double valueMin, double valueMax, bool readDirection) override;
 
 	// this is a scaling function - while it will work with other types it should only be used with double and float
-	virtual bool siteToDouble(int &siteIndex, double &value, double valueMin, double valueMax, bool readDirection, int code = -1, int CodingRegionIndex = 0);
+	virtual bool siteToDouble(int &siteIndex, double &value, double valueMin, double valueMax, bool readDirection, int code = -1, int CodingRegionIndex = 0) override;
 
 	// resize a chromosome to length and fill will values from alphabet
 	virtual void fillRandom(int length) override;
@@ -222,13 +222,13 @@ template<class T> class Chromosome : public AbstractChromosome {
 	// This function is to make testing easy.
 	virtual void fillConstant(const int value) override;
 
-	virtual void readChromosomeFromSS(std::stringstream &ss, int _chromosomeLength);
+	virtual void readChromosomeFromSS(std::stringstream &ss, int _chromosomeLength) override;
 	// convert a chromosome to a string
-	virtual string chromosomeToStr();
-	virtual void resize(int size);
-	virtual int size();
-	virtual vector<string> getFixedStats();
-	virtual vector<string> getStats();
+	virtual string chromosomeToStr() override;
+	virtual void resize(int size) override;
+	virtual int size() override;
+	virtual vector<string> getFixedStats() override;
+	virtual vector<string> getStats() override;
 	virtual string codingRegionsToString();
 
 	//////////////////////////////
@@ -238,17 +238,17 @@ template<class T> class Chromosome : public AbstractChromosome {
 	// create a new chromosome with a copied peice of this chromosome. The size of the copy
 	// will be random between minSize and maxSize. the copy location will be determined randomly
 	// but will at lease segmentSize before the end of the chromosome.
-	virtual shared_ptr<AbstractChromosome> getSegment(int minSize, int maxSize);
+	virtual shared_ptr<AbstractChromosome> getSegment(int minSize, int maxSize) override;
 	// insert from segement into this chromosome. The insertion location is random.
-	virtual void insertSegment(shared_ptr<AbstractChromosome> segment);
-	virtual void mutatePoint();
+	virtual void insertSegment(shared_ptr<AbstractChromosome> segment) override;
+	virtual void mutatePoint() override;
 	// mutate chromosome by getting a copy of a segment of this chromosome and
 	// inserting that segment randomly into this chromosome
-	virtual void mutateCopy(int minSize, int maxSize, int chromosomeSizeMax);
+	virtual void mutateCopy(int minSize, int maxSize, int chromosomeSizeMax) override;
 	// delete a random segement from the chromosome
-	virtual void mutateDelete(int minSize, int maxSize, int chromosomeSizeMin);
+	virtual void mutateDelete(int minSize, int maxSize, int chromosomeSizeMin) override;
 	// delete the sites of this chromosome. Then set sites to a crossed over chromosome made up of parents
-	virtual void crossover(vector<shared_ptr<AbstractChromosome>> parents, int crossCount);
+	virtual void crossover(vector<shared_ptr<AbstractChromosome>> parents, int crossCount) override;
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Chromosome__) */

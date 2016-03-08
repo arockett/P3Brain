@@ -38,7 +38,7 @@ class Classic_GateListBuilder : public Base_GateListBuilder {
 	Classic_GateListBuilder() = default;
 	virtual ~Classic_GateListBuilder() = default;
 
-	virtual vector<shared_ptr<Gate>> buildGateList(shared_ptr<AbstractGenome> genome, int nrOfBrainStates);
+	virtual vector<shared_ptr<Gate>> buildGateList(shared_ptr<AbstractGenome> genome, int nrOfBrainStates) override;
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__GateListBuilder__) */

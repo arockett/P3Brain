@@ -59,18 +59,18 @@ class MarkovBrain : public AbstractBrain {
 	MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrOfBrainStates = defaultNrOfBrainStates);
 	virtual ~MarkovBrain() = default;
 
-	virtual void update();
+	virtual void update() override;
 
 	void inOutReMap();
 
-	virtual shared_ptr<AbstractBrain> makeBrainFromGenome(shared_ptr<AbstractGenome> _genome);
+	virtual shared_ptr<AbstractBrain> makeBrainFromGenome(shared_ptr<AbstractGenome> _genome) override;
 
-	virtual string description();
-	virtual vector<string> getStats();
+	virtual string description() override;
+	virtual vector<string> getStats() override;
 
 	virtual int IntFromState(vector<int> I);
 	virtual int IntFromAllStates();
-	virtual void resetBrain();
+	virtual void resetBrain() override;
 	virtual string gateList();
 	virtual vector<vector<int>> getConnectivityMatrix();
 	virtual int brainSize();
@@ -78,7 +78,7 @@ class MarkovBrain : public AbstractBrain {
 	int numGates();
 
  public:
-	inline void setState(const int& state, const double& value) {
+	inline void setState(const int& state, const double& value) override{
 		if (state < (int) states.size()) {
 			states[state] = value;
 		} else {
@@ -86,7 +86,7 @@ class MarkovBrain : public AbstractBrain {
 			exit(1);
 		}
 	}
-	inline double getState(const int& state) {
+	inline double getState(const int& state) override{
 		if (state < (int) states.size()) {
 			return states[state];
 		} else {

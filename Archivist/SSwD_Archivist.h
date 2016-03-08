@@ -53,7 +53,7 @@ class SSwD_Archivist : public Archivist {  // SnapShot with Delay
 	// this will have the effect of a delayed pruning, but should do a good enough job keeping memory down.
 	void cleanup();
 
-	virtual bool archive(vector<shared_ptr<Organism>> population, int flush = 0);
+	virtual bool archive(vector<shared_ptr<Organism>> population, int flush = 0) override;
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__SSwD_Archivist__) */

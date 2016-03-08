@@ -36,7 +36,7 @@ class Snapshot_Archivist : public Archivist {  // SnapShot
 
 	void saveSnapshotGenomes(vector<shared_ptr<Organism>> population, int update);
 
-	virtual bool archive(vector<shared_ptr<Organism>> population, int flush = 0);
+	virtual bool archive(vector<shared_ptr<Organism>> population, int flush = 0) override;
 
 };
 

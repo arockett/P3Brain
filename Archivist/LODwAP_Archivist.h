@@ -48,7 +48,7 @@ class LODwAP_Archivist : public Archivist {  // Line of Decent with Active Pruni
 
 	virtual ~LODwAP_Archivist() = default;
 
-	virtual bool archive(vector<shared_ptr<Organism>> population, int flush = 0);
+	virtual bool archive(vector<shared_ptr<Organism>> population, int flush = 0) override;
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__LODwAP_Archivist__) */
