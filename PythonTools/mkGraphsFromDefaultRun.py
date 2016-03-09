@@ -96,7 +96,7 @@ dominant_csv_file = pandas.read_csv(r'dominant.csv')
 
 ## tookout food 2
 BuildMultiPlotFromDict(ave_csv_file,NamesList = ['score','gates','genomeLength'],XCoordinateName='update',Columns=2,title = 'Average')
-BuildMultiPlotFromDict(dominant_csv_file,NamesList = ['score','food1','switches','gates','genomeLength'],XCoordinateName='update',Columns=2,title = 'Dominant')
+BuildMultiPlotFromDict(dominant_csv_file,NamesList = ['score','food1','switches','food2','gates','genomeLength'],XCoordinateName='update',Columns=2,title = 'Dominant')
 
 
 #BuildMultiPlotFromDict(data_csv_file,NamesList = ['score','food1','switches','food2','gates','genomeLength','total'],Columns=2,title = 'Dominant')
