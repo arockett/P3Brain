@@ -42,24 +42,12 @@ class WireBrain : public AbstractBrain {
 	static int& overchargeThreshold;
 	static int& chargeUpdatesPerUpdate;
 	static bool& constantInputs;
-//	class cell {
-// 	public:
-//		int value;
-//		int chargeCount;
-//		vector<shared_ptr<cell>> neighbors;
-//
-//		cell(int _value) {
-//			value = _value;
-//			chargeCount = 0;
-//		}
-//	};
+	static bool& cacheResults;
+	static int& cacheResultsCount;
 
  public:
 
 	int width, depth, height, nrOfNodes;
-	//vector<shared_ptr<cell>> allCells;
-	//unordered_set<shared_ptr<cell>> charged, chargedNext, decay, decayNext, wire;
-	//vector<shared_ptr<cell>> inputCells, outputCells;
 
 	vector<bool> nodes, nodesNext;
 	vector<int> nodesAddresses, nodesNextAddresses;  // where the nodes connect to the brain
@@ -68,85 +56,18 @@ class WireBrain : public AbstractBrain {
 	vector<vector<int>> neighbors;  // for every cell list of wired neighbors (most will be empty)
 	vector<int> wireAddresses;  // list of addresses for all cells which are wireAddresses (uncharged, charged and decay)
 
+	vector<vector<long>> inputLookUpTable;  // table that contains output for a given input
+	vector<int> inputCount;  // table that contains a count of the number of times we have seen a given input
+
 	WireBrain() {
 		width = defaultWidth;
 		height = defaultHeight;
 		depth = defaultDepth;
 		nrOfNodes = defaultNrOfBrainNodes;
-
 	}
 
-//	WireBrain(shared_ptr<AbstractGenome> genome, int _nrOfNodes) {
-//		nrOfNodes = _nrOfNodes;
-//		width = defaultWidth;
-//		height = defaultHeight;
-//		depth = defaultDepth;
-//
-//		nodes.resize(nrOfNodes);
-//		nodesNext.resize(nrOfNodes);
-//		nodesAddresses.resize(nrOfNodes);
-//		nodesNextAddresses.resize(nrOfNodes);
-//
-//		allCells.resize(width * depth * height);
-//		nextAllCells.resize(width * depth * height);
-//		neighbors.resize(width * depth * height);
-//
-//		int connectionsCount = 0;
-//		int wireCount = 0;
-//		int emptyCount = 0;
-//
-//		// load genome into allCells
-//		auto genomeHandler = genome->newHandler(genome, true);
-//		for (int l = 0; l < width * depth * height; l++) {
-//			allCells[l] = genomeHandler->readDouble(0, 1) < initialFillRatio;  // 1 (WIRE) will be assigned initialFillRatio % of the time
-//			if (allCells[l] == WIRE) {
-//				wireAddresses.push_back(l);
-//				wireCount++;
-//			} else {
-//				emptyCount++;
-//			}
-//		}
-//
-//		// make neighbor connections
-//		for (auto l : wireAddresses) {  // for every cell
-//			int cellX = (l % (width * height)) % width;  // find this cells x,y,z location in brain
-//			int cellY = (l % (width * height)) / width;
-//			int cellZ = l / (width * height);
-//			for (int x = -1; x < 2; x++) {	// for every neighbor in x,y,z, if that neighbor is wireAddresses, add it to the neighbor list
-//				for (int y = -1; y < 2; y++) {
-//					for (int z = -1; z < 2; z++) {
-//						int testX = cellX + x;
-//						int testY = cellY + y;
-//						int testZ = cellZ + z;
-//						//cout << testX << " " << testY << " " << testZ << "\n";
-//						if (((testX >= 0) && (testX < width)) && ((testY >= 0) && (testY < height)) && ((testZ >= 0) && (testZ < depth))) {
-//							//cout << "  valid\n";
-//							int neighborIndex = testX + (testY * width) + (testZ * (width * height));
-//							if ((allCells[neighborIndex] == WIRE) && (l != neighborIndex)) {
-//								connectionsCount++;
-//								neighbors[l].push_back(neighborIndex);
-//							}
-//						}
-//					}
-//				}
-//			}
-//		}
-//
-//		if (width * depth * height < (nrOfNodes * worldConnectionsSeparation)) {
-//			cout << "ERROR: WireBrain requires a bigger brain width * depth * height must be >= (nrOfNodes * worldConnectionsSeparation)!\nExiting\n";
-//			exit(1);
-//		}
-//		for (int i = 0; i < nrOfNodes; i++) {
-//			nodesAddresses[i] = worldConnectionsSeparation * i;
-//			nodesNextAddresses[i] = ((width * depth * height) - 1) - (worldConnectionsSeparation * i);
-//			//cout << worldConnectionsSeparation * i << " " << nodesAddresses[i] << "    " << nodesNextAddresses[i] << "\n";
-//		}
-//		//cout << "  made wire brain with : " << connectionsCount << " connections (w:" << wireCount << "/e:" << emptyCount << ")\n";
-//
-//
-//	}
-
 	WireBrain(shared_ptr<AbstractGenome> genome, int _nrOfNodes) {
+		//cout << "in WireBrain(shared_ptr<AbstractGenome> genome, int _nrOfNodes)" << endl;
 		nrOfNodes = _nrOfNodes;
 		width = defaultWidth;
 		height = defaultHeight;
@@ -160,6 +81,20 @@ class WireBrain : public AbstractBrain {
 		allCells.resize(width * depth * height);
 		nextAllCells.resize(width * depth * height);
 		neighbors.resize(width * depth * height);
+
+		if (cacheResults) {
+			inputLookUpTable.resize(pow(2, nrOfNodes));  // set lookup tables to be large enough to handle all possible input combinations
+			inputCount.clear();  // insure that the input counts are all 0.
+			inputCount.resize(pow(2, nrOfNodes));
+			for (int i = 0; i < pow(2, nrOfNodes); i++) {
+				inputCount[i] = 0;
+			}
+
+			if (cacheResultsCount < 1) {
+				cout << "\n\nERROR! in WireBrain(shared_ptr<AbstractGenome> genome, int _nrOfNodes) cacheResultsCount must be > 0!\n\nExiting.\n" << endl;
+				exit(1);
+			}
+		}
 
 		int connectionsCount = 0;
 		int wireCount = 0;
@@ -258,7 +193,7 @@ class WireBrain : public AbstractBrain {
 			nodesNextAddresses[i] = ((width * depth * height) - 1) - (worldConnectionsSeparation * i);
 			//cout << worldConnectionsSeparation * i << " " << nodesAddresses[i] << "    " << nodesNextAddresses[i] << "\n";
 		}
-		//cout << "  made wire brain with : " << connectionsCount << " connections (w:" << wireCount << "/e:" << emptyCount << ")\n";
+		//cout << "  made wire brain with : " << connectionsCount << " connections (w:" << wireCount << "/e:" << emptyCount <<endl;
 
 	}
 
@@ -270,7 +205,7 @@ class WireBrain : public AbstractBrain {
 	}
 
 	virtual void chargeUpdate() {
-		//cout << "in chargeUpdate()\n";
+		//cout << "in chargeUpdate()" << endl;
 		//int wireCount = 0;
 		//int evalCount = 0;
 		//int evalToCharge = 0;
@@ -287,6 +222,9 @@ class WireBrain : public AbstractBrain {
 				chargeCount = 0;
 				int nc = (int) neighbors[cellAddress].size() - 1;  // get the number of neighbors which are wire - 1
 				while (nc >= 0 && chargeCount < overchargeThreshold) {  // for each neighbor
+//					cout << "cellAddress: " << cellAddress << "   nc:" << nc << endl;
+//					cout << "    neighbors size: " << neighbors[cellAddress].size() << endl;
+//					cout << allCells[neighbors[cellAddress][nc]] << endl;
 					if (allCells[neighbors[cellAddress][nc]] == CHARGE) {  // if that neighbor is charged
 						chargeCount++;
 						nextAllCells[cellAddress] = CHARGE;  // set this WIRE to CHARGE
@@ -336,22 +274,78 @@ class WireBrain : public AbstractBrain {
 
 	virtual void update() override {
 		//cout << "in update()\n";
-		for (auto w : wireAddresses) {  // clear out anything that is charged or decay from last update
-			allCells[w] = 1;
-		}
-		for (int i = 0; i < nrOfNodes; i++) {  // set up inputs and outputs
-			nodesNext[i] = 0;  // reset nodesNext
-			if (nodes[i] == 1 && allCells[nodesAddresses[i]] == WIRE) {  // if this node is on and connects to wire
-				allCells[nodesAddresses[i]] = CHARGE;
+
+		/// first see if we we already know this input
+
+//		for (auto v:inputCount){
+//			if (v != 0){
+//				cout << "found: " << v << endl;
+//				exit(1);
+//			}
+//		}
+
+		if (cacheResults) {
+			long inputLookUpValue = 0;
+			//cout << "\nInput nodes: ";
+
+			for (int i = 0; i < nrOfNodes; i++) {  // load inputs into inputLookUpValue
+				inputLookUpValue = nodes[i] + (inputLookUpValue << 1);
+				//cout << nodes[i];
+			}
+			//cout << " = " << inputLookUpValue << endl << "  count: " << inputCount[inputLookUpValue] << endl;
+			if (inputCount[inputLookUpValue] >= cacheResultsCount) {  // if we have seen this value at least cacheResultsCount
+				long outputValue = inputLookUpTable[inputLookUpValue][Random::getIndex(cacheResultsCount)];  // pull a stored value randomly
+				//cout << "                                                                     outputValue: " << outputValue << " = ";
+				for (int i = nrOfNodes - 1; i > -1; i--) {  // load outputValue into nodesNext
+					nodesNext[i] = outputValue & 1;  // get right most bit
+					outputValue = outputValue >> 1;  // clip off right most bit
+					//cout << nodesNext[i];
+				}
+				//cout << endl;
+			} else {  // we have not seen this input value enough times, and we will need to actually do the work
+				for (auto w : wireAddresses) {  // clear out any wire that is charged or decay from last update
+					allCells[w] = 1;
+				}
+				for (int i = 0; i < nrOfNodes; i++) {  // set up inputs and outputs
+					nodesNext[i] = 0;  // reset all nodesNext
+					if (nodes[i] == 1 && allCells[nodesAddresses[i]] == WIRE) {  // for each node if it is on and connects to wire
+						allCells[nodesAddresses[i]] = CHARGE;  // charge the wire
+					}
+				}
+
+				for (int count = 0; count < chargeUpdatesPerUpdate; count++) {
+					chargeUpdate();
+				}
+
+				//////
+				// set lookup table value!
+				//////
+				long outputValue = 0;
+				for (int i = 0; i < nrOfNodes; i++) {  // load outputs into outputValue
+					outputValue = nodesNext[i] + (outputValue << 1);
+				}
+				inputLookUpTable[inputLookUpValue].push_back(outputValue);  // push outputValue into the lookup table
+
+			}
+			inputCount[inputLookUpValue]++;
+
+		} else {  // no caching
+			for (auto w : wireAddresses) {  // clear out anything that is charged or decay from last update
+				allCells[w] = 1;
+			}
+			for (int i = 0; i < nrOfNodes; i++) {  // set up inputs and outputs
+				nodesNext[i] = 0;  // reset nodesNext
+				if (nodes[i] == 1 && allCells[nodesAddresses[i]] == WIRE) {  // if this node is on and connects to wire
+					allCells[nodesAddresses[i]] = CHARGE;
+				}
+			}
+
+			for (int count = 0; count < chargeUpdatesPerUpdate; count++) {
+				chargeUpdate();
 			}
 		}
 
-		for (int count = 0; count < chargeUpdatesPerUpdate; count++) {
-			chargeUpdate();
-			//displayBrainState();
-		}
-		//displayBrainState();
-		nodes = nodesNext;
+		nodes = nodesNext;  // update nodes
 
 	}
 

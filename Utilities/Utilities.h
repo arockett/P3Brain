@@ -151,11 +151,16 @@ static bool load_value(const string& value, T& target) {
 	}
 }
 
-// converts a vector of strings to a vector of type of returnData
+// converts a vector of string to a vector of type of returnData
 template<class T>
 void convertCSVListToVector(string stringData, vector<T> &returnData, const char separator = ',') {
 	returnData.clear();
-	stringData = stringData.substr(1, stringData.size() - 2);  // strip off leading and trailing square brakets
+	if (stringData[0] == '\"') {
+		stringData = stringData.substr(1, stringData.size() - 2);  // strip off leading and trailing quotes
+	}
+	if (stringData[0] == '[') {
+		stringData = stringData.substr(1, stringData.size() - 2);  // strip off leading and trailing square brakets
+	}
 	vector<string> dataLine = parseCSVLine(stringData, separator);
 
 	T tempValue;

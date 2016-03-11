@@ -53,9 +53,14 @@ bool& BerryWorld::senseFrontSides = Parameters::register_parameter("BERRY_senseF
 bool& BerryWorld::senseWalls = Parameters::register_parameter("BERRY_senseWalls", false, "if true, Agent can sense Walls", "WORLD - BERRY");
 int& BerryWorld::replacement = Parameters::register_parameter("BERRY_replacement", -1, "-1 = random, 0 = no replacement, 1 = replace other", "WORLD - BERRY - ADVANCED");
 
+bool& BerryWorld::recordConsumptionRatio = Parameters::register_parameter("BERRY_recordConsumptionRatio", false, "if true, record greater of red/blue+1 or blue/red+1", "WORLD - BERRY - ADVANCED");
+bool& BerryWorld::recordFoodList = Parameters::register_parameter("BERRY_recordFoodList", true, "if true, record list of food eaten", "WORLD - BERRY - ADVANCED");
+bool& BerryWorld::recordFoodListEatEmpty = Parameters::register_parameter("BERRY_recordFoodListEatEmpty", false, "if true, foodList will include attempts to eat 0", "WORLD - BERRY - ADVANCED");
+bool& BerryWorld::recordFoodListNoEat = Parameters::register_parameter("BERRY_recordFoodListNoEat", false, "if true, if true foodList will include no eat (-1)", "WORLD - BERRY - ADVANCED");
+
 BerryWorld::BerryWorld() {
 
-	if (foodTypes < 1 || foodTypes > 8){
+	if (foodTypes < 1 || foodTypes > 8) {
 		cout << "In BerryWorld you either have too few or too many foodTypes (must be >0 and <=8)\n\nExiting\n\n";
 		exit(1);
 	}
@@ -72,14 +77,13 @@ BerryWorld::BerryWorld() {
 		// sense down * types of food, same for senseFront, same for senseFrontSides, but there are 2
 	}
 
-
 	cout << "BerryWorld requires brains with at least " << inputStatesCount + outputStatesCount << " nodes.\n";
-	if (inputStatesCount == 0){
+	if (inputStatesCount == 0) {
 		cout << "    " << inputStatesCount << " Inputs\t No Inputs\n";
 		cout << "    " << outputStatesCount << " Outputs\t nodes 0 to " << outputStatesCount - 1 << "\n";
 	} else {
 		cout << "    " << inputStatesCount << " Inputs\t nodes 0 to " << inputStatesCount - 1 << "\n";
-		cout << "    " << outputStatesCount << " Outputs\t nodes " << inputStatesCount << " to " <<  inputStatesCount + outputStatesCount - 1 << "\n";
+		cout << "    " << outputStatesCount << " Outputs\t nodes " << inputStatesCount << " to " << inputStatesCount + outputStatesCount - 1 << "\n";
 
 	}
 	foodRatioLookup.resize(9);  // stores reward of each type of food NOTE: food is indexed from 1 so 0th entry is chance to leave empty
@@ -97,7 +101,8 @@ BerryWorld::BerryWorld() {
 		foodRatioCount += foodRatioLookup[i];
 	}
 
-	foodRewards.resize(9);  // stores reward of each type of food NOTE: food is indexed from 1 so 0th entry is not used
+	foodRewards.resize(9);  // stores reward of each type of food
+	foodRewards[0] = 0;
 	foodRewards[1] = rewardForFood1;
 	foodRewards[2] = rewardForFood2;
 	foodRewards[3] = rewardForFood3;
@@ -164,10 +169,12 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 	// set up to track what food is eaten
 	int switches = 0;  // number of times organism has switched food source
 	int lastFood = -1;  //nothing has been eaten yet!
-	vector<int> eaten;  // stores number of each type of food was eaten in total for this test NOTE: food is indexed from 1 so 0th entry is not used
+	vector<int> eaten;  // stores number of each type of food was eaten in total for this test. [0] stores number of times org attempted to eat on empty location
 	eaten.resize(foodTypes + 1);
 
-	org->dataMap.Clear("foodList");  // since foodList is built with Append, if an org lives for more then one "generation update" it's foodList must be cleared
+	if (recordFoodList) {
+		org->dataMap.Append("foodList", -2);  // -2 = a world initialization, -1 = did not eat this step
+	}
 
 	// set up vars needed to run
 	int output1 = 0;  // store outputs from brain
@@ -265,19 +272,29 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 		// output 2 has info about the 3rd output bit, which either does nothing, or is eat.
 		output2 = Bit(org->brain->getState(inputStatesCount + 2));
 
-		if ((output2 == 1) && (getGridValue(grid, currentLocation) != EMPTY)) {  // eat food here (if there is food here)
-			if (lastFood != -1) {  // if some food has already been eaten
-				if (lastFood != getGridValue(grid, currentLocation)) {  // if this food is different then the last food eaten
-					score -= BerryWorld::TSK;  // pay the task switch cost
-					switches++;
-				}
+		if (output2 == 1) {  // if org tried to eat
+			int foodHere = getGridValue(grid, currentLocation);
+			if ( (recordFoodList && foodHere!=0) || (recordFoodList && recordFoodListEatEmpty) ) {
+				org->dataMap.Append("foodList", foodHere);  // record that org ate food (or tried to at any rate)
 			}
-			lastFood = getGridValue(grid, currentLocation);  // remember the last food eaten
-			score += foodRewards[getGridValue(grid, currentLocation)];  // you ate a food... good for you!
-			eaten[getGridValue(grid, currentLocation)]++;  // track the number of each berry eaten
-			org->dataMap.Append("foodList", getGridValue(grid, currentLocation));
-			setGridValue(grid, currentLocation, 0);  // clear this location
+			eaten[foodHere]++;  // track the number of each berry eaten, including 0s
+			if (foodHere != EMPTY) {  // eat food here (if there is food here)
+				if (lastFood != -1) {  // if some food has already been eaten
+					if (lastFood != foodHere) {  // if this food is different then the last food eaten
+						score -= BerryWorld::TSK;  // pay the task switch cost
+						switches++;
+					}
+				}
+				lastFood = foodHere;  // remember the last food eaten
+				score += foodRewards[foodHere];  // you ate a food... good for you!
+				setGridValue(grid, currentLocation, 0);  // clear this location
+			}
+		} else {
+			if (recordFoodList && recordFoodListNoEat) {
+				org->dataMap.Append("foodList", -1);  // record that org did not try to eat this time
+			}
 		}
+
 		if ((output2 == 0) || (allowMoveAndEat == 1)) {  // if we did not eat or we allow moving and eating in the same world update
 			switch (output1) {
 				case 0:  //nothing
@@ -292,7 +309,7 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 					break;
 				case 3:  //move forward
 					if (getGridValue(grid, moveOnGrid(currentLocation, facing)) != WALL) {  // if the proposed move is not a wall
-					score += rewardForMove;
+						score += rewardForMove;
 						if (getGridValue(grid, currentLocation) == EMPTY) {  // if the current location is empty
 							if (replacement == -1) {
 								setGridValue(grid, currentLocation, pickFood(-1));  // plant a random food
@@ -322,20 +339,22 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 		score = 0.0;
 	}
 
-	if (!org->dataMap.fieldExists("foodList")) {  // if no food was eaten foodList will be empty.
-		org->dataMap.Append("foodList", 0);  // put a 0 in it as a placeholder (0 is no food)
-	}
-
 	int total_eaten = 0;
-	for (int i = 1; i <= foodTypes; i++) {
-		total_eaten += eaten[i];
-		string temp_name = "food" + to_string(i);  // make food names i.e. food1, food2, etc.
-		org->dataMap.Set(temp_name, eaten[i]);
+	for (int i = 0; i <= foodTypes; i++) {
+		if (i!=0){ // don't count the attempts to eat empty!
+			total_eaten += eaten[i];
+		}
+		string temp_name = "allfood" + to_string(i);  // make food names i.e. food1, food2, etc.
+		org->dataMap.Append(temp_name, eaten[i]);
 	}
-	org->dataMap.Set("total", total_eaten);  // total food eaten (regardless of type)
+	bool recordConsumptionRatio = true;
+	if (recordConsumptionRatio) {  // consumption ratio displays high value of org favors one food over the other and low values if both are being consumed. works on food[0] and food[1] only
+		(eaten[1] > eaten[2]) ? org->dataMap.Append("allconsumptionRatio", (double) eaten[1] / (double) (eaten[2] + 1)) : org->dataMap.Append("allconsumptionRatio", (double) eaten[2] / (double) (eaten[1] + 1));
+	}
+	org->dataMap.Append("alltotal", total_eaten);  // total food eaten (regardless of type)
 
-	org->dataMap.Set("switches", switches);
-	org->dataMap.Set("score", score);
+	org->dataMap.Append("allswitches", switches);
+	org->dataMap.Append("allscore", score);
 
 	if (analyse) {
 		org->dataMap.Set("phi", Analyse::computeAtomicPhi(stateCollector, org->brain->nrOfBrainStates));

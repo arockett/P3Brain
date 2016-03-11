@@ -76,6 +76,11 @@ class BerryWorld : public World {
 
 	static int& replacement;
 
+	static bool& recordConsumptionRatio;
+	static bool& recordFoodList;
+	static bool& recordFoodListEatEmpty;
+	static bool& recordFoodListNoEat;
+
 	int inputStatesCount = 0;
 	int outputStatesCount = 0;
 

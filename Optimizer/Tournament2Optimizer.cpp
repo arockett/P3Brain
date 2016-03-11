@@ -27,17 +27,17 @@ void Tournament2Optimizer::makeNextGeneration(vector<shared_ptr<Organism>> &popu
 	int best = findGreatestInVector(Scores);
 	maxFitness = Scores[best];
 
-	{  // check to make sure there are at least 2 genders.
-		bool same = true;
-		for (int index = 0; index < (int) population.size() - 2; index++) {
-			if (population[index]->gender != population[index + 1]->gender) {
-				same = false;
-			}
-		}
-		if (same == true) {  // if there are not atleast 2 genders, make population[0] have a diffrent gender
-			(population[0]->gender == 1) ? population[0]->gender = 0 : population[0]->gender = 1;
-		}
-	}
+//	{  // check to make sure there are at least 2 genders.
+//		bool same = true;
+//		for (int index = 0; index < (int) population.size() - 2; index++) {
+//			if (population[index]->gender != population[index + 1]->gender) {
+//				same = false;
+//			}
+//		}
+//		if (same == true) {  // if there are not atleast 2 genders, make population[0] have a diffrent gender
+//			(population[0]->gender == 1) ? population[0]->gender = 0 : population[0]->gender = 1;
+//		}
+//	}
 
 	while (nextPopulation.size() < population.size()) {  // while we have not filled up the next generation
 		// chance for each pick that this org survives to the next population

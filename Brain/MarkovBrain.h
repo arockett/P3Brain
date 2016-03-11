@@ -34,6 +34,9 @@ class MarkovBrain : public AbstractBrain {
 	//int nrOfBrainStates;  // the number of states in THIS brain
 	static bool& serialProcessing;  // write directly states (overwrite) - do not use nextStates
 
+//	static bool& cacheResults;
+//	static int& cacheResultsCount;
+
 	static void initializeParameters();
 	static vector<int> defaultNodeMap;
 

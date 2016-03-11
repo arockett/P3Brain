@@ -20,16 +20,37 @@ Archivist::Archivist() {
 }
 
 //save dominant and average file data
+//keys named all* will be converted to *. These should key for lists of values. These values will be averaged (used to average world repeats)
 void Archivist::writeRealTimeFiles(vector<shared_ptr<Organism>> &population) {
 	// write out Average data
 	if (writeAveFile) {
 		double aveValue, temp;
 		DataMap AveMap;
 		for (auto key : DefaultAveFileColumns) {
+			temp = 0;
 			aveValue = 0;
 			for (auto org : population) {
-				stringstream ss(org->dataMap.Get(key));
-				ss >> temp;
+				if (org->dataMap.fieldExists(key)) {
+					stringstream ss(org->dataMap.Get(key));
+					ss >> temp;
+				} else { // if field not found, check if there is an all()s version
+					string allKey = "all" + key;
+					//cout << allKey << endl;
+					if (org->dataMap.fieldExists(allKey)) {
+						string dataList = org->dataMap.Get(allKey);
+						//cout << dataList << endl;
+						temp = 0;
+						vector<double> values;
+						convertCSVListToVector(dataList, values);
+						for (auto v : values){
+							temp += v;
+							//cout << key << " " << allKey << " " << v << " " << temp << endl;
+						}
+						temp /= (double)values.size();
+					} else {
+						cout << "WARNING:  In Archivist::writeRealTimeFiles(vector<shared_ptr<Organism>> &population) key \"" << key << "\" could not be found in dataMap!" << endl;
+					}
+				}
 				aveValue += temp;
 			}
 			aveValue /= population.size();
@@ -45,7 +66,25 @@ void Archivist::writeRealTimeFiles(vector<shared_ptr<Organism>> &population) {
 		}
 
 		int best = findGreatestInVector(Scores);
-		population[best]->dataMap.writeToFile(DominantFileName);
+		DataMap DomMap;
+		for (auto key : population[best]->dataMap.getKeys()){
+			if (key[0] == 'a' && key [1] == 'l' && key [2] == 'l') {
+				double temp = 0;
+				vector<double> values;
+				convertCSVListToVector(population[best]->dataMap.Get(key), values);
+				for (auto v : values){
+					temp += v;
+					//cout << key << " " << allKey << " " << v << " " << temp << endl;
+				}
+				temp /= (double)values.size();
+				DomMap.Set(key.substr(3, key.size()-1),temp);
+			} else {
+				DomMap.Set(key,population[best]->dataMap.Get(key));
+			}
+		}
+
+
+		DomMap.writeToFile(DominantFileName);
 	}
 }
 

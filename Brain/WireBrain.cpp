@@ -20,3 +20,5 @@ int& WireBrain::overchargeThreshold = Parameters::register_parameter("overcharge
 int& WireBrain::chargeUpdatesPerUpdate = Parameters::register_parameter("chargeUpdatesPerUpdate", 30, "Number of charge updates per brain update", "BRAIN - WIRE");
 bool& WireBrain::constantInputs = Parameters::register_parameter("constantInputs", true, "if true, input values are reset every charge update, if not, input values are set on first charge update only.", "BRAIN - WIRE");
 
+bool& WireBrain::cacheResults = Parameters::register_parameter("WireBrain_cacheResults", true, "if true, t+1 nodes will be cached. If the same input is seen, the cached node values will be used.", "BRAIN - WIRE");
+int& WireBrain::cacheResultsCount = Parameters::register_parameter("WireBrain_cacheResultsCount", 1, "input combinations will be cached this many times, after this, repeats of a given input array will look up a random value from cached values", "BRAIN - WIRE");
