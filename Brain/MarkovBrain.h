@@ -98,6 +98,8 @@ class MarkovBrain : public AbstractBrain {
 		}
 	}
 
+	virtual void initalizeGenome(shared_ptr<AbstractGenome> _genome);
+
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__MarkovBrain__) */

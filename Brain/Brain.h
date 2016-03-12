@@ -50,6 +50,7 @@ class AbstractBrain {
 	virtual shared_ptr<AbstractBrain> makeBrainFromGenome(shared_ptr<AbstractGenome> _genome) = 0;
 	virtual void setState(const int& state, const double& value) = 0;
 	virtual double getState(const int& state) = 0;
+	virtual void initalizeGenome(shared_ptr<AbstractGenome> _genome) = 0;
 
 };
 

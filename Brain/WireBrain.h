@@ -24,10 +24,16 @@
 #include "../Utilities/Utilities.h"
 
 // define the wire states
-#define CHARGE 3
+
 #define DECAY 2
 #define WIRE 1
 #define HOLLOW 0
+
+#define START_CODE 0
+#define LOCATION_CODE 1
+#define DIRECTION_CODE 2
+#define LENGTH_CODE 3
+#define DESTINATION_CODE 4
 
 using namespace std;
 
@@ -38,12 +44,30 @@ class WireBrain : public AbstractBrain {
 	static int& defaultDepth;
 	static int& defaultNrOfBrainNodes;
 	static int& worldConnectionsSeparation;
-	static double& initialFillRatio;
 	static int& overchargeThreshold;
+	static int& decayDuration;
 	static int& chargeUpdatesPerUpdate;
 	static bool& constantInputs;
 	static bool& cacheResults;
 	static int& cacheResultsCount;
+
+	static string& genomeDecodingMethod;  // "bitmap" = convert genome directly, "wiregenes" = genes defined by start codeons, location, direction and location
+	static int& wiregenesInitialGeneCount;
+	static double& bitmapInitialFillRatio;
+
+	static bool& wiregenesAllowSimpleWires;
+	static int& wiregenesSimpleWireMaxLength;
+	static string& wiregenesSimpleWireDirections;
+
+	static bool& wiregenesAllowWormholes;
+	static int& wiregenesWormholesBidirectional;
+
+	static bool& wiregenesAllowSquiggleWires;
+	static int& wiregenesSquiggleWireMinLength;
+	static int& wiregenesSquiggleWireMaxLength;
+	static string& wiregenesSquiggleWireDirections;
+
+	const int CHARGE = 2 + decayDuration;
 
  public:
 
@@ -59,11 +83,14 @@ class WireBrain : public AbstractBrain {
 	vector<vector<long>> inputLookUpTable;  // table that contains output for a given input
 	vector<int> inputCount;  // table that contains a count of the number of times we have seen a given input
 
+	int connectionsCount;
+
 	WireBrain() {
 		width = defaultWidth;
 		height = defaultHeight;
 		depth = defaultDepth;
 		nrOfNodes = defaultNrOfBrainNodes;
+		connectionsCount = 0;
 	}
 
 	WireBrain(shared_ptr<AbstractGenome> genome, int _nrOfNodes) {
@@ -82,6 +109,11 @@ class WireBrain : public AbstractBrain {
 		nextAllCells.resize(width * depth * height);
 		neighbors.resize(width * depth * height);
 
+		// used in wiregenes decoding
+		vector<vector<int>> simpleWireFeatures;
+		vector<vector<int>> squiggleWireFeatures;
+		vector<vector<int>> wormholeFeatures;
+
 		if (cacheResults) {
 			inputLookUpTable.resize(pow(2, nrOfNodes));  // set lookup tables to be large enough to handle all possible input combinations
 			inputCount.clear();  // insure that the input counts are all 0.
@@ -96,68 +128,276 @@ class WireBrain : public AbstractBrain {
 			}
 		}
 
-		int connectionsCount = 0;
+		connectionsCount = 0;
 		int wireCount = 0;
-		int emptyCount = 0;
 
-		// load genome into allCells
-		auto genomeHandler = genome->newHandler(genome, true);
-		for (int l = 0; l < width * depth * height; l++) {
-			allCells[l] = genomeHandler->readDouble(0, 1) < initialFillRatio;  // 1 (WIRE) will be assigned initialFillRatio % of the time
-			if (allCells[l] == WIRE) {
-				wireAddresses.push_back(l);
-				wireCount++;
-			} else {
-				emptyCount++;
-			}
-		}
-
-//		width = 7;
-//		height = 7;
-//		depth = 3;
-//
-//		allCells.resize(width * depth * height);
-//		nextAllCells.resize(width * depth * height);
-//		neighbors.resize(width * depth * height);
-//
-//		connectionsCount = 0;
-//		wireCount = 0;
-//		emptyCount = 0;
-//
-//		allCells = {
-//			1,0,0,1,1,0,0,
-//			0,0,1,0,0,1,0,
-//			0,1,0,1,0,1,0,
-//			0,1,1,1,0,0,0,
-//			0,0,1,0,0,1,0,
-//			0,1,0,0,1,1,1,
-//			1,1,1,1,1,0,1,
-//
-//			1,0,0,0,0,0,0,
-//			0,0,0,0,0,0,0,
-//			0,0,0,0,0,0,0,
-//			0,0,0,0,0,1,0,
-//			0,0,0,0,0,0,0,
-//			0,0,0,0,0,0,0,
-//			0,0,0,0,0,0,0,
-//
-//			1,0,0,1,1,0,0,
-//			1,0,1,0,0,1,0,
-//			0,1,0,1,0,1,0,
-//			0,1,0,0,0,0,0,
-//			0,0,1,0,0,1,0,
-//			0,1,0,0,0,1,0,
-//			0,0,1,1,1,0,0};
-//
-//		for (int l = 0; l < (int) allCells.size(); l++) {
+//		// load genome into allCells
+//		auto genomeHandler = genome->newHandler(genome, true);
+//		for (int l = 0; l < width * depth * height; l++) {
+//			allCells[l] = genomeHandler->readInt(0, 1);  // 1 (WIRE) will be assigned initialFillRatio % of the time
 //			if (allCells[l] == WIRE) {
 //				wireAddresses.push_back(l);
 //				wireCount++;
 //			} else {
 //				emptyCount++;
 //			}
-//
 //		}
+
+		if (genomeDecodingMethod == "bitmap") {
+			// load genome into allCells
+			auto genomeHandler = genome->newHandler(genome, true);
+			for (int l = 0; l < width * depth * height; l++) {
+				allCells[l] = genomeHandler->readInt(0, 1);  // 1 (WIRE) will be assigned initialFillRatio % of the time
+				if (allCells[l] == WIRE) {
+					wireAddresses.push_back(l);
+					wireCount++;
+				}
+			}
+		} else if (genomeDecodingMethod == "wiregenes") {
+
+			// features are:
+			// simpleWire: 42,255-42,X,Y,Z,Length, Direction (if cardinalOnly 0->5 if diagonalsAlso 0->25)
+			// squiggleWire: 44,255-44,X,Y,Z,Length,dX,dY,dZ,dX,dY,dZ,dX,dY,dZ,dX,dY,dZ... (length sets of dX,dY,dZ)
+			// wormhole: 43,255-43,Direction,X,Y,Z,DestinationX,DestinationY,DestionationZ (Direction, 0 = forward, 1 = backwards 2 = both)
+			// first, decode genome into features list
+			// then place all wire
+			// and build all connections
+			// then add wormhole connections if X,Y,Z and DestinationX,DestinationY,DestionationZ are both wire
+			bool translation_Complete = false;
+			if (genome->isEmpty()) {
+				translation_Complete = true;
+			} else {
+
+				bool readForward = true;
+				auto genomeHandler = genome->newHandler(genome, readForward);
+				auto featureGenomeHandler = genome->newHandler(genome, readForward);
+
+				int featureCount = 0;
+
+				int testSite1Value, testSite2Value;
+				testSite1Value = genomeHandler->readInt(0, 255);
+				testSite2Value = genomeHandler->readInt(0, 255);
+				while (!translation_Complete) {
+					if (genomeHandler->atEOG()) {  // if genomeIndex > testIndex, testIndex has wrapped and we are done translating
+						translation_Complete = true;
+					} else if (testSite1Value + testSite2Value == 255) {  // if we found a possible start codon...
+						if (testSite1Value == 42 && wiregenesAllowSimpleWires) {  // record a wire feature
+
+							int possibleDirections;  // if cardinalOnly, only 6 possible directions, if diagonalsAlso then 26 possible directions
+							if (wiregenesSimpleWireDirections == "cardinalOnly") {
+								possibleDirections = 5;
+							} else if (wiregenesSimpleWireDirections == "diagonalsAlso") {
+								possibleDirections = 25;
+							} else {
+								cout << "\nERROR: in WireBrain(shared_ptr<AbstractGenome> genome, int _nrOfNodes) recived illegal value for wiregenesSimpleWireDirections \"" << wiregenesSimpleWireDirections << "\".\n\nExiting!\n\n" << endl;
+								exit(1);
+							}
+
+							genomeHandler->copyTo(featureGenomeHandler);  // make a copy of the genome handler so we can remeber where we are
+							featureGenomeHandler->toggleReadDirection();
+							featureGenomeHandler->readInt(0, 255);  // move back 2 start codon values
+							featureGenomeHandler->readInt(0, 255);
+							featureGenomeHandler->toggleReadDirection();  // reverse the read direction again
+							featureGenomeHandler->readInt(0, 255, START_CODE, featureCount);  // mark start codon in genomes coding region
+							featureGenomeHandler->readInt(0, 255, START_CODE, featureCount);
+
+							simpleWireFeatures.push_back( { featureGenomeHandler->readInt(0, width - 1, LOCATION_CODE),  // X
+							featureGenomeHandler->readInt(0, height - 1, LOCATION_CODE),  // Y
+							featureGenomeHandler->readInt(0, depth - 1, LOCATION_CODE),  // Z
+							featureGenomeHandler->readInt(1, wiregenesSimpleWireMaxLength, LENGTH_CODE),  // length of wire
+							featureGenomeHandler->readInt(0, possibleDirections, DIRECTION_CODE),  // Direction the wire will be built in
+							        });
+
+							featureCount++;
+
+						} else if (testSite1Value == 43 && wiregenesAllowWormholes) {  // record a wormhole
+							genomeHandler->copyTo(featureGenomeHandler);  // make a copy of the genome handler so we can remeber where we are
+							featureGenomeHandler->toggleReadDirection();
+							featureGenomeHandler->readInt(0, 255);  // move back 2 start codon values
+							featureGenomeHandler->readInt(0, 255);
+							featureGenomeHandler->toggleReadDirection();  // reverse the read direction again
+							featureGenomeHandler->readInt(0, 255, START_CODE, featureCount);  // mark start codon in genomes coding region
+							featureGenomeHandler->readInt(0, 255, START_CODE, featureCount);
+
+							wormholeFeatures.push_back( { featureGenomeHandler->readInt(0, width - 1, LOCATION_CODE),  // X
+							featureGenomeHandler->readInt(0, height - 1, LOCATION_CODE),  // Y
+							featureGenomeHandler->readInt(0, depth - 1, LOCATION_CODE),  // Z
+							featureGenomeHandler->readInt(0, width - 1, DESTINATION_CODE),  // DestinationX
+							featureGenomeHandler->readInt(0, height - 1, DESTINATION_CODE),  // DestinationY
+							featureGenomeHandler->readInt(0, depth - 1, DESTINATION_CODE),  // DestinationZ
+							featureGenomeHandler->readInt(0, 1, DESTINATION_CODE),  // Direction
+							        });
+
+							featureCount++;
+						} else if (testSite1Value == 44 && wiregenesAllowSquiggleWires) {  // record a squggleWire
+
+							int possibleDirections;  // if cardinalOnly, only 6 possible directions, if diagonalsAlso then 26 possible directions
+							if (wiregenesSquiggleWireDirections == "cardinalOnly") {
+								possibleDirections = 5;
+							} else if (wiregenesSquiggleWireDirections == "diagonalsAlso") {
+								possibleDirections = 25;
+							} else {
+								cout << "\nERROR: in WireBrain(shared_ptr<AbstractGenome> genome, int _nrOfNodes) recived illegal value for wiregenesSquiggleWireDirections \"" << wiregenesSquiggleWireDirections << "\".\n\nExiting!\n\n" << endl;
+								exit(1);
+							}
+
+							genomeHandler->copyTo(featureGenomeHandler);  // make a copy of the genome handler so we can remeber where we are
+							featureGenomeHandler->toggleReadDirection();
+							featureGenomeHandler->readInt(0, 255);  // move back 2 start codon values
+							featureGenomeHandler->readInt(0, 255);
+							featureGenomeHandler->toggleReadDirection();  // reverse the read direction again
+							featureGenomeHandler->readInt(0, 255, START_CODE, featureCount);  // mark start codon in genomes coding region
+							featureGenomeHandler->readInt(0, 255, START_CODE, featureCount);
+
+							squiggleWireFeatures.push_back( { featureGenomeHandler->readInt(0, width - 1, LOCATION_CODE),  // X
+							featureGenomeHandler->readInt(0, height - 1, LOCATION_CODE),  // Y
+							featureGenomeHandler->readInt(0, depth - 1, LOCATION_CODE),  // Z
+							featureGenomeHandler->readInt(wiregenesSquiggleWireMinLength, wiregenesSquiggleWireMaxLength, LENGTH_CODE) });
+
+							int index = squiggleWireFeatures.size() - 1;
+							int length = squiggleWireFeatures[squiggleWireFeatures.size() - 1][3];
+
+							for (int i = 1; i < length; i++) {  // for length of wire, add directions
+								squiggleWireFeatures[index].push_back(featureGenomeHandler->readInt(0, possibleDirections, DIRECTION_CODE));
+							}
+							featureCount++;
+						}
+					}
+					genomeHandler->toggleReadDirection();
+					genomeHandler->readInt(0, 255);  // move back 2 start codon values
+					genomeHandler->readInt(0, 255);
+					genomeHandler->toggleReadDirection();
+					genomeHandler->advanceIndex();  // advance 1 index (might not be equal to a start codeon value (i.e. if we are reading from a bit genome)
+					testSite1Value = genomeHandler->readInt(0, 255);
+					testSite2Value = genomeHandler->readInt(0, 255);
+				}
+			}
+
+			int X, Y, Z, length, wireIndex;
+			// dList contains all possible directions, the 6 cardinal directions are listed first, so if cardinalOnly we will only pick from that subset
+			vector<vector<int>> dList = { { 1, 0, 0 }, { -1, 0, 0 }, { 0, 1, 0 }, { 0, -1, 0 }, { 0, 0, 1 }, { 0, 0, -1 }, { 1, 1, 1 }, { 1, 1, 0 }, { 1, 1, -1 }, { 1, 0, 1 }, { 1, 0, -1 }, { 1, -1, 1 }, { 1, -1, 0 }, { 1, -1, -1 }, { 0, 1, 1 }, { 0, 1, -1 }, { 0, -1, 1 }, { 0, -1, -1 }, { -1, 1, 1 }, { -1, 1, 0 }, { -1, 1, -1 }, { -1, 0, 1 }, { -1, 0, -1 }, { -1, -1, 1 }, { -1, -1, 0 }, { -1, -1, -1 } };
+
+			for (auto feature : simpleWireFeatures) {  // for every wire feature
+				//cout << "simpleWireFeature: " << feature[0] << "," << feature[1] << "," << feature[2] << " L:" << feature[3] << " D:" << feature[4] << endl;
+				X = feature[0];
+				Y = feature[1];
+				Z = feature[2];
+				length = feature[3];
+				for (int i = 0; i < length; i++) {  // for
+					if (((X >= 0) && (X < width)) && ((Y >= 0) && (Y < height)) && ((Z >= 0) && (Z < depth))) {  //if we are in the brain, make this cell wire
+						wireIndex = X + (Y * width) + (Z * (width * height));
+						//cout << "WI: " << wireIndex << endl;
+						if (allCells[wireIndex] != WIRE) {  // if this cell is not already wire...
+							allCells[wireIndex] = WIRE;  // make this cell wire
+							wireAddresses.push_back(wireIndex);  // add this cell to wireAddresses
+							wireCount++;
+						}
+						//cout << X << "," << Y << "," << Z << endl;
+						X += dList[feature[4]][0];  // move in direction to the next cell in this wire
+						Y += dList[feature[4]][1];
+						Z += dList[feature[4]][2];
+
+					} else {
+						//cout << "stopped" <<  endl;
+						i = wiregenesSimpleWireMaxLength;  // if we are outside of the brain, stop this wire
+					}
+				}
+			}
+			for (auto feature : squiggleWireFeatures) {  // for every wire feature
+//				cout << "squiggleWireFeature: " << feature[0] << "," << feature[1] << "," << feature[2] << " L:" << feature[3];
+//				for (int i = 4; i < (int)feature.size(); i++){
+//					cout << " " << feature[i];
+//				}
+//				cout << endl;
+
+				int index = 0;
+				X = feature[index++];
+				Y = feature[index++];
+				Z = feature[index++];
+				length = feature[index++];
+
+				for (int i = 1; i < length; i++) {  // for
+					if (((X >= 0) && (X < width)) && ((Y >= 0) && (Y < height)) && ((Z >= 0) && (Z < depth))) {  //if we are in the brain, make this cell wire
+						wireIndex = X + (Y * width) + (Z * (width * height));
+						//cout << "WI: " << wireIndex << endl;
+						if (allCells[wireIndex] != WIRE) {  // if this cell is not already wire...
+							allCells[wireIndex] = WIRE;  // make this cell wire
+							wireAddresses.push_back(wireIndex);  // add this cell to wireAddresses
+							wireCount++;
+						}
+						//cout << X << "," << Y << "," << Z << endl;
+						X += dList[feature[index]][0];  // move in direction indicated by the next three values in feature
+						Y += dList[feature[index]][1];
+						Z += dList[feature[index++]][2];
+
+					} else {
+						//cout << "stopped" <<  endl;
+						i = wiregenesSquiggleWireMaxLength;  // if we are outside of the brain, stop this wire
+					}
+				}
+			}
+		} else {
+			cout << "\nERROR: in WireBrain(shared_ptr<AbstractGenome> genome, int _nrOfNodes) received illegal value for genomeDecodingMethod \"" << genomeDecodingMethod << "\".\n\nExiting!\n\n" << endl;
+			exit(1);
+		}
+
+		//displayBrainState();
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// The following block creates a "manageable" brain for testing ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//				width = 7;
+//				height = 7;
+//				depth = 3;
+//				allCells.resize(0);
+//				nextAllCells.resize(0);
+//				neighbors.resize(0);
+//
+//				allCells.resize(width * depth * height);
+//				nextAllCells.resize(width * depth * height);
+//				neighbors.resize(width * depth * height);
+//				wireAddresses.resize(0);
+//
+//				connectionsCount = 0;
+//				wireCount = 0;
+//				emptyCount = 0;
+//
+//				allCells = {
+//					1,1,0,1,1,0,0,
+//					0,0,1,0,0,1,0,
+//					0,1,0,1,0,1,0,
+//					0,1,1,1,0,0,0,
+//					0,0,1,0,0,1,0,
+//					0,1,0,0,1,1,1,
+//					1,1,1,1,1,0,1,
+//
+//					1,0,0,0,0,0,0,
+//					0,0,0,0,0,0,0,
+//					0,0,0,0,0,0,0,
+//					0,0,0,0,0,1,0,
+//					0,0,0,0,0,0,0,
+//					0,0,0,0,0,0,0,
+//					0,0,0,0,0,0,0,
+//
+//					1,0,0,1,1,0,0,
+//					1,0,1,0,0,1,0,
+//					0,1,0,1,0,1,0,
+//					0,1,0,0,0,0,0,
+//					0,0,1,0,0,1,0,
+//					0,1,0,0,0,1,0,
+//					0,0,1,1,1,0,0};
+//
+//				for (int l = 0; l < (int) allCells.size(); l++) {
+//					if (allCells[l] == WIRE) {
+//						wireAddresses.push_back(l);
+//						wireCount++;
+//					} else {
+//						emptyCount++;
+//					}
+//
+//				}
+////////^///////////////^///////////////////^///////////////////^/////////////////^////////////////////////////^////////////////////////////////
+// a "manageable" brain for testing ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		// make neighbor connections
 		for (auto l : wireAddresses) {  // for every cell
@@ -179,6 +419,39 @@ class WireBrain : public AbstractBrain {
 								neighbors[l].push_back(neighborIndex);
 							}
 						}
+					}
+				}
+			}
+		}
+
+		// add wiregenes wormholes
+		if (genomeDecodingMethod == "wiregenes") {
+			int sourceX, sourceY, sourceZ;
+			int destinationX, destinationY, destinationZ;
+			int sourceIndex, destinationIndex;
+			for (auto feature : wormholeFeatures) {  // for every wire feature
+//				cout << "wormholeFeature: " << feature[0] << "," << feature[1] << "," << feature[2] << "   " << feature[3] << "," << feature[4] << "," << feature[5] << " D:" << feature[6] << endl;
+
+				sourceX = feature[0];
+				sourceY = feature[1];
+				sourceZ = feature[2];
+
+				destinationX = feature[3];
+				destinationY = feature[4];
+				destinationZ = feature[5];
+
+				sourceIndex = sourceX + (sourceY * width) + (sourceZ * (width * height));
+				destinationIndex = destinationX + (destinationY * width) + (destinationZ * (width * height));
+				if (allCells[sourceIndex] == WIRE && allCells[destinationIndex] == WIRE) {
+					if (wiregenesWormholesBidirectional == 0) {
+						neighbors[destinationIndex].push_back(sourceIndex);
+					}
+					if (wiregenesWormholesBidirectional == 1) {
+						(feature[6])? neighbors[destinationIndex].push_back(sourceIndex):neighbors[sourceIndex].push_back(destinationIndex);
+					}
+					if (wiregenesWormholesBidirectional == 2) {
+						neighbors[destinationIndex].push_back(sourceIndex);
+						neighbors[sourceIndex].push_back(destinationIndex);
 					}
 				}
 			}
@@ -220,32 +493,21 @@ class WireBrain : public AbstractBrain {
 			//wireCount++;
 			if (allCells[cellAddress] == WIRE) {
 				chargeCount = 0;
-				int nc = (int) neighbors[cellAddress].size() - 1;  // get the number of neighbors which are wire - 1
+				int nc = (int) neighbors[cellAddress].size() - 1;  // get the number of neighbors which are wire
 				while (nc >= 0 && chargeCount < overchargeThreshold) {  // for each neighbor
-//					cout << "cellAddress: " << cellAddress << "   nc:" << nc << endl;
-//					cout << "    neighbors size: " << neighbors[cellAddress].size() << endl;
-//					cout << allCells[neighbors[cellAddress][nc]] << endl;
 					if (allCells[neighbors[cellAddress][nc]] == CHARGE) {  // if that neighbor is charged
 						chargeCount++;
 						nextAllCells[cellAddress] = CHARGE;  // set this WIRE to CHARGE
-						//cout << "nc: " << nc << " chargeCount: " << chargeCount << endl;
-						//evalCount++;
 					}
 					nc--;
 				}
-				if (chargeCount == overchargeThreshold) {
+				if (chargeCount >= overchargeThreshold) {
 					nextAllCells[cellAddress] = WIRE;  // if overcharged, change back to WIRE
 					//evalToCharge++;
 				}
 				//cout << "  " << cellAddress << " " << nextAllCells[cellAddress] << endl;
-			} else if (allCells[cellAddress] == DECAY) {
-				nextAllCells[cellAddress] = WIRE;
-				//evalCount++;
-				//evalToWire++;
-			} else if (allCells[cellAddress] == CHARGE) {
-				nextAllCells[cellAddress] = DECAY;
-				//evalCount++;
-				//evalToDecay++;
+			} else {  // this wire is currently either charged or in decay
+				nextAllCells[cellAddress] = allCells[cellAddress] - 1;
 			}
 		}
 		allCells = nextAllCells;
@@ -311,12 +573,16 @@ class WireBrain : public AbstractBrain {
 					if (nodes[i] == 1 && allCells[nodesAddresses[i]] == WIRE) {  // for each node if it is on and connects to wire
 						allCells[nodesAddresses[i]] = CHARGE;  // charge the wire
 					}
+					//// for testing only!!!////
+					//allCells[0]=CHARGE;
+					/////////////////////////////
 				}
-
+				//SaveBrainState();
 				for (int count = 0; count < chargeUpdatesPerUpdate; count++) {
 					chargeUpdate();
+					//SaveBrainState();
 				}
-
+				//exit(1);
 				//////
 				// set lookup table value!
 				//////
@@ -349,6 +615,46 @@ class WireBrain : public AbstractBrain {
 
 	}
 
+	virtual void SaveBrainState() {
+//		for (int i = 0; i < nrOfNodes; i++) {
+//			int l = nodesAddresses[i];
+//			int cellX = (l % (width * height)) % width;  // find this cells x,y,z location in brain
+//			int cellY = (l % (width * height)) / width;
+//			int cellZ = l / (width * height);
+//
+//			cout << "node" << i << "@(" << cellX << "," << cellY << "," << cellZ << ")=" << nodes[i] << "  ";
+//		}
+//
+//		cout << endl;
+//		cout << "---------------------------------------------------\n";
+
+		string stateNow = "";
+
+		for (auto cell : allCells) {
+			if (cell == 0) {
+				stateNow += "E";
+			} else if (cell == 1) {
+				stateNow += "W";
+			} else if (cell == CHARGE) {
+				stateNow += "C";
+			} else {
+				stateNow += "D";
+			}
+		}
+		FileManager::writeToFile("wireBrain.run", stateNow, to_string(width) + ',' + to_string(height) + ',' + to_string(depth));  //fileName, data, header - used when you want to output formatted data (i.e. genomes)
+//		for (int i = 0; i < nrOfNodes; i++) {
+//			int l = nodesNextAddresses[i];
+//			int cellX = (l % (width * height)) % width;  // find this cells x,y,z location in brain
+//			int cellY = (l % (width * height)) / width;
+//			int cellZ = l / (width * height);
+//
+//			cout << "node" << i << "@(" << cellX << "," << cellY << "," << cellZ << ")=" << nodesNext[i] << "  ";
+//		}
+//		cout << endl;
+//		char c;
+//		cin >> c;
+	}
+
 	virtual void displayBrainState() {
 		for (int i = 0; i < nrOfNodes; i++) {
 			int l = nodesAddresses[i];
@@ -367,16 +673,13 @@ class WireBrain : public AbstractBrain {
 
 		for (auto cell : allCells) {
 			if (cell == 0) {
+				cout << " ";
+			} else if (cell == 1) {
 				cout << ".";
-			}
-			if (cell == 1) {
-				cout << "-";
-			}
-			if (cell == 2) {
-				cout << "*";
-			}
-			if (cell == 3) {
+			} else if (cell == CHARGE) {
 				cout << "O";
+			} else {
+				cout << "-";
 			}
 
 			w++;
@@ -422,6 +725,9 @@ class WireBrain : public AbstractBrain {
 		dataPairs.push_back("brainWireCount");
 		dataPairs.push_back(to_string(wireAddresses.size()));
 
+		dataPairs.push_back("connectionsCount");
+		dataPairs.push_back(to_string(connectionsCount));
+
 		return dataPairs;
 	}
 	virtual void resetBrain() override {
@@ -442,6 +748,29 @@ class WireBrain : public AbstractBrain {
 		} else {
 			cout << "Reading from invalid brain state - this brain needs more states!\nExiting\n";
 			exit(1);
+		}
+	}
+
+	virtual void initalizeGenome(shared_ptr<AbstractGenome> _genome) {
+
+		if (genomeDecodingMethod == "bitmap") {
+			auto genomeHandler = _genome->newHandler(_genome);
+
+			for (int i = 0; i < width * depth * height; i++) {  // fill the genome with 0s and 1s randomly with a biased ratio
+				genomeHandler->writeInt(Random::P(bitmapInitialFillRatio), 0, 1);
+			}
+		}
+		if (genomeDecodingMethod == "wiregenes") {
+			_genome->fillRandom();
+
+			auto genomeHandler = _genome->newHandler(_genome);
+
+			for (int i = 0; i < wiregenesInitialGeneCount; i++) {
+				genomeHandler->randomize();
+				int pick = Random::getInt(42,44);
+				genomeHandler->writeInt(pick, 0, 255);
+				genomeHandler->writeInt(255 - pick, 0, 255);
+			}
 		}
 	}
 

@@ -173,16 +173,7 @@ int main(int argc, const char * argv[]) {
 
 		for (int i = 0; i < Global::popSize; i++) {
 			shared_ptr<Genome> genome = make_shared<Genome>(initalChromosome, Genome::initialChromosomes, Genome::initialPloidy);
-			genome->fillRandom();
-
-			auto genomeHandler = genome->newHandler(genome);
-
-			for (int i = 0; i < 5; i++) {
-				genomeHandler->randomize();
-				genomeHandler->writeInt(43, 0, 255);
-				genomeHandler->writeInt(255 - 43, 0, 255);
-			}
-
+			progenitor->brain->initalizeGenome(genome);
 			shared_ptr<Organism> org = make_shared<Organism>(progenitor, genome);
 			population.push_back(org);  // add a new org to population using progenitors template and a new random genome
 			population[population.size() - 1]->gender = Random::getInt(0, 1);  // assign a random gender to the new org

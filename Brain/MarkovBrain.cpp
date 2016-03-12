@@ -171,3 +171,15 @@ int MarkovBrain::numGates() {
 	return brainSize();
 }
 
+void MarkovBrain::initalizeGenome(shared_ptr<AbstractGenome> _genome){
+	_genome->fillRandom();
+
+	auto genomeHandler = _genome->newHandler(_genome);
+
+	for (int i = 0; i < 5; i++) {
+		genomeHandler->randomize();
+		genomeHandler->writeInt(43, 0, 255);
+		genomeHandler->writeInt(255 - 43, 0, 255);
+	}
+}
+

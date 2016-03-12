@@ -81,6 +81,7 @@ class AbstractGenome {
 
 		virtual void writeInt(int value, int valueMin, int valueMax) = 0;
 		virtual vector<vector<int>> readTable(pair<int,int> tableSize, pair<int,int> tableMaxSize, pair<int,int> valueRange, int code = -1, int CodingRegionIndex = 0)=0;
+		virtual void advanceIndex(int distance = 1) = 0;
 
 		virtual void copyTo(shared_ptr<Handler> to) = 0;
 
@@ -185,7 +186,7 @@ class Genome : public AbstractGenome {
 		// NOTE: if the advance is > the current chromosome size, it will be modded to the chromosome size.
 		// i.e. if the chromosome was length 10, and the current siteIndex = 0, advanceIndex(15) will advance to
 		// site 5 of the next chromosome. Should this be fixed?!??
-		virtual void advanceIndex(int distance = 1);
+		virtual void advanceIndex(int distance = 1) override;
 
 		// returns true if this Handler has reached the end of genome (or start if direction is backwards).
 		virtual bool atEOG() override;

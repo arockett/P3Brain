@@ -43,8 +43,17 @@ vector<shared_ptr<Gate>> Classic_GateListBuilder::buildGateList(shared_ptr<Abstr
 					gateCount++;
 				}
 			}
-			testSite1Value = testSite2Value;
+//			testSite1Value = testSite2Value;
+//			testSite2Value = genomeHandler->readInt(0, 255);
+
+			genomeHandler->toggleReadDirection();
+			genomeHandler->readInt(0, 255);  // move back 2 start codon values
+			genomeHandler->readInt(0, 255);
+			genomeHandler->toggleReadDirection();
+			genomeHandler->advanceIndex();  // advance 1 index (might not be equal to a start codeon value (i.e. if we are reading from a bit genome)
+			testSite1Value = genomeHandler->readInt(0, 255);
 			testSite2Value = genomeHandler->readInt(0, 255);
+
 			//cout << testSite1Value << " + " << testSite2Value << " = " << testSite1Value + testSite2Value << endl;
 
 		}

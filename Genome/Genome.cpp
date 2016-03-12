@@ -402,7 +402,7 @@ shared_ptr<AbstractGenome> Genome::makeMutatedGenome(vector<shared_ptr<AbstractG
 			}
 			newGenome->chromosomes[newGenome->chromosomes.size() - 1]->crossover(parentChromosomes, newGenome->PT.lookup("genomecrossCount"));  // create a crossover chromosome
 		}
-	} else if (ploidy == (int) parents.size()) {  // if diploid than cross chromosomes from all parents
+	} else if (ploidy == (int) parents.size()) {  // if multi ploid than cross chromosomes from all parents
 		int setCount = castParent0->chromosomes.size() / ploidy;  // number of sets of chromosomes
 		for (int currSet = 0; currSet < setCount; currSet++) {
 			int parentCount = 0;
