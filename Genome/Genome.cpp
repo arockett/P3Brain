@@ -355,7 +355,7 @@ void Genome::mutate() {
 
 // make a mutated genome. from this genome
 // the undefined action is to return a new genome
-shared_ptr<AbstractGenome> Genome::makeMutatedGenome(shared_ptr<AbstractGenome> parent) {
+shared_ptr<AbstractGenome> Genome::makeMutatedGenomeFrom(shared_ptr<AbstractGenome> parent) {
 	auto newGenome = make_shared<Genome>();
 	newGenome->copyFrom(parent);
 	newGenome->mutate();
@@ -370,7 +370,7 @@ shared_ptr<AbstractGenome> Genome::makeMutatedGenome(shared_ptr<AbstractGenome> 
 // each parents 0 chromosome is crossed to make a new 0 chromosome, then each parents 1 chromosome...
 // if ploidy > 1 then the number of parents must match ploidy (this may be extended in the future)
 // in this case, each parent crosses all of its chromosomes and contributs the result as a new chromosome
-shared_ptr<AbstractGenome> Genome::makeMutatedGenome(vector<shared_ptr<AbstractGenome>> parents) {
+shared_ptr<AbstractGenome> Genome::makeMutatedGenomeFromMany(vector<shared_ptr<AbstractGenome>> parents) {
 //	cout << "In Genome::makeMutatedGenome(vector<shared_ptr<AbstractGenome>> parents)\n";
 	// first, check to make sure that parent genomes are conpatable.
 	auto castParent0 = dynamic_pointer_cast<Genome>(parents[0]);  // we will be pulling all sorts of stuff from this genome so lets just cast it once.

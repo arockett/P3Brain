@@ -47,7 +47,7 @@ void TournamentOptimizer::makeNextGeneration(vector<shared_ptr<Organism>> &popul
 				}
 			}
 		}
-		nextPopulation.push_back(population[winner]->makeMutatedOffspring(population[winner]));
+		nextPopulation.push_back(population[winner]->makeMutatedOffspringFrom(population[winner]));
 		//nextPopulation.push_back(population[winner]);
 	}
 	for (size_t i = 0; i < population.size(); i++) {

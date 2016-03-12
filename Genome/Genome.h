@@ -134,8 +134,8 @@ class AbstractGenome {
 	virtual bool isEmpty() = 0;
 
 	virtual void mutate() = 0;
-	virtual shared_ptr<AbstractGenome> makeMutatedGenome(shared_ptr<AbstractGenome> parent) = 0;
-	virtual shared_ptr<AbstractGenome> makeMutatedGenome(vector<shared_ptr<AbstractGenome>> parents) = 0;
+	virtual shared_ptr<AbstractGenome> makeMutatedGenomeFrom(shared_ptr<AbstractGenome> parent) = 0;
+	virtual shared_ptr<AbstractGenome> makeMutatedGenomeFromMany(vector<shared_ptr<AbstractGenome>> parents) = 0;
 
 };
 
@@ -246,7 +246,7 @@ class Genome : public AbstractGenome {
 
 	// make a mutated genome. from this genome
 	// the undefined action is to return a new genome
-	virtual shared_ptr<AbstractGenome> makeMutatedGenome(shared_ptr<AbstractGenome> parent) override;
+	virtual shared_ptr<AbstractGenome> makeMutatedGenomeFrom(shared_ptr<AbstractGenome> parent) override;
 
 	// make a mutated genome from a vector or genomes
 	// inherit the ParamatersTable from the 0th parent
@@ -255,7 +255,7 @@ class Genome : public AbstractGenome {
 	// each parents 0 chromosome is crossed to make a new 0 chromosome, then each parents 1 chromosome...
 	// if ploidy > 1 then the number of parents must match ploidy (this may be extended in the future)
 	// in this case, each parent crosses all of its chromosomes and contributs the result as a new chromosome
-	virtual shared_ptr<AbstractGenome> makeMutatedGenome(vector<shared_ptr<AbstractGenome>> parents) override;
+	virtual shared_ptr<AbstractGenome> makeMutatedGenomeFromMany(vector<shared_ptr<AbstractGenome>> parents) override;
 
 // IO and Data Management functions
 

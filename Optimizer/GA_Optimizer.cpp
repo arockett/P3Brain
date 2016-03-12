@@ -49,7 +49,7 @@ void GA_Optimizer::makeNextGeneration(vector<shared_ptr<Organism>> &population) 
 				who = Random::getIndex(population.size());  // otherwise, just pick a random genome from population
 			}
 		}
-		nextPopulation.push_back(population[who]->makeMutatedOffspring(population[who]));
+		nextPopulation.push_back(population[who]->makeMutatedOffspringFrom(population[who]));
 
 	}
 	for (size_t i = 0; i < population.size(); i++) {

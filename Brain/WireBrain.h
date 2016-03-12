@@ -445,13 +445,17 @@ class WireBrain : public AbstractBrain {
 				if (allCells[sourceIndex] == WIRE && allCells[destinationIndex] == WIRE) {
 					if (wiregenesWormholesBidirectional == 0) {
 						neighbors[destinationIndex].push_back(sourceIndex);
+						connectionsCount++;
 					}
 					if (wiregenesWormholesBidirectional == 1) {
 						(feature[6])? neighbors[destinationIndex].push_back(sourceIndex):neighbors[sourceIndex].push_back(destinationIndex);
+						connectionsCount++;
 					}
 					if (wiregenesWormholesBidirectional == 2) {
 						neighbors[destinationIndex].push_back(sourceIndex);
+						connectionsCount++;
 						neighbors[sourceIndex].push_back(destinationIndex);
+						connectionsCount++;
 					}
 				}
 			}

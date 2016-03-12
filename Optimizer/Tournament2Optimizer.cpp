@@ -81,7 +81,7 @@ void Tournament2Optimizer::makeNextGeneration(vector<shared_ptr<Organism>> &popu
 					}
 				}
 			}
-			nextPopulation.push_back(population[p1]->makeMutatedOffspring( { population[p1], population[p2] }));
+			nextPopulation.push_back(population[p1]->makeMutatedOffspringFromMany( { population[p1], population[p2] }));
 			//cout << p1 << " " << p2 << endl;
 			//nextPopulation.push_back(population[p1]->makeMutatedOffspring(population[p1]));
 			//cout << " " << nextPopulation.size() << " " << population.size() << endl;
