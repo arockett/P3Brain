@@ -17,6 +17,7 @@ bool& Gate_Builder::usingThGate = Parameters::register_parameter("thresholdGate"
 int& Gate_Builder::thGateInitialCount = Parameters::register_parameter("thresholdGate_InitialCount", 3, "seed genome with this many start codons", "GATE TYPES");
 
 set<int> Gate_Builder::inUseGateTypes;
+map<int,vector<int>> Gate_Builder::gateStartCodes;
 map<int,int> Gate_Builder::intialGateCounts;
 
 // *** General tools for All Gates ***
@@ -66,9 +67,11 @@ void Gate_Builder::setupGates() {
 		AddGate(i, nullptr);
 	}
 	if (usingProbGate) {
-		inUseGateTypes.insert(42);
-		intialGateCounts[42] = probGateInitialCount;
-		AddGate(42, [](shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
+		int codonOne = 42;
+		inUseGateTypes.insert(codonOne);
+		gateStartCodes[codonOne] = {codonOne,255-codonOne};
+		intialGateCounts[codonOne] = probGateInitialCount;
+		AddGate(codonOne, [](shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
 			pair<vector<int>,vector<int>> addresses = getInputsAndOutputs( {1, 4}, {1, 4}, genomeHandler, gateID);
 
 			vector<vector<int>> rawTable = genomeHandler->readTable({ 1 << addresses.first.size(), 1 << addresses.second.size() }, { 16, 16 }, { 0, 255 }, Gate::DATA_CODE, gateID);
@@ -80,10 +83,12 @@ void Gate_Builder::setupGates() {
 		});
 	}
 	if (usingDetGate) {
-		inUseGateTypes.insert(43);
-		intialGateCounts[43] = detGateInitialCount;
+		int codonOne = 43;
+		inUseGateTypes.insert(codonOne);
+		gateStartCodes[codonOne] = {codonOne,255-codonOne};
+		intialGateCounts[codonOne] = detGateInitialCount;
 
-		AddGate(43, [](shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
+		AddGate(codonOne, [](shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
 			pair<vector<int>,vector<int>> addresses = getInputsAndOutputs( {1, 4}, {1, 4}, genomeHandler, gateID);
 			vector<vector<int>> table = genomeHandler->readTable( {1 << addresses.first.size(), addresses.second.size()}, {16, 4}, {0, 1}, Gate::DATA_CODE, gateID);
 			if (genomeHandler->atEOG()) {
@@ -93,14 +98,36 @@ void Gate_Builder::setupGates() {
 			return make_shared<DeterministicGate>(addresses,table,gateID);
 		});
 	}
-//	if (usingEpsiGate) {
-//		AddGate(47, [](shared_ptr<AbstractGenome> genome,shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {return make_shared<FixedEpsilonGate>(genome,genomeHandler,gateID);});
-//		Global::inUseGateTypes.insert(47);
-//	}
-//	if (usingVoidGate) {
-//		AddGate(48, [](shared_ptr<AbstractGenome> genome,shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {return make_shared<VoidGate>(genome,genomeHandler,gateID);});
-//		Global::inUseGateTypes.insert(48);
-//	}
+	if (usingEpsiGate) {
+		int codonOne = 47;
+		inUseGateTypes.insert(codonOne);
+		gateStartCodes[codonOne] = {codonOne,255-codonOne};
+		intialGateCounts[codonOne] = epsiGateInitialCount;
+		AddGate(codonOne, [](shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
+			pair<vector<int>,vector<int>> addresses = getInputsAndOutputs( {1, 4}, {1, 4}, genomeHandler, gateID);
+			vector<vector<int>> table = genomeHandler->readTable( {1 << addresses.first.size(), addresses.second.size()}, {16, 4}, {0, 1}, Gate::DATA_CODE, gateID);
+			if (genomeHandler->atEOG()) {
+				shared_ptr<FixedEpsilonGate> nullObj;
+				return nullObj;
+			}
+			return make_shared<FixedEpsilonGate>(addresses,table,gateID);
+		});
+	}
+	if (usingVoidGate) {
+		int codonOne = 48;
+		inUseGateTypes.insert(codonOne);
+		gateStartCodes[codonOne] = {codonOne,255-codonOne};
+		intialGateCounts[codonOne] = voidGateInitialCount;
+		AddGate(codonOne, [](shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
+			pair<vector<int>,vector<int>> addresses = getInputsAndOutputs( {1, 4}, {1, 4}, genomeHandler, gateID);
+			vector<vector<int>> table = genomeHandler->readTable( {1 << addresses.first.size(), addresses.second.size()}, {16, 4}, {0, 1}, Gate::DATA_CODE, gateID);
+			if (genomeHandler->atEOG()) {
+				shared_ptr<VoidGate> nullObj;
+				return nullObj;
+			}
+			return make_shared<VoidGate>(addresses,table,gateID);
+		});
+	}
 //	if (usingFBGate) {
 //		AddGate(44, [](shared_ptr<AbstractGenome> genome,shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {return make_shared<FeedbackGate>(genome,genomeHandler,gateID);});
 //		Global::inUseGateTypes.insert(44);
@@ -113,7 +140,6 @@ void Gate_Builder::setupGates() {
 //		AddGate(46, [](shared_ptr<AbstractGenome> genome,shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {return make_shared<Thresholdgate>(genome,genomeHandler,gateID);});
 //		Global::inUseGateTypes.insert(46);
 //	}
-
 }
 
 /* *** some c++ 11 magic to speed up translation from genome to gates *** */

@@ -211,7 +211,6 @@ int main(int argc, const char * argv[]) {
 	bool finished = false;  // when the archivist says we are done, we can stop!
 
 	while (!finished) {
-
 		world->evaluateFitness(group->population, false);  // evaluate each organism in the population using a World
 		cout << "  evaluation done\n";
 		finished = group->archive();  // save data, update memory and delete any unneeded data;

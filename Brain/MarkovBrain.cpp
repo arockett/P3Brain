@@ -176,13 +176,13 @@ void MarkovBrain::initalizeGenome(shared_ptr<AbstractGenome> _genome){
 
 	auto genomeHandler = _genome->newHandler(_genome);
 
-	for (auto i : Gate_Builder::inUseGateTypes){
-		cout << i << " " << Gate_Builder::intialGateCounts[i] << endl;
-	}
-	for (int i = 0; i < 5; i++) {
-		genomeHandler->randomize();
-		genomeHandler->writeInt(43, 0, 255);
-		genomeHandler->writeInt(255 - 43, 0, 255);
+	for (auto gateType : Gate_Builder::inUseGateTypes){
+		for (int i = 0; i < Gate_Builder::intialGateCounts[gateType]; i++) {
+			genomeHandler->randomize();
+			for (auto value : Gate_Builder::gateStartCodes[gateType]){
+				genomeHandler->writeInt(value, 0, 255);
+			}
+		}
 	}
 }
 

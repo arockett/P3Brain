@@ -104,7 +104,7 @@ class ProbabilisticGate : public Gate {  //conventional probabilistic gate
 	vector<vector<double>> table;
 
 	ProbabilisticGate() = delete;
-	ProbabilisticGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
+	//ProbabilisticGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
 	ProbabilisticGate(pair<vector<int>,vector<int>> addresses, vector<vector<int>> _rawTable, int _ID);
 
 
@@ -121,7 +121,7 @@ class DeterministicGate : public Gate {
 	vector<vector<int>> table;
 
 	DeterministicGate() = delete;
-	DeterministicGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
+	//DeterministicGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
 	DeterministicGate(pair<vector<int>,vector<int>> addresses, vector<vector<int>> _table, int _ID);
 
 	virtual ~DeterministicGate() = default;
@@ -142,7 +142,7 @@ class FixedEpsilonGate : public DeterministicGate {
 	vector<int> defaultOutput;
 	double epsilon;
 	FixedEpsilonGate() = delete;
-	FixedEpsilonGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
+	FixedEpsilonGate(pair<vector<int>,vector<int>> addresses, vector<vector<int>> _table, int _ID);
 	virtual ~FixedEpsilonGate() = default;
 	virtual void update(vector<double> & states, vector<double> & nextStates) override;
 	virtual string description() override;
@@ -156,7 +156,7 @@ class VoidGate : public DeterministicGate {
 	vector<int> defaultOutput;
 	double epsilon;
 	VoidGate() = delete;
-	VoidGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
+	VoidGate(pair<vector<int>,vector<int>> addresses, vector<vector<int>> _table, int _ID);
 	virtual ~VoidGate() = default;
 	virtual void update(vector<double> & states, vector<double> & nextStates) override;
 	virtual string description() override;

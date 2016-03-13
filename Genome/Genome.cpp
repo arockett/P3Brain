@@ -187,6 +187,9 @@ void Genome::Handler::copyTo(shared_ptr<AbstractGenome::Handler> to) {
 
 bool Genome::Handler::inTelomere(int length) {
 	modulateIndex();
+	if (atEOG()){
+		return true;
+	}
 	if (readDirection) {  // if reading forward
 		return (siteIndex >= (genome->chromosomes[chromosomeIndex]->size() - length));
 	} else {
