@@ -38,9 +38,11 @@ vector<shared_ptr<Gate>> Classic_GateListBuilder::buildGateList(shared_ptr<Abstr
 					gateGenomeHandler->toggleReadDirection();  // reverse the read direction again
 					gateGenomeHandler->readInt(0, 255, Gate::START_CODE, gateCount);  // mark start codon in genomes coding region
 					gateGenomeHandler->readInt(0, 255, Gate::START_CODE, gateCount);
-
-					gates.push_back(Gate_Builder::makeGate[testSite1Value](genome, gateGenomeHandler, gateCount));  // make a gate of the type associated with the value in testSite1Value
-					gateCount++;
+					shared_ptr<Gate> newGate = Gate_Builder::makeGate[testSite1Value](gateGenomeHandler, gateCount);
+					if (newGate != NULL) {
+						gates.push_back(newGate);  // make a gate of the type associated with the value in testSite1Value
+						gateCount++;
+					}
 				}
 			}
 //			testSite1Value = testSite2Value;

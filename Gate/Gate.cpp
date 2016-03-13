@@ -147,6 +147,40 @@ ProbabilisticGate::ProbabilisticGate(shared_ptr<AbstractGenome> genome, shared_p
 
 }
 
+
+ProbabilisticGate::ProbabilisticGate(pair<vector<int>,vector<int>> addresses, vector<vector<int>> rawTable, int _ID){
+
+	ID = _ID;
+
+	int i, j;
+	inputs = addresses.first;
+	outputs = addresses.second;
+
+	int numInputs = inputs.size();
+	int numOutputs = outputs.size();
+
+	table.resize(1 << numInputs);
+	//normalize each row
+	for (i = 0; i < (1 << numInputs); i++) {  //for each row (each possible input bit string)
+		table[i].resize(1 << numOutputs);
+		// first sum the row
+		double S = 0;
+		for (j = 0; j < (1 << numOutputs); j++) {
+			S += (double) rawTable[i][j];
+		}
+		// now normalize the row
+		if (S == 0.0) {  //if all the inputs on this row are 0, then give them all a probability of 1/(2^(number of outputs))
+			for (j = 0; j < (1 << numOutputs); j++)
+				table[i][j] = 1.0 / (double) (1 << numOutputs);
+		} else {  //otherwise divide all values in a row by the sum of the row
+			for (j = 0; j < (1 << numOutputs); j++)
+				table[i][j] = (double) rawTable[i][j] / S;
+		}
+	}
+
+}
+
+
 void ProbabilisticGate::update(vector<double> & states, vector<double> & nextStates) {  //this translates the input bits of the current states to the output bits of the next states
 	int input = getIndexFromInputs(states);  // converts the input values into an index
 	int outputColumn = 0;
@@ -185,6 +219,16 @@ DeterministicGate::DeterministicGate(shared_ptr<AbstractGenome> genome, shared_p
 	// get a table filled with values from the genome that has
 	// rows = (the number of possible combinations of input values) and columns = (the number of possible combinations of output values)
 	table = genomeHandler->readTable({ 1 << numInputs, numOutputs }, { 16, 4 }, { 0, 1 }, Gate::DATA_CODE, gateID);
+}
+
+
+DeterministicGate::DeterministicGate(pair<vector<int>,vector<int>> addresses, vector<vector<int>> _table, int _ID) {
+
+	ID = _ID;
+
+	inputs = addresses.first;
+	outputs = addresses.second;
+	table = _table;
 }
 
 void DeterministicGate::setupForBits(int* Ins, int nrOfIns, int Out, int logic) {

@@ -34,9 +34,9 @@ class Gate {  // abstact class. Assumes that a standard genome is being used.
 	static const int OUT_ADDRESS_CODE = 21;
 	static const int DATA_CODE = 30;
 
-	static void AddGate(int ID, function<shared_ptr<Gate>(shared_ptr<Genome>, int)> theFunction);
+	//static void AddGate(int ID, function<shared_ptr<Gate>(shared_ptr<Genome>, int)> theFunction);
 	static void setupGates();
-	static function<shared_ptr<Gate>(shared_ptr<Genome>, int)> makeGate[256];
+	//static function<shared_ptr<Gate>(shared_ptr<Genome>, int)> makeGate[256];
 
 	Gate() {
 		ID = 0;
@@ -50,7 +50,7 @@ class Gate {  // abstact class. Assumes that a standard genome is being used.
 
 	// functions used in genome translation
 	//void movePastStartCodeon(int& genomeIndex, shared_ptr<Genome> genome);  // simply addvances genomeIndex by the size of a start codeon (2)
-	int getIOAddress(shared_ptr<AbstractGenome::Handler> genomeHandler, shared_ptr<AbstractGenome> genome, int gateID);  // extracts one brain state value address from a genome
+	//int getIOAddress(shared_ptr<AbstractGenome::Handler> genomeHandler, shared_ptr<AbstractGenome> genome, int gateID);  // extracts one brain state value address from a genome
 	void getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, shared_ptr<AbstractGenome::Handler> genomeHandler, shared_ptr<AbstractGenome> genome, int code, int gateID);  // extracts many brain state value addresses from a genome
 	void getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, shared_ptr<AbstractGenome::Handler> genomeHandle, shared_ptr<AbstractGenome> genome, int gateID);  // extracts the input and output brain state value addresses for this gate
 
@@ -105,6 +105,8 @@ class ProbabilisticGate : public Gate {  //conventional probabilistic gate
 
 	ProbabilisticGate() = delete;
 	ProbabilisticGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
+	ProbabilisticGate(pair<vector<int>,vector<int>> addresses, vector<vector<int>> _rawTable, int _ID);
+
 
 	virtual ~ProbabilisticGate() = default;
 
@@ -120,6 +122,8 @@ class DeterministicGate : public Gate {
 
 	DeterministicGate() = delete;
 	DeterministicGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
+	DeterministicGate(pair<vector<int>,vector<int>> addresses, vector<vector<int>> _table, int _ID);
+
 	virtual ~DeterministicGate() = default;
 	virtual void update(vector<double> & states, vector<double> & nextStates) override;
 

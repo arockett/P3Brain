@@ -34,7 +34,8 @@ class Global {
 	                                  // Below are non configurable values (not set directly by Parameters.h methods)
 	                                  //////////
 	static int update;  // the current "time"
-	static set<int> inUseGateTypes;  // this is global - a list of the start codeons for gates being used
+	//static set<int> inUseGateTypes;  // this is global - a list of the start codeons for gates being used
+
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Global__) */

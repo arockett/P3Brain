@@ -164,8 +164,8 @@ int main(int argc, const char * argv[]) {
 //		}
 //		exit(17);
 
-		//auto initalBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
-		auto initalBrain = make_shared<WireBrain>();
+		auto initalBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
+		//auto initalBrain = make_shared<WireBrain>();
 		shared_ptr<Organism> progenitor = make_shared<Organism>(initalGenome, initalBrain);  // make a organism with a genome and brain (if you need to change the types here is where you do it)
 
 		Global::update = 0;  // the beginning of time - now we construct the first population

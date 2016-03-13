@@ -11,4 +11,4 @@ string& Global::outputDirectory = Parameters::register_parameter("outputDirector
 int& Global::bitsPerBrainAddress = Parameters::register_parameter("bitsPerBrainAddress", 8, "how many bits are evaluated to determine the brain addresses", "BRAIN");
 
 int Global::update = 0;
-set<int> Global::inUseGateTypes;
+//set<int> Global::inUseGateTypes;
