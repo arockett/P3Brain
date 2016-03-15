@@ -172,16 +172,21 @@ int MarkovBrain::numGates() {
 }
 
 void MarkovBrain::initalizeGenome(shared_ptr<AbstractGenome> _genome){
+	int codonMax = (1 << Global::bitsPerCodon) - 1;
 	_genome->fillRandom();
 
 	auto genomeHandler = _genome->newHandler(_genome);
 
 	for (auto gateType : Gate_Builder::inUseGateTypes){
+		//cout << gateType << " : "<<Gate_Builder::intialGateCounts[gateType]<<endl;
 		for (int i = 0; i < Gate_Builder::intialGateCounts[gateType]; i++) {
+			//cout << "    " << i << " : ";
 			genomeHandler->randomize();
 			for (auto value : Gate_Builder::gateStartCodes[gateType]){
-				genomeHandler->writeInt(value, 0, 255);
+				//cout << value << " ";
+				genomeHandler->writeInt(value, 0, codonMax);
 			}
+			//cout << endl;
 		}
 	}
 }

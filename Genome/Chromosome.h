@@ -177,16 +177,22 @@ template<class T> class Chromosome : public AbstractChromosome {
 	// insures that a site index is valid, if in index is > sites.size(), mod it.
 	// return true if siteIndex went out of range
 	virtual inline bool modulateIndex(int &siteIndex) override{
+		//cout << " In modulateIndex " << "   " << siteIndex << endl;
 		if (siteIndex >= (int)sites.size() || siteIndex<0) {
 			siteIndex = loopMod(siteIndex,(int)sites.size());
+			//cout << "   in loop " << siteIndex << endl;
 			return true;
 		}
+		//cout << "   after: " << siteIndex << endl;
+
 		return false;
 	}
 
 	// advance or reverse (if readDirection = false) a site index 1 or distance sites and check that new index is valid
 	// return true if siteIndex went out of range
 	virtual inline bool advanceIndex(int &siteIndex, bool readDirection = 1, int distance = 1) override{
+		string rd = (readDirection)?"forward " + to_string(distance):"backward " + to_string(distance);
+		//cout << " In advanceIndex " << rd << endl;
 		siteIndex += (readDirection)?distance:(-1*distance);  //move index
 		return modulateIndex(siteIndex);// confirm that new index is in range
 	}

@@ -106,7 +106,7 @@ void Genome::Handler::modulateIndex() {
 // i.e. if the chromosome was length 10, and the current siteIndex = 0, advanceIndex(15) will advance to
 // site 5 of the next chromosome. Should this be fixed?!??
 void Genome::Handler::advanceIndex(int distance) {
-	modulateIndex();
+	//modulateIndex();
 	if (readDirection) {	// reading forward
 		if ((genome->chromosomes[chromosomeIndex]->size() - siteIndex) > distance) {
 			siteIndex += distance;	// if there are enough sites left in the current chromosome, just move siteIndex
@@ -148,7 +148,9 @@ void Genome::Handler::advanceChromosome() {
 }
 
 void Genome::Handler::printIndex() {
-	cout << "chromosomeIndex: " << chromosomeIndex << "  siteIndex: " << siteIndex << "  EOG: " << EOG << "\n";
+	string rd = (readDirection)?"forward":"backwards";
+
+	cout << "chromosomeIndex: " << chromosomeIndex << "  siteIndex: " << siteIndex << "  EOG: " << EOG << "  direction: " << rd << endl;
 }
 
 int Genome::Handler::readInt(int valueMin, int valueMax, int code, int CodingRegionIndex) {

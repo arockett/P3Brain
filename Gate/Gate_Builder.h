@@ -35,9 +35,9 @@ class Gate_Builder {  // manages what kinds of gates can be built
 	Gate_Builder() = delete;
 	~Gate_Builder();
 
-	static void AddGate(int ID, function<shared_ptr<Gate>(shared_ptr<AbstractGenome::Handler>, int gateID)> theFunction);
+	static void AddGate(int gateType, function<shared_ptr<Gate>(shared_ptr<AbstractGenome::Handler>, int gateID)> theFunction);
 	static void setupGates();
-	static function<shared_ptr<Gate>(shared_ptr<AbstractGenome::Handler>, int gateID)> makeGate[256];
+	static vector<function<shared_ptr<Gate>(shared_ptr<AbstractGenome::Handler>, int gateID)>> makeGate;
 
 
 	//int getIOAddress(shared_ptr<AbstractGenome::Handler> genomeHandler, shared_ptr<AbstractGenome> genome, int gateID);  // extracts one brain state value address from a genome

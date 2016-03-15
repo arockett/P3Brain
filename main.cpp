@@ -43,7 +43,7 @@ using namespace std;
 
 int main(int argc, const char * argv[]) {
 
-	cout << "\n\n" << "\tMM   MM      A       BBBBBB    EEEEEE\n" << "\tMMM MMM     AAA      BB   BB   EE\n" << "\tMMMMMMM    AA AA     BBBBBB    EEEEEE\n" << "\tMM M MM   AAAAAAA    BB   BB   EE\n" << "\tMM   MM  AA     AA   BBBBBB    EEEEEE\n" << "\n" << "\tModular    Agent      Based    Evolver\n\n\n\thttp://hintzelab.msu.edu/MABE\n\n\n";
+	cout << "\n\n" << "\tMM   MM      A       BBBBBB    EEEEEE\n" << "\tMMM MMM     AAA      BB   BB   EE\n" << "\tMMMMMMM    AA AA     BBBBBB    EEEEEE\n" << "\tMM M MM   AAAAAAA    BB   BB   EE\n" << "\tMM   MM  AA     AA   BBBBBB    EEEEEE\n" << "\n" << "\tModular    Agent      Based    Evolver\n\n\n\thttp://hintzelab.msu.edu/MABE\n\n" << endl;
 	Parameters::initialize_parameters(argc, argv);  // loads command line and configFile values into registered parameters
 	                                                // also writes out a config file if requested
 	//make a node map to handle genome value to brain state address look up.
@@ -132,7 +132,7 @@ int main(int argc, const char * argv[]) {
 		} else if (Archivist::Arch_outputMethodStr == "SSwD") {
 			archivist = make_shared<SSwD_Archivist>();
 		} else {
-			cout << "\n\nERROR: Unrecognized archivist type in configuration!\n  \"" << Archivist::Arch_outputMethodStr << "\" is not defined.\n\nExiting.\n\n";
+			cout << "\n\nERROR: Unrecognized archivist type in configuration!\n  \"" << Archivist::Arch_outputMethodStr << "\" is not defined.\n\nExiting.\n" << endl;
 			exit(1);
 		}
 
@@ -145,7 +145,7 @@ int main(int argc, const char * argv[]) {
 		} else if (BaseOptimizer::Optimizer_MethodStr == "Tournament2") {
 			optimizer = make_shared<Tournament2Optimizer>();
 		} else {
-			cout << "\n\nERROR: Unrecognized optimizer type in configuration!\n  \"" << BaseOptimizer::Optimizer_MethodStr << "\" is not defined.\n\nExiting.\n\n";
+			cout << "\n\nERROR: Unrecognized optimizer type in configuration!\n  \"" << BaseOptimizer::Optimizer_MethodStr << "\" is not defined.\n\nExiting.\n" << endl;
 			exit(1);
 		}
 
@@ -200,7 +200,6 @@ int main(int argc, const char * argv[]) {
 //		exit(1);
 /////// to test genome to brain conversion and coding regions, set popsize = 1 and uncomment the block above this comment
 
-
 		group = make_shared<Group>(population, optimizer, archivist);
 	}
 
@@ -218,15 +217,15 @@ int main(int argc, const char * argv[]) {
 		Global::update++;
 		group->optimize();  // update the population (reproduction and death)
 		cout << "  optimize done\n";
-		cout << "update: " << Global::update - 1 << "   maxFitness: " << group->optimizer->maxFitness << "\n";
+		cout << "update: " << Global::update - 1 << "   maxFitness: " << group->optimizer->maxFitness << "" << endl;
 	}
 
 	group->archive(1);  // flush any data that has not been output yet
 
-	if (Archivist::Arch_outputMethodStr == "LODwAP") {  // if using LODwAP, write out some info about MRCA
-		shared_ptr<Organism> FinalMRCA = group->population[0]->getMostRecentCommonAncestor(group->population[0]);
-		cout << "MRCA - ID: " << FinalMRCA->ID << " born on: " << FinalMRCA->timeOfBirth << "\n" << FinalMRCA->brain->description();
-		//cout << "\n\n" << FinalMRCA->genome->showCodingRegions();
-	}
+	//if (Archivist::Arch_outputMethodStr == "LODwAP") {  // if using LODwAP, write out some info about MRCA
+	//	shared_ptr<Organism> FinalMRCA = group->population[0]->getMostRecentCommonAncestor(group->population[0]);
+	//	cout << "MRCA - ID: " << FinalMRCA->ID << " born on: " << FinalMRCA->timeOfBirth << endl << FinalMRCA->brain->description() << endl;
+	//	//cout << "\n\n" << FinalMRCA->genome->showCodingRegions();
+	//}
 	return 0;
 }

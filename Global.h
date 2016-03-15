@@ -29,12 +29,12 @@ class Global {
 
 	static int& bitsPerBrainAddress;  // how many bits are evaluated to determine the brain addresses.
 	                                  // i.e. ceil(bitsPerBrainAddress/8) = number of genome sites used
+	static int& bitsPerCodon;
 
 	                                  //////////
 	                                  // Below are non configurable values (not set directly by Parameters.h methods)
 	                                  //////////
 	static int update;  // the current "time"
-	//static set<int> inUseGateTypes;  // this is global - a list of the start codeons for gates being used
 
 };
 

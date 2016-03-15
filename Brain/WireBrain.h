@@ -462,7 +462,7 @@ class WireBrain : public AbstractBrain {
 		}
 
 		if (width * depth * height < (nrOfNodes * worldConnectionsSeparation)) {
-			cout << "ERROR: WireBrain requires a bigger brain width * depth * height must be >= (nrOfNodes * worldConnectionsSeparation)!\nExiting\n";
+			cout << "ERROR: WireBrain requires a bigger brain width * depth * height must be >= (nrOfNodes * worldConnectionsSeparation)!\nExiting\n"<<endl;
 			exit(1);
 		}
 		for (int i = 0; i < nrOfNodes; i++) {
@@ -539,7 +539,7 @@ class WireBrain : public AbstractBrain {
 	}
 
 	virtual void update() override {
-		//cout << "in update()\n";
+		//cout << "in update()"<<endl;
 
 		/// first see if we we already know this input
 
@@ -742,7 +742,7 @@ class WireBrain : public AbstractBrain {
 		if (state < (int) nodes.size()) {
 			nodes[state] = value;
 		} else {
-			cout << "Writing to invalid brain state - this brain needs more states!\nExiting\n";
+			cout << "Writing to invalid brain state - this brain needs more states!\nExiting"<<endl;
 			exit(1);
 		}
 	}
@@ -750,12 +750,13 @@ class WireBrain : public AbstractBrain {
 		if (state < (int) nodes.size()) {
 			return nodes[state];
 		} else {
-			cout << "Reading from invalid brain state - this brain needs more states!\nExiting\n";
+			cout << "Reading from invalid brain state - this brain needs more states!\nExiting"<<endl;
 			exit(1);
 		}
 	}
 
 	virtual void initalizeGenome(shared_ptr<AbstractGenome> _genome) {
+		int codonMax = (1 << Global::bitsPerCodon) - 1;
 
 		if (genomeDecodingMethod == "bitmap") {
 			auto genomeHandler = _genome->newHandler(_genome);
@@ -772,8 +773,8 @@ class WireBrain : public AbstractBrain {
 			for (int i = 0; i < wiregenesInitialGeneCount; i++) {
 				genomeHandler->randomize();
 				int pick = Random::getInt(42,44);
-				genomeHandler->writeInt(pick, 0, 255);
-				genomeHandler->writeInt(255 - pick, 0, 255);
+				genomeHandler->writeInt(pick, 0, codonMax);
+				genomeHandler->writeInt(codonMax - pick, 0, codonMax);
 			}
 		}
 	}

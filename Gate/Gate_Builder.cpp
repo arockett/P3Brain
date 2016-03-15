@@ -17,8 +17,8 @@ bool& Gate_Builder::usingThGate = Parameters::register_parameter("thresholdGate"
 int& Gate_Builder::thGateInitialCount = Parameters::register_parameter("thresholdGate_InitialCount", 3, "seed genome with this many start codons", "GATE TYPES");
 
 set<int> Gate_Builder::inUseGateTypes;
-map<int,vector<int>> Gate_Builder::gateStartCodes;
-map<int,int> Gate_Builder::intialGateCounts;
+map<int, vector<int>> Gate_Builder::gateStartCodes;
+map<int, int> Gate_Builder::intialGateCounts;
 
 // *** General tools for All Gates ***
 
@@ -63,20 +63,26 @@ pair<vector<int>, vector<int>> Gate_Builder::getInputsAndOutputs(const pair<int,
 //there are 256 possible gates identified each by a pair of codons (n followed by 256-n)
 //after initializing Gate::MakeGate, Gate::AddGate() adds values and the associated constructor function to Gate::MakeGate
 void Gate_Builder::setupGates() {
-	for (int i = 0; i < 256; i++) {
+	makeGate.resize(1 << Global::bitsPerCodon);
+	for (int i = 0; i < (1 << Global::bitsPerCodon); i++) {
 		AddGate(i, nullptr);
 	}
 	if (usingProbGate) {
 		int codonOne = 42;
 		inUseGateTypes.insert(codonOne);
-		gateStartCodes[codonOne] = {codonOne,255-codonOne};
+		{
+			gateStartCodes.insert(pair<int, vector<int> >(10, vector<int>()));
+			//gateStartCodes[codonOne] = vector<int>();
+			gateStartCodes[codonOne].push_back(codonOne);
+			gateStartCodes[codonOne].push_back(((1 << Global::bitsPerCodon) - 1) - codonOne);
+		}
 		intialGateCounts[codonOne] = probGateInitialCount;
 		AddGate(codonOne, [](shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
 			pair<vector<int>,vector<int>> addresses = getInputsAndOutputs( {1, 4}, {1, 4}, genomeHandler, gateID);
 
-			vector<vector<int>> rawTable = genomeHandler->readTable({ 1 << addresses.first.size(), 1 << addresses.second.size() }, { 16, 16 }, { 0, 255 }, Gate::DATA_CODE, gateID);
+			vector<vector<int>> rawTable = genomeHandler->readTable( {1 << addresses.first.size(), 1 << addresses.second.size()}, {16, 16}, {0, 255}, Gate::DATA_CODE, gateID);
 			if (genomeHandler->atEOG()) {
-				shared_ptr<ProbabilisticGate> nullObj;
+				shared_ptr<ProbabilisticGate> nullObj = nullptr;
 				return nullObj;
 			}
 			return make_shared<ProbabilisticGate>(addresses,rawTable,gateID);
@@ -85,14 +91,19 @@ void Gate_Builder::setupGates() {
 	if (usingDetGate) {
 		int codonOne = 43;
 		inUseGateTypes.insert(codonOne);
-		gateStartCodes[codonOne] = {codonOne,255-codonOne};
+		{
+			gateStartCodes.insert(pair<int, vector<int> >(10, vector<int>()));
+			//gateStartCodes[codonOne] = vector<int>();
+			gateStartCodes[codonOne].push_back(codonOne);
+			gateStartCodes[codonOne].push_back(((1 << Global::bitsPerCodon) - 1) - codonOne);
+		}
 		intialGateCounts[codonOne] = detGateInitialCount;
 
 		AddGate(codonOne, [](shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
 			pair<vector<int>,vector<int>> addresses = getInputsAndOutputs( {1, 4}, {1, 4}, genomeHandler, gateID);
 			vector<vector<int>> table = genomeHandler->readTable( {1 << addresses.first.size(), addresses.second.size()}, {16, 4}, {0, 1}, Gate::DATA_CODE, gateID);
 			if (genomeHandler->atEOG()) {
-				shared_ptr<DeterministicGate> nullObj;
+				shared_ptr<DeterministicGate> nullObj = nullptr;;
 				return nullObj;
 			}
 			return make_shared<DeterministicGate>(addresses,table,gateID);
@@ -101,13 +112,18 @@ void Gate_Builder::setupGates() {
 	if (usingEpsiGate) {
 		int codonOne = 47;
 		inUseGateTypes.insert(codonOne);
-		gateStartCodes[codonOne] = {codonOne,255-codonOne};
+		{
+			gateStartCodes.insert(pair<int, vector<int> >(10, vector<int>()));
+			//gateStartCodes[codonOne] = vector<int>();
+			gateStartCodes[codonOne].push_back(codonOne);
+			gateStartCodes[codonOne].push_back(((1 << Global::bitsPerCodon) - 1) - codonOne);
+		}
 		intialGateCounts[codonOne] = epsiGateInitialCount;
 		AddGate(codonOne, [](shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
 			pair<vector<int>,vector<int>> addresses = getInputsAndOutputs( {1, 4}, {1, 4}, genomeHandler, gateID);
 			vector<vector<int>> table = genomeHandler->readTable( {1 << addresses.first.size(), addresses.second.size()}, {16, 4}, {0, 1}, Gate::DATA_CODE, gateID);
 			if (genomeHandler->atEOG()) {
-				shared_ptr<FixedEpsilonGate> nullObj;
+				shared_ptr<FixedEpsilonGate> nullObj = nullptr;;
 				return nullObj;
 			}
 			return make_shared<FixedEpsilonGate>(addresses,table,gateID);
@@ -116,13 +132,18 @@ void Gate_Builder::setupGates() {
 	if (usingVoidGate) {
 		int codonOne = 48;
 		inUseGateTypes.insert(codonOne);
-		gateStartCodes[codonOne] = {codonOne,255-codonOne};
+		{
+			gateStartCodes.insert(pair<int, vector<int> >(10, vector<int>()));
+			//gateStartCodes[codonOne] = vector<int>();
+			gateStartCodes[codonOne].push_back(codonOne);
+			gateStartCodes[codonOne].push_back(((1 << Global::bitsPerCodon) - 1) - codonOne);
+		}
 		intialGateCounts[codonOne] = voidGateInitialCount;
 		AddGate(codonOne, [](shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
 			pair<vector<int>,vector<int>> addresses = getInputsAndOutputs( {1, 4}, {1, 4}, genomeHandler, gateID);
 			vector<vector<int>> table = genomeHandler->readTable( {1 << addresses.first.size(), addresses.second.size()}, {16, 4}, {0, 1}, Gate::DATA_CODE, gateID);
 			if (genomeHandler->atEOG()) {
-				shared_ptr<VoidGate> nullObj;
+				shared_ptr<VoidGate> nullObj = nullptr;;
 				return nullObj;
 			}
 			return make_shared<VoidGate>(addresses,table,gateID);
@@ -143,9 +164,10 @@ void Gate_Builder::setupGates() {
 }
 
 /* *** some c++ 11 magic to speed up translation from genome to gates *** */
-function<shared_ptr<Gate>(shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID)> Gate_Builder::makeGate[256];
+//function<shared_ptr<Gate>(shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID)> Gate_Builder::makeGate[256];
+vector<function<shared_ptr<Gate>(shared_ptr<AbstractGenome::Handler>, int gateID)>> Gate_Builder::makeGate;
 
-void Gate_Builder::AddGate(int ID, function<shared_ptr<Gate>(shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID)> theFunction) {
-	makeGate[ID] = theFunction;
+void Gate_Builder::AddGate(int gateType, function<shared_ptr<Gate>(shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID)> theFunction) {
+	makeGate[gateType] = theFunction;
 }
 /* *** end - some c++ 11 magic to speed up translation from genome to gates *** */

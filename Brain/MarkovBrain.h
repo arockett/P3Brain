@@ -85,7 +85,7 @@ class MarkovBrain : public AbstractBrain {
 		if (state < (int) states.size()) {
 			states[state] = value;
 		} else {
-			cout << "Writing to invalid brain state - this brain needs more states!\nExiting\n";
+			cout << "Writing to invalid brain state - this brain needs more states!\nExiting"<<endl;
 			exit(1);
 		}
 	}
@@ -93,7 +93,7 @@ class MarkovBrain : public AbstractBrain {
 		if (state < (int) states.size()) {
 			return states[state];
 		} else {
-			cout << "Reading from invalid brain state - this brain needs more states!\nExiting\n";
+			cout << "Reading from invalid brain state - this brain needs more states!\nExiting"<<endl;
 			exit(1);
 		}
 	}

@@ -29,6 +29,10 @@ class Base_GateListBuilder {
 		vector<shared_ptr<Gate>> gates;
 		return gates;
 	}
+//	virtual vector<shared_ptr<Gate>> buildGateList(shared_ptr<AbstractGenome> genome, int nrOfBrainStates) {
+//		vector<shared_ptr<Gate>> gates;
+//		return gates;
+//	}
 
 };
 

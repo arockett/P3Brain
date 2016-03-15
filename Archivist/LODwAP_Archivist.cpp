@@ -44,7 +44,7 @@ bool LODwAP_Archivist::archive(vector<shared_ptr<Organism>> population, int flus
 		vector<shared_ptr<Organism>> LOD = population[0]->getLOD(population[0]);  // get line of decent
 		shared_ptr<Organism> effective_MRCA;
 		if (flush) {  // if flush then we don't care about coalescence
-			cout << "flushing LODwAP: using population[0] as Most Recent Common Ancestor (MRCA)\n";
+			cout << "flushing LODwAP: using population[0] as Most Recent Common Ancestor (MRCA)"<<endl;
 			effective_MRCA = population[0]->parents[0];  // this assumes that a population was created, but not tested at the end of the evolution loop!
 		} else {
 			effective_MRCA = population[0]->getMostRecentCommonAncestor(LOD);  // find the convergance point in the LOD.

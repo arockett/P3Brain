@@ -9,6 +9,6 @@ int& Global::popSize = Parameters::register_parameter("popSize", 150, "number of
 string& Global::outputDirectory = Parameters::register_parameter("outputDirectory", (string) "./", "where files will be written", "GLOBAL");
 
 int& Global::bitsPerBrainAddress = Parameters::register_parameter("bitsPerBrainAddress", 8, "how many bits are evaluated to determine the brain addresses", "BRAIN");
+int& Global::bitsPerCodon = Parameters::register_parameter("bitsPerCodon", 8, "how many bits are evaluated to determine the codon addresses", "BRAIN");
 
 int Global::update = 0;
-//set<int> Global::inUseGateTypes;
