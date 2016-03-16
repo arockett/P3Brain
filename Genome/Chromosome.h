@@ -23,6 +23,9 @@ using namespace std;
 
 class AbstractChromosome {
  public:
+	double alphabetSize;  // values in this chromosome will be in the range of 0 to < alphabetSize
+	                      // i.e. the number of diffrent values that can be at a site
+	                      // for double this is the range of the value
 
 	virtual ~AbstractChromosome() {
 	}
@@ -156,9 +159,6 @@ template<class T> class Chromosome : public AbstractChromosome {
 		virtual string codingRegionsToString(int CodingRegionIndex = -1);
 	};
 
-	double alphabetSize;  // values in this chromosome will be in the range of 0 to < alphabetSize
-	                      // i.e. the number of diffrent values that can be at a site
-	                      // for double this is the range of the value
 	CodingRegions codingRegions;
 
 	                      // default fail constructor - if alphebetSize default has not been explicitly defined, this is run.

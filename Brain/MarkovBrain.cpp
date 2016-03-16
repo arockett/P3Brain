@@ -32,7 +32,9 @@ MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<Abstr
 
 	GLB = _GLB;
 	//cout << "in MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrOfBrainStates)\n\tabout to - gates = GLB->buildGateList(genome, nrOfBrainStates);" << endl;
+
 	gates = GLB->buildGateList(genome, nrOfBrainStates);
+
 	//cout << "\tback"<<endl;
 //  bool translation_Complete = false;
 //  if (genome->getSize() == 0){
@@ -171,18 +173,18 @@ int MarkovBrain::numGates() {
 	return brainSize();
 }
 
-void MarkovBrain::initalizeGenome(shared_ptr<AbstractGenome> _genome){
+void MarkovBrain::initalizeGenome(shared_ptr<AbstractGenome> _genome) {
 	int codonMax = (1 << Global::bitsPerCodon) - 1;
 	_genome->fillRandom();
 
 	auto genomeHandler = _genome->newHandler(_genome);
 
-	for (auto gateType : Gate_Builder::inUseGateTypes){
+	for (auto gateType : Gate_Builder::inUseGateTypes) {
 		//cout << gateType << " : "<<Gate_Builder::intialGateCounts[gateType]<<endl;
 		for (int i = 0; i < Gate_Builder::intialGateCounts[gateType]; i++) {
 			//cout << "    " << i << " : ";
 			genomeHandler->randomize();
-			for (auto value : Gate_Builder::gateStartCodes[gateType]){
+			for (auto value : Gate_Builder::gateStartCodes[gateType]) {
 				//cout << value << " ";
 				genomeHandler->writeInt(value, 0, codonMax);
 			}

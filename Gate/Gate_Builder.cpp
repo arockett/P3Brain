@@ -17,7 +17,7 @@ bool& Gate_Builder::usingThGate = Parameters::register_parameter("thresholdGate"
 int& Gate_Builder::thGateInitialCount = Parameters::register_parameter("thresholdGate_InitialCount", 3, "seed genome with this many start codons", "GATE TYPES");
 
 set<int> Gate_Builder::inUseGateTypes;
-map<int, vector<int>> Gate_Builder::gateStartCodes;
+vector<vector<int>> Gate_Builder::gateStartCodes;
 map<int, int> Gate_Builder::intialGateCounts;
 
 // *** General tools for All Gates ***
@@ -50,6 +50,7 @@ pair<vector<int>, vector<int>> Gate_Builder::getInputsAndOutputs(const pair<int,
 
 	inputs.resize(numInputs);
 	outputs.resize(numOutputs);
+
 	if (insRange.second > 0) {
 		getSomeBrainAddresses(numInputs, insRange.second, inputs, genomeHandler, Gate::IN_ADDRESS_CODE, gateID);
 	}
@@ -67,12 +68,12 @@ void Gate_Builder::setupGates() {
 	for (int i = 0; i < (1 << Global::bitsPerCodon); i++) {
 		AddGate(i, nullptr);
 	}
+	gateStartCodes.resize(1 << Global::bitsPerCodon);
 	if (usingProbGate) {
 		int codonOne = 42;
 		inUseGateTypes.insert(codonOne);
 		{
-			gateStartCodes.insert(pair<int, vector<int> >(10, vector<int>()));
-			//gateStartCodes[codonOne] = vector<int>();
+			//gateStartCodes.insert(pair<int, vector<int> >(codonOne, vector<int>()));
 			gateStartCodes[codonOne].push_back(codonOne);
 			gateStartCodes[codonOne].push_back(((1 << Global::bitsPerCodon) - 1) - codonOne);
 		}
@@ -81,7 +82,7 @@ void Gate_Builder::setupGates() {
 			pair<vector<int>,vector<int>> addresses = getInputsAndOutputs( {1, 4}, {1, 4}, genomeHandler, gateID);
 
 			vector<vector<int>> rawTable = genomeHandler->readTable( {1 << addresses.first.size(), 1 << addresses.second.size()}, {16, 16}, {0, 255}, Gate::DATA_CODE, gateID);
-			if (genomeHandler->atEOG()) {
+			if (genomeHandler->atEOC()) {
 				shared_ptr<ProbabilisticGate> nullObj = nullptr;
 				return nullObj;
 			}
@@ -92,17 +93,19 @@ void Gate_Builder::setupGates() {
 		int codonOne = 43;
 		inUseGateTypes.insert(codonOne);
 		{
-			gateStartCodes.insert(pair<int, vector<int> >(10, vector<int>()));
-			//gateStartCodes[codonOne] = vector<int>();
+			//gateStartCodes.insert(pair<int, vector<int> >(codonOne, vector<int>()));
 			gateStartCodes[codonOne].push_back(codonOne);
 			gateStartCodes[codonOne].push_back(((1 << Global::bitsPerCodon) - 1) - codonOne);
 		}
+
 		intialGateCounts[codonOne] = detGateInitialCount;
 
 		AddGate(codonOne, [](shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
 			pair<vector<int>,vector<int>> addresses = getInputsAndOutputs( {1, 4}, {1, 4}, genomeHandler, gateID);
 			vector<vector<int>> table = genomeHandler->readTable( {1 << addresses.first.size(), addresses.second.size()}, {16, 4}, {0, 1}, Gate::DATA_CODE, gateID);
-			if (genomeHandler->atEOG()) {
+
+			//vector<vector<int>> table = genomeHandler->readTable( {16,4}, {16, 4}, {0, 1}, Gate::DATA_CODE, gateID);
+			if (genomeHandler->atEOC()) {
 				shared_ptr<DeterministicGate> nullObj = nullptr;;
 				return nullObj;
 			}
@@ -113,8 +116,7 @@ void Gate_Builder::setupGates() {
 		int codonOne = 47;
 		inUseGateTypes.insert(codonOne);
 		{
-			gateStartCodes.insert(pair<int, vector<int> >(10, vector<int>()));
-			//gateStartCodes[codonOne] = vector<int>();
+			//gateStartCodes.insert(pair<int, vector<int> >(codonOne, vector<int>()));
 			gateStartCodes[codonOne].push_back(codonOne);
 			gateStartCodes[codonOne].push_back(((1 << Global::bitsPerCodon) - 1) - codonOne);
 		}
@@ -122,7 +124,7 @@ void Gate_Builder::setupGates() {
 		AddGate(codonOne, [](shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
 			pair<vector<int>,vector<int>> addresses = getInputsAndOutputs( {1, 4}, {1, 4}, genomeHandler, gateID);
 			vector<vector<int>> table = genomeHandler->readTable( {1 << addresses.first.size(), addresses.second.size()}, {16, 4}, {0, 1}, Gate::DATA_CODE, gateID);
-			if (genomeHandler->atEOG()) {
+			if (genomeHandler->atEOC()) {
 				shared_ptr<FixedEpsilonGate> nullObj = nullptr;;
 				return nullObj;
 			}
@@ -133,8 +135,7 @@ void Gate_Builder::setupGates() {
 		int codonOne = 48;
 		inUseGateTypes.insert(codonOne);
 		{
-			gateStartCodes.insert(pair<int, vector<int> >(10, vector<int>()));
-			//gateStartCodes[codonOne] = vector<int>();
+			//gateStartCodes.insert(pair<int, vector<int> >(codonOne, vector<int>()));
 			gateStartCodes[codonOne].push_back(codonOne);
 			gateStartCodes[codonOne].push_back(((1 << Global::bitsPerCodon) - 1) - codonOne);
 		}
@@ -142,7 +143,7 @@ void Gate_Builder::setupGates() {
 		AddGate(codonOne, [](shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
 			pair<vector<int>,vector<int>> addresses = getInputsAndOutputs( {1, 4}, {1, 4}, genomeHandler, gateID);
 			vector<vector<int>> table = genomeHandler->readTable( {1 << addresses.first.size(), addresses.second.size()}, {16, 4}, {0, 1}, Gate::DATA_CODE, gateID);
-			if (genomeHandler->atEOG()) {
+			if (genomeHandler->atEOC()) {
 				shared_ptr<VoidGate> nullObj = nullptr;;
 				return nullObj;
 			}

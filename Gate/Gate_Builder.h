@@ -29,7 +29,7 @@ class Gate_Builder {  // manages what kinds of gates can be built
 
 
 	static set<int> inUseGateTypes;  // this is global - a list of the start codeons for gates being used
-	static map<int,vector<int>> gateStartCodes;
+	static vector<vector<int>> gateStartCodes;
 	static map<int,int> intialGateCounts;
 
 	Gate_Builder() = delete;

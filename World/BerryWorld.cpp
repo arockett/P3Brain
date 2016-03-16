@@ -49,7 +49,7 @@ bool& BerryWorld::clearOutputs = Parameters::register_parameter("BERRY_clearOutp
 bool& BerryWorld::allowMoveAndEat = Parameters::register_parameter("BERRY_allowMoveAndEat", false, "if true, the brain can move and eat in the same world update", "WORLD - BERRY - ADVANCED");
 bool& BerryWorld::senseDown = Parameters::register_parameter("BERRY_senseDown", true, "if true, Agent can sense what it's standing on", "WORLD - BERRY");
 bool& BerryWorld::senseFront = Parameters::register_parameter("BERRY_senseFront", true, "if true, Agent can sense what's in front of it", "WORLD - BERRY");
-bool& BerryWorld::senseFrontSides = Parameters::register_parameter("BERRY_senseFrontSides", true, "if true, Agent can sense what's in front to the left and right of it", "WORLD - BERRY");
+bool& BerryWorld::senseFrontSides = Parameters::register_parameter("BERRY_senseFrontSides", false, "if true, Agent can sense what's in front to the left and right of it", "WORLD - BERRY");
 bool& BerryWorld::senseWalls = Parameters::register_parameter("BERRY_senseWalls", false, "if true, Agent can sense Walls", "WORLD - BERRY");
 int& BerryWorld::replacement = Parameters::register_parameter("BERRY_replacement", -1, "-1 = random, 0 = no replacement, 1 = replace other", "WORLD - BERRY - ADVANCED");
 
@@ -97,6 +97,7 @@ BerryWorld::BerryWorld() {
 	foodRatioLookup[7] = ratioFood7;
 	foodRatioLookup[8] = ratioFood8;
 
+	foodRatioCount = 0;
 	for (int i = 0; i <= foodTypes; i++) {
 		foodRatioCount += foodRatioLookup[i];
 	}
@@ -146,7 +147,7 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 	}
 	int facing = Random::getIndex(8);  // direction the agent is facing
 
-////////////////////////// uncomment to test world makeing and food picking
+////////////////////////// uncomment to test world making and food picking
 //	printGrid(grid, currentLocation, facing);
 //	for (int x = 1; x < WorldX - 1; x++) {
 //		for (int y = 1; y < WorldY - 1; y++) {
@@ -164,7 +165,7 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 //	printGrid(grid, currentLocation, facing);
 //
 //	exit(1);
-////////////////////////// uncomment to test world makeing and food picking
+////////////////////////// uncomment to test world making and food picking
 
 	// set up to track what food is eaten
 	int switches = 0;  // number of times organism has switched food source

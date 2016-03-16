@@ -49,8 +49,17 @@ void Genome::Handler::resetHandler() {
 		siteIndex = genome->chromosomes[chromosomeIndex]->size() - 1;  // set to last site in last chromosome
 	}
 	resetEOG();
+	resetEOC();
 }
 
+void Genome::Handler::resetHandlerOnChromosome() {
+	if (readDirection) {  // if reading forward
+		siteIndex = 0;
+	} else {  // if reading backwards
+		siteIndex = genome->chromosomes[chromosomeIndex]->size() - 1;  // set to last site in last chromosome
+	}
+	resetEOC();
+}
 // modulateIndex checks to see if the current chromosomeIndex and siteIndex are out of range. if they are
 // it uses readDirection to resolve them.	virtual void copyFrom(shared_ptr<Genome> from) {
 
@@ -65,18 +74,20 @@ void Genome::Handler::modulateIndex() {
 		if (chromosomeIndex >= (int) genome->chromosomes.size()) {
 			chromosomeIndex = 0;  // reset chromosomeIndex
 			EOG = true;  // if we are past the last chromosome then EOG = true
+			EOC = true;
 		}
 
 		// now that we know that the chromosome index is in range, check the site index
 		if (genome->chromosomes[chromosomeIndex]->modulateIndex(siteIndex)) {
 			chromosomeIndex++;	// if the site index is out of range, increment the chromosomeIndex
-			siteIndex = 0;		// ... and reset the site index
 			// now that we know that the site index is also in range, we have to check the chromosome index again!
 			if (chromosomeIndex >= (int) genome->chromosomes.size()) {
 				chromosomeIndex = 0;	// if the site index is out of range, increment the chromosomeIndex
 				siteIndex = 0;			// ... and reset the site index
 				EOG = true;
 			};
+			siteIndex = 0;		// ... and reset the site index
+			EOC = true;
 		}
 	} else {  //reading backwards!
 		// first see if we are past last chromosome
@@ -84,6 +95,7 @@ void Genome::Handler::modulateIndex() {
 			chromosomeIndex = ((int) genome->chromosomes.size()) - 1;  // reset chromosomeIndex (to last chromosome)
 			siteIndex = genome->chromosomes[chromosomeIndex]->size() - 1;  // reset siteIndex (to last site in this chromosome)
 			EOG = true;  // if we are past the last chromosome then EOG = true
+			EOC = true;
 		}
 
 		// now that we know that the chromosome index is in range, check the site index
@@ -95,6 +107,7 @@ void Genome::Handler::modulateIndex() {
 				EOG = true;
 			}
 			siteIndex = genome->chromosomes[chromosomeIndex]->size() - 1;	// reset siteIndex (to last site in this chromosome)
+			EOC = true;
 		}
 
 	}
@@ -137,6 +150,11 @@ bool Genome::Handler::atEOG() {
 	return EOG;
 }
 
+bool Genome::Handler::atEOC() {
+	modulateIndex();
+	return EOC;
+}
+
 void Genome::Handler::advanceChromosome() {
 	chromosomeIndex += (readDirection) ? 1 : (-1);  //move index
 	siteIndex = 0;	// set siteIndex to 0 so modulateIndex can not advance again
@@ -145,12 +163,13 @@ void Genome::Handler::advanceChromosome() {
 	if (!readDirection) {  // if we are reading backwards, set siteIndex to the last site
 		siteIndex = genome->chromosomes[chromosomeIndex]->size() - 1;
 	}
+	EOC = true;
 }
 
 void Genome::Handler::printIndex() {
 	string rd = (readDirection)?"forward":"backwards";
 
-	cout << "chromosomeIndex: " << chromosomeIndex << "  siteIndex: " << siteIndex << "  EOG: " << EOG << "  direction: " << rd << endl;
+	cout << "chromosomeIndex: " << chromosomeIndex << "  siteIndex: " << siteIndex << "  EOC: " << EOC << "  EOG: " << EOG << "  direction: " << rd << endl;
 }
 
 int Genome::Handler::readInt(int valueMin, int valueMax, int code, int CodingRegionIndex) {
@@ -185,11 +204,12 @@ void Genome::Handler::copyTo(shared_ptr<AbstractGenome::Handler> to) {
 	castTo->chromosomeIndex = chromosomeIndex;
 	castTo->siteIndex = siteIndex;
 	castTo->EOG = EOG;
+	castTo->EOC = EOC;
 }
 
 bool Genome::Handler::inTelomere(int length) {
 	modulateIndex();
-	if (atEOG()){
+	if (atEOC() || atEOG()){
 		return true;
 	}
 	if (readDirection) {  // if reading forward
@@ -271,6 +291,10 @@ shared_ptr<AbstractGenome::Handler> Genome::newHandler(shared_ptr<AbstractGenome
 	}
 
 	return make_shared<Handler>(_genome, _readDirection);
+}
+
+double Genome::alphabetSize(){
+	return chromosomes[0]->alphabetSize;
 }
 
 // randomize this genomes contents
@@ -514,5 +538,13 @@ string Genome::genomeToStr() {
 	S.erase(S.begin());  // clip off the leading separator
 	S = "\"[" + S + "]\"";
 	return S;
+}
+
+
+void Genome::printGenome() {
+	cout << "alphabetSize: " << alphabetSize() << "  chromosomes: " << chromosomes.size() <<  "  ploidy: " << ploidy << endl;
+	for (size_t c = 0; c < chromosomes.size(); c++) {
+		cout << c << " : " << chromosomes[c]->size() << " : " << chromosomes[c]->chromosomeToStr() << endl;
+	}
 }
 

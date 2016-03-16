@@ -40,19 +40,28 @@ class AbstractGenome {
 		//shared_ptr<AbstractGenome> genome;
 		bool readDirection;  // true = forward, false = backwards
 		bool EOG;  // end of genome
+		bool EOC;  // end of chromosome - in this context chromosome is a subsection of the genome
+				// which after having passed we may want to perform some different behavior
 
 		Handler() {
 			readDirection = true;
-			EOG = true;
+			EOG = false;
+			EOC = false;
 		}
 
 		Handler(shared_ptr<AbstractGenome> _genome, bool _readDirection = true) {
 			readDirection = _readDirection;
-			EOG = true;
+			EOG = false;
+			EOC = false;
 		}
 
 		virtual void resetEOG() {
 			EOG = false;
+			EOC = false;
+		}
+
+		virtual void resetEOC() {
+			EOC = false;
 		}
 
 		virtual void setReadDirection(bool _readDirection) {
@@ -64,6 +73,7 @@ class AbstractGenome {
 		}
 
 		virtual void resetHandler() = 0;
+		virtual void resetHandlerOnChromosome() = 0;
 
 		virtual ~Handler() {
 		}
@@ -89,6 +99,10 @@ class AbstractGenome {
 			return false;
 		}
 
+		virtual bool atEOC() {
+			return false;
+		}
+
 		virtual void printIndex() = 0;
 
 		virtual bool inTelomere(int length) {
@@ -106,6 +120,7 @@ class AbstractGenome {
 	//virtual shared_ptr<AbstractGenome::Handler> newHandler(shared_ptr<AbstractGenome> _genome, bool _readDirection = true) override {
 
 	virtual shared_ptr<AbstractGenome::Handler> newHandler(shared_ptr<AbstractGenome> _genome, bool _readDirection = true) = 0;
+	virtual double alphabetSize() = 0;
 
 	virtual void copyFrom(shared_ptr<AbstractGenome> from) = 0;
 
@@ -123,6 +138,10 @@ class AbstractGenome {
 	virtual string genomeToStr() {
 		cout << "Warning! In AbstractGenome::genomeToStr()...\n";
 		return "";
+	}
+
+	virtual void printGenome() {
+		cout << "Warning! In AbstractGenome::printGenome()...\n";
 	}
 
 	virtual void loadGenome(string fileName, string key, string keyValue) {
@@ -170,6 +189,7 @@ class Genome : public AbstractGenome {
 		virtual ~Handler() = default;
 
 		virtual void resetHandler() override;
+		virtual void resetHandlerOnChromosome() override;
 
 		// modulateIndex checks to see if the current chromosomeIndex and siteIndex are out of range. if they are
 		// it uses readDirection to resolve them.	virtual void copyFrom(shared_ptr<Genome> from) {
@@ -190,6 +210,8 @@ class Genome : public AbstractGenome {
 
 		// returns true if this Handler has reached the end of genome (or start if direction is backwards).
 		virtual bool atEOG() override;
+		virtual bool atEOC() override;
+
 		virtual void advanceChromosome();
 		virtual void printIndex() override;
 		virtual int readInt(int valueMin, int valueMax, int code = -1, int CodingRegionIndex = 0) override;
@@ -216,6 +238,8 @@ class Genome : public AbstractGenome {
 	virtual ~Genome() = default;
 
 	virtual shared_ptr<AbstractGenome::Handler> newHandler(shared_ptr<AbstractGenome> _genome, bool _readDirection = true) override;
+
+	virtual double alphabetSize() override;
 
 	// randomize this genomes contents
 	virtual void fillRandom() override;
@@ -276,6 +300,9 @@ class Genome : public AbstractGenome {
 
 	// convert a genome to a string
 	virtual string genomeToStr() override;
+
+	virtual void printGenome() override;
+
 
 }
 ;
