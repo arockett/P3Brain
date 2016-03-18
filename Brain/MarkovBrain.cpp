@@ -22,18 +22,18 @@ bool& MarkovBrain::serialProcessing = Parameters::register_parameter("serialProc
 
 MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, int _nrOfStates) {
 	GLB = _GLB;
-	nrOfBrainStates = _nrOfStates;
+	nrOfBrainNodes = _nrOfStates;
 }
 
 MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrOfBrainStates) {  //this is a constructor. it is run whenever a new brain is created.
-	nrOfBrainStates = _nrOfBrainStates;
-	states.resize(nrOfBrainStates);
-	nextStates.resize(nrOfBrainStates);
+	nrOfBrainNodes = _nrOfBrainStates;
+	states.resize(nrOfBrainNodes);
+	nextStates.resize(nrOfBrainNodes);
 
 	GLB = _GLB;
 	//cout << "in MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrOfBrainStates)\n\tabout to - gates = GLB->buildGateList(genome, nrOfBrainStates);" << endl;
 
-	gates = GLB->buildGateList(genome, nrOfBrainStates);
+	gates = GLB->buildGateList(genome, nrOfBrainNodes);
 
 	//cout << "\tback"<<endl;
 //  bool translation_Complete = false;
@@ -68,7 +68,7 @@ shared_ptr<AbstractBrain> MarkovBrain::makeBrainFromGenome(shared_ptr<AbstractGe
 }
 
 void MarkovBrain::resetBrain() {
-	for (int i = 0; i < nrOfBrainStates; i++)
+	for (int i = 0; i < nrOfBrainNodes; i++)
 		states[i] = 0.0;
 	for (size_t i = 0; i < gates.size(); i++)
 		gates[i]->resetGate();
@@ -85,7 +85,7 @@ void MarkovBrain::update() {
 	 }
 	 } else {*/
 	//this is the default way of parallel updating
-	nextStates.assign(nrOfBrainStates, 0.0);
+	nextStates.assign(nrOfBrainNodes, 0.0);
 	for (size_t i = 0; i < gates.size(); i++) {  //update each gate
 		gates[i]->update(states, nextStates);
 	}
@@ -95,7 +95,7 @@ void MarkovBrain::update() {
 
 void MarkovBrain::inOutReMap() {  // remaps genome site values to valid brain state addresses
 	for (size_t i = 0; i < gates.size(); i++) {
-		gates[i]->applyNodeMap(defaultNodeMap, nrOfBrainStates);
+		gates[i]->applyNodeMap(defaultNodeMap, nrOfBrainNodes);
 	}
 
 }
@@ -109,7 +109,7 @@ int MarkovBrain::IntFromState(vector<int> I) {
 
 int MarkovBrain::IntFromAllStates() {
 	int r = 0;
-	for (int i = 0; i < nrOfBrainStates; i++)
+	for (int i = 0; i < nrOfBrainNodes; i++)
 		r = (r << 1) + Bit(states[i]);
 	return r;
 
@@ -137,10 +137,10 @@ string MarkovBrain::gateList() {
 
 vector<vector<int>> MarkovBrain::getConnectivityMatrix() {
 	vector<vector<int>> M;
-	M.resize(nrOfBrainStates);
-	for (int i = 0; i < nrOfBrainStates; i++) {
-		M[i].resize(nrOfBrainStates);
-		for (int j = 0; j < nrOfBrainStates; j++)
+	M.resize(nrOfBrainNodes);
+	for (int i = 0; i < nrOfBrainNodes; i++) {
+		M[i].resize(nrOfBrainNodes);
+		for (int j = 0; j < nrOfBrainNodes; j++)
 			M[i][j] = 0;
 	}
 	for (auto G : gates) {

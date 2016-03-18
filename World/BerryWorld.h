@@ -81,8 +81,8 @@ class BerryWorld : public World {
 	static bool& recordFoodListEatEmpty;
 	static bool& recordFoodListNoEat;
 
-	int inputStatesCount = 0;
-	int outputStatesCount = 0;
+	int inputNodesCount = 0;
+	int outputNodesCount = 0;
 
 	int foodRatioTotal;  // sum of ratioFood for foods in use
 	vector<int> foodRatioLookup;

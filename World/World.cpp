@@ -40,7 +40,7 @@ double World::testIndividual(shared_ptr<Organism> org, bool analyse, bool show) 
 	org->brain->resetBrain();
 	org->brain->update();
 	double w=0.0;
-	for(int i=0;i < org->brain->nrOfBrainStates;i++)
+	for(int i=0;i < org->brain->nrOfBrainNodes;i++)
 	w+=(double)(((int)org->brain->getState(i))&1);
 	return w*w;
 }

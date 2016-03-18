@@ -24,11 +24,11 @@
 using namespace std;
 class AbstractBrain {
  public:
-	int nrOfBrainStates;  // the number of states in THIS brain
+	int nrOfBrainNodes;  // the number of states in THIS brain
 	                      // this is temporary! new node/memory/dataCell will fix this.
 
 	AbstractBrain() {
-		nrOfBrainStates = 0;
+		nrOfBrainNodes = 0;
 	}
 	virtual ~AbstractBrain() = default;
 	virtual void update() = 0;

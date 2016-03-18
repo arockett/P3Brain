@@ -66,24 +66,24 @@ BerryWorld::BerryWorld() {
 	}
 	senseWalls = senseWalls & (borderWalls | (randomWalls > 0));  // if there are no walls, there is no need to sense them!
 
-	outputStatesCount = 3;  // number of brain states used for output, 2 for move, 1 for eat
+	outputNodesCount = 3;  // number of brain nodes used for output, 2 for move, 1 for eat
 
 	if (senseWalls) {
-		inputStatesCount = (senseDown * foodTypes) + ((senseFront * foodTypes) + senseWalls) + (2 * ((senseFrontSides * foodTypes) + senseWalls));
+		inputNodesCount = (senseDown * foodTypes) + ((senseFront * foodTypes) + senseWalls) + (2 * ((senseFrontSides * foodTypes) + senseWalls));
 		// sense down does not include walls (can't stand on a wall (yet!) * types of food
 		// senseFront * types of food + wall, same for senseFrontSides, but there are 2
 	} else {  // no border walls
-		inputStatesCount = (senseDown * foodTypes) + (senseFront * foodTypes) + (2 * (senseFrontSides * foodTypes));
+		inputNodesCount = (senseDown * foodTypes) + (senseFront * foodTypes) + (2 * (senseFrontSides * foodTypes));
 		// sense down * types of food, same for senseFront, same for senseFrontSides, but there are 2
 	}
 
-	cout << "BerryWorld requires brains with at least " << inputStatesCount + outputStatesCount << " nodes.\n";
-	if (inputStatesCount == 0) {
-		cout << "    " << inputStatesCount << " Inputs\t No Inputs\n";
-		cout << "    " << outputStatesCount << " Outputs\t nodes 0 to " << outputStatesCount - 1 << "\n";
+	cout << "BerryWorld requires brains with at least " << inputNodesCount + outputNodesCount << " nodes.\n";
+	if (inputNodesCount == 0) {
+		cout << "    " << inputNodesCount << " Inputs\t No Inputs\n";
+		cout << "    " << outputNodesCount << " Outputs\t nodes 0 to " << outputNodesCount - 1 << "\n";
 	} else {
-		cout << "    " << inputStatesCount << " Inputs\t nodes 0 to " << inputStatesCount - 1 << "\n";
-		cout << "    " << outputStatesCount << " Outputs\t nodes " << inputStatesCount << " to " << inputStatesCount + outputStatesCount - 1 << "\n";
+		cout << "    " << inputNodesCount << " Inputs\t nodes 0 to " << inputNodesCount - 1 << "\n";
+		cout << "    " << outputNodesCount << " Outputs\t nodes " << inputNodesCount << " to " << inputNodesCount + outputNodesCount - 1 << "\n";
 
 	}
 	foodRatioLookup.resize(9);  // stores reward of each type of food NOTE: food is indexed from 1 so 0th entry is chance to leave empty
@@ -221,7 +221,7 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 
 	int here, leftFront, front, rightFront;  // store grid values relitive to organsism
 
-	int statesAssignmentCounter;  // this world can has number of brainState inputs set by parameter. This counter is used while assigning inputs
+	int nodesAssignmentCounter;  // this world can has number of brainState inputs set by parameter. This counter is used while assigning inputs
 
 	vector<int> stateCollector;  // used in the phi calculation
 
@@ -235,42 +235,42 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 		leftFront = getGridValue(grid, moveOnGrid(currentLocation, turnLeft(facing)));
 		rightFront = getGridValue(grid, moveOnGrid(currentLocation, turnRight(facing)));
 
-		statesAssignmentCounter = 0;  // get ready to start assigning inputs
+		nodesAssignmentCounter = 0;  // get ready to start assigning inputs
 		if (senseWalls) {
 			if (senseDown) {
-				for (int i = 0; i < foodTypes; i++) {  // fill first states with food values at here location
-					org->brain->setState(statesAssignmentCounter++, (here == i + 1));
+				for (int i = 0; i < foodTypes; i++) {  // fill first nodes with food values at here location
+					org->brain->setState(nodesAssignmentCounter++, (here == i + 1));
 				}
 			}
 			if (senseFront) {
-				for (int i = 0; i < foodTypes; i++) {  // fill first states with food values at front location
-					org->brain->setState(statesAssignmentCounter++, (front == i + 1));
+				for (int i = 0; i < foodTypes; i++) {  // fill first nodes with food values at front location
+					org->brain->setState(nodesAssignmentCounter++, (front == i + 1));
 				}
-				org->brain->setState(statesAssignmentCounter++, (front == WALL));
+				org->brain->setState(nodesAssignmentCounter++, (front == WALL));
 			}
 			if (senseFrontSides) {
-				for (int i = 0; i < foodTypes; i++) {  // fill first states with food values at front location
-					org->brain->setState(statesAssignmentCounter++, (leftFront == i + 1));
-					org->brain->setState(statesAssignmentCounter++, (rightFront == i + 1));
+				for (int i = 0; i < foodTypes; i++) {  // fill first nodes with food values at front location
+					org->brain->setState(nodesAssignmentCounter++, (leftFront == i + 1));
+					org->brain->setState(nodesAssignmentCounter++, (rightFront == i + 1));
 				}
-				org->brain->setState(statesAssignmentCounter++, (leftFront == WALL));
-				org->brain->setState(statesAssignmentCounter++, (rightFront == WALL));
+				org->brain->setState(nodesAssignmentCounter++, (leftFront == WALL));
+				org->brain->setState(nodesAssignmentCounter++, (rightFront == WALL));
 			}
 		} else {  // don't sense walls
 			if (senseDown) {
-				for (int i = 0; i < foodTypes; i++) {  // fill first states with food values at here location
-					org->brain->setState(statesAssignmentCounter++, (here == i + 1));
+				for (int i = 0; i < foodTypes; i++) {  // fill first nodes with food values at here location
+					org->brain->setState(nodesAssignmentCounter++, (here == i + 1));
 				}
 			}
 			if (senseFront) {
-				for (int i = 0; i < foodTypes; i++) {  // fill first states with food values at front location
-					org->brain->setState(statesAssignmentCounter++, (front == i + 1));
+				for (int i = 0; i < foodTypes; i++) {  // fill first nodes with food values at front location
+					org->brain->setState(nodesAssignmentCounter++, (front == i + 1));
 				}
 			}
 			if (senseFrontSides) {
-				for (int i = 0; i < foodTypes; i++) {  // fill first states with food values at front location
-					org->brain->setState(statesAssignmentCounter++, (leftFront == i + 1));
-					org->brain->setState(statesAssignmentCounter++, (rightFront == i + 1));
+				for (int i = 0; i < foodTypes; i++) {  // fill first nodes with food values at front location
+					org->brain->setState(nodesAssignmentCounter++, (leftFront == i + 1));
+					org->brain->setState(nodesAssignmentCounter++, (rightFront == i + 1));
 				}
 			}
 		}
@@ -279,26 +279,26 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 			cout << "\n----------------------------\n";
 			cout << "\ngeneration update: " << Global::update << "  world update: " << t << "\n";
 			cout << "currentLocation: " << currentLocation.first << "," << currentLocation.second << "  :  " << facing << "\n";
-			cout << "inStates: ";
-			for (int i = 0; i < inputStatesCount; i++) {
+			cout << "inNodes: ";
+			for (int i = 0; i < inputNodesCount; i++) {
 				cout << org->brain->getState(i);
 			}
 			cout << "\n\n  -- brain update --\n\n";
 		}
 
-		// inputStatesCount is now set to the first output Brain State Address. we will not move it until the next world update!
+		// inputNodesCount is now set to the first output Brain State Address. we will not move it until the next world update!
 		if (clearOutputs) {
-			org->brain->setState(inputStatesCount, 0.0);
-			org->brain->setState(inputStatesCount + 1, 0.0);
-			org->brain->setState(inputStatesCount + 2, 0.0);
+			org->brain->setState(inputNodesCount, 0.0);
+			org->brain->setState(inputNodesCount + 1, 0.0);
+			org->brain->setState(inputNodesCount + 2, 0.0);
 		}
 
 		if (analyse) {  // gather some data before and after running update
 			int S = 0;
-			for (int i = 0; i < inputStatesCount; i++)
+			for (int i = 0; i < inputNodesCount; i++)
 				S = (S << 1) + Bit(org->brain->getState(i));
 			org->brain->update();
-			for (int i = inputStatesCount + outputStatesCount; i < org->brain->nrOfBrainStates; i++)
+			for (int i = inputNodesCount + outputNodesCount; i < org->brain->nrOfBrainNodes; i++)
 				S = (S << 1) + Bit(org->brain->getState(i));
 			stateCollector.push_back(S);
 		} else {
@@ -307,9 +307,9 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 
 		// set output values
 		// output1 has info about the first 2 output bits these [00 eat, 10 left, 01 right, 11 move]
-		output1 = Bit(org->brain->getState(inputStatesCount)) + (Bit(org->brain->getState(inputStatesCount + 1)) << 1);
+		output1 = Bit(org->brain->getState(inputNodesCount)) + (Bit(org->brain->getState(inputNodesCount + 1)) << 1);
 		// output 2 has info about the 3rd output bit, which either does nothing, or is eat.
-		output2 = Bit(org->brain->getState(inputStatesCount + 2));
+		output2 = Bit(org->brain->getState(inputNodesCount + 2));
 
 		if (output2 == 1) {  // if org tried to eat
 			int foodHere = getGridValue(grid, currentLocation);
@@ -366,7 +366,7 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 		}
 
 		if (show) {
-			cout << "outStates: " << Bit(org->brain->getState(inputStatesCount)) << Bit(org->brain->getState(inputStatesCount + 1)) << Bit(org->brain->getState(inputStatesCount + 2)) << "\n";
+			cout << "outNodes: " << Bit(org->brain->getState(inputNodesCount)) << Bit(org->brain->getState(inputNodesCount + 1)) << Bit(org->brain->getState(inputNodesCount + 2)) << "\n";
 			cout << "output1: " << output1 << "  output2: " << output2 << "\n";
 			cout << "\n  -- world update --\n\n";
 			printGrid(grid, currentLocation, facing);
@@ -397,7 +397,7 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 	org->dataMap.Append("allscore", score);
 
 	if (analyse) {
-		org->dataMap.Set("phi", Analyse::computeAtomicPhi(stateCollector, org->brain->nrOfBrainStates));
+		org->dataMap.Set("phi", Analyse::computeAtomicPhi(stateCollector, org->brain->nrOfBrainNodes));
 	}
 
 	return score;

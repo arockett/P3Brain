@@ -8,6 +8,7 @@ bool& Archivist::Arch_writeDominantFile = Parameters::register_parameter("writeD
 string& Archivist::Arch_AveFileName = Parameters::register_parameter("aveFileName", (string) "ave.csv", "name of average file (saves population averages)", "ARCHIVIST");
 string& Archivist::Arch_DominantFileName = Parameters::register_parameter("dominantFileName", (string) "dominant.csv", "name of dominant file (saves data on dominant organism)", "ARCHIVIST");
 string& Archivist::Arch_DefaultAveFileColumnNames = Parameters::register_parameter("aveFileColumns", (string) "[update,score]", "data to be saved into average file (must be values that can generate an average)", "ARCHIVIST");
+bool& Archivist::Arch_DominantFileShowAllLists = Parameters::register_parameter("dominantFileShowAllLists", true, "lists named 'all'* in data map will be averaged and added to file. if true, raw 'all'* lists will also be added to the file", "ARCHIVIST");
 
 Archivist::Archivist() {
 	realtimeFilesInterval = Arch_realtimeFilesInterval;
@@ -33,7 +34,7 @@ void Archivist::writeRealTimeFiles(vector<shared_ptr<Organism>> &population) {
 				if (org->dataMap.fieldExists(key)) {
 					stringstream ss(org->dataMap.Get(key));
 					ss >> temp;
-				} else { // if field not found, check if there is an all()s version
+				} else {  // if field not found, check if there is an all()s version
 					string allKey = "all" + key;
 					//cout << allKey << endl;
 					if (org->dataMap.fieldExists(allKey)) {
@@ -42,11 +43,11 @@ void Archivist::writeRealTimeFiles(vector<shared_ptr<Organism>> &population) {
 						temp = 0;
 						vector<double> values;
 						convertCSVListToVector(dataList, values);
-						for (auto v : values){
+						for (auto v : values) {
 							temp += v;
 							//cout << key << " " << allKey << " " << v << " " << temp << endl;
 						}
-						temp /= (double)values.size();
+						temp /= (double) values.size();
 					} else {
 						cout << "WARNING:  In Archivist::writeRealTimeFiles(vector<shared_ptr<Organism>> &population) key \"" << key << "\" could not be found in dataMap!" << endl;
 					}
@@ -67,23 +68,22 @@ void Archivist::writeRealTimeFiles(vector<shared_ptr<Organism>> &population) {
 
 		int best = findGreatestInVector(Scores);
 		DataMap DomMap;
-		for (auto key : population[best]->dataMap.getKeys()){
-			if (key[0] == 'a' && key [1] == 'l' && key [2] == 'l') {
+		for (auto key : population[best]->dataMap.getKeys()) {
+			if (key[0] == 'a' && key[1] == 'l' && key[2] == 'l') {
 				double temp = 0;
 				vector<double> values;
 				convertCSVListToVector(population[best]->dataMap.Get(key), values);
-				for (auto v : values){
+				for (auto v : values) {
 					temp += v;
 					//cout << key << " " << allKey << " " << v << " " << temp << endl;
 				}
-				temp /= (double)values.size();
-				DomMap.Set(key.substr(3, key.size()-1),temp);
-			} else {
-				DomMap.Set(key,population[best]->dataMap.Get(key));
+				temp /= (double) values.size();
+				DomMap.Set(key.substr(3, key.size() - 1), temp);
+			}
+			if (Arch_DominantFileShowAllLists) {
+				DomMap.Set(key, population[best]->dataMap.Get(key));
 			}
 		}
-
-
 		DomMap.writeToFile(DominantFileName);
 	}
 }
