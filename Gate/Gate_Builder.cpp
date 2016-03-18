@@ -3,7 +3,7 @@
 bool& Gate_Builder::usingProbGate = Parameters::register_parameter("probabilisticGate", false, "set to true to enable probabilistic gates", "GATE TYPES");
 int& Gate_Builder::probGateInitialCount = Parameters::register_parameter("probabilisticGate_InitialCount", 3, "seed genome with this many start codons", "GATE TYPES");
 bool& Gate_Builder::usingDetGate = Parameters::register_parameter("deterministicGate", true, "set to true to enable deterministic gates?", "GATE TYPES");
-int& Gate_Builder::detGateInitialCount = Parameters::register_parameter("deterministicGate_InitialCount", 3, "seed genome with this many start codons", "GATE TYPES");
+int& Gate_Builder::detGateInitialCount = Parameters::register_parameter("deterministicGate_InitialCount", 6, "seed genome with this many start codons", "GATE TYPES");
 bool& Gate_Builder::usingEpsiGate = Parameters::register_parameter("fixedEpsilonGate", false, "set to true to enable epsilon gates", "GATE TYPES");
 int& Gate_Builder::epsiGateInitialCount = Parameters::register_parameter("fixedEpsilonGate_InitialCount", 3, "seed genome with this many start codons", "GATE TYPES");
 bool& Gate_Builder::usingVoidGate = Parameters::register_parameter("voidGate", false, "set to true to enable void gates", "GATE TYPES");

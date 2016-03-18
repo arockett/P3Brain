@@ -30,14 +30,14 @@ double& BerryWorld::rewardForTurn = Parameters::register_parameter("BERRY_reward
 double& BerryWorld::rewardForMove = Parameters::register_parameter("BERRY_rewardForMove", 0.0, "reward for moving", "WORLD - BERRY - ADVANCED");
 
 int& BerryWorld::ratioFood0 = Parameters::register_parameter("BERRY_replacementRatioFood0", 0, "Relative likelihood to leave empty space empty", "WORLD - BERRY - ADVANCED");
-int& BerryWorld::ratioFood1 = Parameters::register_parameter("BERRY_replacementRatioFood1", 1, "Relative likelihood to place FOOD1", "WORLD - BERRY - ADVANCED");
-int& BerryWorld::ratioFood2 = Parameters::register_parameter("BERRY_replacementRatioFood2", 1, "Relative likelihood to place FOOD1", "WORLD - BERRY - ADVANCED");
-int& BerryWorld::ratioFood3 = Parameters::register_parameter("BERRY_replacementRatioFood3", 1, "Relative likelihood to place FOOD1", "WORLD - BERRY - ADVANCED");
-int& BerryWorld::ratioFood4 = Parameters::register_parameter("BERRY_replacementRatioFood4", 1, "Relative likelihood to place FOOD1", "WORLD - BERRY - ADVANCED");
-int& BerryWorld::ratioFood5 = Parameters::register_parameter("BERRY_replacementRatioFood5", 1, "Relative likelihood to place FOOD1", "WORLD - BERRY - ADVANCED");
-int& BerryWorld::ratioFood6 = Parameters::register_parameter("BERRY_replacementRatioFood6", 1, "Relative likelihood to place FOOD1", "WORLD - BERRY - ADVANCED");
-int& BerryWorld::ratioFood7 = Parameters::register_parameter("BERRY_replacementRatioFood7", 1, "Relative likelihood to place FOOD1", "WORLD - BERRY - ADVANCED");
-int& BerryWorld::ratioFood8 = Parameters::register_parameter("BERRY_replacementRatioFood8", 1, "Relative likelihood to place FOOD1", "WORLD - BERRY - ADVANCED");
+int& BerryWorld::ratioFood1 = Parameters::register_parameter("BERRY_replacementRatioFood1", 1, "Relative likelihood to place Food1", "WORLD - BERRY - ADVANCED");
+int& BerryWorld::ratioFood2 = Parameters::register_parameter("BERRY_replacementRatioFood2", 1, "Relative likelihood to place Food2", "WORLD - BERRY - ADVANCED");
+int& BerryWorld::ratioFood3 = Parameters::register_parameter("BERRY_replacementRatioFood3", 1, "Relative likelihood to place Food3", "WORLD - BERRY - ADVANCED");
+int& BerryWorld::ratioFood4 = Parameters::register_parameter("BERRY_replacementRatioFood4", 1, "Relative likelihood to place Food4", "WORLD - BERRY - ADVANCED");
+int& BerryWorld::ratioFood5 = Parameters::register_parameter("BERRY_replacementRatioFood5", 1, "Relative likelihood to place Food5", "WORLD - BERRY - ADVANCED");
+int& BerryWorld::ratioFood6 = Parameters::register_parameter("BERRY_replacementRatioFood6", 1, "Relative likelihood to place Food6", "WORLD - BERRY - ADVANCED");
+int& BerryWorld::ratioFood7 = Parameters::register_parameter("BERRY_replacementRatioFood7", 1, "Relative likelihood to place Food7", "WORLD - BERRY - ADVANCED");
+int& BerryWorld::ratioFood8 = Parameters::register_parameter("BERRY_replacementRatioFood8", 1, "Relative likelihood to place Food8", "WORLD - BERRY - ADVANCED");
 
 int& BerryWorld::WorldX = Parameters::register_parameter("BERRY_WorldX", 8, "world X size", "WORLD - BERRY");
 int& BerryWorld::WorldY = Parameters::register_parameter("BERRY_WorldY", 8, "world Y size", "WORLD - BERRY");
@@ -51,7 +51,7 @@ bool& BerryWorld::senseDown = Parameters::register_parameter("BERRY_senseDown", 
 bool& BerryWorld::senseFront = Parameters::register_parameter("BERRY_senseFront", true, "if true, Agent can sense what's in front of it", "WORLD - BERRY");
 bool& BerryWorld::senseFrontSides = Parameters::register_parameter("BERRY_senseFrontSides", false, "if true, Agent can sense what's in front to the left and right of it", "WORLD - BERRY");
 bool& BerryWorld::senseWalls = Parameters::register_parameter("BERRY_senseWalls", false, "if true, Agent can sense Walls", "WORLD - BERRY");
-int& BerryWorld::replacement = Parameters::register_parameter("BERRY_replacement", -1, "-1 = random, 0 = no replacement, 1 = replace other", "WORLD - BERRY - ADVANCED");
+int& BerryWorld::replacement = Parameters::register_parameter("BERRY_replacement", -1, "-1 = random, 0 = no replacement, 1 = replace other (note: Food0, can be replace by Food0)", "WORLD - BERRY - ADVANCED");
 
 bool& BerryWorld::recordConsumptionRatio = Parameters::register_parameter("BERRY_recordConsumptionRatio", false, "if true, record greater of red/blue+1 or blue/red+1", "WORLD - BERRY - ADVANCED");
 bool& BerryWorld::recordFoodList = Parameters::register_parameter("BERRY_recordFoodList", true, "if true, record list of food eaten", "WORLD - BERRY - ADVANCED");
@@ -97,9 +97,9 @@ BerryWorld::BerryWorld() {
 	foodRatioLookup[7] = ratioFood7;
 	foodRatioLookup[8] = ratioFood8;
 
-	foodRatioCount = 0;
+	foodRatioTotal = 0;
 	for (int i = 0; i <= foodTypes; i++) {
-		foodRatioCount += foodRatioLookup[i];
+		foodRatioTotal += foodRatioLookup[i];
 	}
 
 	foodRewards.resize(9);  // stores reward of each type of food
@@ -167,9 +167,47 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 //	exit(1);
 ////////////////////////// uncomment to test world making and food picking
 
+
+////////////////////////// uncomment to test food ratios
+//	// note, I am not treating 0 diffrently in these tests (i.e. if replacement = "other" (1) 0 will not be replaced by 0 (unlike in berry world)
+//	cout << endl;
+//
+//	vector <int> c;
+//	c.resize(foodTypes+1);
+//	for (int i = 0; i < 10000; i++) {
+//		if (replacement == -1) {
+//			setGridValue(grid, { 2, 2 }, pickFood(-1));  // plant a random food
+//		} else if (replacement == 1) {
+//			setGridValue(grid, { 2, 2 }, pickFood(getGridValue(grid, { 2, 2 })));  // plant a different
+//		} else {
+//			setGridValue(grid, { 2, 2 }, EMPTY);  // plant a 0
+//		}
+//
+//		c[getGridValue(grid, { 2, 2 })]++;;
+//	}
+//	cout << endl;
+//	cout << endl;
+//
+//	cout << "food counts:" << endl;
+//	for (auto v:c){
+//		cout << "  " << v << endl;
+//	}
+//
+//	cout << "foodRatioLookup:" << endl;
+//
+//	for (auto v:foodRatioLookup){
+//		cout << "  " << v << endl;
+//	}
+//
+//	cout << "foodRatioTotal: " << foodRatioTotal << endl;
+//	exit(1);
+////////////////////////// uncomment to test food ratios
+
+
 	// set up to track what food is eaten
 	int switches = 0;  // number of times organism has switched food source
 	int lastFood = -1;  //nothing has been eaten yet!
+	int foodHereOnArrival = getGridValue(grid, currentLocation); //value of the food when we got here - needed for replacement method.
 	vector<int> eaten;  // stores number of each type of food was eaten in total for this test. [0] stores number of times org attempted to eat on empty location
 	eaten.resize(foodTypes + 1);
 
@@ -275,7 +313,7 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 
 		if (output2 == 1) {  // if org tried to eat
 			int foodHere = getGridValue(grid, currentLocation);
-			if ( (recordFoodList && foodHere!=0) || (recordFoodList && recordFoodListEatEmpty) ) {
+			if ((recordFoodList && foodHere != 0) || (recordFoodList && recordFoodListEatEmpty)) {
 				org->dataMap.Append("foodList", foodHere);  // record that org ate food (or tried to at any rate)
 			}
 			eaten[foodHere]++;  // track the number of each berry eaten, including 0s
@@ -298,30 +336,32 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 
 		if ((output2 == 0) || (allowMoveAndEat == 1)) {  // if we did not eat or we allow moving and eating in the same world update
 			switch (output1) {
-				case 0:  //nothing
-					break;
-				case 1:  //turn left
-					facing = turnLeft(facing);
-					score += rewardForTurn;
-					break;
-				case 2:  //turn right
-					facing = turnRight(facing);
-					score += rewardForTurn;
-					break;
-				case 3:  //move forward
-					if (getGridValue(grid, moveOnGrid(currentLocation, facing)) != WALL) {  // if the proposed move is not a wall
-						score += rewardForMove;
-						if (getGridValue(grid, currentLocation) == EMPTY) {  // if the current location is empty
-							if (replacement == -1) {
-								setGridValue(grid, currentLocation, pickFood(-1));  // plant a random food
-							} else if (replacement == 1) {
-								setGridValue(grid, currentLocation, pickFood(lastFood));  // plant a different
-							}
-							// if 0, no replacment/do nothing
+			case 0:  //nothing
+				break;
+			case 1:  //turn left
+				facing = turnLeft(facing);
+				score += rewardForTurn;
+				break;
+			case 2:  //turn right
+				facing = turnRight(facing);
+				score += rewardForTurn;
+				break;
+			case 3:  //move forward
+				if (getGridValue(grid, moveOnGrid(currentLocation, facing)) != WALL) {  // if the proposed move is not a wall
+					score += rewardForMove;
+					if (getGridValue(grid, currentLocation) == EMPTY) {  // if the current location is empty...
+						if (replacement == -1 || foodHereOnArrival == EMPTY) { // if replacement = random (-1) or the this location was already empty when org got here...
+							setGridValue(grid, currentLocation, pickFood(-1));  // plant a random food
+						} else if (replacement == 1 && foodHereOnArrival > EMPTY) { // if replacement = other (1) and there was some food here when org got here...
+							setGridValue(grid, currentLocation, pickFood(foodHereOnArrival));  // plant a different food when what was here
 						}
-						currentLocation = moveOnGrid(currentLocation, facing);
+						// if replacement = no replacement (0), no replacement/do nothing
 					}
-					break;
+					currentLocation = moveOnGrid(currentLocation, facing);
+					foodHereOnArrival = getGridValue(grid, currentLocation); //value of the food when we got here - needed for replacement method.
+
+				}
+				break;
 			}
 		}
 
@@ -342,13 +382,12 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 
 	int total_eaten = 0;
 	for (int i = 0; i <= foodTypes; i++) {
-		if (i!=0){ // don't count the attempts to eat empty!
+		if (i != 0) {  // don't count the attempts to eat empty!
 			total_eaten += eaten[i];
 		}
 		string temp_name = "allfood" + to_string(i);  // make food names i.e. food1, food2, etc.
 		org->dataMap.Append(temp_name, eaten[i]);
 	}
-	bool recordConsumptionRatio = true;
 	if (recordConsumptionRatio) {  // consumption ratio displays high value of org favors one food over the other and low values if both are being consumed. works on food[0] and food[1] only
 		(eaten[1] > eaten[2]) ? org->dataMap.Append("allconsumptionRatio", (double) eaten[1] / (double) (eaten[2] + 1)) : org->dataMap.Append("allconsumptionRatio", (double) eaten[2] / (double) (eaten[1] + 1));
 	}

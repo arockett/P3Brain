@@ -17,7 +17,7 @@
 int& Genome::initialPloidy = Parameters::register_parameter("ploidy", 1, "number of copies of each chromosome", "GENOME");
 int& Genome::initialChromosomes = Parameters::register_parameter("chromosomes", 1, "number of chromosome pairs (i.e. if chromosomes = 2 and ploidy = 2 there will be 4 chromosomes in the genome)", "GENOME");
 
-int& Genome::initialChromosomeSize = Parameters::register_parameter("chromosomeSizeInitial", 1000, "starting size for all chromosomes in genome (genome size will be chromosomeSizeInitial * number of chromosomes * ploidy)", "GENOME");
+int& Genome::initialChromosomeSize = Parameters::register_parameter("chromosomeSizeInitial", 10000, "starting size for all chromosomes in genome (genome size will be chromosomeSizeInitial * number of chromosomes * ploidy)", "GENOME");
 double& Genome::pointMutationRate = Parameters::register_parameter("pointMutationRate", 0.005, "per site mutation rate", "GENOME");
 double& Genome::insertionRate = Parameters::register_parameter("mutationCopyRate", 0.00002, "per genome insertion/deletion rate", "GENOME");
 int& Genome::insertionMinSize = Parameters::register_parameter("mutationCopyMinSize", 10, "minimum size of insertion mutation", "GENOME");

@@ -84,7 +84,7 @@ class BerryWorld : public World {
 	int inputStatesCount = 0;
 	int outputStatesCount = 0;
 
-	int foodRatioCount;  // sum of ratioFood for foods in use
+	int foodRatioTotal;  // sum of ratioFood for foods in use
 	vector<int> foodRatioLookup;
 	vector<double> foodRewards;
 
@@ -94,11 +94,13 @@ class BerryWorld : public World {
 
 	double testIndividual(shared_ptr<Organism> org, bool analyse, bool show = 0) override;
 
+	// if lastfood < 0, do not consider last food, pick randomly
+	// if
 	int pickFood(int lastfood) {
 		//cout << "In BerryWorld::pickFood(int lastfood)\n";
 		int lookup, counter, pick;
-		if (lastfood < 1) {  // if lastfood is < 0 (or was 0) then return a random food
-			lookup = Random::getInt(1, foodRatioCount);  // get a random int [1,sum of food ratios]
+		if (lastfood < 0) {  // if lastfood is < 0 (or was 0) then return a random food
+			lookup = Random::getInt(1, foodRatioTotal);  // get a random int [1,sum of food ratios]
 			counter = foodRatioLookup[0];  // set the counter to the ratio of replace with empty (0)
 			pick = 0;  // set pick to empty (0)
 			while (counter < lookup) {
@@ -110,21 +112,22 @@ class BerryWorld : public World {
 				cout << "ERROR: In BerryWorld::pickFood() - lastfood > foodTypes (i.e. last food eaten is not in foodTypes!)\nExiting.\n\n";
 				exit(1);
 			}
-			if (foodRatioCount - foodRatioLookup[lastfood] == 0){
-				cout << "ERROR: In BerryWorld::pickFood() - lastfood set, but there is only one foodType so pick can not be a diffrent foodType\n\nExiting";
+			if (foodRatioTotal - foodRatioLookup[lastfood] == 0){
+				cout << "ERROR: In BerryWorld::pickFood() : lastfood is not <= 0, and foodTypes = 1.\nThere is only one foodType! Pick can not be a different foodType\n\nExiting";
 				exit(1);
 			}
-			lookup = Random::getInt(1, foodRatioCount - foodRatioLookup[lastfood]);  // get a random int [1,sum of food ratios] but leave out the ratio of last food
-			counter = foodRatioLookup[0];  // set the counter to the ratio of replace with empty (0)
-			pick = 0;  // set pick to empty (0)
+			lookup = Random::getInt(1, foodRatioTotal - foodRatioLookup[lastfood]);  // get a random int [1,sum of food ratios] but leave out the ratio of last food
 			if (lastfood == 0) {  // if the last food was empty...
 				counter = foodRatioLookup[1];  // set counter to ratio of food1 instead
 				pick = 1;  // set pick to food1 (1)
+			} else {
+				counter = foodRatioLookup[0];  // set the counter to the ratio of replace with empty (0)
+				pick = 0;  // set pick to empty (0)
 			}
 			while (counter < lookup) {
 				pick++;  // this is not our pick, so advance to the next pick and...
 				if (pick == lastfood) {
-					pick++;  // if the new pick = lastfood, then skip it and...
+					pick++;  // if the new pick = lastfood, then skip it (we already removed the foodRatio for this food) and...
 				}
 				counter += foodRatioLookup[pick];  // add this new picks ratio to counter
 			}
