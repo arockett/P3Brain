@@ -40,7 +40,7 @@ class SSwD_Archivist : public Archivist {  // SnapShot with Delay
 	int nextDataCheckPoint;  // next time data files contents need to be checkpointed (this is needed particularly to handle delay > interval)
 	int nextGenomeCheckPoint;  // next time a genome files contents need to be checkpointed (this is needed particularly to handle delay > interval)
 
-	unordered_map<int, vector<weak_ptr<Organism>>> checkpoints;  // used by SSwD only - this keeps lists of orgs that may be written (if they have living decendents)
+	map<int, vector<weak_ptr<Organism>>> checkpoints;  // used by SSwD only - this keeps lists of orgs that may be written (if they have living decendents)
 	// key is Global::nextGenomeWrite or Global::nextDataWrite
 
 	SSwD_Archivist();

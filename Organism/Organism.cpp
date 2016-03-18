@@ -44,7 +44,7 @@ Organism::Organism() {
 	gender = 0;  // by default all orgs are female.
 	offspringCount = 0;  // because it's alive;
 	genomeAncestors.insert(ID);  // it is it's own Ancestor for genome tracking purposes
-	dataAncestors.insert(ID);  // it is it's own Ancestor for data tracking purposes
+	ancestors.insert(ID);  // it is it's own Ancestor for data tracking purposes
 	timeOfBirth = Global::update;  // happy birthday!
 	timeOfDeath = -1;  // still alive
 	dataMap.Set("ID", ID);
@@ -56,15 +56,14 @@ Organism::Organism() {
  * create a new organism given only a genome - since we do not know the type of brain we are using, we can not make the brain yet
  * parents is left empty (this is organism has no parents!)
  */
-Organism::Organism(shared_ptr<Genome> _genome) {
+Organism::Organism(shared_ptr<AbstractGenome> _genome) {
 	genome = _genome;
 	brain = nullptr;
 	ID = registerOrganism();
 	alive = true;
 	gender = 0;  // by default all orgs are female.
 	offspringCount = 0;  // because it's alive;
-	genomeAncestors.insert(ID);  // it is it's own Ancestor for genome tracking purposes
-	dataAncestors.insert(ID);  // it is it's own Ancestor for data tracking purposes
+	ancestors.insert(ID);  // it is it's own Ancestor for data tracking purposes
 	timeOfBirth = Global::update;  // happy birthday!
 	timeOfDeath = -1;  // still alive
 	dataMap.Set("ID", ID);
@@ -73,15 +72,16 @@ Organism::Organism(shared_ptr<Genome> _genome) {
 	dataMap.SetMany(genome->getStats());
 }
 
-Organism::Organism(shared_ptr<Genome> _genome, shared_ptr<ClassicBrain> _brain) {
+Organism::Organism(shared_ptr<AbstractGenome> _genome, shared_ptr<AbstractBrain> _brain) {
 	genome = _genome;
+	//cout << "in Organism::Organism(shared_ptr<AbstractGenome> _genome, shared_ptr<AbstractBrain> _brain)\n\tabout to make brain from genome"<<endl;
 	brain = _brain->makeBrainFromGenome(genome);
+	//cout << "\tmade brain from genome"<<endl;
 	ID = registerOrganism();
 	alive = true;
 	gender = 0;  // by default all orgs are female.
 	offspringCount = 0;  // because it's alive;
-	genomeAncestors.insert(ID);  // it is it's own Ancestor for genome tracking purposes
-	dataAncestors.insert(ID);  // it is it's own Ancestor for data tracking purposes
+	ancestors.insert(ID);  // it is it's own Ancestor for data tracking purposes
 	timeOfBirth = Global::update;  // happy birthday!
 	timeOfDeath = -1;  // still alive
 	dataMap.Set("ID", ID);
@@ -94,7 +94,7 @@ Organism::Organism(shared_ptr<Genome> _genome, shared_ptr<ClassicBrain> _brain) 
  * create an organism with one parent
  * a brain is created with the assumption that the new brain should be of the same type as the parents brain
  */
-Organism::Organism(shared_ptr<Organism> from, shared_ptr<Genome> _genome) {
+Organism::Organism(shared_ptr<Organism> from, shared_ptr<AbstractGenome> _genome) {
 	genome = _genome;
 	brain = from->brain->makeBrainFromGenome(genome);
 	ID = registerOrganism();
@@ -103,11 +103,8 @@ Organism::Organism(shared_ptr<Organism> from, shared_ptr<Genome> _genome) {
 	offspringCount = 0;
 	parents.push_back(from);
 	from->offspringCount++;  // this parent has an(other) offspring
-	for (auto ancestorID : from->genomeAncestors) {
-		genomeAncestors.insert(ancestorID);  // union all parents genomeAncestors into this organisms genomeAncestor set.
-	}
-	for (auto ancestorID : from->dataAncestors) {
-		dataAncestors.insert(ancestorID);  // union all parents dataAncestors into this organisms dataAncestor set.
+	for (auto ancestorID : from->ancestors) {
+		ancestors.insert(ancestorID);  // union all parents ancestors into this organisms ancestor set.
 	}
 	timeOfBirth = Global::update;  // happy birthday!
 	timeOfDeath = -1;  // still alive
@@ -125,7 +122,7 @@ Organism::Organism(shared_ptr<Organism> from, shared_ptr<Genome> _genome) {
  * a) all organisms in from are the same
  * b) and the new brain should be of the same type as the parents brain
  */
-Organism::Organism(const vector<shared_ptr<Organism>> from, shared_ptr<Genome> _genome) {
+Organism::Organism(const vector<shared_ptr<Organism>> from, shared_ptr<AbstractGenome> _genome) {
 	genome = _genome;
 	brain = from[0]->brain->makeBrainFromGenome(genome);
 	ID = registerOrganism();
@@ -135,11 +132,8 @@ Organism::Organism(const vector<shared_ptr<Organism>> from, shared_ptr<Genome> _
 	for (auto parent : from) {
 		parents.push_back(parent);  // add this parent to the parents set
 		parent->offspringCount++;  // this parent has an(other) offspring
-		for (auto ancestorID : parent->genomeAncestors) {
-			genomeAncestors.insert(ancestorID);  // union all parents genomeAncestors into this organisms genomeAncestor set.
-		}
-		for (auto ancestorID : parent->dataAncestors) {
-			dataAncestors.insert(ancestorID);  // union all parents dataAncestors into this organisms dataAncestor set.
+		for (auto ancestorID : parent->ancestors) {
+			ancestors.insert(ancestorID);  // union all parents ancestors into this organisms ancestor set
 		}
 	}
 	timeOfBirth = Global::update;  // happy birthday!
@@ -175,11 +169,13 @@ shared_ptr<Organism> Organism::makeMutatedOffspring(shared_ptr<Organism> parent)
 }
 
 shared_ptr<Organism> Organism::makeMutatedOffspring(vector<shared_ptr<Organism>> from) {
-	vector<shared_ptr<Genome>> parentGenomes;
+	vector<shared_ptr<AbstractGenome>> parentGenomes;
 	for (auto p : from) {
 		parentGenomes.push_back(p->genome);
 	}
 	shared_ptr<Organism> newOrg = make_shared<Organism>(from, genome->makeMutatedGenome(parentGenomes));
+	//shared_ptr<Organism> newOrg = make_shared<Organism>(from[1], genome->makeMutatedGenome(genome));
+
 	newOrg->gender = from[Random::getIndex(from.size())]->gender;  // assign a gender to the new org randomly from one of it's parents
 	return newOrg;
 }
@@ -218,6 +214,7 @@ vector<shared_ptr<Organism>> Organism::getLOD(shared_ptr<Organism> org) {
 	for (size_t i = 0; i < list.size(); i++) {
 	}
 	if (org->parents.size() > 1) {  // if more than one parent we have a problem!
+		cout << "In Organism::getLOD(shared_ptr<Organism> org)\n Looks like you have enabled sexual reproduction.\nLOD only works with asexual populations. i.e. an offspring may have at most one parent.\nExiting!\n";
 		exit(1);
 	}
 	return list;
@@ -252,6 +249,4 @@ shared_ptr<Organism> Organism::getMostRecentCommonAncestor(vector<shared_ptr<Org
 // clear all historical data (used when only saving real time data)
 void Organism::clearHistory() {
 	parents.clear();
-	genomeAncestors.clear();
-	dataAncestors.clear();
 }

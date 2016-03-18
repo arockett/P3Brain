@@ -6,8 +6,8 @@
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
 //
 
-#ifndef __BasicMarkovBrainTemplate__Brain__
-#define __BasicMarkovBrainTemplate__Brain__
+#ifndef __BasicMarkovBrainTemplate__MarkovBrain__
+#define __BasicMarkovBrainTemplate__MarkovBrain__
 
 #include <math.h>
 #include <memory>
@@ -15,6 +15,7 @@
 #include <set>
 #include <vector>
 
+#include "Brain.h"
 #include "../Gate/Gate_Builder.h"
 #include "../GateListBuilder/GateListBuilder.h"
 #include "../Genome/Genome.h"
@@ -22,23 +23,15 @@
 #include "../Utilities/Parameters.h"
 
 using namespace std;
-class AbstractBrain {
- public:
-	AbstractBrain() = default;
-	virtual ~AbstractBrain() = default;
-	virtual void update() = 0;
-	virtual string description() = 0;  // returns a desription of this brain in it's current state
-	virtual vector<string> getStats() =0;  // returns a vector of string pairs of any stats that can then be used for data tracking (etc.)
-};
 
-class ClassicBrain : AbstractBrain {
+class MarkovBrain : public AbstractBrain {
  protected:
 	vector<shared_ptr<Gate>> gates;
 	shared_ptr<Base_GateListBuilder> GLB;
 
  public:
 	static int& defaultNrOfBrainStates;  // default value for number of states in all brains
-	int nrOfBrainStates;  // the number of states in THIS brain
+	//int nrOfBrainStates;  // the number of states in THIS brain
 	static bool& serialProcessing;  // write directly states (overwrite) - do not use nextStates
 
 	static void initializeParameters();
@@ -60,17 +53,17 @@ class ClassicBrain : AbstractBrain {
 	vector<double> states;
 	vector<double> nextStates;
 
-	ClassicBrain() = delete;
+	MarkovBrain() = delete;
 
-	ClassicBrain(shared_ptr<Base_GateListBuilder> _GLB, int _nrOfStates = defaultNrOfBrainStates);
-	ClassicBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<Genome> startGenome, int _nrOfStates = defaultNrOfBrainStates);
-	virtual ~ClassicBrain() = default;
+	MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, int _nrOfStates = defaultNrOfBrainStates);
+	MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> startGenome, int _nrOfStates = defaultNrOfBrainStates);
+	virtual ~MarkovBrain() = default;
 
 	virtual void update();
 
 	void inOutReMap();
 
-	virtual shared_ptr<ClassicBrain> makeBrainFromGenome(shared_ptr<Genome> _genome);
+	virtual shared_ptr<AbstractBrain> makeBrainFromGenome(shared_ptr<AbstractGenome> _genome);
 
 	virtual string description();
 	virtual vector<string> getStats();
@@ -104,4 +97,4 @@ class ClassicBrain : AbstractBrain {
 
 };
 
-#endif /* defined(__BasicMarkovBrainTemplate__Brain__) */
+#endif /* defined(__BasicMarkovBrainTemplate__MarkovBrain__) */

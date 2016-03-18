@@ -6,11 +6,12 @@
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
 //
 
+#include "TournamentOptimizer.h"
+
 #include <algorithm>
 #include <math.h>
 #include <stdlib.h>     // for atoi
 
-#include "Tournament_Optimizer.h"
 #include "../Utilities/Random.h"
 
 using namespace std;
@@ -21,7 +22,7 @@ using namespace std;
  * for each next population genome, randomly select (with replacement) n genomes (where n = Optimizer::tournamentSize)
  * copy to the next generation and mutate the copy.
  */
-void Tournament::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
+void TournamentOptimizer::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
 	vector<shared_ptr<Organism>> nextPopulation;
 
 	vector<double> Scores;
@@ -45,15 +46,24 @@ void Tournament::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
 				}
 			}
 		}
-		cout << "*" << flush;
 		nextPopulation.push_back(population[winner]->makeMutatedOffspring(population[winner]));
 		//nextPopulation.push_back(population[winner]);
-		cout << "." << flush;
 	}
 	for (size_t i = 0; i < population.size(); i++) {
 		population[i]->kill();  // set org.alive = 0 and delete the organism if it has no offspring
 	}
-	cout << endl;
+	//population = nextPopulation;
+	//population.resize(0);
+//	while (population.size() > 0){
+//		cout << population.size() << " " << flush;
+//		auto keys = population[population.size()-1]->dataMap.getKeys();
+//		for (auto key:keys){
+//			cout << key << " = " << flush << population[population.size()-1]->dataMap.Get(key) << "   " << flush;
+//
+//		}
+//		cout << "   done keys" << endl;
+//		population.pop_back();
+//	}
 	population = nextPopulation;
 
 }

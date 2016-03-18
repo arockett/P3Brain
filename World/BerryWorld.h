@@ -17,7 +17,7 @@
 #include "../Genome/Genome.h"
 #include "../World/World.h"
 #include "../Analyze/Analyze.h"
-#include "../Brain/ClassicBrain.h"
+#include "../Brain/Brain.h"
 #include "../Utilities/Parameters.h"
 #include "../Utilities/Utilities.h"
 #include "../Utilities/Random.h"
@@ -122,6 +122,15 @@ class BerryWorld : public World {
 					setGridValue(grid, { x, y }, Random::getInt(1, foodTypes));  // place random food where there is not a wall
 				}
 			}
+		}
+
+		if ((randomWalls >= WorldX * WorldY) && !borderWalls){
+			cout << "In BerryWorld::makeTestGrid() To many random walls... exiting!"<<endl;
+			exit(1);
+		}
+		if ((randomWalls >= (WorldX-2) * (WorldY-2)) && borderWalls){
+			cout << "In BerryWorld::makeTestGrid() To many random walls... exiting!"<<endl;
+			exit(1);
 		}
 
 		for (int i = 0; i < randomWalls; i++) {  // add random walls

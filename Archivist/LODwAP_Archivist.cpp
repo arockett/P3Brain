@@ -1,8 +1,8 @@
 #include "LODwAP_Archivist.h"
 
-int& LODwAP_Archivist::LODwAP_Arch_dataInterval = Parameters::register_parameter("dataInterval_LODwAP", 10, "How often to write to data file", "ARCHIVIST_LODWAP");
-int& LODwAP_Archivist::LODwAP_Arch_genomeInterval = Parameters::register_parameter("genomeInterval_LODwAP", 10, "How often to write genome file", "ARCHIVIST_LODWAP");
-int& LODwAP_Archivist::LODwAP_Arch_pruneInterval = Parameters::register_parameter("pruneInterval_LODwAP", 10, "How often to attempt to prune LOD and actually write out to files", "ARCHIVIST_LODWAP");
+int& LODwAP_Archivist::LODwAP_Arch_dataInterval = Parameters::register_parameter("dataInterval_LODwAP", 100, "How often to write to data file", "ARCHIVIST_LODWAP");
+int& LODwAP_Archivist::LODwAP_Arch_genomeInterval = Parameters::register_parameter("genomeInterval_LODwAP", 1000, "How often to write genome file", "ARCHIVIST_LODWAP");
+int& LODwAP_Archivist::LODwAP_Arch_pruneInterval = Parameters::register_parameter("pruneInterval_LODwAP", 100, "How often to attempt to prune LOD and actually write out to files", "ARCHIVIST_LODWAP");
 int& LODwAP_Archivist::LODwAP_Arch_terminateAfter = Parameters::register_parameter("terminateAfter_LODwAP", 100, "how long to run after updates (to get better coalescence)", "ARCHIVIST_LODWAP");
 string& LODwAP_Archivist::LODwAP_Arch_DataFileName = Parameters::register_parameter("dataFileName_LODwAP", (string) "data.csv", "name of genome file (stores genomes for line of decent)", "ARCHIVIST_LODWAP");
 string& LODwAP_Archivist::LODwAP_Arch_GenomeFileName = Parameters::register_parameter("genomeFileName_LODwAP", (string) "genome.csv", "name of data file (stores everything but genomes)", "ARCHIVIST_LODWAP");
@@ -68,8 +68,11 @@ bool LODwAP_Archivist::archive(vector<shared_ptr<Organism>> population, int flus
 				shared_ptr<Organism> current = LOD[nextGenomeWrite - lastPrune];
 				//string dataString = to_string(nextGenomeWrite) + FileManager::separator + "\"[" + current->genome->genomeToStr() + "]\"";  // add write update and padding to genome string
 				//FileManager::writeToFile(GenomeFileName, dataString, "update,genome");  // write data to file
-				current->genome->dataMap.Set("update",current->dataMap.Get("update"));
-				current->genome->dataMap.writeToFile(GenomeFileName, current->genome->dataMap.getKeys());  // append new data to the file
+				current->genome->dataMap.Set("sites",current->genome->genomeToStr());
+				current->genome->dataMap.Set("update",nextGenomeWrite);
+				current->genome->dataMap.Set("ID",current->dataMap.Get("ID"));
+				//current->genome->dataMap.writeToFile(GenomeFileName, current->genome->dataMap.getKeys());  // append new data to the file
+				current->genome->dataMap.writeToFile(GenomeFileName, Genome::genomeFileColumns);  // append new data to the file
 				nextGenomeWrite += genomeInterval;
 			}
 		}

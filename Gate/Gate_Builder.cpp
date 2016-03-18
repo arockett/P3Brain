@@ -30,7 +30,7 @@ void Gate_Builder::setupGates() {
 	}
 	if (usingVoidGate) {
 		AddGate(48, [](shared_ptr<AbstractGenome> genome,shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {return make_shared<VoidGate>(genome,genomeHandler,gateID);});
-		Global::inUseGateTypes.insert(47);
+		Global::inUseGateTypes.insert(48);
 	}
 	if (usingFBGate) {
 		AddGate(44, [](shared_ptr<AbstractGenome> genome,shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {return make_shared<FeedbackGate>(genome,genomeHandler,gateID);});

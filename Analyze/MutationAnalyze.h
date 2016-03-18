@@ -24,7 +24,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include "../Brain/ClassicBrain.h"
+#include "../Brain/MarkovBrain.h"
 
 using namespace std;
 //class MutationAnalyse {
