@@ -23,19 +23,22 @@
 
 using namespace std;
 class AbstractBrain {
- public:
+public:
 	static string& brainTypeStr;
 	static int& hiddenNodes;
 
 	int nrOfBrainNodes;  // the number of states in THIS brain
-	                      // this is temporary! new node/memory/dataCell will fix this.
+						 // this is temporary! new node/memory/dataCell will fix this.
 	int nrInNodes;
 	int nrOutNodes;
 	int nrHiddenNodes;
 
+	vector<double> nodes;
+	vector<double> nextNodes;
+
 	AbstractBrain() {
 		nrInNodes = nrOutNodes = nrHiddenNodes = nrOfBrainNodes = 0;
-		cout << "ERROR: attempting to construct brain with no arguments. Check brain type for required parameters... most likely at least #in, #out and #hidden are required!\n\nExiting.\n" << endl;;
+		cout << "ERROR: attempting to construct brain with no arguments. Check brain type for required parameters... most likely at least #in, #out and #hidden are required!\n\nExiting.\n" << endl;
 		exit(1);
 	}
 
@@ -45,29 +48,57 @@ class AbstractBrain {
 		nrHiddenNodes = hidden;
 
 		nrOfBrainNodes = nrInNodes + nrOutNodes + nrHiddenNodes;
+		nodes.resize(nrOfBrainNodes);
+		nextNodes.resize(nrOfBrainNodes);
+
 	}
 
 	virtual ~AbstractBrain() = default;
 	virtual void update() = 0;
+
 	virtual string description() = 0;  // returns a desription of this brain in it's current state
 	virtual vector<string> getStats() =0;  // returns a vector of string pairs of any stats that can then be used for data tracking (etc.)
 
-//	virtual string description();
-//	virtual vector<string> getStats();
-//
-//	virtual int IntFromState(vector<int> I);
-//	virtual int IntFromAllStates();
-//	virtual string gateList();
-//	virtual vector<vector<int>> getConnectivityMatrix();
-//	virtual int brainSize();
-//	//set<int> findCodingRegions(int mask);
-//	int numGates();
-	virtual void resetBrain() = 0;
-
 	virtual shared_ptr<AbstractBrain> makeBrainFromGenome(shared_ptr<AbstractGenome> _genome) = 0;
-	virtual void setState(const int& state, const double& value) = 0;
-	virtual double getState(const int& state) = 0;
 	virtual void initalizeGenome(shared_ptr<AbstractGenome> _genome) = 0;
+
+	virtual void inline resetBrain() {
+		for (int i = 0; i < nrOfBrainNodes; i++) {
+			nodes[i] = 0.0;
+		}
+	}
+
+	inline void setState(const int& state, const double& value) {
+		if (state < (int) nodes.size()) {
+			nodes[state] = value;
+		} else {
+			cout << "Writing to invalid brain node - this brain needs more states!\nExiting" << endl;
+			exit(1);
+		}
+	}
+	inline double getState(const int& state) {
+		if (state < (int) nodes.size()) {
+			return nodes[state];
+		} else {
+			cout << "Reading from invalid brain node - this brain needs more states!\nExiting" << endl;
+			exit(1);
+		}
+	}
+
+	int IntFromState(vector<int> I) {
+		int r = 0;
+		for (size_t i = 0; i < I.size(); i++)
+			r = (r << 1) + Bit(nodes[I[i]]);
+		return r;
+	}
+
+	int IntFromAllStates() {
+		int r = 0;
+		for (int i = 0; i < nrOfBrainNodes; i++)
+			r = (r << 1) + Bit(nodes[i]);
+		return r;
+
+	}
 
 };
 

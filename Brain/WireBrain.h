@@ -42,7 +42,6 @@ class WireBrain: public AbstractBrain {
 	static int& defaultWidth;
 	static int& defaultHeight;
 	static int& defaultDepth;
-	static int& defaultNrOfBrainNodes;
 	static int& worldConnectionsSeparation;
 	static int& overchargeThreshold;
 	static int& decayDuration;
@@ -73,7 +72,6 @@ public:
 
 	int width, depth, height;
 
-	vector<bool> nodes, nodesNext;
 	vector<int> nodesAddresses, nodesNextAddresses;  // where the nodes connect to the brain
 
 	vector<int> allCells, nextAllCells;  // list of all cells in this brain
@@ -90,6 +88,7 @@ public:
 		width = defaultWidth;
 		height = defaultHeight;
 		depth = defaultDepth;
+
 		connectionsCount = 0;
 	}
 
@@ -97,14 +96,12 @@ public:
 			WireBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes) {
 		//cout << "in WireBrain(shared_ptr<AbstractGenome> genome, int _nrOfNodes)" << endl;
 
-		nodes.resize(nrOfBrainNodes);
-		nodesNext.resize(nrOfBrainNodes);
-		nodesAddresses.resize(nrOfBrainNodes);
-		nodesNextAddresses.resize(nrOfBrainNodes);
-
 		allCells.resize(width * depth * height);
 		nextAllCells.resize(width * depth * height);
 		neighbors.resize(width * depth * height);
+
+		nodesAddresses.resize(nrOfBrainNodes);
+		nodesNextAddresses.resize(nrOfBrainNodes);
 
 		// used in wiregenes decoding
 		vector<vector<int>> simpleWireFeatures;
@@ -127,18 +124,6 @@ public:
 
 		connectionsCount = 0;
 		int wireCount = 0;
-
-//		// load genome into allCells
-//		auto genomeHandler = genome->newHandler(genome, true);
-//		for (int l = 0; l < width * depth * height; l++) {
-//			allCells[l] = genomeHandler->readInt(0, 1);  // 1 (WIRE) will be assigned initialFillRatio % of the time
-//			if (allCells[l] == WIRE) {
-//				wireAddresses.push_back(l);
-//				wireCount++;
-//			} else {
-//				emptyCount++;
-//			}
-//		}
 
 		if (genomeDecodingMethod == "bitmap") {
 			// load genome into allCells
@@ -457,8 +442,7 @@ public:
 				}
 			}
 		}
-
-		if (width * depth * height < (nrOfBrainNodes * worldConnectionsSeparation)) {
+		if ((width * depth * height) < (nrOfBrainNodes * worldConnectionsSeparation)) {
 			cout << "ERROR: WireBrain requires a bigger brain width * depth * height must be >= (nrOfNodes * worldConnectionsSeparation)!\nExiting\n" << endl;
 			exit(1);
 		}
@@ -467,7 +451,7 @@ public:
 			nodesNextAddresses[i] = ((width * depth * height) - 1) - (worldConnectionsSeparation * i);
 			//cout << worldConnectionsSeparation * i << " " << nodesAddresses[i] << "    " << nodesNextAddresses[i] << "\n";
 		}
-		//cout << "  made wire brain with : " << connectionsCount << " connections (w:" << wireCount << "/e:" << emptyCount <<endl;
+		//cout << "  made wire brain with : " << connectionsCount << " connections and " << wireCount << " wires." << endl;
 
 	}
 
@@ -529,7 +513,7 @@ public:
 		// NOTE: output cells can go into charge/decay sets
 		for (int i = 0; i < nrOfBrainNodes; i++) {
 			//cout << i << " " << nodesNextAddresses[i] << " " << nodesNext[i] <<endl;
-			nodesNext[i] = nodesNext[i] | (allCells[nodesNextAddresses[i]] == CHARGE);
+			nextNodes[i] = nextNodes[i] + (allCells[nodesNextAddresses[i]] == CHARGE);
 			//cout << i << " " << nodesNextAddresses[i] << " " << nodesNext[i] <<endl;
 		}
 
@@ -552,7 +536,7 @@ public:
 			//cout << "\nInput nodes: ";
 
 			for (int i = 0; i < nrOfBrainNodes; i++) {  // load inputs into inputLookUpValue
-				inputLookUpValue = nodes[i] + (inputLookUpValue << 1);
+				inputLookUpValue = Bit(nodes[i]) + (inputLookUpValue << 1);
 				//cout << nodes[i];
 			}
 			//cout << " = " << inputLookUpValue << endl << "  count: " << inputCount[inputLookUpValue] << endl;
@@ -560,7 +544,7 @@ public:
 				long outputValue = inputLookUpTable[inputLookUpValue][Random::getIndex(cacheResultsCount)];  // pull a stored value randomly
 				//cout << "                                                                     outputValue: " << outputValue << " = ";
 				for (int i = nrOfBrainNodes - 1; i > -1; i--) {  // load outputValue into nodesNext
-					nodesNext[i] = outputValue & 1;  // get right most bit
+					nextNodes[i] = outputValue & 1;  // get right most bit
 					outputValue = outputValue >> 1;  // clip off right most bit
 					//cout << nodesNext[i];
 				}
@@ -570,7 +554,7 @@ public:
 					allCells[w] = 1;
 				}
 				for (int i = 0; i < nrOfBrainNodes; i++) {  // set up inputs and outputs
-					nodesNext[i] = 0;  // reset all nodesNext
+					nextNodes[i] = 0;  // reset all nodesNext
 					if (nodes[i] == 1 && allCells[nodesAddresses[i]] == WIRE) {  // for each node if it is on and connects to wire
 						allCells[nodesAddresses[i]] = CHARGE;  // charge the wire
 					}
@@ -589,7 +573,7 @@ public:
 				//////
 				long outputValue = 0;
 				for (int i = 0; i < nrOfBrainNodes; i++) {  // load outputs into outputValue
-					outputValue = nodesNext[i] + (outputValue << 1);
+					outputValue = nextNodes[i] + (outputValue << 1);
 				}
 				inputLookUpTable[inputLookUpValue].push_back(outputValue);  // push outputValue into the lookup table
 
@@ -601,7 +585,7 @@ public:
 				allCells[w] = 1;
 			}
 			for (int i = 0; i < nrOfBrainNodes; i++) {  // set up inputs and outputs
-				nodesNext[i] = 0;  // reset nodesNext
+				nextNodes[i] = 0;  // reset nodesNext
 				if (nodes[i] == 1 && allCells[nodesAddresses[i]] == WIRE) {  // if this node is on and connects to wire
 					allCells[nodesAddresses[i]] = CHARGE;
 				}
@@ -612,7 +596,7 @@ public:
 			}
 		}
 
-		nodes = nodesNext;  // update nodes
+		nodes = nextNodes;  // update nodes
 
 	}
 
@@ -702,7 +686,7 @@ public:
 			int cellY = (l % (width * height)) / width;
 			int cellZ = l / (width * height);
 
-			cout << "node" << i << "@(" << cellX << "," << cellY << "," << cellZ << ")=" << nodesNext[i] << "  ";
+			cout << "node" << i << "@(" << cellX << "," << cellY << "," << cellZ << ")=" << nextNodes[i] << "  ";
 		}
 		cout << endl;
 		char c;
@@ -735,23 +719,6 @@ public:
 	}
 
 public:
-	inline void setState(const int& state, const double& value) override {
-		if (state < (int) nodes.size()) {
-			nodes[state] = value;
-		} else {
-			cout << "Writing to invalid brain state - this brain needs more states!\nExiting" << endl;
-			exit(1);
-		}
-	}
-	inline double getState(const int& state) override {
-		if (state < (int) nodes.size()) {
-			return nodes[state];
-		} else {
-			cout << "Reading from invalid brain state - this brain needs more states!\nExiting" << endl;
-			exit(1);
-		}
-	}
-
 	virtual void initalizeGenome(shared_ptr<AbstractGenome> _genome) {
 		int codonMax = (1 << Global::bitsPerCodon) - 1;
 

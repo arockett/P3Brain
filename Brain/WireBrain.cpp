@@ -13,7 +13,6 @@
 int& WireBrain::defaultWidth = Parameters::register_parameter("size_width", 10, "width of the wire brain cube", "BRAIN - WIRE");
 int& WireBrain::defaultHeight = Parameters::register_parameter("size_height", 10, "height of the wire brain cube", "BRAIN - WIRE");
 int& WireBrain::defaultDepth = Parameters::register_parameter("size_depth", 10, "depth of the wire brain cube", "BRAIN - WIRE");
-int& WireBrain::defaultNrOfBrainNodes = Parameters::register_parameter("NrOfBrainNodes", 15, "number of nodes (I/O)", "BRAIN - WIRE");
 int& WireBrain::worldConnectionsSeparation = Parameters::register_parameter("worldConnectionsSeparation", 7, "distance between nodes input and output connections (I/O)", "BRAIN - WIRE");
 int& WireBrain::overchargeThreshold = Parameters::register_parameter("overchargeThreshold", 3, "If a cell receives this much charge or more, it will not charge", "BRAIN - WIRE");
 int& WireBrain::decayDuration = Parameters::register_parameter("decayDuration", 1, "length of time a cell will decay (while in decay a cell can not become charged)", "BRAIN - WIRE");

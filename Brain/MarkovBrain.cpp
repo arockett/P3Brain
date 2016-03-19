@@ -20,8 +20,6 @@ bool& MarkovBrain::serialProcessing = Parameters::register_parameter("serialProc
 MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes) :
 		AbstractBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes) {
 	GLB = _GLB;
-	states.resize(nrOfBrainNodes);
-	nextStates.resize(nrOfBrainNodes);
 	//make a node map to handle genome value to brain state address look up.
 	makeNodeMap(nodeMap, Global::bitsPerBrainAddress, nrOfBrainNodes);
 }
@@ -39,50 +37,23 @@ shared_ptr<AbstractBrain> MarkovBrain::makeBrainFromGenome(shared_ptr<AbstractGe
 }
 
 void MarkovBrain::resetBrain() {
-	for (int i = 0; i < nrOfBrainNodes; i++)
-		states[i] = 0.0;
+	AbstractBrain::resetBrain();
 	for (size_t i = 0; i < gates.size(); i++)
 		gates[i]->resetGate();
 }
 
 void MarkovBrain::update() {
-	/*
-	 if(Agent::serialProcessing){
-	 //this is a special way of serialized updating
-	 //experimental feature, should be default off!
-	 //only change if you really know what you are doing!
-	 for(int i=0;i<gates.size();i++){
-	 gates[i]->update(states, states);
-	 }
-	 } else {*/
-	//this is the default way of parallel updating
-	nextStates.assign(nrOfBrainNodes, 0.0);
+	nextNodes.assign(nrOfBrainNodes, 0.0);
 	for (size_t i = 0; i < gates.size(); i++) {  //update each gate
-		gates[i]->update(states, nextStates);
+		gates[i]->update(nodes, nextNodes);
 	}
-
-	swap(states, nextStates);
+	swap(nodes,nextNodes);
 }
 
 void MarkovBrain::inOutReMap() {  // remaps genome site values to valid brain state addresses
 	for (size_t i = 0; i < gates.size(); i++) {
 		gates[i]->applyNodeMap(nodeMap, nrOfBrainNodes);
 	}
-
-}
-
-int MarkovBrain::IntFromState(vector<int> I) {
-	int r = 0;
-	for (size_t i = 0; i < I.size(); i++)
-		r = (r << 1) + Bit(states[I[i]]);
-	return r;
-}
-
-int MarkovBrain::IntFromAllStates() {
-	int r = 0;
-	for (int i = 0; i < nrOfBrainNodes; i++)
-		r = (r << 1) + Bit(states[i]);
-	return r;
 
 }
 
@@ -123,18 +94,6 @@ vector<vector<int>> MarkovBrain::getConnectivityMatrix() {
 	}
 	return M;
 }
-
-//set<int> Brain::findCodingRegions(int mask) {  //if mask=0, all coding regions are returned. if mask=1, return everything except start codon. if mask=2, return everything except start codon and wiring.
-//  set<int> allCodingRegions;
-//  for (auto gateIterator = gates.begin(); gateIterator != gates.end(); gateIterator++) {
-//    for (auto iterator = (*gateIterator)->codingRegions.begin(); iterator != (*gateIterator)->codingRegions.end(); iterator++) {
-//      if (iterator->second >= mask) {
-//        allCodingRegions.insert(iterator->first);
-//      }
-//    }
-//  }
-//  return allCodingRegions;
-//}
 
 int MarkovBrain::brainSize() {
 	return (int) gates.size();
