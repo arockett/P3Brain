@@ -67,9 +67,9 @@ vector<shared_ptr<Gate>> Classic_GateListBuilder::buildGateListAndGetAllValues(s
 						if (!gateGenomeHandler->atEOC()) {  // we may run out of space while reading the perGate sites...
 							gates.push_back(newGate);
 							//genomePerGateValues.push_back(thisGatesValues);
-							gateCount++;
 						}
 					}
+					gateCount++;
 				}
 			}
 			if (mustReadAll) {  // if start codon values are bigger then the alphabetSize of the genome, we must step forward one genome site at a time (slow)

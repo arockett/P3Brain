@@ -93,7 +93,7 @@ vector<int> Gate::getOuts() {
 }
 
 string Gate::description() {
-	string S = " Gate\n";
+	string S = "Gate\n";
 	S = S + "IN:";
 	for (size_t i = 0; i < inputs.size(); i++)
 		S = S + " " + to_string(inputs[i]);
@@ -194,7 +194,7 @@ void ProbabilisticGate::update(vector<double> & states, vector<double> & nextSta
 }
 
 string ProbabilisticGate::description() {
-	string S = to_string(ID) + ": ProbilisticGate" + Gate::description();
+	string S = "Gate " + to_string(ID) + " is a Probabilistic " + Gate::description();
 	return S;
 }
 
@@ -249,7 +249,8 @@ void DeterministicGate::update(vector<double> & states, vector<double> & nextSta
 }
 
 string DeterministicGate::description() {
-	return to_string(ID) + ": Deterministic " + Gate::description();
+	string S = "Gate " + to_string(ID) + " is a Deterministic " + Gate::description();
+	return S;
 }
 
 /* *** Fixed Epison Gate *** */
