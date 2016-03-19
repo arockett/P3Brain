@@ -68,8 +68,6 @@ public:
 		}
 	}
 
-public:
-
 	inline void setInput(const int& nodeAddress, const double& value) {
 		if (nodeAddress < nrInNodes) {
 			nodes[nodeAddress] = value;

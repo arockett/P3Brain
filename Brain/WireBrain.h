@@ -705,15 +705,13 @@ public:
 		dataPairs.push_back("brainDepth");
 		dataPairs.push_back(to_string(depth));
 
-		dataPairs.push_back("brainWireCount");
+		dataPairs.push_back("wireBrainWireCount");
 		dataPairs.push_back(to_string(wireAddresses.size()));
 
-		dataPairs.push_back("connectionsCount");
+		dataPairs.push_back("wireBrainConnectionsCount");
 		dataPairs.push_back(to_string(connectionsCount));
 
 		return dataPairs;
-	}
-	virtual void resetBrain() override {
 	}
 
 public:

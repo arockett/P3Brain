@@ -397,7 +397,7 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 	org->dataMap.Append("alltotal", total_eaten);  // total food eaten (regardless of type)
 
 	org->dataMap.Append("allswitches", switches);
-	org->dataMap.Append("allscore", score);
+	//org->dataMap.Append("allscore", score);
 
 //	if (analyse) {
 //		org->dataMap.Set("phi", Analyse::computeAtomicPhi(stateCollector, org->brain->nrOfBrainNodes));
