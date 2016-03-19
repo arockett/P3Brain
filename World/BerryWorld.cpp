@@ -239,38 +239,38 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 		if (senseWalls) {
 			if (senseDown) {
 				for (int i = 0; i < foodTypes; i++) {  // fill first nodes with food values at here location
-					org->brain->setState(nodesAssignmentCounter++, (here == i + 1));
+					org->brain->setInput(nodesAssignmentCounter++, (here == i + 1));
 				}
 			}
 			if (senseFront) {
 				for (int i = 0; i < foodTypes; i++) {  // fill first nodes with food values at front location
-					org->brain->setState(nodesAssignmentCounter++, (front == i + 1));
+					org->brain->setInput(nodesAssignmentCounter++, (front == i + 1));
 				}
-				org->brain->setState(nodesAssignmentCounter++, (front == WALL));
+				org->brain->setInput(nodesAssignmentCounter++, (front == WALL));
 			}
 			if (senseFrontSides) {
 				for (int i = 0; i < foodTypes; i++) {  // fill first nodes with food values at front location
-					org->brain->setState(nodesAssignmentCounter++, (leftFront == i + 1));
-					org->brain->setState(nodesAssignmentCounter++, (rightFront == i + 1));
+					org->brain->setInput(nodesAssignmentCounter++, (leftFront == i + 1));
+					org->brain->setInput(nodesAssignmentCounter++, (rightFront == i + 1));
 				}
-				org->brain->setState(nodesAssignmentCounter++, (leftFront == WALL));
-				org->brain->setState(nodesAssignmentCounter++, (rightFront == WALL));
+				org->brain->setInput(nodesAssignmentCounter++, (leftFront == WALL));
+				org->brain->setInput(nodesAssignmentCounter++, (rightFront == WALL));
 			}
 		} else {  // don't sense walls
 			if (senseDown) {
 				for (int i = 0; i < foodTypes; i++) {  // fill first nodes with food values at here location
-					org->brain->setState(nodesAssignmentCounter++, (here == i + 1));
+					org->brain->setInput(nodesAssignmentCounter++, (here == i + 1));
 				}
 			}
 			if (senseFront) {
 				for (int i = 0; i < foodTypes; i++) {  // fill first nodes with food values at front location
-					org->brain->setState(nodesAssignmentCounter++, (front == i + 1));
+					org->brain->setInput(nodesAssignmentCounter++, (front == i + 1));
 				}
 			}
 			if (senseFrontSides) {
 				for (int i = 0; i < foodTypes; i++) {  // fill first nodes with food values at front location
-					org->brain->setState(nodesAssignmentCounter++, (leftFront == i + 1));
-					org->brain->setState(nodesAssignmentCounter++, (rightFront == i + 1));
+					org->brain->setInput(nodesAssignmentCounter++, (leftFront == i + 1));
+					org->brain->setInput(nodesAssignmentCounter++, (rightFront == i + 1));
 				}
 			}
 		}
@@ -280,36 +280,39 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 			cout << "\ngeneration update: " << Global::update << "  world update: " << t << "\n";
 			cout << "currentLocation: " << currentLocation.first << "," << currentLocation.second << "  :  " << facing << "\n";
 			cout << "inNodes: ";
+			cout << "inNodes: ";
 			for (int i = 0; i < inputNodesCount; i++) {
-				cout << org->brain->getState(i);
+				cout << org->brain->readInput(i);
+			}
+			cout << "\nlast outNodes: ";
+			for (int i = 0; i < outputNodesCount; i++) {
+				cout << org->brain->readOutput(i);
 			}
 			cout << "\n\n  -- brain update --\n\n";
 		}
 
 		// inputNodesCount is now set to the first output Brain State Address. we will not move it until the next world update!
 		if (clearOutputs) {
-			org->brain->setState(inputNodesCount, 0.0);
-			org->brain->setState(inputNodesCount + 1, 0.0);
-			org->brain->setState(inputNodesCount + 2, 0.0);
+			org->brain->resetBrain();
 		}
 
-		if (analyse) {  // gather some data before and after running update
-			int S = 0;
-			for (int i = 0; i < inputNodesCount; i++)
-				S = (S << 1) + Bit(org->brain->getState(i));
-			org->brain->update();
-			for (int i = inputNodesCount + outputNodesCount; i < org->brain->nrOfBrainNodes; i++)
-				S = (S << 1) + Bit(org->brain->getState(i));
-			stateCollector.push_back(S);
-		} else {
+//		if (analyse) {  // gather some data before and after running update
+//			int S = 0;
+//			for (int i = 0; i < inputNodesCount; i++)
+//				S = (S << 1) + Bit(org->brain->readInput(i));
+//			org->brain->update();
+//			for (int i = inputNodesCount + outputNodesCount; i < org->brain->nrOfBrainNodes; i++)
+//				S = (S << 1) + Bit(org->brain->getState(i));
+//			stateCollector.push_back(S);
+//		} else {
 			org->brain->update();  // just run the update!
-		}
+//		}
 
 		// set output values
 		// output1 has info about the first 2 output bits these [00 eat, 10 left, 01 right, 11 move]
-		output1 = Bit(org->brain->getState(inputNodesCount)) + (Bit(org->brain->getState(inputNodesCount + 1)) << 1);
+		output1 = Bit(org->brain->readOutput(0)) + (Bit(org->brain->readOutput(1)) << 1);
 		// output 2 has info about the 3rd output bit, which either does nothing, or is eat.
-		output2 = Bit(org->brain->getState(inputNodesCount + 2));
+		output2 = Bit(org->brain->readOutput(2));
 
 		if (output2 == 1) {  // if org tried to eat
 			int foodHere = getGridValue(grid, currentLocation);
@@ -366,7 +369,7 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 		}
 
 		if (show) {
-			cout << "outNodes: " << Bit(org->brain->getState(inputNodesCount)) << Bit(org->brain->getState(inputNodesCount + 1)) << Bit(org->brain->getState(inputNodesCount + 2)) << "\n";
+			cout << "outNodes: " << Bit(org->brain->readOutput(0)) << Bit(org->brain->readOutput(1)) << Bit(org->brain->readOutput(2)) << "\n";
 			cout << "output1: " << output1 << "  output2: " << output2 << "\n";
 			cout << "\n  -- world update --\n\n";
 			printGrid(grid, currentLocation, facing);
@@ -396,9 +399,9 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 	org->dataMap.Append("allswitches", switches);
 	org->dataMap.Append("allscore", score);
 
-	if (analyse) {
-		org->dataMap.Set("phi", Analyse::computeAtomicPhi(stateCollector, org->brain->nrOfBrainNodes));
-	}
+//	if (analyse) {
+//		org->dataMap.Set("phi", Analyse::computeAtomicPhi(stateCollector, org->brain->nrOfBrainNodes));
+//	}
 
 	return score;
 }

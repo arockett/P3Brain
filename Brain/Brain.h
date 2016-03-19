@@ -68,19 +68,31 @@ public:
 		}
 	}
 
-	inline void setState(const int& state, const double& value) {
-		if (state < (int) nodes.size()) {
-			nodes[state] = value;
+public:
+
+	inline void setInput(const int& nodeAddress, const double& value) {
+		if (nodeAddress < nrInNodes) {
+			nodes[nodeAddress] = value;
 		} else {
-			cout << "Writing to invalid brain node - this brain needs more states!\nExiting" << endl;
+			cout << "Writing to invalid input node (" << nodeAddress << ") - this brain needs more input nodes!\nExiting" << endl;
 			exit(1);
 		}
 	}
-	inline double getState(const int& state) {
-		if (state < (int) nodes.size()) {
-			return nodes[state];
+
+	inline double readInput(const int& nodeAddress) {
+		if (nodeAddress < nrInNodes) {
+			return nodes[nodeAddress];
 		} else {
-			cout << "Reading from invalid brain node - this brain needs more states!\nExiting" << endl;
+			cout << "Reading from invalid input node (" << nodeAddress << ") - this brain needs more input nodes!\nExiting" << endl;
+			exit(1);
+		}
+	}
+
+	inline double readOutput(const int& nodeAddress) {
+		if (nodeAddress < nrOutNodes) {
+			return nodes[nodeAddress + nrInNodes];
+		} else {
+			cout << "Reading from invalid output node (" << nodeAddress << ") - this brain needs more output nodes!\nExiting" << endl;
 			exit(1);
 		}
 	}

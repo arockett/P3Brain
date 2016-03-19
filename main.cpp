@@ -58,8 +58,8 @@ int main(int argc, const char * argv[]) {
 		Random::getCommonGenerator().seed(Global::randomSeed);
 	}
 
-	World *world = (World*) new BerryWorld();  //new World();
-	//World *world = (World*) new World();  //new World();
+	//World *world = (World*) new BerryWorld();  //new World();
+	World *world = (World*) new World();  //new World();
 
 // test chromosome crossover speed
 //	auto C1 = make_shared<Chromosome<bool>>(10000, 2);

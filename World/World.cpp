@@ -17,8 +17,8 @@
 int& World::repeats = Parameters::register_parameter("repeats", 3, "Number of times to test each Genome per generation", "WORLD");
 
 World::World() {
-	inputNodesCount = 0;
-	outputNodesCount = 10;
+	inputNodesCount = 1;
+	outputNodesCount = 100;
 }
 
 World::~World() {
@@ -38,22 +38,24 @@ void World::evaluateFitness(vector<shared_ptr<Organism>> population, bool analys
 	//cout << "\n";
 }
 
+// score is number of outputs set to 1 (i.e. output > 0) squared
 double World::testIndividual(shared_ptr<Organism> org, bool analyse, bool show) {
 	org->brain->resetBrain();
+	org->brain->setInput(0,1); // give the brain a constant 1 (for wire brain)
 	org->brain->update();
-	double w=0.0;
-	for(int i=0;i < org->brain->nrOfBrainNodes;i++)
-	w+=(double)(((int)org->brain->getState(i))&1);
-	return w*w;
+	double w = 0.0;
+	for (int i = 0; i < org->brain->nrOutNodes; i++) {
+		w += Bit(org->brain->readOutput(i)) & 1;
+	}
+	return w * w;
 }
 
- int World::requiredInputs(){
-	 return inputNodesCount;
- }
- int World::requiredOutputs(){
-	 return outputNodesCount;
- }
-
+int World::requiredInputs() {
+	return inputNodesCount;
+}
+int World::requiredOutputs() {
+	return outputNodesCount;
+}
 
 ///* *** Example World Implementation *** */
 //ExampleWorld::ExampleWorld() {

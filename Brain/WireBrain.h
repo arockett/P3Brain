@@ -95,7 +95,6 @@ public:
 	WireBrain(shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes) :
 			WireBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes) {
 		//cout << "in WireBrain(shared_ptr<AbstractGenome> genome, int _nrOfNodes)" << endl;
-
 		allCells.resize(width * depth * height);
 		nextAllCells.resize(width * depth * height);
 		neighbors.resize(width * depth * height);
@@ -449,7 +448,6 @@ public:
 		for (int i = 0; i < nrOfBrainNodes; i++) {
 			nodesAddresses[i] = worldConnectionsSeparation * i;
 			nodesNextAddresses[i] = ((width * depth * height) - 1) - (worldConnectionsSeparation * i);
-			//cout << worldConnectionsSeparation * i << " " << nodesAddresses[i] << "    " << nodesNextAddresses[i] << "\n";
 		}
 		//cout << "  made wire brain with : " << connectionsCount << " connections and " << wireCount << " wires." << endl;
 
