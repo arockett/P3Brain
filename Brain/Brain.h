@@ -85,18 +85,22 @@ public:
 		}
 	}
 
-	int IntFromState(vector<int> I) {
-		int r = 0;
-		for (size_t i = 0; i < I.size(); i++)
-			r = (r << 1) + Bit(nodes[I[i]]);
-		return r;
+	// takes a vector of indices to nodes, converts the value at each nodes[index] to bit and converts the bits to an int
+	// useful to generate values for lookups
+	int someNodesToBitToInt(vector<int> nodeAddresses) {
+		int result = 0;
+		for (size_t i = 0; i < nodeAddresses.size(); i++)
+			result = (result << 1) + Bit(nodes[nodeAddresses[i]]);
+		return result;
 	}
 
-	int IntFromAllStates() {
-		int r = 0;
+	// converts the value of each value in nodes[] to bit and converts the bits to an int
+	// useful to generate values for lookups
+	int allNodesToBitToInt() {
+		int result = 0;
 		for (int i = 0; i < nrOfBrainNodes; i++)
-			r = (r << 1) + Bit(nodes[i]);
-		return r;
+			result = (result) + Bit(nodes[i]);
+		return result;
 
 	}
 
