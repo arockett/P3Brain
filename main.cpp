@@ -45,10 +45,7 @@ int main(int argc, const char * argv[]) {
 
 	cout << "\n\n" << "\tMM   MM      A       BBBBBB    EEEEEE\n" << "\tMMM MMM     AAA      BB   BB   EE\n" << "\tMMMMMMM    AA AA     BBBBBB    EEEEEE\n" << "\tMM M MM   AAAAAAA    BB   BB   EE\n" << "\tMM   MM  AA     AA   BBBBBB    EEEEEE\n" << "\n" << "\tModular    Agent      Based    Evolver\n\n\n\thttp://hintzelab.msu.edu/MABE\n\n" << endl;
 	Parameters::initialize_parameters(argc, argv);  // loads command line and configFile values into registered parameters
-	                                                // also writes out a config file if requested
-	//make a node map to handle genome value to brain state address look up.
-	MarkovBrain::makeNodeMap(MarkovBrain::defaultNodeMap, Global::bitsPerBrainAddress, MarkovBrain::defaultNrOfBrainStates);
-
+													// also writes out a config file if requested
 	Gate_Builder::setupGates();  // determines which gate types will be in use.
 
 	// outputDirectory must exist. If outputDirectory does not exist, no error will occur, but no data will be writen.
@@ -144,84 +141,82 @@ int main(int argc, const char * argv[]) {
 //	///////////////////////// end test reading a writing to genomes ///////////////////////////////////////////
 //
 //	///////////////////////// test genome to gate translation /////////////////////////////////////////////////
-	auto initalChromosome = make_shared<Chromosome<int>>(400, 2);
-	auto initalGenome = make_shared<Genome>(initalChromosome, 2, 2);
-	auto initalBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
-	int testStartCode = 43;
-	initalGenome->fillAcending();
-	initalGenome->printGenome();
-
-	auto handler = initalGenome->newHandler(initalGenome,1);
-
-	handler->writeInt(200,0,255);
-	handler->writeInt(201,0,255);
-	handler->writeInt(testStartCode,0,255);
-	handler->writeInt(255-testStartCode,0,255);
-
-	handler->writeInt(4,1,4); // 4 in
-	handler->writeInt(4,1,4); // 4 out
-
-	handler->writeInt(3,0,255); // in 1
-	handler->writeInt(2,0,255); // in 2
-	handler->writeInt(1,0,255); // ..
-	handler->writeInt(0,0,255); // ..
-	handler->writeInt(2,0,255); // out 1
-	handler->writeInt(4,0,255); // ..
-	handler->writeInt(6,0,255); // ..
-	handler->writeInt(8,0,255); // ..
-
-	handler->advanceIndex(180);
-	handler->writeInt(testStartCode,0,255);
-	handler->writeInt(255-testStartCode,0,255);
-	handler->writeInt(1,1,4); // 1 in
-	handler->writeInt(1,1,4); // 1 out
-
-	handler->advanceIndex(2);
-	handler->writeInt(testStartCode,0,255);
-	handler->writeInt(255-testStartCode,0,255);
-	handler->writeInt(4,1,4); // 4 in
-	handler->writeInt(4,1,4); // 4 out
-
-	handler->writeInt(7,0,255); // in 1
-	handler->writeInt(6,0,255); // in 2
-	handler->writeInt(5,0,255); // ..
-	handler->writeInt(4,0,255); // ..
-	handler->writeInt(4,0,255); // out 1
-	handler->writeInt(5,0,255); // ..
-	handler->writeInt(6,0,255); // ..
-	handler->writeInt(7,0,255); // ..
-
-	handler->advanceIndex(100);
-	handler->writeInt(testStartCode,0,255);
-	handler->writeInt(255-testStartCode,0,255);
-	handler->writeInt(4,1,4); // 4 in
-	handler->writeInt(4,1,4); // 4 out
-
-	handler->writeInt(1,0,255); // in 1
-	handler->writeInt(3,0,255); // in 2
-	handler->writeInt(5,0,255); // ..
-	handler->writeInt(7,0,255); // ..
-	handler->writeInt(5,0,255); // out 1
-	handler->writeInt(3,0,255); // ..
-	handler->writeInt(1,0,255); // ..
-	handler->writeInt(9,0,255); // ..
-
-	initalGenome->printGenome();
-		shared_ptr<Organism> testSubject = make_shared<Organism>(initalGenome, initalBrain);  // make a organism with a genome and brain (if you need to change the types here is where you do it)
-
-	cout << "brain" << endl;
-	cout << testSubject->brain->description() << endl;
-
-	cout << "coding regions" << endl;
-	auto test_genome = dynamic_pointer_cast<Genome>(testSubject->genome);
-	for (auto c : test_genome->chromosomes){
-		auto convertedC = dynamic_pointer_cast<Chromosome<int>>(c);
-		cout << convertedC->codingRegionsToString() << endl<< endl;
-	}
-	exit (100);
+//	auto initalChromosome = make_shared<Chromosome<int>>(400, 2);
+//	auto initalGenome = make_shared<Genome>(initalChromosome, 2, 2);
+//	auto initalBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
+//	int testStartCode = 43;
+//	initalGenome->fillAcending();
+//	initalGenome->printGenome();
+//
+//	auto handler = initalGenome->newHandler(initalGenome,1);
+//
+//	handler->writeInt(200,0,255);
+//	handler->writeInt(201,0,255);
+//	handler->writeInt(testStartCode,0,255);
+//	handler->writeInt(255-testStartCode,0,255);
+//
+//	handler->writeInt(4,1,4); // 4 in
+//	handler->writeInt(4,1,4); // 4 out
+//
+//	handler->writeInt(3,0,255); // in 1
+//	handler->writeInt(2,0,255); // in 2
+//	handler->writeInt(1,0,255); // ..
+//	handler->writeInt(0,0,255); // ..
+//	handler->writeInt(2,0,255); // out 1
+//	handler->writeInt(4,0,255); // ..
+//	handler->writeInt(6,0,255); // ..
+//	handler->writeInt(8,0,255); // ..
+//
+//	handler->advanceIndex(180);
+//	handler->writeInt(testStartCode,0,255);
+//	handler->writeInt(255-testStartCode,0,255);
+//	handler->writeInt(1,1,4); // 1 in
+//	handler->writeInt(1,1,4); // 1 out
+//
+//	handler->advanceIndex(2);
+//	handler->writeInt(testStartCode,0,255);
+//	handler->writeInt(255-testStartCode,0,255);
+//	handler->writeInt(4,1,4); // 4 in
+//	handler->writeInt(4,1,4); // 4 out
+//
+//	handler->writeInt(7,0,255); // in 1
+//	handler->writeInt(6,0,255); // in 2
+//	handler->writeInt(5,0,255); // ..
+//	handler->writeInt(4,0,255); // ..
+//	handler->writeInt(4,0,255); // out 1
+//	handler->writeInt(5,0,255); // ..
+//	handler->writeInt(6,0,255); // ..
+//	handler->writeInt(7,0,255); // ..
+//
+//	handler->advanceIndex(100);
+//	handler->writeInt(testStartCode,0,255);
+//	handler->writeInt(255-testStartCode,0,255);
+//	handler->writeInt(4,1,4); // 4 in
+//	handler->writeInt(4,1,4); // 4 out
+//
+//	handler->writeInt(1,0,255); // in 1
+//	handler->writeInt(3,0,255); // in 2
+//	handler->writeInt(5,0,255); // ..
+//	handler->writeInt(7,0,255); // ..
+//	handler->writeInt(5,0,255); // out 1
+//	handler->writeInt(3,0,255); // ..
+//	handler->writeInt(1,0,255); // ..
+//	handler->writeInt(9,0,255); // ..
+//
+//	initalGenome->printGenome();
+//		shared_ptr<Organism> testSubject = make_shared<Organism>(initalGenome, initalBrain);  // make a organism with a genome and brain (if you need to change the types here is where you do it)
+//
+//	cout << "brain" << endl;
+//	cout << testSubject->brain->description() << endl;
+//
+//	cout << "coding regions" << endl;
+//	auto test_genome = dynamic_pointer_cast<Genome>(testSubject->genome);
+//	for (auto c : test_genome->chromosomes){
+//		auto convertedC = dynamic_pointer_cast<Chromosome<int>>(c);
+//		cout << convertedC->codingRegionsToString() << endl<< endl;
+//	}
+//	exit (100);
 //	///////////////////////// test end ///////////////////////////////////////////
-
-
 
 	shared_ptr<Group> group;
 
@@ -260,6 +255,7 @@ int main(int argc, const char * argv[]) {
 		//shared_ptr<MarkovBrain> tesBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
 		auto initalChromosome = make_shared<Chromosome<unsigned char>>(Genome::initialChromosomeSize, 256);
 		auto initalGenome = make_shared<Genome>(initalChromosome, Genome::initialChromosomes, Genome::initialPloidy);
+
 //		vector<shared_ptr<AbstractGenome>> genomes;
 //		for (int i = 0; i < 500; i++) {
 //			cout << i << " " << flush;
@@ -270,8 +266,16 @@ int main(int argc, const char * argv[]) {
 //		}
 //		exit(17);
 
-		auto initalBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
-		//auto initalBrain = make_shared<WireBrain>();
+		shared_ptr<AbstractBrain> initalBrain;
+		if (AbstractBrain::brainTypeStr == "Markov") {
+			initalBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>(),world->requiredInputs(),world->requiredOutputs(),AbstractBrain::hiddenNodes);
+		} else if (AbstractBrain::brainTypeStr == "Wire") {
+			initalBrain = make_shared<WireBrain>(world->requiredInputs(),world->requiredOutputs(),AbstractBrain::hiddenNodes);
+		} else {
+			cout << "\n\nERROR: Unrecognized brain type in configuration!\n  \"" << AbstractBrain::brainTypeStr << "\" is not defined.\n\nExiting.\n" << endl;
+			exit(1);
+		}
+
 		shared_ptr<Organism> progenitor = make_shared<Organism>(initalGenome, initalBrain);  // make a organism with a genome and brain (if you need to change the types here is where you do it)
 
 		Global::update = 0;  // the beginning of time - now we construct the first population
@@ -316,12 +320,12 @@ int main(int argc, const char * argv[]) {
 
 	while (!finished) {
 		world->evaluateFitness(group->population, false);  // evaluate each organism in the population using a World
-		cout << "  evaluation done\n";
+		//cout << "  evaluation done\n";
 		finished = group->archive();  // save data, update memory and delete any unneeded data;
-		cout << "  archive done\n";
+		//cout << "  archive done\n";
 		Global::update++;
 		group->optimize();  // update the population (reproduction and death)
-		cout << "  optimize done\n";
+		//cout << "  optimize done\n";
 		cout << "update: " << Global::update - 1 << "   maxFitness: " << group->optimizer->maxFitness << "" << endl;
 	}
 

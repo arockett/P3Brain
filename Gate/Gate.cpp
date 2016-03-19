@@ -146,7 +146,6 @@ string Gate::description() {
 //	}
 //
 //}
-
 ProbabilisticGate::ProbabilisticGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> rawTable, int _ID) {
 
 	ID = _ID;
@@ -190,12 +189,11 @@ void ProbabilisticGate::update(vector<double> & states, vector<double> & nextSta
 	}
 	for (size_t i = 0; i < outputs.size(); i++)  //for each output...
 		nextStates[outputs[i]] += 1.0 * ((outputColumn >> (outputs.size() - 1 - i)) & 1);  // convert output (the column number) to bits and pack into next states
-		                                                                                   // but always put the last bit in the first input (to maintain consistancy)
+																						   // but always put the last bit in the first input (to maintain consistancy)
 }
 
 string ProbabilisticGate::description() {
-	string S = "Gate " + to_string(ID) + " is a Probabilistic " + Gate::description();
-	return S;
+	return "Gate " + to_string(ID) + " is a Probabilistic " + Gate::description();
 }
 
 /* *** Determistic Gate Implementation *** */
@@ -218,7 +216,6 @@ string ProbabilisticGate::description() {
 //	// rows = (the number of possible combinations of input values) and columns = (the number of possible combinations of output values)
 //	table = genomeHandler->readTable({ 1 << numInputs, numOutputs }, { 16, 4 }, { 0, 1 }, Gate::DATA_CODE, gateID);
 //}
-
 DeterministicGate::DeterministicGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID) {
 
 	ID = _ID;
@@ -249,15 +246,14 @@ void DeterministicGate::update(vector<double> & states, vector<double> & nextSta
 }
 
 string DeterministicGate::description() {
-	string S = "Gate " + to_string(ID) + " is a Deterministic " + Gate::description();
-	return S;
+	return "Gate " + to_string(ID) + " is a Deterministic " + Gate::description();
 }
 
 /* *** Fixed Epison Gate *** */
 /* this gate behaves like a deterministic gate with a constant externally set error which may cause the outputs to scramble */
 
-FixedEpsilonGate::FixedEpsilonGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID)
-		: DeterministicGate(addresses, _table, _ID) {  // use DeterministicGate constructor to build set up everything (including a table of 0s and 1s)
+FixedEpsilonGate::FixedEpsilonGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID) :
+		DeterministicGate(addresses, _table, _ID) {  // use DeterministicGate constructor to build set up everything (including a table of 0s and 1s)
 	epsilon = FixedEpsilonGate_Probability;  // in case you want to have different epsilon for different gates (who am I to judge?)
 
 	// now to the specifics of this gate - we convert the table to a list of numbers (i.e. bitstrings) so we can do fast comparisons in the update
@@ -292,14 +288,14 @@ void FixedEpsilonGate::update(vector<double> & states, vector<double> & nextStat
 }
 
 string FixedEpsilonGate::description() {
-	return to_string(ID) + ": Fixed Epsilon " + to_string(epsilon) + "\n " + Gate::description();
+	return "Gate " + to_string(ID) + " is a Fixed Epsilon " + Gate::description();
 }
 
 /* *** VoidGate *** */
 /* this gate behaves like a deterministic gate with a constant externally set error which may set a single output to 0 */
 
-VoidGate::VoidGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID)
-		: DeterministicGate(addresses, _table, _ID) {  // use DeterministicGate constructor to build set up everything (including a table of 0s and 1s)
+VoidGate::VoidGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID) :
+		DeterministicGate(addresses, _table, _ID) {  // use DeterministicGate constructor to build set up everything (including a table of 0s and 1s)
 	epsilon = voidGate_Probability;  // in case you want to have different epsilon for different gates (who am I to judge?)
 }
 
@@ -316,6 +312,6 @@ void VoidGate::update(vector<double> & states, vector<double> & nextStates) {
 }
 
 string VoidGate::description() {
-	return to_string(ID) + ": Void Gate " + to_string(epsilon) + "\n " + Gate::description();
+	return "Gate " + to_string(ID) + " is a Void Gate " + Gate::description();
 }
 

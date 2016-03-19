@@ -30,15 +30,13 @@ class MarkovBrain : public AbstractBrain {
 	shared_ptr<Base_GateListBuilder> GLB;
 
  public:
-	static int& defaultNrOfBrainStates;  // default value for number of states in all brains
-	//int nrOfBrainStates;  // the number of states in THIS brain
 	static bool& serialProcessing;  // write directly states (overwrite) - do not use nextStates
 
 //	static bool& cacheResults;
 //	static int& cacheResultsCount;
 
 	static void initializeParameters();
-	static vector<int> defaultNodeMap;
+	vector<int> nodeMap;
 
 	/*
 	 * Builds a look up table to convert genome site values into brain state addresses - this is only used when there is a fixed number of brain states
@@ -52,14 +50,13 @@ class MarkovBrain : public AbstractBrain {
 		return 1;
 	}
 
-	//Genome *genome;
 	vector<double> states;
 	vector<double> nextStates;
 
 	MarkovBrain() = delete;
 
-	MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, int _nrOfStates = defaultNrOfBrainStates);
-	MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrOfBrainStates = defaultNrOfBrainStates);
+	MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes);
+	MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes);
 	virtual ~MarkovBrain() = default;
 
 	virtual void update() override;

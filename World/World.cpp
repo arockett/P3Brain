@@ -17,6 +17,8 @@
 int& World::repeats = Parameters::register_parameter("repeats", 3, "Number of times to test each Genome per generation", "WORLD");
 
 World::World() {
+	inputNodesCount = 0;
+	outputNodesCount = 10;
 }
 
 World::~World() {
@@ -44,6 +46,14 @@ double World::testIndividual(shared_ptr<Organism> org, bool analyse, bool show) 
 	w+=(double)(((int)org->brain->getState(i))&1);
 	return w*w;
 }
+
+ int World::requiredInputs(){
+	 return inputNodesCount;
+ }
+ int World::requiredOutputs(){
+	 return outputNodesCount;
+ }
+
 
 ///* *** Example World Implementation *** */
 //ExampleWorld::ExampleWorld() {

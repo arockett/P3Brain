@@ -24,12 +24,29 @@
 using namespace std;
 class AbstractBrain {
  public:
+	static string& brainTypeStr;
+	static int& hiddenNodes;
+
 	int nrOfBrainNodes;  // the number of states in THIS brain
 	                      // this is temporary! new node/memory/dataCell will fix this.
+	int nrInNodes;
+	int nrOutNodes;
+	int nrHiddenNodes;
 
 	AbstractBrain() {
-		nrOfBrainNodes = 0;
+		nrInNodes = nrOutNodes = nrHiddenNodes = nrOfBrainNodes = 0;
+		cout << "ERROR: attempting to construct brain with no arguments. Check brain type for required parameters... most likely at least #in, #out and #hidden are required!\n\nExiting.\n" << endl;;
+		exit(1);
 	}
+
+	AbstractBrain(int ins, int outs, int hidden) {
+		nrInNodes = ins;
+		nrOutNodes = outs;
+		nrHiddenNodes = hidden;
+
+		nrOfBrainNodes = nrInNodes + nrOutNodes + nrHiddenNodes;
+	}
+
 	virtual ~AbstractBrain() = default;
 	virtual void update() = 0;
 	virtual string description() = 0;  // returns a desription of this brain in it's current state
