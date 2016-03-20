@@ -23,11 +23,22 @@ using namespace std;
 inline int loopMod(const int numerator, const int denominator) {
 	return ((numerator % denominator) + denominator) % denominator;
 }
-/*
- * returns 1 if "d" is greater than 0, else return 0
- */
-inline int Bit(double d) {
-	return (d > 0.0);
+// returns 1 if "d" is greater than 0, else return 0
+template<typename Type>
+inline int Bit(Type d) {
+	return d > 0.0;
+}
+
+// returns 1 if "d" is greater than 0
+//         0 if "d" is equal to 0
+//        -1 if "d" is less than 0
+template<typename Type>
+inline int Trit(Type d) {
+	if (d < 0) {
+		return -1;
+	} else {
+		return d > 0;
+	}
 }
 
 inline vector<string> parseCSVLine(string rawLine, const char separator = ',') {
@@ -151,11 +162,16 @@ static bool load_value(const string& value, T& target) {
 	}
 }
 
-// converts a vector of strings to a vector of type of returnData
+// converts a vector of string to a vector of type of returnData
 template<class T>
 void convertCSVListToVector(string stringData, vector<T> &returnData, const char separator = ',') {
 	returnData.clear();
-	stringData = stringData.substr(1, stringData.size() - 2);  // strip off leading and trailing square brakets
+	if (stringData[0] == '\"') {
+		stringData = stringData.substr(1, stringData.size() - 2);  // strip off leading and trailing quotes
+	}
+	if (stringData[0] == '[') {
+		stringData = stringData.substr(1, stringData.size() - 2);  // strip off leading and trailing square brakets
+	}
 	vector<string> dataLine = parseCSVLine(stringData, separator);
 
 	T tempValue;
@@ -182,6 +198,49 @@ inline string to_string(string str) {
 template<typename Type>
 inline int findGreatestInVector(vector<Type> vec) {
 	return distance(vec.begin(), max_element(vec.begin(), vec.end()));
+}
+
+// takes a vector of template values and a vector of indices.
+// each indicated value is converted to a bit and the resulting bit string is packed into an int.
+// if reverseOrder, than the last index is read first
+//
+// useful to generate values for lookups
+// reverseOrder is useful for gate lookups as it maintains meaning even if the number of inputs to a gate changes
+// i.e. since the first input is read last, 1, 10 and 100 (etc.) all return 1. (01)
+// and 01, 010, 0100 (etc.) all return 2 (10)
+// and 11, 110, 1100 (etc.) all return 3 (11)
+// etc... hopefully you see the pattern
+
+template<typename Type>
+inline int vectorToBitToInt(const vector<Type> &nodes, const vector<int> &nodeAddresses, bool reverseOrder = false) {
+	int result = 0;
+	if (reverseOrder) {
+
+		for (int i = (int) nodeAddresses.size() - 1; i >= 0; i--) {
+			result = (result << 1) + Bit(nodes[nodeAddresses[i]]);
+		}
+	} else {
+		for (int i = 0; i < (int) nodeAddresses.size(); i++) {
+			result = (result << 1) + Bit(nodes[nodeAddresses[i]]);
+		}
+	}
+	return result;
+}
+
+// see vectorToBitToInt, same process, but for Trits
+template<typename Type>
+inline int vectorToTritToInt(const vector<Type> &nodes, const vector<int> &nodeAddresses, bool reverseOrder = false) {
+	int result = 0;
+	if (reverseOrder) {
+		for (int i = (int) nodeAddresses.size() - 1; i >= 0; i--) {
+			result = (result * 3) + (Trit(nodes[nodeAddresses[i]]) + 1);
+		}
+	} else {
+		for (int i = 0; i < (int) nodeAddresses.size(); i++) {
+			result = (result * 3) + (Trit(nodes[nodeAddresses[i]]) + 1);
+		}
+	}
+	return result;
 }
 
 #endif // __BasicMarkovBrainTemplate__Utilities__

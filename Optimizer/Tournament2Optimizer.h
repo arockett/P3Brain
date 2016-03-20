@@ -13,7 +13,7 @@
 
 class Tournament2Optimizer : public BaseOptimizer {
  public:
-	virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
+	virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population) override;
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Tournament2_Optimizer__) */

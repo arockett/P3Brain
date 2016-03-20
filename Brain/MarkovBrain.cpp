@@ -11,101 +11,50 @@
 #include "../Utilities/Random.h"
 #include "../Utilities/Utilities.h"
 
-vector<int> MarkovBrain::defaultNodeMap;
 
-int& MarkovBrain::defaultNrOfBrainStates = Parameters::register_parameter("brainSize", 15, "number of Brain Values", "BRAIN");
+bool& MarkovBrain::serialProcessing = Parameters::register_parameter("serialProcessing", false, "sets brains to overwrite... right?", "BRAIN - MARKOV");
 
-bool& MarkovBrain::serialProcessing = Parameters::register_parameter("serialProcessing", false, "sets brains to overwrite... right?", "BRAIN");
+//bool& MarkovBrain::cacheResults = Parameters::register_parameter("MarkovBrain_cacheResults", true, "if true, t+1 nodes will be cached. If the same input is seen, the cached node values will be used.", "BRAIN - MARKOV");
+//int& MarkovBrain::cacheResultsCount = Parameters::register_parameter("MarkovBrain_cacheResultsCount", 1, "input combinations will be cached this many times, after this, repeats of a given input array will look up a random value from cached values", "BRAIN - MARKOV");
 
-MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, int _nrOfStates) {
+MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes) :
+		AbstractBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes) {
 	GLB = _GLB;
-	nrOfBrainStates = _nrOfStates;
+	//make a node map to handle genome value to brain state address look up.
+	makeNodeMap(nodeMap, Global::bitsPerBrainAddress, nrOfBrainNodes);
 }
 
-MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrOfBrainStates) {  //this is a constructor. it is run whenever a new brain is created.
-	nrOfBrainStates = _nrOfBrainStates;
-	states.resize(nrOfBrainStates);
-	nextStates.resize(nrOfBrainStates);
-
-	GLB = _GLB;
+MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes) :
+		MarkovBrain(_GLB, _nrInNodes, _nrOutNodes, _nrHiddenNodes) {  //this is a constructor. it is run whenever a new brain is created.
 	//cout << "in MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrOfBrainStates)\n\tabout to - gates = GLB->buildGateList(genome, nrOfBrainStates);" << endl;
-	gates = GLB->buildGateList(genome, nrOfBrainStates);
-	//cout << "\tback"<<endl;
-//  bool translation_Complete = false;
-//  if (genome->getSize() == 0){
-//    translation_Complete = true;
-//  }
-//  int genomeIndex = 0;
-//  int saveIndex = 0;
-//  int testIndex;
-//  while (!translation_Complete) {  // while there are sites in the genome
-//    testIndex = genomeIndex;  // get to values from genome to test for start codns
-//    const int testSite1Value = genome->extractValue(testIndex, { 0, 255 });  // extract first 1/2 of startcodon
-//    saveIndex = testIndex;  // save this index, this is where we pick up when we come back from building a gate.
-//    const int testSite2Value = genome->extractValue(testIndex, { 0, 255 });  // extract second 1/2 of startcodon
-//    if (genomeIndex > testIndex) {  // if genomeIndex > testIndex, testIndex has wrapped and we are done translating
-//      translation_Complete = true;
-//    } else if (testSite1Value + testSite2Value == 255) {  // if we found a start codon
-//      if (Gate_Builder::makeGate[testSite1Value] != nullptr) {  // and that start codon codes to an in use gate class
-//        genome->extractValue(genomeIndex, { 0, 255 }, Genome::START_CODE);  // mark start codon in genomes coding region
-//        genome->extractValue(genomeIndex, { 0, 255 }, Genome::START_CODE);  // mark start codon in genomes coding region
-//        gates.push_back(Gate_Builder::makeGate[testSite1Value](genome, genomeIndex));  // make a gate of the type associated with the value in testSite1Value
-//      }
-//    }
-//    genomeIndex = saveIndex;
-//  }
+	gates = GLB->buildGateList(genome, nrOfBrainNodes);
 	inOutReMap();  // map ins and outs from genome values to brain states
 }
 
 shared_ptr<AbstractBrain> MarkovBrain::makeBrainFromGenome(shared_ptr<AbstractGenome> _genome) {
-	shared_ptr<MarkovBrain> newBrain = make_shared<MarkovBrain>(GLB, _genome, MarkovBrain::defaultNrOfBrainStates);
+	shared_ptr<MarkovBrain> newBrain = make_shared<MarkovBrain>(GLB, _genome, nrInNodes, nrOutNodes, nrHiddenNodes);
 	return newBrain;
 }
 
 void MarkovBrain::resetBrain() {
-	for (int i = 0; i < nrOfBrainStates; i++)
-		states[i] = 0.0;
-	for (size_t i = 0; i < gates.size(); i++)
+	AbstractBrain::resetBrain();
+	for (size_t i = 0; i < gates.size(); i++){
 		gates[i]->resetGate();
+	}
 }
 
 void MarkovBrain::update() {
-	/*
-	 if(Agent::serialProcessing){
-	 //this is a special way of serialized updating
-	 //experimental feature, should be default off!
-	 //only change if you really know what you are doing!
-	 for(int i=0;i<gates.size();i++){
-	 gates[i]->update(states, states);
-	 }
-	 } else {*/
-	//this is the default way of parallel updating
-	nextStates.assign(nrOfBrainStates, 0.0);
+	nextNodes.assign(nrOfBrainNodes, 0.0);
 	for (size_t i = 0; i < gates.size(); i++) {  //update each gate
-		gates[i]->update(states, nextStates);
+		gates[i]->update(nodes, nextNodes);
 	}
-	swap(states, nextStates);
+	swap(nodes,nextNodes);
 }
 
 void MarkovBrain::inOutReMap() {  // remaps genome site values to valid brain state addresses
 	for (size_t i = 0; i < gates.size(); i++) {
-		gates[i]->applyNodeMap(defaultNodeMap, nrOfBrainStates);
+		gates[i]->applyNodeMap(nodeMap, nrOfBrainNodes);
 	}
-
-}
-
-int MarkovBrain::IntFromState(vector<int> I) {
-	int r = 0;
-	for (size_t i = 0; i < I.size(); i++)
-		r = (r << 1) + Bit(states[I[i]]);
-	return r;
-}
-
-int MarkovBrain::IntFromAllStates() {
-	int r = 0;
-	for (int i = 0; i < nrOfBrainStates; i++)
-		r = (r << 1) + Bit(states[i]);
-	return r;
 
 }
 
@@ -131,10 +80,10 @@ string MarkovBrain::gateList() {
 
 vector<vector<int>> MarkovBrain::getConnectivityMatrix() {
 	vector<vector<int>> M;
-	M.resize(nrOfBrainStates);
-	for (int i = 0; i < nrOfBrainStates; i++) {
-		M[i].resize(nrOfBrainStates);
-		for (int j = 0; j < nrOfBrainStates; j++)
+	M.resize(nrOfBrainNodes);
+	for (int i = 0; i < nrOfBrainNodes; i++) {
+		M[i].resize(nrOfBrainNodes);
+		for (int j = 0; j < nrOfBrainNodes; j++)
 			M[i][j] = 0;
 	}
 	for (auto G : gates) {
@@ -147,23 +96,31 @@ vector<vector<int>> MarkovBrain::getConnectivityMatrix() {
 	return M;
 }
 
-//set<int> Brain::findCodingRegions(int mask) {  //if mask=0, all coding regions are returned. if mask=1, return everything except start codon. if mask=2, return everything except start codon and wiring.
-//  set<int> allCodingRegions;
-//  for (auto gateIterator = gates.begin(); gateIterator != gates.end(); gateIterator++) {
-//    for (auto iterator = (*gateIterator)->codingRegions.begin(); iterator != (*gateIterator)->codingRegions.end(); iterator++) {
-//      if (iterator->second >= mask) {
-//        allCodingRegions.insert(iterator->first);
-//      }
-//    }
-//  }
-//  return allCodingRegions;
-//}
-
 int MarkovBrain::brainSize() {
 	return (int) gates.size();
 }
 
 int MarkovBrain::numGates() {
 	return brainSize();
+}
+
+void MarkovBrain::initalizeGenome(shared_ptr<AbstractGenome> _genome) {
+	int codonMax = (1 << Global::bitsPerCodon) - 1;
+	_genome->fillRandom();
+
+	auto genomeHandler = _genome->newHandler(_genome);
+
+	for (auto gateType : Gate_Builder::inUseGateTypes) {
+		//cout << gateType << " : "<<Gate_Builder::intialGateCounts[gateType]<<endl;
+		for (int i = 0; i < Gate_Builder::intialGateCounts[gateType]; i++) {
+			//cout << "    " << i << " : ";
+			genomeHandler->randomize();
+			for (auto value : Gate_Builder::gateStartCodes[gateType]) {
+				//cout << value << " ";
+				genomeHandler->writeInt(value, 0, codonMax);
+			}
+			//cout << endl;
+		}
+	}
 }
 

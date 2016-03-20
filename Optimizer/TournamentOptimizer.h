@@ -15,7 +15,7 @@ using namespace std;
 
 class TournamentOptimizer : public BaseOptimizer {
  public:
-	virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
+	virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population) override;
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Tournament_Optimizer__) */

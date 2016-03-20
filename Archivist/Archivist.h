@@ -37,13 +37,13 @@ class Archivist {
 	static string& Arch_AveFileName;  // name of the Averages file (ave for all brains when file is written to)
 	static string& Arch_DominantFileName;  // name of the Dominant file (all stats for best brain when file is writtne to)
 	static string& Arch_DefaultAveFileColumnNames;  // data to be saved into average file (must be values that can generate an average)
+	static bool& Arch_DominantFileShowAllLists;
 
 	int realtimeFilesInterval;  // how often to write out data
 	bool writeAveFile;  // if true, ave file will be created
 	bool writeDominantFile;  // if true, dominant file will be created
 	string AveFileName;  // name of the Averages file (ave for all brains when file is written to)
 	string DominantFileName;  // name of the Dominant file (all stats for best brain when file is writtne to)
-
 	map<string, vector<string>> files;  // list of files (NAME,LIST OF COLUMNS)
 	vector<string> DefaultAveFileColumns;  // what columns will be written into the AveFile
 

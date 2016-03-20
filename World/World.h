@@ -21,15 +21,17 @@ using namespace std;
 class World {
  public:
 	static int& repeats;
+	int inputNodesCount = 0;
+	int outputNodesCount = 0;
+
 
  public:
 	World();
 	virtual ~World();
 	virtual void evaluateFitness(vector<shared_ptr<Organism>> population, bool analyse);
-	virtual double testIndividual(shared_ptr<Organism> org, bool analyse);
-	virtual double testIndividual(shared_ptr<Organism> org, bool analyse, bool show) {
-		return testIndividual(org, analyse);
-	}
+	virtual double testIndividual(shared_ptr<Organism> org, bool analyse, bool show = 0);
+	virtual int requiredInputs();
+	virtual int requiredOutputs();
 
 };
 
