@@ -95,17 +95,8 @@ public:
 		}
 	}
 
-	// takes a vector of indices to nodes, converts the value at each nodes[index] to bit and converts the bits to an int
-	// useful to generate values for lookups
-	int someNodesToBitToInt(vector<int> nodeAddresses) {
-		int result = 0;
-		for (size_t i = 0; i < nodeAddresses.size(); i++)
-			result = (result << 1) + Bit(nodes[nodeAddresses[i]]);
-		return result;
-	}
-
 	// converts the value of each value in nodes[] to bit and converts the bits to an int
-	// useful to generate values for lookups
+	// useful to generate values for lookups, useful for caching
 	int allNodesToBitToInt() {
 		int result = 0;
 		for (int i = 0; i < nrOfBrainNodes; i++)

@@ -53,13 +53,16 @@ int main(int argc, const char * argv[]) {
 
 	if (Global::randomSeed == -1) {
 		random_device rd;
-		Random::getCommonGenerator().seed(rd());
+		int temp = rd();
+		Random::getCommonGenerator().seed(temp);
+		cout << "Generating Random Seed\n  "<< temp <<endl;
 	} else {
 		Random::getCommonGenerator().seed(Global::randomSeed);
+		cout << "Using Random Seed: " << Global::randomSeed << endl;
 	}
 
-	//World *world = (World*) new BerryWorld();  //new World();
-	World *world = (World*) new World();  //new World();
+	auto world = make_shared<BerryWorld>();  //new World();
+	//World *world = (World*) new World();  //new World();
 
 // test chromosome crossover speed
 //	auto C1 = make_shared<Chromosome<bool>>(10000, 2);
@@ -226,12 +229,16 @@ int main(int argc, const char * argv[]) {
 
 		if (Archivist::Arch_outputMethodStr == "default") {
 			archivist = make_shared<Archivist>();
+			cout << "Using Default Archivist" << endl;
 		} else if (Archivist::Arch_outputMethodStr == "LODwAP") {
 			archivist = make_shared<LODwAP_Archivist>();
+			cout << "Using Line of Decent with Aggressive Pruning Archivist" << endl;
 		} else if (Archivist::Arch_outputMethodStr == "snapshot") {
 			archivist = make_shared<Snapshot_Archivist>();
+			cout << "Using Snapshot Archivist" << endl;
 		} else if (Archivist::Arch_outputMethodStr == "SSwD") {
 			archivist = make_shared<SSwD_Archivist>();
+			cout << "Using Snapshot with Delay Archivist" << endl;
 		} else {
 			cout << "\n\nERROR: Unrecognized archivist type in configuration!\n  \"" << Archivist::Arch_outputMethodStr << "\" is not defined.\n\nExiting.\n" << endl;
 			exit(1);
@@ -241,10 +248,13 @@ int main(int argc, const char * argv[]) {
 
 		if (BaseOptimizer::Optimizer_MethodStr == "GA") {
 			optimizer = make_shared<GA_Optimizer>();
+			cout << "Using GA Optimizer" << endl;
 		} else if (BaseOptimizer::Optimizer_MethodStr == "Tournament") {
 			optimizer = make_shared<TournamentOptimizer>();
+			cout << "Using Tournament Optimizer" << endl;
 		} else if (BaseOptimizer::Optimizer_MethodStr == "Tournament2") {
 			optimizer = make_shared<Tournament2Optimizer>();
+			cout << "Using Tournament2 Optimizer" << endl;
 		} else {
 			cout << "\n\nERROR: Unrecognized optimizer type in configuration!\n  \"" << BaseOptimizer::Optimizer_MethodStr << "\" is not defined.\n\nExiting.\n" << endl;
 			exit(1);

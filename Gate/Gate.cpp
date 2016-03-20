@@ -18,40 +18,6 @@ double& VoidGate::voidGate_Probability = Parameters::register_parameter("voidGat
 
 // *** General tools for All Gates ***
 
-// Gets "howMany" addresses, advances the genome_index buy "howManyMax" addresses and updates "codingRegions" with the addresses being used.
-void Gate::getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, shared_ptr<AbstractGenome::Handler> genomeHandler, shared_ptr<AbstractGenome> genome, int code, int gateID) {
-	int i;
-	for (i = 0; i < howMany; i++) {  // for the number of addresses we need
-		addresses[i] = genomeHandler->readInt(0, (1 << Global::bitsPerBrainAddress) - 1, code, gateID);  // get an address
-		//cout << addresses[i] << "\n";
-	}
-	while (i < howManyMax) {  // leave room in the genome in case this gate gets more IO later
-		//cout << "skipping: " << i << "\n";
-		genomeHandler->readInt(0, (1 << Global::bitsPerBrainAddress) - 1);
-		i++;
-	}
-}
-
-// given a genome and a genomeIndex:
-// pull out the number a number of inputs, number of outputs and then that many inputs and outputs
-// if number of inputs or outputs is less then the max possible inputs or outputs skip the unused sites in the genome
-void Gate::getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, shared_ptr<AbstractGenome::Handler> genomeHandler, shared_ptr<AbstractGenome> genome, int gateID) {  // (max#in, max#out,currentIndexInGenome,genome,codingRegions)
-
-	int numInputs = genomeHandler->readInt(insRange[0], insRange[1], Gate::IN_COUNT_CODE, gateID);
-	//cout << "num_Inputs: " << numInputs << "\n";
-	int numOutputs = genomeHandler->readInt(outsRange[0], outsRange[1], Gate::OUT_COUNT_CODE, gateID);
-	//cout << "num_Outputs: " << numOutputs << "\n";
-
-	inputs.resize(numInputs);
-	outputs.resize(numOutputs);
-	if (insRange[1] > 0) {
-		getSomeBrainAddresses(numInputs, insRange[1], inputs, genomeHandler, genome, Gate::IN_ADDRESS_CODE, gateID);
-	}
-	if (outsRange[1] > 0) {
-		getSomeBrainAddresses(numOutputs, outsRange[1], outputs, genomeHandler, genome, Gate::OUT_ADDRESS_CODE, gateID);
-	}
-}
-
 // converts values attained from genome for inputs and outputs to vaild brain state ids
 // uses nodeMap to accomplish the remaping
 void Gate::applyNodeMap(vector<int> nodeMap, int maxNodes) {
@@ -61,23 +27,6 @@ void Gate::applyNodeMap(vector<int> nodeMap, int maxNodes) {
 	for (size_t i = 0; i < outputs.size(); i++) {
 		outputs[i] = nodeMap[outputs[i]] % maxNodes;
 	}
-}
-
-/* useful function if you need to look up values from a table during update.
- * convert the inputs to an index by reading them one at a time and bitshifting the result
- * the first input is read last so that 1, 10 , 100 (etc.) all return 1. (01)
- * and 01, 010, 0100 (etc.) all return 2 (10)
- * and 11, 110, 1100 (etc.) all return 3 (11)
- * etc... hopefully you see the pattern
- * This, btw, will maintain output consistency for these lower values even if a gate gains or loses inputs.
- */
-int Gate::getIndexFromInputs(vector<double> & brainState) {
-	int index = 0;
-
-	for (int i = (int) inputs.size() - 1; i >= 0; i--) {
-		index = (index << 1) + Bit(brainState[inputs[i]]);
-	}
-	return index;
 }
 
 void Gate::resetGate(void) {
@@ -108,48 +57,8 @@ string Gate::description() {
 
 /* *** ProbilisticGate implementation *** */
 
-//ProbabilisticGate::ProbabilisticGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID){
-//
-//	ID = gateID;
-//
-//	int i, j;
-//	inputs.clear();
-//	outputs.clear();
-//	int numOutputs, numInputs;
-//
-//	// get numInputs inputs and numOutputs outputs, advance k (genomeIndex) as if we had gotten 4 of each and record this in codingRegions
-//	getInputsAndOutputs( { 1, 4 }, { 1, 4 }, genomeHandler, genome, gateID);  // (insRange, outsRange,currentIndexInGenome,genome,codingRegions)
-//	numInputs = inputs.size();
-//	numOutputs = outputs.size();
-//
-//	// get a table filled with values from the genome that has
-//	// rows = (the number of possible combinations of input values) and columns = (the number of possible combinations of output values)
-//	vector<vector<int>> rawTable = genomeHandler->readTable({ 1 << numInputs, 1 << numOutputs }, { 16, 16 }, { 0, 255 }, Gate::DATA_CODE, gateID);
-//
-//	table.resize(1 << numInputs);
-//	//normalize each row
-//	for (i = 0; i < (1 << numInputs); i++) {  //for each row (each possible input bit string)
-//		table[i].resize(1 << numOutputs);
-//		// first sum the row
-//		double S = 0;
-//		for (j = 0; j < (1 << numOutputs); j++) {
-//			S += (double) rawTable[i][j];
-//		}
-//		// now normalize the row
-//		if (S == 0.0) {  //if all the inputs on this row are 0, then give them all a probability of 1/(2^(number of outputs))
-//			for (j = 0; j < (1 << numOutputs); j++)
-//				table[i][j] = 1.0 / (double) (1 << numOutputs);
-//		} else {  //otherwise divide all values in a row by the sum of the row
-//			for (j = 0; j < (1 << numOutputs); j++)
-//				table[i][j] = (double) rawTable[i][j] / S;
-//		}
-//	}
-//
-//}
 ProbabilisticGate::ProbabilisticGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> rawTable, int _ID) {
-
 	ID = _ID;
-
 	int i, j;
 	inputs = addresses.first;
 	outputs = addresses.second;
@@ -178,8 +87,8 @@ ProbabilisticGate::ProbabilisticGate(pair<vector<int>, vector<int>> addresses, v
 
 }
 
-void ProbabilisticGate::update(vector<double> & states, vector<double> & nextStates) {  //this translates the input bits of the current states to the output bits of the next states
-	int input = getIndexFromInputs(states);  // converts the input values into an index
+void ProbabilisticGate::update(vector<double> & nodes, vector<double> & nextNodes) {  //this translates the input bits of the current states to the output bits of the next states
+	int input = vectorToBitToInt(nodes,inputs,true); // converts the input values into an index (true indicates to reverse order)
 	int outputColumn = 0;
 	double r = Random::getDouble(1);  // r will determine with set of outputs will be chosen
 	while (r > table[input][outputColumn]) {
@@ -188,7 +97,7 @@ void ProbabilisticGate::update(vector<double> & states, vector<double> & nextSta
 		outputColumn++;  // we have not found the correct output so move to the next output
 	}
 	for (size_t i = 0; i < outputs.size(); i++)  //for each output...
-		nextStates[outputs[i]] += 1.0 * ((outputColumn >> (outputs.size() - 1 - i)) & 1);  // convert output (the column number) to bits and pack into next states
+		nextNodes[outputs[i]] += 1.0 * ((outputColumn >> (outputs.size() - 1 - i)) & 1);  // convert output (the column number) to bits and pack into next states
 																						   // but always put the last bit in the first input (to maintain consistancy)
 }
 
@@ -198,28 +107,8 @@ string ProbabilisticGate::description() {
 
 /* *** Determistic Gate Implementation *** */
 
-//DeterministicGate::DeterministicGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
-//
-//	ID = gateID;
-//
-//	inputs.clear();
-//	outputs.clear();
-//	int numOutputs, numInputs;
-//
-//	// get numInputs inputs and numOutputs outputs, advance k (genomeIndex) as if we had gotten 4 of each and record this in codingRegions
-//	getInputsAndOutputs( { 1, 4 }, { 1, 4 }, genomeHandler, genome, gateID);  // (insRange, outsRange,currentIndexInGenome,genome,codingRegions)
-//	numInputs = inputs.size();
-//	numOutputs = outputs.size();
-//	//cout << " after getIO index: " << genomeIndex << "\n";
-//
-//	// get a table filled with values from the genome that has
-//	// rows = (the number of possible combinations of input values) and columns = (the number of possible combinations of output values)
-//	table = genomeHandler->readTable({ 1 << numInputs, numOutputs }, { 16, 4 }, { 0, 1 }, Gate::DATA_CODE, gateID);
-//}
 DeterministicGate::DeterministicGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID) {
-
 	ID = _ID;
-
 	inputs = addresses.first;
 	outputs = addresses.second;
 	table = _table;
@@ -238,10 +127,10 @@ void DeterministicGate::setupForBits(int* Ins, int nrOfIns, int Out, int logic) 
 	}
 }
 
-void DeterministicGate::update(vector<double> & states, vector<double> & nextStates) {
-	int input = getIndexFromInputs(states);  // converts the input values into an index
+void DeterministicGate::update(vector<double> & nodes, vector<double> & nextNodes) {
+	int input = vectorToBitToInt(nodes,inputs,true); // converts the input values into an index (true indicates to reverse order)
 	for (size_t i = 0; i < outputs.size(); i++) {
-		nextStates[outputs[i]] += table[input][i];
+		nextNodes[outputs[i]] += table[input][i];
 	}
 }
 
@@ -250,7 +139,7 @@ string DeterministicGate::description() {
 }
 
 /* *** Fixed Epison Gate *** */
-/* this gate behaves like a deterministic gate with a constant externally set error which may cause the outputs to scramble */
+/* this gate behaves like a deterministic gate with a constant externally set error which may the gate to deliver the wrong set of output values */
 
 FixedEpsilonGate::FixedEpsilonGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID) :
 		DeterministicGate(addresses, _table, _ID) {  // use DeterministicGate constructor to build set up everything (including a table of 0s and 1s)
@@ -268,21 +157,21 @@ FixedEpsilonGate::FixedEpsilonGate(pair<vector<int>, vector<int>> addresses, vec
 	}
 }
 
-void FixedEpsilonGate::update(vector<double> & states, vector<double> & nextStates) {
-	int input = getIndexFromInputs(states);  // converts the input values into an index
-	if (Random::P(epsilon)) {  //if there will be an error
-		//do a random output excluding the one otherwise given
+void FixedEpsilonGate::update(vector<double> & nodes, vector<double> & nextNodes) {
+	int input = vectorToBitToInt(nodes,inputs,true); // converts the input values into an index (true indicates to reverse order)
+
+	if (Random::P(epsilon)) {  //if chance... then return a different set of output values
 		int output = 0;
 		do {
-			output = Random::getIndex(table.size());  // pick a bitstring (with the correct number of bits) i.e. one bit for each output
-		} while (output == defaultOutput[input]);  // if you happen to pick the a bit string which happens to match the correct output, pick again
+			output = Random::getIndex(table.size());
+		} while (output == defaultOutput[input]);  // keep picking randomly until you pick a different output
 		for (size_t i = 0; i < outputs.size(); i++) {
-			nextStates[outputs[i]] += 1.0 * (double) ((output >> i) & 1);
+			nextNodes[outputs[i]] += 1.0 * (double) ((output >> i) & 1);
 		}
 	} else {
 		//do the default output
 		for (size_t i = 0; i < outputs.size(); i++) {
-			nextStates[outputs[i]] += table[input][i];
+			nextNodes[outputs[i]] += table[input][i];
 		}
 	}
 }
@@ -299,15 +188,16 @@ VoidGate::VoidGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>>
 	epsilon = voidGate_Probability;  // in case you want to have different epsilon for different gates (who am I to judge?)
 }
 
-void VoidGate::update(vector<double> & states, vector<double> & nextStates) {
-	int input = getIndexFromInputs(states);  // converts the input values into an index
-	vector<int> outputRow = table[input];
+void VoidGate::update(vector<double> & nodes, vector<double> & nextNodes) {
+	int input = vectorToBitToInt(nodes,inputs,true); // converts the input values into an index (true indicates to reverse order)
 
-	if (Random::P(epsilon)) {
+	vector<int> outputRow = table[input]; // pick the output row
+
+	if (Random::P(epsilon)) { // if chance...
 		outputRow[Random::getIndex(outputs.size())] = 0;  // pick one output randomly and set it to 0
 	}
-	for (size_t i = 0; i < outputs.size(); i++) {
-		nextStates[outputs[i]] += outputRow[i];
+	for (size_t i = 0; i < outputs.size(); i++) { // add output row to nextNodes
+		nextNodes[outputs[i]] += outputRow[i];
 	}
 }
 

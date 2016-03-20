@@ -29,7 +29,7 @@ class FeedbackGate : public Gate {
 	virtual ~FeedbackGate() = default;
 	virtual void update(vector<double> & states, vector<double> & nextStates) override;
 	virtual string description() override;
-	virtual void applyNodeMap(vector<int> nodeMap, int maxNodes) override;
+	virtual void applyNodeMap(vector<int> nodeMap, int maxNodes);
 	virtual void resetGate(void) override;
 	virtual vector<int> getIns() override;
 };

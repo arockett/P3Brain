@@ -46,15 +46,13 @@ class Gate {  // abstact class. Assumes that a standard genome is being used.
 	vector<int> inputs;
 	vector<int> outputs;
 
-	//map<int, int> codingRegions;  //indicates coding regions. maps genome index to usage of nucleotide in gate. 0=start codon. 1=wiring(defines # of inputs and outputs and what they are). 2=gate specific information
 
 	// functions used in genome translation
-	//void movePastStartCodeon(int& genomeIndex, shared_ptr<Genome> genome);  // simply addvances genomeIndex by the size of a start codeon (2)
 	//int getIOAddress(shared_ptr<AbstractGenome::Handler> genomeHandler, shared_ptr<AbstractGenome> genome, int gateID);  // extracts one brain state value address from a genome
-	void getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, shared_ptr<AbstractGenome::Handler> genomeHandler, shared_ptr<AbstractGenome> genome, int code, int gateID);  // extracts many brain state value addresses from a genome
-	void getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, shared_ptr<AbstractGenome::Handler> genomeHandle, shared_ptr<AbstractGenome> genome, int gateID);  // extracts the input and output brain state value addresses for this gate
-
-	int getIndexFromInputs(vector<double> &brainState);  // used during update to convert gate input into table indexes
+//	void getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, shared_ptr<AbstractGenome::Handler> genomeHandler, shared_ptr<AbstractGenome> genome, int code, int gateID);  // extracts many brain state value addresses from a genome
+//	void getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, shared_ptr<AbstractGenome::Handler> genomeHandle, shared_ptr<AbstractGenome> genome, int gateID);  // extracts the input and output brain state value addresses for this gate
+//
+//	int getIndexFromInputs(vector<double> &brainState);  // used during update to convert gate input into table indexes
 
 //  /*
 //   * build a table of size range[0],range[1] which is the upper left subset of a table rangeMax[0],rangeMax[1]
@@ -90,7 +88,6 @@ class Gate {  // abstact class. Assumes that a standard genome is being used.
 	virtual void resetGate(void);  // this is empty here. Some gates so not need to reset, they can use this method.
 	virtual vector<int> getIns();  // returns a vector of int with the adress for this gates input brain state value addresses
 	virtual vector<int> getOuts();  // returns a vector of int with the adress for this gates onput brain state value addresses
-	//virtual string getCodingRegions();  // return a string with the codingRegions
 
 	// functions which must be provided with each gate
 	virtual void update(vector<double> & states, vector<double> & nextStates) = 0;  // the function is empty, and must be provided in any derived gates

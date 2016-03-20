@@ -1,10 +1,13 @@
 #ifndef __BasicMarkovBrainTemplate__Gate_Builder__
 #define __BasicMarkovBrainTemplate__Gate_Builder__
 
+#include <math.h>
+
 #include "Gate.h"
 #include "Feedback_Gate.h"
 #include "GP_Gate.h"
 #include "Threshold_Gate.h"
+#include "TritGate.h"
 
 class Gate_Builder {  // manages what kinds of gates can be built
  public:
@@ -24,6 +27,9 @@ class Gate_Builder {  // manages what kinds of gates can be built
 	static int& gPGateInitialCount;
 	static bool& usingThGate;
 	static int& thGateInitialCount;
+
+	static bool& usingTritDeterministicGate;
+	static int& tritDeterministicGateInitialCount;
 
 
 

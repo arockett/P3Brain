@@ -16,6 +16,10 @@ int& Gate_Builder::gPGateInitialCount = Parameters::register_parameter("geneticP
 bool& Gate_Builder::usingThGate = Parameters::register_parameter("thresholdGate", false, "set to true to enable threshold gates", "GATE TYPES");
 int& Gate_Builder::thGateInitialCount = Parameters::register_parameter("thresholdGate_InitialCount", 3, "seed genome with this many start codons", "GATE TYPES");
 
+bool& Gate_Builder::usingTritDeterministicGate = Parameters::register_parameter("tritDeterministicGate", false, "set to true to enable tritDeterministic gates", "GATE TYPES");
+int& Gate_Builder::tritDeterministicGateInitialCount = Parameters::register_parameter("tritDeterministicGateGate_InitialCount", 3, "seed genome with this many start codons", "GATE TYPES");
+
+
 set<int> Gate_Builder::inUseGateTypes;
 vector<vector<int>> Gate_Builder::gateStartCodes;
 map<int, int> Gate_Builder::intialGateCounts;
@@ -162,6 +166,26 @@ void Gate_Builder::setupGates() {
 //		AddGate(46, [](shared_ptr<AbstractGenome> genome,shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {return make_shared<Thresholdgate>(genome,genomeHandler,gateID);});
 //		Global::inUseGateTypes.insert(46);
 //	}
+	if (usingTritDeterministicGate) {
+		int codonOne = 49;
+		inUseGateTypes.insert(codonOne);
+		{
+			//gateStartCodes.insert(pair<int, vector<int> >(codonOne, vector<int>()));
+			gateStartCodes[codonOne].push_back(codonOne);
+			gateStartCodes[codonOne].push_back(((1 << Global::bitsPerCodon) - 1) - codonOne);
+		}
+		intialGateCounts[codonOne] = tritDeterministicGateInitialCount;
+		AddGate(codonOne, [](shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
+			pair<vector<int>,vector<int>> addresses = getInputsAndOutputs( {1, 4}, {1, 4}, genomeHandler, gateID);
+			vector<vector<int>> table = genomeHandler->readTable( {pow(3,addresses.first.size()), addresses.second.size()}, {81, 4}, {-1, 1}, Gate::DATA_CODE, gateID);
+			if (genomeHandler->atEOC()) {
+				shared_ptr<TritDeterministicGate> nullObj = nullptr;;
+				return nullObj;
+			}
+			return make_shared<TritDeterministicGate>(addresses,table,gateID);
+		});
+	}
+
 }
 
 /* *** some c++ 11 magic to speed up translation from genome to gates *** */

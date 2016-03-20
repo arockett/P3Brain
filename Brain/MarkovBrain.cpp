@@ -38,8 +38,9 @@ shared_ptr<AbstractBrain> MarkovBrain::makeBrainFromGenome(shared_ptr<AbstractGe
 
 void MarkovBrain::resetBrain() {
 	AbstractBrain::resetBrain();
-	for (size_t i = 0; i < gates.size(); i++)
+	for (size_t i = 0; i < gates.size(); i++){
 		gates[i]->resetGate();
+	}
 }
 
 void MarkovBrain::update() {

@@ -22,31 +22,31 @@ union intToFloatBitByBit {
 GPGate::GPGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
 
 	ID = gateID;
-
-	int i;
-	inputs.clear();
-	outputs.clear();
-	int numOutputs;
-
-	// get numInputs inputs and numOutputs outputs, advance k (genomeIndex) as if we had gotten 4 of each and record this in codingRegions
-	getInputsAndOutputs( { 1, 4 }, { 1, 4 }, genomeHandler, genome, gateID);  // (insRange, outsRange,currentIndexInGenome,genome,codingRegions)
-	numOutputs = outputs.size();
-
-	myGateType = genomeHandler->readInt(0, 8, Gate::DATA_CODE, gateID);  //genome->sites[(genomeIndex++) % genome->sites.size()] % 8;
-	myValues.clear();
-	for (i = 0; i < numOutputs; i++) {
-		intToFloatBitByBit V;
-		V.I = 0;
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		for (int j = 0; j < 4; j++) {  // what is this 4??? number of inputs?
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		        // was : V.I = (V.I << (int) 8) + (int) genome->sites[(genomeIndex++) % genome->sites.size()];
-			V.I = (V.I << (int) 8) + genomeHandler->readInt(0, 8, Gate::DATA_CODE, gateID);
-		}
-		myValues.push_back(V.F);
-	}
+//
+//	int i;
+//	inputs.clear();
+//	outputs.clear();
+//	int numOutputs;
+//
+//	// get numInputs inputs and numOutputs outputs, advance k (genomeIndex) as if we had gotten 4 of each and record this in codingRegions
+//	getInputsAndOutputs( { 1, 4 }, { 1, 4 }, genomeHandler, genome, gateID);  // (insRange, outsRange,currentIndexInGenome,genome,codingRegions)
+//	numOutputs = outputs.size();
+//
+//	myGateType = genomeHandler->readInt(0, 8, Gate::DATA_CODE, gateID);  //genome->sites[(genomeIndex++) % genome->sites.size()] % 8;
+//	myValues.clear();
+//	for (i = 0; i < numOutputs; i++) {
+//		intToFloatBitByBit V;
+//		V.I = 0;
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//		for (int j = 0; j < 4; j++) {  // what is this 4??? number of inputs?
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//		        // was : V.I = (V.I << (int) 8) + (int) genome->sites[(genomeIndex++) % genome->sites.size()];
+//			V.I = (V.I << (int) 8) + genomeHandler->readInt(0, 8, Gate::DATA_CODE, gateID);
+//		}
+//		myValues.push_back(V.F);
+//	}
 }
 
 void GPGate::update(vector<double> & states, vector<double> & nextStates) {
