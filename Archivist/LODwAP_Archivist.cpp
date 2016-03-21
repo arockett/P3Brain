@@ -8,7 +8,8 @@ const string& LODwAP_Archivist::LODwAP_Arch_DataFileName = Parameters::register_
 const string& LODwAP_Archivist::LODwAP_Arch_GenomeFileName = Parameters::register_parameter("genomeFileName_LODwAP", (string) "genome.csv", "name of data file (stores everything but genomes)", "ARCHIVIST_LODWAP");
 const bool& LODwAP_Archivist::LODwAP_Arch_writeDataFile = Parameters::register_parameter("writeDataFile_LODwAP", true, "if true, a data file will be written", "ARCHIVIST_LODWAP");
 const bool& LODwAP_Archivist::LODwAP_Arch_writeGenomeFile = Parameters::register_parameter("writeGenomeFile_LODwAP", true, "if true, a genome file will be written", "ARCHIVIST_LODWAP");
-
+const bool& LODwAP_Archivist::LODwAP_Arch_DataFileShowAllLists = Parameters::register_parameter("dataFileShowAllLists", true, "if true, lists named 'all'* in data map will be saved", "ARCHIVIST_LODWAP");
+const bool& LODwAP_Archivist::LODwAP_Arch_DataFileConvertAllLists = Parameters::register_parameter("dataFileConvertAllLists", true, "if true, lists named 'all'* in data map will be averaged and added to file", "ARCHIVIST_LODWAP");
 LODwAP_Archivist::LODwAP_Archivist(vector<string> aveFileColumns) :
 		Archivist(aveFileColumns) {
 
@@ -37,7 +38,30 @@ bool LODwAP_Archivist::archive(vector<shared_ptr<Organism>> population, int flus
 	if ((Global::update % pruneInterval == 0) || (flush == 1)) {
 
 		if (files.find("data.csv") == files.end()) {  // if file has not be initialized yet
-			files[DataFileName] = population[0]->dataMap.getKeys();  // store keys from data map associated with file name
+			if (LODwAP_Arch_DataFileConvertAllLists) {
+				DataMap TempMap;
+				for (auto key : population[0]->dataMap.getKeys()) {
+					if (key[0] == 'a' && key[1] == 'l' && key[2] == 'l') {
+						double temp = 0;
+						vector<double> values;
+						convertCSVListToVector(population[0]->dataMap.Get(key), values);
+						for (auto v : values) {
+							temp += v;
+							//cout << key << " " << allKey << " " << v << " " << temp << endl;
+						}
+						temp /= (double) values.size();
+						TempMap.Set(key.substr(3, key.size() - 1), temp);
+						if (LODwAP_Arch_DataFileShowAllLists) {
+							TempMap.Set(key, population[0]->dataMap.Get(key));
+						}
+					} else {
+						TempMap.Set(key, population[0]->dataMap.Get(key));
+					}
+				}
+				files[DataFileName] = TempMap.getKeys();  // store keys from data map associated with file name
+			} else {
+				files[DataFileName] = population[0]->dataMap.getKeys();  // store keys from data map associated with file name
+			}
 		}
 
 		// get the MRCA
@@ -54,8 +78,35 @@ bool LODwAP_Archivist::archive(vector<shared_ptr<Organism>> population, int flus
 		if (writeDataFile) {
 			while ((effective_MRCA->timeOfBirth >= nextDataWrite) && (nextDataWrite <= Global::updates)) {  // if there is convergence before the next data interval
 				shared_ptr<Organism> current = LOD[nextDataWrite - lastPrune];
-				for (auto file : files) {  // for each file in files
-					current->dataMap.writeToFile(file.first, file.second);  // append new data to the file
+				cout << "A" << endl;
+				if (LODwAP_Arch_DataFileConvertAllLists) {
+					DataMap TempMap;
+					for (auto key : current->dataMap.getKeys()) {
+						if (key[0] == 'a' && key[1] == 'l' && key[2] == 'l') {
+							double temp = 0;
+							vector<double> values;
+							convertCSVListToVector(current->dataMap.Get(key), values);
+							for (auto v : values) {
+								temp += v;
+								//cout << key << " " << allKey << " " << v << " " << temp << endl;
+							}
+							temp /= (double) values.size();
+							TempMap.Set(key.substr(3, key.size() - 1), temp);
+							if (LODwAP_Arch_DataFileShowAllLists) {
+								TempMap.Set(key, current->dataMap.Get(key));
+							}
+						} else {
+							TempMap.Set(key, current->dataMap.Get(key));
+							cout << key << " = " << current->dataMap.Get(key) << endl;
+						}
+					}
+					for (auto file : files) {  // for each file in files
+						TempMap.writeToFile(file.first, file.second);  // append new data to the file
+					}
+				} else {
+					for (auto file : files) {  // for each file in files
+						current->dataMap.writeToFile(file.first, file.second);  // append new data to the file
+					}
 				}
 				nextDataWrite += dataInterval;
 			}
