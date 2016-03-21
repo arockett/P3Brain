@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 from matplotlib.backends.backend_pdf import PdfPages
-#import csv
+import matplotlib.font_manager as font_manager
 import pandas
 import sys
 import getopt
@@ -26,28 +26,42 @@ import getopt
 ####
 
 def BuildMultiPlotFromDict(DataMap,NamesList,XCoordinateName='',Columns=1,title = ''):
-  plt.figure()                                                # create a new figure
-  if (title!=''):
-    plt.suptitle(title, fontsize=14, fontweight='bold')
+	fig = plt.figure(figsize=(20,10))                                                # create a new figure
+	fig.subplots_adjust(hspace=.35)
 
-  Rows = math.ceil(float(len(NamesList))/float(Columns))      # calcualate how many rows we need
+	if (title!=''):
+		plt.suptitle(title, fontsize=20, fontweight='bold')
+
+	Rows = math.ceil(float(len(NamesList))/float(Columns))      # calcualate how many rows we need
   
-  if (XCoordinateName==''):                                   # if there is no XCoordinateName
-    for count in range(len(NamesList)):                       # for each name
-      plt.subplot(Rows,Columns,count+1)                       # go to the count-th row of in our figure (with len(NamesList) rows)
-      plt.plot(DataMap[NamesList[count]],label=NamesList[count])
+	if (XCoordinateName==''):                                   # if there is no XCoordinateName
+		XLimit = len(NamesList[0])
+		for count in range(len(NamesList)):                       # for each name
+			ax = plt.subplot(Rows,Columns,count+1)                       # go to the count-th row of in our figure (with len(NamesList) rows)
+			plt.plot(DataMap[NamesList[count]],label=NamesList[count])
                                                               # plot the data for each element in name in it's own plot
-      plt.title(NamesList[count], fontsize=12) 	              # set the title for this plot
-
-  else:                                                       # else, there is a XCoordinateName
-    for count in range(len(NamesList)):                       # for each name
-      plt.subplot(Rows,Columns,count+1)                       # go to the count-th row of in our figure (with len(NamesList) rows)
-      plt.plot(DataMap[XCoordinateName],DataMap[NamesList[count]],label=NamesList[count])
+			plt.title(NamesList[count], fontsize=16) 	              # set the title for this plot
+			ax.title.set_position([.5, .97])
+			for label in (ax.get_xticklabels() + ax.get_yticklabels()):
+				#label.set_fontname('Arial')
+				label.set_fontsize(10)
+			ax.xaxis.set_tick_params(pad=2)
+			plt.xlim([0,XLimit])
+	else:                                                       # else, there is a XCoordinateName
+		XLimit = DataMap[XCoordinateName][len(DataMap[XCoordinateName])-1]
+		for count in range(len(NamesList)):                       # for each name
+			ax = plt.subplot(Rows,Columns,count+1)                       # go to the count-th row of in our figure (with len(NamesList) rows)
+			plt.plot(DataMap[XCoordinateName],DataMap[NamesList[count]],label=NamesList[count])
                                                               # plot the data for each element in name in it's own plot
-      plt.title(NamesList[count], fontsize=12)                # set the title for this plot
+			plt.title(NamesList[count], fontsize=16)                # set the title for this plot
+			ax.title.set_position([.5, .97])
+			for label in (ax.get_xticklabels() + ax.get_yticklabels()):
+				#label.set_fontname('Arial')
+				label.set_fontsize(10)
+			ax.xaxis.set_tick_params(pad=2)
+			plt.xlim([0,XLimit])
 
-	
-  return plt.gcf()                                            # gcf = get current figure - return that.
+	return plt.gcf()                                            # gcf = get current figure - return that.
 
 ####
 #
@@ -87,21 +101,26 @@ def BuildPlotFromDict(DataMap,NamesList,XCoordinateName='',AddLegend='',title = 
   return plt.gcf()                                            # gcf = get current figure - return that.
 
 	  
-######## LOAD DATA
-
 def usage():
 	print()
-	print(sys.argv[0] + " [-h][-s pdf|png]")
+	print(sys.argv[0] + ' [-h][-s pdf|png][-l][-c "source,x-axis,(legend location,)data1,data2,..."]')
 	print()
-	print("  -h show this help message")
-	print("  -s do not display image, save images (pdf or png formatte")
+	print('  -h show this help message')
+	print('  -s do not display graph(s), save image(s) instead ("pdf" or "png" format)')
+	print('  -l also load and graph Line of Decent (data.csv)')
+	print('  -c make a custom graph')
+	print('       source = ave | dom | LOD (for LOD, must also use -l flag)')
+	print('       x-axis = which column to use for x-axis')
+	print('       legend location = (optional - default "lower right")')
+	print('                         upper right | upper left | lower left | lower right | right,center | left,center | right | lower center | upper center | center')
+	print('       data* = columns to graph')
 	print()
 	
 def main(argv=None):
 	if argv is None:
 		argv = sys.argv
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], "ho:v", ["help", "output="])
+		opts, args = getopt.getopt(sys.argv[1:], "hs:vc:vl")
 	except getopt.GetoptError as err:
 		# print help information and exit:
 		print()
@@ -109,44 +128,83 @@ def main(argv=None):
 		usage()
 		sys.exit(2)
 	output = None
-	verbose = False
-	for o, a in opts:
-		if o == "-v":
+	customOptions = None
+	useLOD = False
+	for option, value in opts:
+		if option == "-v":
 			verbose = True
-		elif o in ("-h", "--help"):
+		elif option in ("-h"):
 			usage()
 			sys.exit()
-		elif o in ("-o", "--output"):
-			output = a
+		elif option == "-c":
+			customOptions = value
+		elif option in ("-s"):
+			output = value
+		elif option in ("-l"):
+			useLOD = True
 		else:
 			assert False, "unhandled option"
-
 
 	ave_csv_file = pandas.read_csv(r'ave.csv')
 	dominant_csv_file = pandas.read_csv(r'dominant.csv')
 
+	if useLOD:
+		LOD_csv_file = pandas.read_csv(r'data.csv')
+		
 	aveList = list(ave_csv_file.columns.values)
 	if "update" in aveList:
 		aveList.remove("update")
 	domList = aveList
-	aveGraph = BuildMultiPlotFromDict(ave_csv_file,NamesList = aveList,XCoordinateName='update',Columns=2,title = 'Average')
-	domGraph = BuildMultiPlotFromDict(dominant_csv_file,NamesList = domList,XCoordinateName='update',Columns=2,title = 'Dominant')
-
-
-	#plt.show()
+	if useLOD:
+		LODList = aveList
+	
+	if customOptions == None:
+		aveGraph = BuildMultiPlotFromDict(ave_csv_file,NamesList = aveList,XCoordinateName='update',Columns=2,title = 'Average')
+		domGraph = BuildMultiPlotFromDict(dominant_csv_file,NamesList = domList,XCoordinateName='update',Columns=2,title = 'Dominant')
+		if useLOD:
+			LODGraph = BuildMultiPlotFromDict(LOD_csv_file,NamesList = LODList,XCoordinateName='update',Columns=2,title = 'Line of Descent')
+	else :
+		customList = customOptions.split(",")
+		if customList[0] == "ave":
+			source = ave_csv_file;
+		elif customList[0] == "dom":
+			source = dominant_csv_file
+		elif customList[0] == "LOD":
+			source = LOD_csv_file
+		else:
+			print ('options for custom must start with "ave", "dom" or, "lod"')
+			sys.exit()
+		if customList[2] in ['upper right','upper left','lower left','lower right','right,center','left,center','right','lower center','upper center','center']:
+			legLoc = customList[2]
+			names = customList[3:]
+		else :
+			legLoc = 'lower right'
+			names = customList[2:]
+		testGraph = BuildPlotFromDict(source,NamesList = names,XCoordinateName=customList[1],AddLegend=legLoc,title = 'foods')
+	
+	
+	if output == None:
+		plt.show()
 
 
 	######## SAVE TO A PNG FILE
-	aveGraph.savefig('aveGraph.png', dpi=100)
-	domGraph.savefig('domGraph.png', dpi=100)
+	if output == 'png':
+		aveGraph.savefig('AveGraph.png', dpi=100)
+		domGraph.savefig('DomGraph.png', dpi=100)
+		if useLOD:
+			LODGraph.savefig('LODGraph.png', dpi=100)
 
 
 	######## SAVE TO A PDF FILE
 
-	#pp = PdfPages('output.pdf')
-	#pp.savefig(fig1)
-	#pp.savefig(fig2)
-	#pp.close()
+	if output == 'pdf':
+		pp = PdfPages('MABE_GRAPHS.pdf')
+		pp.savefig(aveGraph)
+		pp.savefig(domGraph)
+		if useLOD:
+			pp.savefig(LODGraph)
+
+		pp.close()
 
   
 

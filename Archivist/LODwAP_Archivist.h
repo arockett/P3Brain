@@ -23,6 +23,8 @@ class LODwAP_Archivist : public Archivist {  // Line of Decent with Active Pruni
 	static const string& LODwAP_Arch_GenomeFileName;  // name of the Genome file (genomes on LOD)
 	static const bool& LODwAP_Arch_writeDataFile;  // if true, write data file
 	static const bool& LODwAP_Arch_writeGenomeFile;  // if true, write genome file
+	static const bool& LODwAP_Arch_DataFileShowAllLists;
+	static const bool& LODwAP_Arch_DataFileConvertAllLists;
 
 	int dataInterval;  // how often to write out data
 	int genomeInterval;  // how often to write out genomes
