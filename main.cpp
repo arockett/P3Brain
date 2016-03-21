@@ -225,40 +225,6 @@ int main(int argc, const char * argv[]) {
 
 	{
 
-		shared_ptr<Archivist> archivist;
-
-		if (Archivist::Arch_outputMethodStr == "default") {
-			archivist = make_shared<Archivist>();
-			cout << "Using Default Archivist" << endl;
-		} else if (Archivist::Arch_outputMethodStr == "LODwAP") {
-			archivist = make_shared<LODwAP_Archivist>();
-			cout << "Using Line of Decent with Aggressive Pruning Archivist" << endl;
-		} else if (Archivist::Arch_outputMethodStr == "snapshot") {
-			archivist = make_shared<Snapshot_Archivist>();
-			cout << "Using Snapshot Archivist" << endl;
-		} else if (Archivist::Arch_outputMethodStr == "SSwD") {
-			archivist = make_shared<SSwD_Archivist>();
-			cout << "Using Snapshot with Delay Archivist" << endl;
-		} else {
-			cout << "\n\nERROR: Unrecognized archivist type in configuration!\n  \"" << Archivist::Arch_outputMethodStr << "\" is not defined.\n\nExiting.\n" << endl;
-			exit(1);
-		}
-
-		shared_ptr<BaseOptimizer> optimizer;
-
-		if (BaseOptimizer::Optimizer_MethodStr == "GA") {
-			optimizer = make_shared<GA_Optimizer>();
-			cout << "Using GA Optimizer" << endl;
-		} else if (BaseOptimizer::Optimizer_MethodStr == "Tournament") {
-			optimizer = make_shared<TournamentOptimizer>();
-			cout << "Using Tournament Optimizer" << endl;
-		} else if (BaseOptimizer::Optimizer_MethodStr == "Tournament2") {
-			optimizer = make_shared<Tournament2Optimizer>();
-			cout << "Using Tournament2 Optimizer" << endl;
-		} else {
-			cout << "\n\nERROR: Unrecognized optimizer type in configuration!\n  \"" << BaseOptimizer::Optimizer_MethodStr << "\" is not defined.\n\nExiting.\n" << endl;
-			exit(1);
-		}
 
 		// a progenitor must exist - that is, one ancestor genome
 		Global::update = -1;  // before there was time, there was a progenitor
@@ -318,6 +284,50 @@ int main(int argc, const char * argv[]) {
 //		cout << test_brain->description();
 //		exit(1);
 /////// to test genome to brain conversion and coding regions, set popsize = 1 and uncomment the block above this comment
+
+		shared_ptr<BaseOptimizer> optimizer;
+
+		if (BaseOptimizer::Optimizer_MethodStr == "GA") {
+			optimizer = make_shared<GA_Optimizer>();
+			cout << "Using GA Optimizer" << endl;
+		} else if (BaseOptimizer::Optimizer_MethodStr == "Tournament") {
+			optimizer = make_shared<TournamentOptimizer>();
+			cout << "Using Tournament Optimizer" << endl;
+		} else if (BaseOptimizer::Optimizer_MethodStr == "Tournament2") {
+			optimizer = make_shared<Tournament2Optimizer>();
+			cout << "Using Tournament2 Optimizer" << endl;
+		} else {
+			cout << "\n\nERROR: Unrecognized optimizer type in configuration!\n  \"" << BaseOptimizer::Optimizer_MethodStr << "\" is not defined.\n\nExiting.\n" << endl;
+			exit(1);
+		}
+
+
+
+		vector<string> aveFileColumns;
+		aveFileColumns.clear();
+		aveFileColumns.push_back("update");
+		aveFileColumns.insert(aveFileColumns.end(), world->aveFileColumns.begin(), world->aveFileColumns.end());
+		aveFileColumns.insert(aveFileColumns.end(), population[0]->genome->aveFileColumns.begin(), population[0]->genome->aveFileColumns.end());
+		aveFileColumns.insert(aveFileColumns.end(), population[0]->brain->aveFileColumns.begin(), population[0]->brain->aveFileColumns.end());
+
+		shared_ptr<Archivist> archivist;
+
+		if (Archivist::Arch_outputMethodStr == "default") {
+			archivist = make_shared<Archivist>(aveFileColumns);
+			cout << "Using Default Archivist" << endl;
+		} else if (Archivist::Arch_outputMethodStr == "LODwAP") {
+			archivist = make_shared<LODwAP_Archivist>(aveFileColumns);
+			cout << "Using Line of Decent with Aggressive Pruning Archivist" << endl;
+		} else if (Archivist::Arch_outputMethodStr == "snapshot") {
+			archivist = make_shared<Snapshot_Archivist>(aveFileColumns);
+			cout << "Using Snapshot Archivist" << endl;
+		} else if (Archivist::Arch_outputMethodStr == "SSwD") {
+			archivist = make_shared<SSwD_Archivist>(aveFileColumns);
+			cout << "Using Snapshot with Delay Archivist" << endl;
+		} else {
+			cout << "\n\nERROR: Unrecognized archivist type in configuration!\n  \"" << Archivist::Arch_outputMethodStr << "\" is not defined.\n\nExiting.\n" << endl;
+			exit(1);
+		}
 
 		group = make_shared<Group>(population, optimizer, archivist);
 	}

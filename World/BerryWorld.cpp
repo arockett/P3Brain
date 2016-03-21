@@ -13,50 +13,51 @@
 
 /* *** implementation of the World *** */
 
-double& BerryWorld::TSK = Parameters::register_parameter("BERRY_taskSwitchingCost", 1.4, "cost to change food sources", "WORLD - BERRY");
-int& BerryWorld::worldUpdates = Parameters::register_parameter("BERRY_WorldUpdates", 400, "amount of time an brain is tested", "WORLD - BERRY");
+const double& BerryWorld::TSK = Parameters::register_parameter("BERRY_taskSwitchingCost", 1.4, "cost to change food sources", "WORLD - BERRY");
+const int& BerryWorld::worldUpdates = Parameters::register_parameter("BERRY_WorldUpdates", 400, "amount of time an brain is tested", "WORLD - BERRY");
 
-int& BerryWorld::foodTypes = Parameters::register_parameter("BERRY_foodTypes", 2, "number of types of food", "WORLD - BERRY");
-double& BerryWorld::rewardForFood1 = Parameters::register_parameter("BERRY_rewardForFood1", 1.0, "reward for eating a Food1", "WORLD - BERRY");
-double& BerryWorld::rewardForFood2 = Parameters::register_parameter("BERRY_rewardForFood2", 1.0, "reward for eating a Food2", "WORLD - BERRY");
-double& BerryWorld::rewardForFood3 = Parameters::register_parameter("BERRY_rewardForFood3", 1.0, "reward for eating a Food3", "WORLD - BERRY");
-double& BerryWorld::rewardForFood4 = Parameters::register_parameter("BERRY_rewardForFood4", 1.0, "reward for eating a Food4", "WORLD - BERRY");
-double& BerryWorld::rewardForFood5 = Parameters::register_parameter("BERRY_rewardForFood5", 1.0, "reward for eating a Food5", "WORLD - BERRY");
-double& BerryWorld::rewardForFood6 = Parameters::register_parameter("BERRY_rewardForFood6", 1.0, "reward for eating a Food6", "WORLD - BERRY");
-double& BerryWorld::rewardForFood7 = Parameters::register_parameter("BERRY_rewardForFood7", 1.0, "reward for eating a Food7", "WORLD - BERRY");
-double& BerryWorld::rewardForFood8 = Parameters::register_parameter("BERRY_rewardForFood8", 1.0, "reward for eating a Food8", "WORLD - BERRY");
+const int& BerryWorld::foodTypes = Parameters::register_parameter("BERRY_foodTypes", 2, "number of types of food", "WORLD - BERRY");
+const double& BerryWorld::rewardForFood1 = Parameters::register_parameter("BERRY_rewardForFood1", 1.0, "reward for eating a Food1", "WORLD - BERRY");
+const double& BerryWorld::rewardForFood2 = Parameters::register_parameter("BERRY_rewardForFood2", 1.0, "reward for eating a Food2", "WORLD - BERRY");
+const double& BerryWorld::rewardForFood3 = Parameters::register_parameter("BERRY_rewardForFood3", 1.0, "reward for eating a Food3", "WORLD - BERRY");
+const double& BerryWorld::rewardForFood4 = Parameters::register_parameter("BERRY_rewardForFood4", 1.0, "reward for eating a Food4", "WORLD - BERRY");
+const double& BerryWorld::rewardForFood5 = Parameters::register_parameter("BERRY_rewardForFood5", 1.0, "reward for eating a Food5", "WORLD - BERRY");
+const double& BerryWorld::rewardForFood6 = Parameters::register_parameter("BERRY_rewardForFood6", 1.0, "reward for eating a Food6", "WORLD - BERRY");
+const double& BerryWorld::rewardForFood7 = Parameters::register_parameter("BERRY_rewardForFood7", 1.0, "reward for eating a Food7", "WORLD - BERRY");
+const double& BerryWorld::rewardForFood8 = Parameters::register_parameter("BERRY_rewardForFood8", 1.0, "reward for eating a Food8", "WORLD - BERRY");
 
-double& BerryWorld::rewardForTurn = Parameters::register_parameter("BERRY_rewardForTurn", 0.0, "reward for turning", "WORLD - BERRY - ADVANCED");
-double& BerryWorld::rewardForMove = Parameters::register_parameter("BERRY_rewardForMove", 0.0, "reward for moving", "WORLD - BERRY - ADVANCED");
+const double& BerryWorld::rewardForTurn = Parameters::register_parameter("BERRY_rewardForTurn", 0.0, "reward for turning", "WORLD - BERRY - ADVANCED");
+const double& BerryWorld::rewardForMove = Parameters::register_parameter("BERRY_rewardForMove", 0.0, "reward for moving", "WORLD - BERRY - ADVANCED");
 
-int& BerryWorld::ratioFood0 = Parameters::register_parameter("BERRY_replacementRatioFood0", 0, "Relative likelihood to leave empty space empty", "WORLD - BERRY - ADVANCED");
-int& BerryWorld::ratioFood1 = Parameters::register_parameter("BERRY_replacementRatioFood1", 1, "Relative likelihood to place Food1", "WORLD - BERRY - ADVANCED");
-int& BerryWorld::ratioFood2 = Parameters::register_parameter("BERRY_replacementRatioFood2", 1, "Relative likelihood to place Food2", "WORLD - BERRY - ADVANCED");
-int& BerryWorld::ratioFood3 = Parameters::register_parameter("BERRY_replacementRatioFood3", 1, "Relative likelihood to place Food3", "WORLD - BERRY - ADVANCED");
-int& BerryWorld::ratioFood4 = Parameters::register_parameter("BERRY_replacementRatioFood4", 1, "Relative likelihood to place Food4", "WORLD - BERRY - ADVANCED");
-int& BerryWorld::ratioFood5 = Parameters::register_parameter("BERRY_replacementRatioFood5", 1, "Relative likelihood to place Food5", "WORLD - BERRY - ADVANCED");
-int& BerryWorld::ratioFood6 = Parameters::register_parameter("BERRY_replacementRatioFood6", 1, "Relative likelihood to place Food6", "WORLD - BERRY - ADVANCED");
-int& BerryWorld::ratioFood7 = Parameters::register_parameter("BERRY_replacementRatioFood7", 1, "Relative likelihood to place Food7", "WORLD - BERRY - ADVANCED");
-int& BerryWorld::ratioFood8 = Parameters::register_parameter("BERRY_replacementRatioFood8", 1, "Relative likelihood to place Food8", "WORLD - BERRY - ADVANCED");
+const int& BerryWorld::ratioFood0 = Parameters::register_parameter("BERRY_replacementRatioFood0", 0, "Relative likelihood to leave empty space empty", "WORLD - BERRY - ADVANCED");
+const int& BerryWorld::ratioFood1 = Parameters::register_parameter("BERRY_replacementRatioFood1", 1, "Relative likelihood to place Food1", "WORLD - BERRY - ADVANCED");
+const int& BerryWorld::ratioFood2 = Parameters::register_parameter("BERRY_replacementRatioFood2", 1, "Relative likelihood to place Food2", "WORLD - BERRY - ADVANCED");
+const int& BerryWorld::ratioFood3 = Parameters::register_parameter("BERRY_replacementRatioFood3", 1, "Relative likelihood to place Food3", "WORLD - BERRY - ADVANCED");
+const int& BerryWorld::ratioFood4 = Parameters::register_parameter("BERRY_replacementRatioFood4", 1, "Relative likelihood to place Food4", "WORLD - BERRY - ADVANCED");
+const int& BerryWorld::ratioFood5 = Parameters::register_parameter("BERRY_replacementRatioFood5", 1, "Relative likelihood to place Food5", "WORLD - BERRY - ADVANCED");
+const int& BerryWorld::ratioFood6 = Parameters::register_parameter("BERRY_replacementRatioFood6", 1, "Relative likelihood to place Food6", "WORLD - BERRY - ADVANCED");
+const int& BerryWorld::ratioFood7 = Parameters::register_parameter("BERRY_replacementRatioFood7", 1, "Relative likelihood to place Food7", "WORLD - BERRY - ADVANCED");
+const int& BerryWorld::ratioFood8 = Parameters::register_parameter("BERRY_replacementRatioFood8", 1, "Relative likelihood to place Food8", "WORLD - BERRY - ADVANCED");
 
-int& BerryWorld::WorldX = Parameters::register_parameter("BERRY_WorldX", 8, "world X size", "WORLD - BERRY");
-int& BerryWorld::WorldY = Parameters::register_parameter("BERRY_WorldY", 8, "world Y size", "WORLD - BERRY");
-bool& BerryWorld::borderWalls = Parameters::register_parameter("BERRY_makeBorderWalls", true, "if true world will have a bounding wall", "WORLD - BERRY");
-int& BerryWorld::randomWalls = Parameters::register_parameter("BERRY_makeRandomWalls", 0, "add this many walls to the world", "WORLD - BERRY - ADVANCED");
+const int& BerryWorld::WorldX = Parameters::register_parameter("BERRY_WorldX", 8, "world X size", "WORLD - BERRY");
+const int& BerryWorld::WorldY = Parameters::register_parameter("BERRY_WorldY", 8, "world Y size", "WORLD - BERRY");
+const bool& BerryWorld::borderWalls = Parameters::register_parameter("BERRY_makeBorderWalls", true, "if true world will have a bounding wall", "WORLD - BERRY");
+const int& BerryWorld::randomWalls = Parameters::register_parameter("BERRY_makeRandomWalls", 0, "add this many walls to the world", "WORLD - BERRY - ADVANCED");
 
-bool& BerryWorld::clearOutputs = Parameters::register_parameter("BERRY_clearOutputs", false, "if true outputs will be cleared on each world update", "WORLD - BERRY");
+const bool& BerryWorld::clearOutputs = Parameters::register_parameter("BERRY_clearOutputs", false, "if true outputs will be cleared on each world update", "WORLD - BERRY");
 
-bool& BerryWorld::allowMoveAndEat = Parameters::register_parameter("BERRY_allowMoveAndEat", false, "if true, the brain can move and eat in the same world update", "WORLD - BERRY - ADVANCED");
-bool& BerryWorld::senseDown = Parameters::register_parameter("BERRY_senseDown", true, "if true, Agent can sense what it's standing on", "WORLD - BERRY");
-bool& BerryWorld::senseFront = Parameters::register_parameter("BERRY_senseFront", true, "if true, Agent can sense what's in front of it", "WORLD - BERRY");
-bool& BerryWorld::senseFrontSides = Parameters::register_parameter("BERRY_senseFrontSides", false, "if true, Agent can sense what's in front to the left and right of it", "WORLD - BERRY");
-bool& BerryWorld::senseWalls = Parameters::register_parameter("BERRY_senseWalls", false, "if true, Agent can sense Walls", "WORLD - BERRY");
-int& BerryWorld::replacement = Parameters::register_parameter("BERRY_replacement", -1, "-1 = random, 0 = no replacement, 1 = replace other (note: Food0, can be replace by Food0)", "WORLD - BERRY - ADVANCED");
+const bool& BerryWorld::allowMoveAndEat = Parameters::register_parameter("BERRY_allowMoveAndEat", false, "if true, the brain can move and eat in the same world update", "WORLD - BERRY - ADVANCED");
+const bool& BerryWorld::senseDown = Parameters::register_parameter("BERRY_senseDown", true, "if true, Agent can sense what it's standing on", "WORLD - BERRY");
+const bool& BerryWorld::senseFront = Parameters::register_parameter("BERRY_senseFront", true, "if true, Agent can sense what's in front of it", "WORLD - BERRY");
+const bool& BerryWorld::senseFrontSides = Parameters::register_parameter("BERRY_senseFrontSides", false, "if true, Agent can sense what's in front to the left and right of it", "WORLD - BERRY");
+const bool& BerryWorld::senseWalls = Parameters::register_parameter("BERRY_senseWalls", false, "if true, Agent can sense Walls", "WORLD - BERRY");
+const int& BerryWorld::replacement = Parameters::register_parameter("BERRY_replacement", -1, "-1 = random, 0 = no replacement, 1 = replace other (note: Food0, can be replace by Food0)", "WORLD - BERRY - ADVANCED");
 
-bool& BerryWorld::recordConsumptionRatio = Parameters::register_parameter("BERRY_recordConsumptionRatio", false, "if true, record greater of red/blue+1 or blue/red+1", "WORLD - BERRY - ADVANCED");
-bool& BerryWorld::recordFoodList = Parameters::register_parameter("BERRY_recordFoodList", true, "if true, record list of food eaten", "WORLD - BERRY - ADVANCED");
-bool& BerryWorld::recordFoodListEatEmpty = Parameters::register_parameter("BERRY_recordFoodListEatEmpty", false, "if true, foodList will include attempts to eat 0", "WORLD - BERRY - ADVANCED");
-bool& BerryWorld::recordFoodListNoEat = Parameters::register_parameter("BERRY_recordFoodListNoEat", false, "if true, if true foodList will include no eat (-1)", "WORLD - BERRY - ADVANCED");
+const bool& BerryWorld::recordConsumptionRatio = Parameters::register_parameter("BERRY_recordConsumptionRatio", false, "if true, record greater of red/blue+1 or blue/red+1", "WORLD - BERRY - ADVANCED");
+const bool& BerryWorld::recordFoodList = Parameters::register_parameter("BERRY_recordFoodList", true, "if true, record list of food eaten", "WORLD - BERRY - ADVANCED");
+const bool& BerryWorld::recordFoodListEatEmpty = Parameters::register_parameter("BERRY_recordFoodListEatEmpty", false, "if true, foodList will include attempts to eat 0", "WORLD - BERRY - ADVANCED");
+const bool& BerryWorld::recordFoodListNoEat = Parameters::register_parameter("BERRY_recordFoodListNoEat", false, "if true, if true foodList will include no eat (-1)", "WORLD - BERRY - ADVANCED");
+
 
 BerryWorld::BerryWorld() {
 
@@ -64,7 +65,7 @@ BerryWorld::BerryWorld() {
 		cout << "In BerryWorld you either have too few or too many foodTypes (must be >0 and <=8)\n\nExiting\n\n";
 		exit(1);
 	}
-	senseWalls = senseWalls & (borderWalls | (randomWalls > 0));  // if there are no walls, there is no need to sense them!
+	//senseWalls = senseWalls & (borderWalls | (randomWalls > 0));  // if there are no walls, there is no need to sense them!
 
 	outputNodesCount = 3;  // number of brain nodes used for output, 2 for move, 1 for eat
 
@@ -113,6 +114,20 @@ BerryWorld::BerryWorld() {
 	foodRewards[7] = rewardForFood7;
 	foodRewards[8] = rewardForFood8;
 
+	// columns to be added to ave file
+	aveFileColumns.clear();
+	aveFileColumns.push_back("score");
+	aveFileColumns.push_back("total");
+	if (foodTypes > 1) {
+		aveFileColumns.push_back("switches");
+	}
+	for (int i = 0; i <= foodTypes; i++) {
+		string temp_name = "food" + to_string(i);  // make food names i.e. food1, food2, etc.
+		aveFileColumns.push_back(temp_name);
+	}
+	if (recordConsumptionRatio) {  // consumption ratio displays high value of org favors one food over the other and low values if both are being consumed. works on food[0] and food[1] only
+		aveFileColumns.push_back("consumptionRatio");
+	}
 }
 
 void BerryWorld::printGrid(vector<int> grid, pair<int, int> loc, int facing) {

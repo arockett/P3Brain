@@ -13,8 +13,8 @@
 #include "../Utilities/Random.h"
 #include "../Utilities/Utilities.h"
 
-double& FixedEpsilonGate::FixedEpsilonGate_Probability = Parameters::register_parameter("fixedEpsilonGate_Probability", 0.05, "chance that an output from a FixedEpsilonGate gate will be randomized", "GATES - FIXED EPSILON");
-double& VoidGate::voidGate_Probability = Parameters::register_parameter("voidGate_Probability", 0.05, "chance that an output from a void gate will be set to 0", "GATES - VOID");
+const double& FixedEpsilonGate::FixedEpsilonGate_Probability = Parameters::register_parameter("fixedEpsilonGate_Probability", 0.05, "chance that an output from a FixedEpsilonGate gate will be randomized", "GATES - FIXED EPSILON");
+const double& VoidGate::voidGate_Probability = Parameters::register_parameter("voidGate_Probability", 0.05, "chance that an output from a void gate will be set to 0", "GATES - VOID");
 
 // *** General tools for All Gates ***
 

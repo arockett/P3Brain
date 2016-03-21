@@ -30,7 +30,6 @@ class MarkovBrain : public AbstractBrain {
 	shared_ptr<Base_GateListBuilder> GLB;
 
  public:
-	static bool& serialProcessing;  // write directly states (overwrite) - do not use nextStates
 
 //	static bool& cacheResults;
 //	static int& cacheResultsCount;

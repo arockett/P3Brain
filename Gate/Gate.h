@@ -134,7 +134,7 @@ class DeterministicGate : public Gate {
 class FixedEpsilonGate : public DeterministicGate {
  private:
  public:
-	static double& FixedEpsilonGate_Probability;
+	static const double& FixedEpsilonGate_Probability;
 
 	vector<int> defaultOutput;
 	double epsilon;
@@ -146,7 +146,7 @@ class FixedEpsilonGate : public DeterministicGate {
 };
 
 class VoidGate : public DeterministicGate {
-	static double& voidGate_Probability;
+	static const double& voidGate_Probability;
 
  private:
  public:

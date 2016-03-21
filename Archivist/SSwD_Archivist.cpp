@@ -1,17 +1,17 @@
 #include "SSwD_Archivist.h"
 
-int& SSwD_Archivist::SSwD_Arch_dataInterval = Parameters::register_parameter("dataInterval_SSwD", 100, "How often to save a data file", "ARCHIVIST_SSWD");
-int& SSwD_Archivist::SSwD_Arch_genomeInterval = Parameters::register_parameter("genomeInterval_SSwD", 1000, "How often to save a genome file", "ARCHIVIST_SSWD");
-int& SSwD_Archivist::SSwD_Arch_dataIntervalDelay = Parameters::register_parameter("dataIntervalDelay_SSwD", 10, "when using Snap Shot with Delay output Method, how long is the delay before saving data", "ARCHIVIST_SSWD");
-int& SSwD_Archivist::SSwD_Arch_genomeIntervalDelay = Parameters::register_parameter("genomeIntervalDelay_SSwD", 10, "when using Snap Shot with Delay output Method, how long is the delay before saving genomes ", "ARCHIVIST_SSWD");
-int& SSwD_Archivist::SSwD_Arch_cleanupInterval = Parameters::register_parameter("cleanupInterval_SSwD", 100, "How often to cleanup old checkpoints", "ARCHIVIST_SSWD");
-string& SSwD_Archivist::SSwD_Arch_DataFilePrefix = Parameters::register_parameter("dataFilePrefix_SSwD", (string) "data", "name of genome file (stores genomes)", "ARCHIVIST_SSWD");
-string& SSwD_Archivist::SSwD_Arch_GenomeFilePrefix = Parameters::register_parameter("genomeFilePrefix_SSwD", (string) "genome", "name of data file (stores everything but genomes)", "ARCHIVIST_SSWD");
-bool& SSwD_Archivist::SSwD_Arch_writeDataFiles = Parameters::register_parameter("writeDataFiles_SSwD", true, "if true, data files will be written", "ARCHIVIST_SSWD");
-bool& SSwD_Archivist::SSwD_Arch_writeGenomeFiles = Parameters::register_parameter("writeGenomeFiles_SSwD", true, "if true, genome files will be written", "ARCHIVIST_SSWD");
+const int& SSwD_Archivist::SSwD_Arch_dataInterval = Parameters::register_parameter("dataInterval_SSwD", 100, "How often to save a data file", "ARCHIVIST_SSWD");
+const int& SSwD_Archivist::SSwD_Arch_genomeInterval = Parameters::register_parameter("genomeInterval_SSwD", 1000, "How often to save a genome file", "ARCHIVIST_SSWD");
+const int& SSwD_Archivist::SSwD_Arch_dataIntervalDelay = Parameters::register_parameter("dataIntervalDelay_SSwD", 10, "when using Snap Shot with Delay output Method, how long is the delay before saving data", "ARCHIVIST_SSWD");
+const int& SSwD_Archivist::SSwD_Arch_genomeIntervalDelay = Parameters::register_parameter("genomeIntervalDelay_SSwD", 10, "when using Snap Shot with Delay output Method, how long is the delay before saving genomes ", "ARCHIVIST_SSWD");
+const int& SSwD_Archivist::SSwD_Arch_cleanupInterval = Parameters::register_parameter("cleanupInterval_SSwD", 100, "How often to cleanup old checkpoints", "ARCHIVIST_SSWD");
+const string& SSwD_Archivist::SSwD_Arch_DataFilePrefix = Parameters::register_parameter("dataFilePrefix_SSwD", (string) "data", "name of genome file (stores genomes)", "ARCHIVIST_SSWD");
+const string& SSwD_Archivist::SSwD_Arch_GenomeFilePrefix = Parameters::register_parameter("genomeFilePrefix_SSwD", (string) "genome", "name of data file (stores everything but genomes)", "ARCHIVIST_SSWD");
+const bool& SSwD_Archivist::SSwD_Arch_writeDataFiles = Parameters::register_parameter("writeDataFiles_SSwD", true, "if true, data files will be written", "ARCHIVIST_SSWD");
+const bool& SSwD_Archivist::SSwD_Arch_writeGenomeFiles = Parameters::register_parameter("writeGenomeFiles_SSwD", true, "if true, genome files will be written", "ARCHIVIST_SSWD");
 
-SSwD_Archivist::SSwD_Archivist()
-		: Archivist() {
+SSwD_Archivist::SSwD_Archivist(vector<string> aveFileColumns) :
+		Archivist(aveFileColumns) {
 
 	dataInterval = SSwD_Arch_dataInterval;
 	genomeInterval = SSwD_Arch_genomeInterval;
@@ -48,13 +48,13 @@ void SSwD_Archivist::cleanup() {
 							org->parents.clear();  // clear this organisms parents
 						} else {
 							checkpointEmpty = false;  // there is an organism in this checkpoint that was alive later then (Global::update - intervalDelay)
-							                          // this could organism could still be active
+													  // this could organism could still be active
 						}
 					}
 				}
 				if (checkpointEmpty) {  // if all of the organisims in this checkpoint have been dead for a good long time...
-				                        // if this checkpoint is not empty, we want to keep it so we can check it again later.
-					expiredCheckPoints.push_back(checkpoint.first);                                  // add this checkpoint to a list of checkpoints to be deleted
+										// if this checkpoint is not empty, we want to keep it so we can check it again later.
+					expiredCheckPoints.push_back(checkpoint.first);  // add this checkpoint to a list of checkpoints to be deleted
 				}
 			}
 		}
@@ -91,7 +91,7 @@ bool SSwD_Archivist::archive(vector<shared_ptr<Organism>> population, int flush)
 					}
 					org->ancestors.clear();  // clear ancestors (this data is safe in the checkPoint)
 					org->ancestors.insert(org->ID);  // now that we have saved the ancestor data, set ancestors to self (so that others will inherit correctly)
-					                                 // also, if this survives over intervals, it'll be pointing to self as ancestor in files (which is good)
+													 // also, if this survives over intervals, it'll be pointing to self as ancestor in files (which is good)
 				}
 			}
 			if (Global::update == nextGenomeCheckPoint && Global::update <= Global::updates) {  // we have now made a genome checkpoint, advance nextGenomeCheckPoint to get ready for the next interval
@@ -115,12 +115,12 @@ bool SSwD_Archivist::archive(vector<shared_ptr<Organism>> population, int flush)
 				if (auto org = checkpoints[nextGenomeWrite][index].lock()) {  // this ptr is still good
 
 					org->genome->dataMap.Set("ID", org->dataMap.Get("ID"));
-					org->genome->dataMap.Set("update",org->dataMap.Get("update"));
+					org->genome->dataMap.Set("update", org->dataMap.Get("update"));
 
 					org->genome->dataMap.Set("sites", org->genome->genomeToStr());
 
-					org->genome->dataMap.writeToFile(genomeFileName, Genome::genomeFileColumns);  // append new data to the file
-					org->genome->dataMap.Clear("sites"); // this is large, clean it up now!
+					org->genome->dataMap.writeToFile(genomeFileName, org->genome->genomeFileColumns);  // append new data to the file
+					org->genome->dataMap.Clear("sites");  // this is large, clean it up now!
 					index++;
 				} else {  // this ptr is expired - cut it out of the vector
 					swap(checkpoints[nextGenomeWrite][index], checkpoints[nextGenomeWrite].back());  // swap expired ptr to back of vector

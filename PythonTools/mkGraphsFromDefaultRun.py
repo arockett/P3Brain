@@ -6,6 +6,8 @@ import math
 from matplotlib.backends.backend_pdf import PdfPages
 #import csv
 import pandas
+import sys
+import getopt
 
 ####
 #
@@ -87,39 +89,66 @@ def BuildPlotFromDict(DataMap,NamesList,XCoordinateName='',AddLegend='',title = 
 	  
 ######## LOAD DATA
 
-ave_csv_file = pandas.read_csv(r'ave.csv')
-dominant_csv_file = pandas.read_csv(r'dominant.csv')
-#data_csv_file = pandas.read_csv(r'data_9750.csv')
+def usage():
+	print()
+	print(sys.argv[0] + " [-h][-s pdf|png]")
+	print()
+	print("  -h show this help message")
+	print("  -s do not display image, save images (pdf or png formatte")
+	print()
+	
+def main(argv=None):
+	if argv is None:
+		argv = sys.argv
+	try:
+		opts, args = getopt.getopt(sys.argv[1:], "ho:v", ["help", "output="])
+	except getopt.GetoptError as err:
+		# print help information and exit:
+		print()
+		print (str(err)) # will print something like "option -a not recognized"
+		usage()
+		sys.exit(2)
+	output = None
+	verbose = False
+	for o, a in opts:
+		if o == "-v":
+			verbose = True
+		elif o in ("-h", "--help"):
+			usage()
+			sys.exit()
+		elif o in ("-o", "--output"):
+			output = a
+		else:
+			assert False, "unhandled option"
 
-aveList = ['score','genomeLength','wireBrainWireCount','wireBrainConnectionsCount']
-domList = ['score','food1','switches','food2','consumptionRatio','wireBrainWireCount','wireBrainConnectionsCount']
-BuildMultiPlotFromDict(ave_csv_file,NamesList = aveList,XCoordinateName='update',Columns=2,title = 'Average')
-BuildMultiPlotFromDict(dominant_csv_file,NamesList = domList,XCoordinateName='update',Columns=2,title = 'Dominant')
 
-## tookout food 2
-#BuildMultiPlotFromDict(ave_csv_file,NamesList = ['score','gates','genomeLength'],XCoordinateName='update',Columns=2,title = 'Average')
-#BuildMultiPlotFromDict(dominant_csv_file,NamesList = ['score','food1','switches','food2','gates','genomeLength'],XCoordinateName='update',Columns=2,title = 'Dominant')
+	ave_csv_file = pandas.read_csv(r'ave.csv')
+	dominant_csv_file = pandas.read_csv(r'dominant.csv')
 
-
-#BuildMultiPlotFromDict(data_csv_file,NamesList = ['score','food1','switches','food2','gates','genomeLength','total'],Columns=2,title = 'Dominant')
-
-#BuildPlotFromDict(DataMap = Data, NamesList = ['food1','food2','switches'],XCoordinateName = 'update',AddLegend='lower right')
-#BuildPlotFromDict(DataMap = Data, NamesList = ['food1','food2','switches'],XCoordinateName = 'update',AddLegend='lower right')
-
-plt.show()
+	aveList = list(ave_csv_file.columns.values)
+	if "update" in aveList:
+		aveList.remove("update")
+	domList = aveList
+	aveGraph = BuildMultiPlotFromDict(ave_csv_file,NamesList = aveList,XCoordinateName='update',Columns=2,title = 'Average')
+	domGraph = BuildMultiPlotFromDict(dominant_csv_file,NamesList = domList,XCoordinateName='update',Columns=2,title = 'Dominant')
 
 
-######## SAVE TO A PNG FILE
-#plt.savefig('testGraph.png', dpi=100)
+	#plt.show()
 
 
-######## SAVE TO A PDF FILE
+	######## SAVE TO A PNG FILE
+	aveGraph.savefig('aveGraph.png', dpi=100)
+	domGraph.savefig('domGraph.png', dpi=100)
 
-#pp = PdfPages('foo.pdf')
-#pp.savefig(fig1)
-#pp.savefig(fig2)
-#pp.savefig(DisplaysFig)
-#pp.close()
+
+	######## SAVE TO A PDF FILE
+
+	#pp = PdfPages('output.pdf')
+	#pp.savefig(fig1)
+	#pp.savefig(fig2)
+	#pp.close()
 
   
 
+if __name__ == "__main__":
+    main()

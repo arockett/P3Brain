@@ -14,24 +14,21 @@
 
 // Initialize Parameters
 
-int& Genome::initialPloidy = Parameters::register_parameter("ploidy", 1, "number of copies of each chromosome", "GENOME");
-int& Genome::initialChromosomes = Parameters::register_parameter("chromosomes", 1, "number of chromosome pairs (i.e. if chromosomes = 2 and ploidy = 2 there will be 4 chromosomes in the genome)", "GENOME");
+const int& Genome::initialPloidy = Parameters::register_parameter("ploidy", 1, "number of copies of each chromosome", "GENOME");
+const int& Genome::initialChromosomes = Parameters::register_parameter("chromosomes", 1, "number of chromosome pairs (i.e. if chromosomes = 2 and ploidy = 2 there will be 4 chromosomes in the genome)", "GENOME");
 
-int& Genome::initialChromosomeSize = Parameters::register_parameter("chromosomeSizeInitial", 10000, "starting size for all chromosomes in genome (genome size will be chromosomeSizeInitial * number of chromosomes * ploidy)", "GENOME");
-double& Genome::pointMutationRate = Parameters::register_parameter("pointMutationRate", 0.005, "per site mutation rate", "GENOME");
-double& Genome::insertionRate = Parameters::register_parameter("mutationCopyRate", 0.00002, "per genome insertion/deletion rate", "GENOME");
-int& Genome::insertionMinSize = Parameters::register_parameter("mutationCopyMinSize", 10, "minimum size of insertion mutation", "GENOME");
-int& Genome::insertionMaxSize = Parameters::register_parameter("mutationCopyMaxSize", 200, "maximum size of insertion mutation", "GENOME");
-double& Genome::deletionRate = Parameters::register_parameter("mutationDeletionRate", 0.00002, "insertion rate per 1000 genome sites", "GENOME");
-int& Genome::deletionMinSize = Parameters::register_parameter("mutationDeletionMinSize", 10, "minimum size of insertion mutation", "GENOME");
-int& Genome::deletionMaxSize = Parameters::register_parameter("mutationDeletionMaxSize", 200, "maximum size of insertion mutation", "GENOME");
-int& Genome::maxChromosomeSize = Parameters::register_parameter("chromosomeSizeMin", Genome::deletionMaxSize * 2, "if a chromosome is smaller then this, mutations will only increase chromosome size", "GENOME");
-int& Genome::minChromosomeSize = Parameters::register_parameter("chromosomeSizeMax", 20000, "if a chromosome is larger then this, mutations will only decrease chromosome size", "GENOME");
+const int& Genome::initialChromosomeSize = Parameters::register_parameter("chromosomeSizeInitial", 10000, "starting size for all chromosomes in genome (genome size will be chromosomeSizeInitial * number of chromosomes * ploidy)", "GENOME");
+const double& Genome::pointMutationRate = Parameters::register_parameter("pointMutationRate", 0.005, "per site mutation rate", "GENOME");
+const double& Genome::insertionRate = Parameters::register_parameter("mutationCopyRate", 0.00002, "per genome insertion/deletion rate", "GENOME");
+const int& Genome::insertionMinSize = Parameters::register_parameter("mutationCopyMinSize", 10, "minimum size of insertion mutation", "GENOME");
+const int& Genome::insertionMaxSize = Parameters::register_parameter("mutationCopyMaxSize", 200, "maximum size of insertion mutation", "GENOME");
+const double& Genome::deletionRate = Parameters::register_parameter("mutationDeletionRate", 0.00002, "insertion rate per 1000 genome sites", "GENOME");
+const int& Genome::deletionMinSize = Parameters::register_parameter("mutationDeletionMinSize", 10, "minimum size of insertion mutation", "GENOME");
+const int& Genome::deletionMaxSize = Parameters::register_parameter("mutationDeletionMaxSize", 200, "maximum size of insertion mutation", "GENOME");
+const int& Genome::maxChromosomeSize = Parameters::register_parameter("chromosomeSizeMin", Genome::deletionMaxSize * 2, "if a chromosome is smaller then this, mutations will only increase chromosome size", "GENOME");
+const int& Genome::minChromosomeSize = Parameters::register_parameter("chromosomeSizeMax", 20000, "if a chromosome is larger then this, mutations will only decrease chromosome size", "GENOME");
 
-int& Genome::crossCount = Parameters::register_parameter("genomecrossCount", 3, "number of crosses when performing crossover", "GENOME");
-
-// define columns to be written to genome files
-vector<string> Genome::genomeFileColumns = { "update", "ID", "sitesCount", "chromosomeCount", "alphabetSize", "ploidy", "chromosomeLengths", "sites" };
+const int& Genome::crossCount = Parameters::register_parameter("genomecrossCount", 3, "number of crosses when performing crossover", "GENOME");
 
 // constructor
 Genome::Handler::Handler(shared_ptr<AbstractGenome> _genome, bool _readDirection) {
@@ -253,23 +250,39 @@ vector<vector<int>> Genome::Handler::readTable(pair<int,int> tableSize, pair<int
 	return table;
 }
 
+// make an empty genome and ploidy = 1
 Genome::Genome() {
 	ploidy = 1;
+	// define columns to be written to genome files
+	genomeFileColumns.clear();
+	genomeFileColumns.push_back("update");
+	genomeFileColumns.push_back("ID");
+	genomeFileColumns.push_back("sitesCount");
+	genomeFileColumns.push_back("chromosomeCount");
+	genomeFileColumns.push_back("alphabetSize");
+	genomeFileColumns.push_back("ploidy");
+	genomeFileColumns.push_back("chromosomeLengths");
+	genomeFileColumns.push_back("sites");
+	// define columns to added to ave files
+	aveFileColumns.clear();
+	aveFileColumns.push_back("genomeLength");
 }
 
-Genome::Genome(shared_ptr<AbstractChromosome> _chromosome) {
-	ploidy = 1;
+// make a genome with 1 chromosome
+Genome::Genome(shared_ptr<AbstractChromosome> _chromosome) : Genome() {
+	//ploidy = 1;
 	chromosomes.push_back(_chromosome->makeLike());
 	/////////chromosomes[0]->fillRandom();  // resize and set with random values
 	recordDataMap();
 }
 
-Genome::Genome(shared_ptr<AbstractChromosome> _chromosome, int chromosomeCount, int _plodiy) {
+// make a genome with 1 or more chromosome and ploidy >= 1
+Genome::Genome(shared_ptr<AbstractChromosome> _chromosome, int chromosomeCount, int _plodiy) : Genome() {
+	//ploidy = _plodiy;
 	if (_plodiy < 1) {
 		cout << "Error: Genome must have plodiy >= 1";
 		exit(1);
 	}
-	ploidy = _plodiy;
 	if (chromosomeCount < 1) {
 		cout << "Error: Genome must have at least one chromosome";
 		exit(1);

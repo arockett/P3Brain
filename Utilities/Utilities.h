@@ -170,17 +170,19 @@ void convertCSVListToVector(string stringData, vector<T> &returnData, const char
 		stringData = stringData.substr(1, stringData.size() - 2);  // strip off leading and trailing quotes
 	}
 	if (stringData[0] == '[') {
-		stringData = stringData.substr(1, stringData.size() - 2);  // strip off leading and trailing square brakets
+		stringData = stringData.substr(1, stringData.size() - 2);  // strip off leading and trailing square brackets
 	}
-	vector<string> dataLine = parseCSVLine(stringData, separator);
+	if (stringData.size() != 0) {  // this is not an empty list... if it is an empty list, we don't need to do anything else
+		vector<string> dataLine = parseCSVLine(stringData, separator);
 
-	T tempValue;
-	for (auto s : dataLine) {
-		bool success = load_value(s, tempValue);
-		if (!success) {
-			throw std::invalid_argument("In convertVector() attempt to convert string to value failed\n");
-		} else {
-			returnData.push_back(tempValue);
+		T tempValue;
+		for (auto s : dataLine) {
+			bool success = load_value(s, tempValue);
+			if (!success) {
+				throw std::invalid_argument("In convertCSVListToVector() attempt to convert string to value failed\n");
+			} else {
+				returnData.push_back(tempValue);
+			}
 		}
 	}
 }

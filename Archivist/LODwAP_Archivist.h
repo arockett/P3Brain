@@ -15,14 +15,14 @@ using namespace std;
 class LODwAP_Archivist : public Archivist {  // Line of Decent with Active Pruning
  public:
 
-	static int& LODwAP_Arch_dataInterval;  // how often to write out data
-	static int& LODwAP_Arch_genomeInterval;  // how often to write out genomes
-	static int& LODwAP_Arch_pruneInterval;  // how often to attempt to prune the LOD
-	static int& LODwAP_Arch_terminateAfter;  // how long to run after updates (to get better coalescence)
-	static string& LODwAP_Arch_DataFileName;  // name of the Data file
-	static string& LODwAP_Arch_GenomeFileName;  // name of the Genome file (genomes on LOD)
-	static bool& LODwAP_Arch_writeDataFile;  // if true, write data file
-	static bool& LODwAP_Arch_writeGenomeFile;  // if true, write genome file
+	static const int& LODwAP_Arch_dataInterval;  // how often to write out data
+	static const int& LODwAP_Arch_genomeInterval;  // how often to write out genomes
+	static const int& LODwAP_Arch_pruneInterval;  // how often to attempt to prune the LOD
+	static const int& LODwAP_Arch_terminateAfter;  // how long to run after updates (to get better coalescence)
+	static const string& LODwAP_Arch_DataFileName;  // name of the Data file
+	static const string& LODwAP_Arch_GenomeFileName;  // name of the Genome file (genomes on LOD)
+	static const bool& LODwAP_Arch_writeDataFile;  // if true, write data file
+	static const bool& LODwAP_Arch_writeGenomeFile;  // if true, write genome file
 
 	int dataInterval;  // how often to write out data
 	int genomeInterval;  // how often to write out genomes
@@ -44,7 +44,7 @@ class LODwAP_Archivist : public Archivist {  // Line of Decent with Active Pruni
 	//unordered_map<int, vector<weak_ptr<Organism>>> checkpoints;  // used by SSwD only - this keeps lists of orgs that may be written (if they have living decendents)
 	//// key is Global::nextGenomeWrite or Global::nextDataWrite
 
-	LODwAP_Archivist();
+	LODwAP_Archivist(vector<string> aveFileColumns = {});
 
 	virtual ~LODwAP_Archivist() = default;
 

@@ -36,51 +36,52 @@ class BerryWorld : public World {
 	const int EMPTY = 0;
 	const int WALL = 9;
 
-	static double& TSK;
-	static int& worldUpdates;
-	static int& foodTypes;
-	static double& rewardForFood1;
-	static double& rewardForFood2;
-	static double& rewardForFood3;
-	static double& rewardForFood4;
-	static double& rewardForFood5;
-	static double& rewardForFood6;
-	static double& rewardForFood7;
-	static double& rewardForFood8;
+	// Parameters
+	static const double& TSK;
+	static const int& worldUpdates;
+	static const int& foodTypes;
+	static const double& rewardForFood1;
+	static const double& rewardForFood2;
+	static const double& rewardForFood3;
+	static const double& rewardForFood4;
+	static const double& rewardForFood5;
+	static const double& rewardForFood6;
+	static const double& rewardForFood7;
+	static const double& rewardForFood8;
 
-	static double& rewardForTurn;
-	static double& rewardForMove;
+	static const double& rewardForTurn;
+	static const double& rewardForMove;
 
-	static int& ratioFood0;
-	static int& ratioFood1;
-	static int& ratioFood2;
-	static int& ratioFood3;
-	static int& ratioFood4;
-	static int& ratioFood5;
-	static int& ratioFood6;
-	static int& ratioFood7;
-	static int& ratioFood8;
+	static const int& ratioFood0;
+	static const int& ratioFood1;
+	static const int& ratioFood2;
+	static const int& ratioFood3;
+	static const int& ratioFood4;
+	static const int& ratioFood5;
+	static const int& ratioFood6;
+	static const int& ratioFood7;
+	static const int& ratioFood8;
 
-	static int& WorldY;
-	static int& WorldX;
-	static bool& borderWalls;
-	static int& randomWalls;
+	static const int& WorldY;
+	static const int& WorldX;
+	static const bool& borderWalls;
+	static const int& randomWalls;
 
-	static bool& allowMoveAndEat;
+	static const bool& allowMoveAndEat;
 
-	static bool& senseDown;
-	static bool& senseFront;
-	static bool& senseFrontSides;
-	static bool& senseWalls;
-	static bool& clearOutputs;
+	static const bool& senseDown;
+	static const bool& senseFront;
+	static const bool& senseFrontSides;
+	static const bool& senseWalls;
+	static const bool& clearOutputs;
 
-	static int& replacement;
+	static const int& replacement;
 
-	static bool& recordConsumptionRatio;
-	static bool& recordFoodList;
-	static bool& recordFoodListEatEmpty;
-	static bool& recordFoodListNoEat;
-
+	static const bool& recordConsumptionRatio;
+	static const bool& recordFoodList;
+	static const bool& recordFoodListEatEmpty;
+	static const bool& recordFoodListNoEat;
+	// end parameters
 
 	int foodRatioTotal;  // sum of ratioFood for foods in use
 	vector<int> foodRatioLookup;
