@@ -11,9 +11,6 @@
 #include "../Utilities/Random.h"
 #include "../Utilities/Utilities.h"
 
-
-bool& MarkovBrain::serialProcessing = Parameters::register_parameter("serialProcessing", false, "sets brains to overwrite... right?", "BRAIN - MARKOV");
-
 //bool& MarkovBrain::cacheResults = Parameters::register_parameter("MarkovBrain_cacheResults", true, "if true, t+1 nodes will be cached. If the same input is seen, the cached node values will be used.", "BRAIN - MARKOV");
 //int& MarkovBrain::cacheResultsCount = Parameters::register_parameter("MarkovBrain_cacheResultsCount", 1, "input combinations will be cached this many times, after this, repeats of a given input array will look up a random value from cached values", "BRAIN - MARKOV");
 
@@ -22,6 +19,10 @@ MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, int _nrInNodes, 
 	GLB = _GLB;
 	//make a node map to handle genome value to brain state address look up.
 	makeNodeMap(nodeMap, Global::bitsPerBrainAddress, nrOfBrainNodes);
+
+	// columns to be added to ave file
+	aveFileColumns.clear();
+	aveFileColumns.push_back("gates");
 }
 
 MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes) :

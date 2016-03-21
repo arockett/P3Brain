@@ -14,11 +14,15 @@
 #include "../Utilities/Utilities.h"
 #include "../Utilities/Data.h"
 
-int& World::repeats = Parameters::register_parameter("repeats", 3, "Number of times to test each Genome per generation", "WORLD");
+const int& World::repeats = Parameters::register_parameter("repeats", 3, "Number of times to test each Genome per generation", "WORLD");
 
 World::World() {
 	inputNodesCount = 1;
 	outputNodesCount = 100;
+
+	// columns to be added to ave file
+	aveFileColumns.clear();
+	aveFileColumns.push_back("score");
 }
 
 World::~World() {

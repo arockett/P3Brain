@@ -14,15 +14,15 @@ using namespace std;
 
 class SSwD_Archivist : public Archivist {  // SnapShot with Delay
  public:
-	static int& SSwD_Arch_dataInterval;  // how often to write out data
-	static int& SSwD_Arch_genomeInterval;  // how often to write out genomes
-	static int& SSwD_Arch_dataIntervalDelay;  // when using SSwD, how long is the delay
-	static int& SSwD_Arch_genomeIntervalDelay;  // when using SSwD, how long is the delay
-	static int& SSwD_Arch_cleanupInterval;  // how often to attempt to prune the LOD
-	static string& SSwD_Arch_DataFilePrefix;  // name of the Data file
-	static string& SSwD_Arch_GenomeFilePrefix;  // name of the Genome file (genomes on LOD)
-	static bool& SSwD_Arch_writeDataFiles;  // if true, write data file
-	static bool& SSwD_Arch_writeGenomeFiles;  // if true, write genome file
+	static const int& SSwD_Arch_dataInterval;  // how often to write out data
+	static const int& SSwD_Arch_genomeInterval;  // how often to write out genomes
+	static const int& SSwD_Arch_dataIntervalDelay;  // when using SSwD, how long is the delay
+	static const int& SSwD_Arch_genomeIntervalDelay;  // when using SSwD, how long is the delay
+	static const int& SSwD_Arch_cleanupInterval;  // how often to attempt to prune the LOD
+	static const string& SSwD_Arch_DataFilePrefix;  // name of the Data file
+	static const string& SSwD_Arch_GenomeFilePrefix;  // name of the Genome file (genomes on LOD)
+	static const bool& SSwD_Arch_writeDataFiles;  // if true, write data file
+	static const bool& SSwD_Arch_writeGenomeFiles;  // if true, write genome file
 
 	int dataInterval;  // how often to write out data
 	int genomeInterval;  // how often to write out genomes
@@ -43,7 +43,7 @@ class SSwD_Archivist : public Archivist {  // SnapShot with Delay
 	map<int, vector<weak_ptr<Organism>>> checkpoints;  // used by SSwD only - this keeps lists of orgs that may be written (if they have living decendents)
 	// key is Global::nextGenomeWrite or Global::nextDataWrite
 
-	SSwD_Archivist();
+	SSwD_Archivist(vector<string> aveFileColumns = {});
 
 	virtual ~SSwD_Archivist() = default;
 

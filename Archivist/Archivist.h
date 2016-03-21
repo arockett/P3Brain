@@ -28,16 +28,15 @@ using namespace std;
 class Archivist {
  public:
 
-	static string& Arch_outputMethodStr;  // string parameter for outputMethod;
-	////static int outputMethod;  // 0 = LODwAP (Line of Decent with Aggressive Pruning), 1 = SSwD (SnapShot with Delay)
+	static const string& Arch_outputMethodStr;  // string parameter for outputMethod;
 
-	static int& Arch_realtimeFilesInterval;  // how often to write out data
-	static bool& Arch_writeAveFile;  // if true, ave file will be created
-	static bool& Arch_writeDominantFile;  // if true, dominant file will be created
-	static string& Arch_AveFileName;  // name of the Averages file (ave for all brains when file is written to)
-	static string& Arch_DominantFileName;  // name of the Dominant file (all stats for best brain when file is writtne to)
-	static string& Arch_DefaultAveFileColumnNames;  // data to be saved into average file (must be values that can generate an average)
-	static bool& Arch_DominantFileShowAllLists;
+	static const int& Arch_realtimeFilesInterval;  // how often to write out data
+	static const bool& Arch_writeAveFile;  // if true, ave file will be created
+	static const bool& Arch_writeDominantFile;  // if true, dominant file will be created
+	static const string& Arch_AveFileName;  // name of the Averages file (ave for all brains when file is written to)
+	static const string& Arch_DominantFileName;  // name of the Dominant file (all stats for best brain when file is writtne to)
+	static const string& Arch_DefaultAveFileColumnNames;  // data to be saved into average file (must be values that can generate an average)
+	static const bool& Arch_DominantFileShowAllLists;
 
 	int realtimeFilesInterval;  // how often to write out data
 	bool writeAveFile;  // if true, ave file will be created
@@ -49,7 +48,7 @@ class Archivist {
 
 	bool finished;  // if finished, then as far as the archivist is concerned, we can stop the run.
 
-	Archivist();
+	Archivist(vector<string> aveFileColumns = {});
 	virtual ~Archivist() = default;
 
 	//save dominant and average file data

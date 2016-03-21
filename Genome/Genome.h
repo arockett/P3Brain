@@ -31,8 +31,6 @@ class AbstractGenome {
 
  public:
 
-	static vector<string> genomeFileColumns;
-
 	// Handlers are how you access Genomes for reading and writting.
 	// to get a handle for a genome call that that genomes newHandler() method
 	class Handler {
@@ -113,6 +111,9 @@ class AbstractGenome {
 	};
 
 	DataMap dataMap;
+	vector<string> genomeFileColumns;  // = {"ID","alphabetSize","chromosomeCount","chromosomeLength","sitesCount","genomeAncestors","sites"};
+	vector<string> aveFileColumns;  // = {"genomeLength"};
+
 
 	AbstractGenome() = default;
 
@@ -161,21 +162,19 @@ class AbstractGenome {
 class Genome : public AbstractGenome {
  public:
 
-	static int& initialPloidy;
-	static int& initialChromosomes;
-	static int& initialChromosomeSize;
-	static double& pointMutationRate;
-	static double& insertionRate;
-	static int& insertionMinSize;
-	static int& insertionMaxSize;
-	static double& deletionRate;
-	static int& deletionMinSize;
-	static int& deletionMaxSize;
-	static int& maxChromosomeSize;
-	static int& minChromosomeSize;
-	static int& crossCount;  // number of crosses to make when performing crossover
-
-	static vector<string> genomeFileColumns;  // = {"ID","alphabetSize","chromosomeCount","chromosomeLength","sitesCount","genomeAncestors","sites"};
+	static const int& initialPloidy;
+	static const int& initialChromosomes;
+	static const int& initialChromosomeSize;
+	static const double& pointMutationRate;
+	static const double& insertionRate;
+	static const int& insertionMinSize;
+	static const int& insertionMaxSize;
+	static const double& deletionRate;
+	static const int& deletionMinSize;
+	static const int& deletionMaxSize;
+	static const int& maxChromosomeSize;
+	static const int& minChromosomeSize;
+	static const int& crossCount;  // number of crosses to make when performing crossover
 
 	class Handler : public AbstractGenome::Handler {
  	public:

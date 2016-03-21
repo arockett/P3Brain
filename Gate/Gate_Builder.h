@@ -12,24 +12,24 @@
 class Gate_Builder {  // manages what kinds of gates can be built
  public:
 
-	static bool& usingProbGate;
-	static int& probGateInitialCount;
-	static bool& usingDetGate;
-	static int& detGateInitialCount;
-	static bool& usingEpsiGate;
-	static int& epsiGateInitialCount;
-	static bool& usingVoidGate;
-	static int& voidGateInitialCount;
+	static const bool& usingProbGate;
+	static const int& probGateInitialCount;
+	static const bool& usingDetGate;
+	static const int& detGateInitialCount;
+	static const bool& usingEpsiGate;
+	static const int& epsiGateInitialCount;
+	static const bool& usingVoidGate;
+	static const int& voidGateInitialCount;
 
-	static bool& usingFBGate;
-	static int& fBGateInitialCount;
-	static bool& usingGPGate;
-	static int& gPGateInitialCount;
-	static bool& usingThGate;
-	static int& thGateInitialCount;
+	static const bool& usingFBGate;
+	static const int& fBGateInitialCount;
+	static const bool& usingGPGate;
+	static const int& gPGateInitialCount;
+	static const bool& usingThGate;
+	static const int& thGateInitialCount;
 
-	static bool& usingTritDeterministicGate;
-	static int& tritDeterministicGateInitialCount;
+	static const bool& usingTritDeterministicGate;
+	static const int& tritDeterministicGateInitialCount;
 
 
 

@@ -24,8 +24,11 @@
 using namespace std;
 class AbstractBrain {
 public:
-	static string& brainTypeStr;
-	static int& hiddenNodes;
+	static const string& brainTypeStr;
+	static const int& hiddenNodes;
+	static const bool& serialProcessing;
+
+	vector<string> aveFileColumns;
 
 	int nrOfBrainNodes;  // the number of states in THIS brain
 						 // this is temporary! new node/memory/dataCell will fix this.

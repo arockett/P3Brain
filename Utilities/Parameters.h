@@ -155,7 +155,7 @@ class Parameters {
 
 // Use static calls to set up the parameter before main calls "set parameters"
 	template<class T>
-	static T& register_parameter(string name, const T& default_value, const string& documentation, const string& classification = "none") {
+	static const T& register_parameter(string name, const T& default_value, const string& documentation, const string& classification = "none") {
 		if (registry<T>().find(name) != registry<T>().end()) {
 			cout << "  - registering parameters :: \"" << name << "\" is being registered more then once... you should look into this!\n";
 		}

@@ -39,32 +39,32 @@ using namespace std;
 
 class WireBrain: public AbstractBrain {
 
-	static int& defaultWidth;
-	static int& defaultHeight;
-	static int& defaultDepth;
-	static int& worldConnectionsSeparation;
-	static int& overchargeThreshold;
-	static int& decayDuration;
-	static int& chargeUpdatesPerUpdate;
-	static bool& constantInputs;
-	static bool& cacheResults;
-	static int& cacheResultsCount;
+	static const int& defaultWidth;
+	static const int& defaultHeight;
+	static const int& defaultDepth;
+	static const int& worldConnectionsSeparation;
+	static const int& overchargeThreshold;
+	static const int& decayDuration;
+	static const int& chargeUpdatesPerUpdate;
+	static const bool& constantInputs;
+	static const bool& cacheResults;
+	static const int& cacheResultsCount;
 
-	static string& genomeDecodingMethod;  // "bitmap" = convert genome directly, "wiregenes" = genes defined by start codeons, location, direction and location
-	static int& wiregenesInitialGeneCount;
-	static double& bitmapInitialFillRatio;
+	static const string& genomeDecodingMethod;  // "bitmap" = convert genome directly, "wiregenes" = genes defined by start codeons, location, direction and location
+	static const int& wiregenesInitialGeneCount;
+	static const double& bitmapInitialFillRatio;
 
-	static bool& wiregenesAllowSimpleWires;
-	static int& wiregenesSimpleWireMaxLength;
-	static string& wiregenesSimpleWireDirections;
+	static const bool& wiregenesAllowSimpleWires;
+	static const int& wiregenesSimpleWireMaxLength;
+	static const string& wiregenesSimpleWireDirections;
 
-	static bool& wiregenesAllowWormholes;
-	static int& wiregenesWormholesBidirectional;
+	static const bool& wiregenesAllowWormholes;
+	static const int& wiregenesWormholesBidirectional;
 
-	static bool& wiregenesAllowSquiggleWires;
-	static int& wiregenesSquiggleWireMinLength;
-	static int& wiregenesSquiggleWireMaxLength;
-	static string& wiregenesSquiggleWireDirections;
+	static const bool& wiregenesAllowSquiggleWires;
+	static const int& wiregenesSquiggleWireMinLength;
+	static const int& wiregenesSquiggleWireMaxLength;
+	static const string& wiregenesSquiggleWireDirections;
 
 	const int CHARGE = 2 + decayDuration;
 
@@ -450,6 +450,11 @@ public:
 			nodesNextAddresses[i] = ((width * depth * height) - 1) - (worldConnectionsSeparation * i);
 		}
 		//cout << "  made wire brain with : " << connectionsCount << " connections and " << wireCount << " wires." << endl;
+		// columns to be added to ave file
+		aveFileColumns.clear();
+		aveFileColumns.push_back("wireBrainWireCount");
+		aveFileColumns.push_back("wireBrainConnectionsCount");
+
 
 	}
 
@@ -514,7 +519,6 @@ public:
 			nextNodes[i] = nextNodes[i] + (allCells[nodesNextAddresses[i]] == CHARGE);
 			//cout << i << " " << nodesNextAddresses[i] << " " << nodesNext[i] <<endl;
 		}
-
 	}
 
 	virtual void update() override {
