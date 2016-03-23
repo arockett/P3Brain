@@ -36,41 +36,104 @@ class BerryWorld : public World {
 	const int EMPTY = 0;
 	const int WALL = 9;
 
-	static double& TSK;
-	static int& worldUpdates;
-	static int& foodTypes;
-	static double& rewardForFood1;
-	static double& rewardForFood2;
-	static double& rewardForFood3;
-	static double& rewardForFood4;
-	static double& rewardForFood5;
-	static double& rewardForFood6;
-	static double& rewardForFood7;
-	static double& rewardForFood8;
+	// Parameters
+	static const double& TSK;
+	static const int& worldUpdates;
+	static const int& foodTypes;
+	static const double& rewardForFood1;
+	static const double& rewardForFood2;
+	static const double& rewardForFood3;
+	static const double& rewardForFood4;
+	static const double& rewardForFood5;
+	static const double& rewardForFood6;
+	static const double& rewardForFood7;
+	static const double& rewardForFood8;
 
-	static int& WorldY;
-	static int& WorldX;
-	static bool& borderWalls;
-	static int& randomWalls;
+	static const double& rewardForTurn;
+	static const double& rewardForMove;
 
-	static bool& allowMoveAndEat;
+	static const int& ratioFood0;
+	static const int& ratioFood1;
+	static const int& ratioFood2;
+	static const int& ratioFood3;
+	static const int& ratioFood4;
+	static const int& ratioFood5;
+	static const int& ratioFood6;
+	static const int& ratioFood7;
+	static const int& ratioFood8;
 
-	static bool& senseDown;
-	static bool& senseFront;
-	static bool& senseFrontSides;
-	static bool& senseWalls;
-	static bool& clearOutputs;
+	static const int& WorldY;
+	static const int& WorldX;
+	static const bool& borderWalls;
+	static const int& randomWalls;
 
-	int inputStatesCount = 0;
-	int outputStatesCount = 0;
+	static const bool& allowMoveAndEat;
+
+	static const bool& senseDown;
+	static const bool& senseFront;
+	static const bool& senseFrontSides;
+	static const bool& senseWalls;
+	static const bool& clearOutputs;
+
+	static const int& replacement;
+
+	static const bool& recordConsumptionRatio;
+	static const bool& recordFoodList;
+	static const bool& recordFoodListEatEmpty;
+	static const bool& recordFoodListNoEat;
+	// end parameters
+
+	int foodRatioTotal;  // sum of ratioFood for foods in use
+	vector<int> foodRatioLookup;
+	vector<double> foodRewards;
 
 	BerryWorld();
 
 //  double testIndividual(shared_ptr<Organism> org, bool analyse);
 
-	double testIndividual(shared_ptr<Organism> org, bool analyse, bool show);
-	double testIndividual(shared_ptr<Organism> org, bool analyse) {
-		return testIndividual(org, analyse, 0);
+	double testIndividual(shared_ptr<Organism> org, bool analyse, bool show = 0) override;
+
+	// if lastfood < 0, do not consider last food, pick randomly
+	// if
+	int pickFood(int lastfood) {
+		//cout << "In BerryWorld::pickFood(int lastfood)\n";
+		int lookup, counter, pick;
+		if (lastfood < 0) {  // if lastfood is < 0 (or was 0) then return a random food
+			lookup = Random::getInt(1, foodRatioTotal);  // get a random int [1,sum of food ratios]
+			counter = foodRatioLookup[0];  // set the counter to the ratio of replace with empty (0)
+			pick = 0;  // set pick to empty (0)
+			while (counter < lookup) {
+				pick++;  // this is not our pick, so advance to the next pick and...
+				counter += foodRatioLookup[pick];  // add this new picks ratio to counter
+			}
+		} else {  // if given a last food, pick a food that is not that.
+			if (lastfood > foodTypes) {
+				cout << "ERROR: In BerryWorld::pickFood() - lastfood > foodTypes (i.e. last food eaten is not in foodTypes!)\nExiting.\n\n";
+				exit(1);
+			}
+			if (foodRatioTotal - foodRatioLookup[lastfood] == 0){
+				cout << "ERROR: In BerryWorld::pickFood() : lastfood is not <= 0, and foodTypes = 1.\nThere is only one foodType! Pick can not be a different foodType\n\nExiting";
+				exit(1);
+			}
+			lookup = Random::getInt(1, foodRatioTotal - foodRatioLookup[lastfood]);  // get a random int [1,sum of food ratios] but leave out the ratio of last food
+			if (lastfood == 0) {  // if the last food was empty...
+				counter = foodRatioLookup[1];  // set counter to ratio of food1 instead
+				pick = 1;  // set pick to food1 (1)
+			} else {
+				counter = foodRatioLookup[0];  // set the counter to the ratio of replace with empty (0)
+				pick = 0;  // set pick to empty (0)
+			}
+			while (counter < lookup) {
+				pick++;  // this is not our pick, so advance to the next pick and...
+				if (pick == lastfood) {
+					pick++;  // if the new pick = lastfood, then skip it (we already removed the foodRatio for this food) and...
+				}
+				counter += foodRatioLookup[pick];  // add this new picks ratio to counter
+			}
+		}
+		//cout << "  Leaving BerryWorld::pickFood(int lastfood)\n";
+		return pick;
+
 	}
 
 	// convert x,y into a grid index
@@ -119,17 +182,17 @@ class BerryWorld : public World {
 				if (borderWalls && (x == 0 || x == WorldX - 1 || y == 0 || y == WorldY - 1)) {
 					setGridValue(grid, { x, y }, WALL);  // place walls on edge
 				} else {
-					setGridValue(grid, { x, y }, Random::getInt(1, foodTypes));  // place random food where there is not a wall
+					setGridValue(grid, { x, y }, pickFood(-1));  // place random food where there is not a wall
 				}
 			}
 		}
 
-		if ((randomWalls >= WorldX * WorldY) && !borderWalls){
-			cout << "In BerryWorld::makeTestGrid() To many random walls... exiting!"<<endl;
+		if ((randomWalls >= WorldX * WorldY) && !borderWalls) {
+			cout << "In BerryWorld::makeTestGrid() To many random walls... exiting!" << endl;
 			exit(1);
 		}
-		if ((randomWalls >= (WorldX-2) * (WorldY-2)) && borderWalls){
-			cout << "In BerryWorld::makeTestGrid() To many random walls... exiting!"<<endl;
+		if ((randomWalls >= (WorldX - 2) * (WorldY - 2)) && borderWalls) {
+			cout << "In BerryWorld::makeTestGrid() To many random walls... exiting!" << endl;
 			exit(1);
 		}
 

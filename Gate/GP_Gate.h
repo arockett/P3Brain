@@ -22,8 +22,8 @@ class GPGate : public Gate {
 	GPGate() = delete;
 	GPGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
 	virtual ~GPGate() = default;
-	virtual void update(vector<double> & states, vector<double> & nextStates);
-	virtual string description();
+	virtual void update(vector<double> & states, vector<double> & nextStates) override;
+	virtual string description() override;
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__GP_Gate__) */

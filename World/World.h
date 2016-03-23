@@ -20,16 +20,19 @@ using namespace std;
 
 class World {
  public:
-	static int& repeats;
+	const static int& repeats;
 
- public:
+	vector<string> aveFileColumns;
+
+	int inputNodesCount = 0;
+	int outputNodesCount = 0;
+
 	World();
 	virtual ~World();
 	virtual void evaluateFitness(vector<shared_ptr<Organism>> population, bool analyse);
-	virtual double testIndividual(shared_ptr<Organism> org, bool analyse);
-	virtual double testIndividual(shared_ptr<Organism> org, bool analyse, bool show) {
-		return testIndividual(org, analyse);
-	}
+	virtual double testIndividual(shared_ptr<Organism> org, bool analyse, bool show = 0);
+	virtual int requiredInputs();
+	virtual int requiredOutputs();
 
 };
 

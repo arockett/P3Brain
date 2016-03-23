@@ -16,10 +16,10 @@
 
 using namespace std;
 
-string& BaseOptimizer::Optimizer_MethodStr = Parameters::register_parameter("optimizer", (string) "GA", "optimizer to be used in evolution loop, [GA, Tournament, Tournament2]", "OPTIMIZER");  // string parameter for outputMethod;
+const string& BaseOptimizer::Optimizer_MethodStr = Parameters::register_parameter("optimizer", (string) "GA", "optimizer to be used in evolution loop, [GA, Tournament, Tournament2]", "OPTIMIZER");  // string parameter for outputMethod;
 
-int& BaseOptimizer::elitism = Parameters::register_parameter("elitism", 0, "if the chosen optimizer allows for elitism, The highest scoring brain will be included in the next generation this many times (0 = no elitism)?", "OPTIMIZER");
-int& BaseOptimizer::tournamentSize = Parameters::register_parameter("tournamentSize", 5, "how many genomes to consider when doing Tournament selection? 1 will result in random selection.", "OPTIMIZER - TOURNAMENT");
+const int& BaseOptimizer::elitism = Parameters::register_parameter("elitism", 0, "if the chosen optimizer allows for elitism, The highest scoring brain will be included in the next generation this many times (0 = no elitism)?", "OPTIMIZER");
+const int& BaseOptimizer::tournamentSize = Parameters::register_parameter("tournamentSize", 5, "how many genomes to consider when doing Tournament selection? 1 will result in random selection.", "OPTIMIZER - TOURNAMENT");
 
 /*
  * Optimizer::makeNextGeneration(vector<Genome*> population, vector<double> W)

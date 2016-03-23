@@ -19,6 +19,7 @@
 #include "Archivist/snapshot_Archivist.h"
 #include "Archivist/SSwD_Archivist.h"
 #include "Brain/MarkovBrain.h"
+#include "Brain/WireBrain.h"
 
 #include "Genome/Genome.h"
 
@@ -42,12 +43,9 @@ using namespace std;
 
 int main(int argc, const char * argv[]) {
 
-	cout << "\n\n" << "\tMM   MM      A       BBBBBB    EEEEEE\n" << "\tMMM MMM     AAA      BB   BB   EE\n" << "\tMMMMMMM    AA AA     BBBBBB    EEEEEE\n" << "\tMM M MM   AAAAAAA    BB   BB   EE\n" << "\tMM   MM  AA     AA   BBBBBB    EEEEEE\n" << "\n" << "\tModular    Agent      Based    Evolver\n\n\n\thttp://hintzelab.msu.edu/MABE\n\n\n";
+	cout << "\n\n" << "\tMM   MM      A       BBBBBB    EEEEEE\n" << "\tMMM MMM     AAA      BB   BB   EE\n" << "\tMMMMMMM    AA AA     BBBBBB    EEEEEE\n" << "\tMM M MM   AAAAAAA    BB   BB   EE\n" << "\tMM   MM  AA     AA   BBBBBB    EEEEEE\n" << "\n" << "\tModular    Agent      Based    Evolver\n\n\n\thttp://hintzelab.msu.edu/MABE\n\n" << endl;
 	Parameters::initialize_parameters(argc, argv);  // loads command line and configFile values into registered parameters
-	                                                // also writes out a config file if requested
-	//make a node map to handle genome value to brain state address look up.
-	MarkovBrain::makeNodeMap(MarkovBrain::defaultNodeMap, Global::bitsPerBrainAddress, MarkovBrain::defaultNrOfBrainStates);
-
+													// also writes out a config file if requested
 	Gate_Builder::setupGates();  // determines which gate types will be in use.
 
 	// outputDirectory must exist. If outputDirectory does not exist, no error will occur, but no data will be writen.
@@ -55,11 +53,15 @@ int main(int argc, const char * argv[]) {
 
 	if (Global::randomSeed == -1) {
 		random_device rd;
-		Random::getCommonGenerator().seed(rd());
+		int temp = rd();
+		Random::getCommonGenerator().seed(temp);
+		cout << "Generating Random Seed\n  "<< temp <<endl;
 	} else {
 		Random::getCommonGenerator().seed(Global::randomSeed);
+		cout << "Using Random Seed: " << Global::randomSeed << endl;
 	}
-	World *world = (World*) new BerryWorld();  //new World();
+
+	auto world = make_shared<BerryWorld>();  //new World();
 	//World *world = (World*) new World();  //new World();
 
 // test chromosome crossover speed
@@ -115,14 +117,121 @@ int main(int argc, const char * argv[]) {
 	// define population
 	//////////////////
 
+//	///////////////////////// test reading a writing to genomes ///////////////////////////////////////////
+//	auto initalChromosome = make_shared<Chromosome<int>>(200, 10);
+//	auto initalGenome = make_shared<Genome>(initalChromosome, 2, 1);
+//	auto initalBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
+//	int testStartCode = 43;
+//	initalGenome->fillAcending();
+//	initalGenome->printGenome();
+//
+//	auto handler = initalGenome->newHandler(initalGenome,1);
+//
+//	handler->writeInt(200,182,255);
+//	handler->writeInt(8,7,25);
+//	handler->writeInt(5,2,8);
+//	handler->writeInt(3,1,9);
+//	handler->resetHandler();
+//
+//	cout << handler->readInt(182,255) << endl;
+//	cout << handler->readInt(7,25) << endl;
+//	cout << handler->readInt(2,8) << endl;
+//	cout << handler->readInt(1,9) << endl;
+//
+//	initalGenome->printGenome();
+//
+//	exit(1);
+//	///////////////////////// end test reading a writing to genomes ///////////////////////////////////////////
+//
+//	///////////////////////// test genome to gate translation /////////////////////////////////////////////////
+//	auto initalChromosome = make_shared<Chromosome<int>>(400, 2);
+//	auto initalGenome = make_shared<Genome>(initalChromosome, 2, 2);
+//	auto initalBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
+//	int testStartCode = 43;
+//	initalGenome->fillAcending();
+//	initalGenome->printGenome();
+//
+//	auto handler = initalGenome->newHandler(initalGenome,1);
+//
+//	handler->writeInt(200,0,255);
+//	handler->writeInt(201,0,255);
+//	handler->writeInt(testStartCode,0,255);
+//	handler->writeInt(255-testStartCode,0,255);
+//
+//	handler->writeInt(4,1,4); // 4 in
+//	handler->writeInt(4,1,4); // 4 out
+//
+//	handler->writeInt(3,0,255); // in 1
+//	handler->writeInt(2,0,255); // in 2
+//	handler->writeInt(1,0,255); // ..
+//	handler->writeInt(0,0,255); // ..
+//	handler->writeInt(2,0,255); // out 1
+//	handler->writeInt(4,0,255); // ..
+//	handler->writeInt(6,0,255); // ..
+//	handler->writeInt(8,0,255); // ..
+//
+//	handler->advanceIndex(180);
+//	handler->writeInt(testStartCode,0,255);
+//	handler->writeInt(255-testStartCode,0,255);
+//	handler->writeInt(1,1,4); // 1 in
+//	handler->writeInt(1,1,4); // 1 out
+//
+//	handler->advanceIndex(2);
+//	handler->writeInt(testStartCode,0,255);
+//	handler->writeInt(255-testStartCode,0,255);
+//	handler->writeInt(4,1,4); // 4 in
+//	handler->writeInt(4,1,4); // 4 out
+//
+//	handler->writeInt(7,0,255); // in 1
+//	handler->writeInt(6,0,255); // in 2
+//	handler->writeInt(5,0,255); // ..
+//	handler->writeInt(4,0,255); // ..
+//	handler->writeInt(4,0,255); // out 1
+//	handler->writeInt(5,0,255); // ..
+//	handler->writeInt(6,0,255); // ..
+//	handler->writeInt(7,0,255); // ..
+//
+//	handler->advanceIndex(100);
+//	handler->writeInt(testStartCode,0,255);
+//	handler->writeInt(255-testStartCode,0,255);
+//	handler->writeInt(4,1,4); // 4 in
+//	handler->writeInt(4,1,4); // 4 out
+//
+//	handler->writeInt(1,0,255); // in 1
+//	handler->writeInt(3,0,255); // in 2
+//	handler->writeInt(5,0,255); // ..
+//	handler->writeInt(7,0,255); // ..
+//	handler->writeInt(5,0,255); // out 1
+//	handler->writeInt(3,0,255); // ..
+//	handler->writeInt(1,0,255); // ..
+//	handler->writeInt(9,0,255); // ..
+//
+//	initalGenome->printGenome();
+//		shared_ptr<Organism> testSubject = make_shared<Organism>(initalGenome, initalBrain);  // make a organism with a genome and brain (if you need to change the types here is where you do it)
+//
+//	cout << "brain" << endl;
+//	cout << testSubject->brain->description() << endl;
+//
+//	cout << "coding regions" << endl;
+//	auto test_genome = dynamic_pointer_cast<Genome>(testSubject->genome);
+//	for (auto c : test_genome->chromosomes){
+//		auto convertedC = dynamic_pointer_cast<Chromosome<int>>(c);
+//		cout << convertedC->codingRegionsToString() << endl<< endl;
+//	}
+//	exit (100);
+//	///////////////////////// test end ///////////////////////////////////////////
+
 	shared_ptr<Group> group;
 
 	{
+
+
 		// a progenitor must exist - that is, one ancestor genome
 		Global::update = -1;  // before there was time, there was a progenitor
 		//shared_ptr<MarkovBrain> tesBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
-		auto initalChromosome = make_shared<Chromosome<int>>(Genome::initialChromosomeSize, 256);
+		auto initalChromosome = make_shared<Chromosome<unsigned char>>(Genome::initialChromosomeSize, 256);
 		auto initalGenome = make_shared<Genome>(initalChromosome, Genome::initialChromosomes, Genome::initialPloidy);
+
 //		vector<shared_ptr<AbstractGenome>> genomes;
 //		for (int i = 0; i < 500; i++) {
 //			cout << i << " " << flush;
@@ -133,7 +242,16 @@ int main(int argc, const char * argv[]) {
 //		}
 //		exit(17);
 
-		auto initalBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
+		shared_ptr<AbstractBrain> initalBrain;
+		if (AbstractBrain::brainTypeStr == "Markov") {
+			initalBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>(),world->requiredInputs(),world->requiredOutputs(),AbstractBrain::hiddenNodes);
+		} else if (AbstractBrain::brainTypeStr == "Wire") {
+			initalBrain = make_shared<WireBrain>(world->requiredInputs(),world->requiredOutputs(),AbstractBrain::hiddenNodes);
+		} else {
+			cout << "\n\nERROR: Unrecognized brain type in configuration!\n  \"" << AbstractBrain::brainTypeStr << "\" is not defined.\n\nExiting.\n" << endl;
+			exit(1);
+		}
+
 		shared_ptr<Organism> progenitor = make_shared<Organism>(initalGenome, initalBrain);  // make a organism with a genome and brain (if you need to change the types here is where you do it)
 
 		Global::update = 0;  // the beginning of time - now we construct the first population
@@ -141,24 +259,12 @@ int main(int argc, const char * argv[]) {
 
 		for (int i = 0; i < Global::popSize; i++) {
 			shared_ptr<Genome> genome = make_shared<Genome>(initalChromosome, Genome::initialChromosomes, Genome::initialPloidy);
-			genome->fillRandom();
-			auto genomeHandler = genome->newHandler(genome);
-
-			for (int i = 0; i < 5; i++) {
-				genomeHandler->randomize();
-				genomeHandler->writeInt(43, 0, 255);
-				genomeHandler->writeInt(255 - 43, 0, 255);
-				genomeHandler->writeInt(1, 0, 255);
-				genomeHandler->writeInt(2, 0, 255);
-				genomeHandler->writeInt(3, 0, 255);
-			}
-
+			progenitor->brain->initalizeGenome(genome);
 			shared_ptr<Organism> org = make_shared<Organism>(progenitor, genome);
 			population.push_back(org);  // add a new org to population using progenitors template and a new random genome
 			population[population.size() - 1]->gender = Random::getInt(0, 1);  // assign a random gender to the new org
 		}
 		progenitor->kill();  // the progenitor has served it's purpose.
-
 /////// to test genome to brain conversion and coding regions, set popsize = 1 and uncomment the block below this comment
 //		shared_ptr<Organism> test_org = dynamic_pointer_cast<Organism>(population[0]);
 //		shared_ptr<Genome> test_genome = dynamic_pointer_cast<Genome>(test_org->genome);
@@ -179,34 +285,50 @@ int main(int argc, const char * argv[]) {
 //		exit(1);
 /////// to test genome to brain conversion and coding regions, set popsize = 1 and uncomment the block above this comment
 
-		shared_ptr<Archivist> archivist;
-
-		if (Archivist::Arch_outputMethodStr == "default") {
-			archivist = make_shared<Archivist>();
-		}
-		if (Archivist::Arch_outputMethodStr == "LODwAP") {
-			archivist = make_shared<LODwAP_Archivist>();
-		}
-		if (Archivist::Arch_outputMethodStr == "snapshot") {
-			archivist = make_shared<Snapshot_Archivist>();
-		}
-		if (Archivist::Arch_outputMethodStr == "SSwD") {
-			archivist = make_shared<SSwD_Archivist>();
-		}
-
 		shared_ptr<BaseOptimizer> optimizer;
 
 		if (BaseOptimizer::Optimizer_MethodStr == "GA") {
 			optimizer = make_shared<GA_Optimizer>();
-		}
-		if (BaseOptimizer::Optimizer_MethodStr == "Tournament") {
+			cout << "Using GA Optimizer" << endl;
+		} else if (BaseOptimizer::Optimizer_MethodStr == "Tournament") {
 			optimizer = make_shared<TournamentOptimizer>();
-		}
-		if (BaseOptimizer::Optimizer_MethodStr == "Tournament2") {
+			cout << "Using Tournament Optimizer" << endl;
+		} else if (BaseOptimizer::Optimizer_MethodStr == "Tournament2") {
 			optimizer = make_shared<Tournament2Optimizer>();
+			cout << "Using Tournament2 Optimizer" << endl;
+		} else {
+			cout << "\n\nERROR: Unrecognized optimizer type in configuration!\n  \"" << BaseOptimizer::Optimizer_MethodStr << "\" is not defined.\n\nExiting.\n" << endl;
+			exit(1);
 		}
 
-		//optimizer = make_shared<BaseOptimizer>();
+
+
+		vector<string> aveFileColumns;
+		aveFileColumns.clear();
+		aveFileColumns.push_back("update");
+		aveFileColumns.insert(aveFileColumns.end(), world->aveFileColumns.begin(), world->aveFileColumns.end());
+		aveFileColumns.insert(aveFileColumns.end(), population[0]->genome->aveFileColumns.begin(), population[0]->genome->aveFileColumns.end());
+		aveFileColumns.insert(aveFileColumns.end(), population[0]->brain->aveFileColumns.begin(), population[0]->brain->aveFileColumns.end());
+
+		shared_ptr<Archivist> archivist;
+
+		if (Archivist::Arch_outputMethodStr == "default") {
+			archivist = make_shared<Archivist>(aveFileColumns);
+			cout << "Using Default Archivist" << endl;
+		} else if (Archivist::Arch_outputMethodStr == "LODwAP") {
+			archivist = make_shared<LODwAP_Archivist>(aveFileColumns);
+			cout << "Using Line of Decent with Aggressive Pruning Archivist" << endl;
+		} else if (Archivist::Arch_outputMethodStr == "snapshot") {
+			archivist = make_shared<Snapshot_Archivist>(aveFileColumns);
+			cout << "Using Snapshot Archivist" << endl;
+		} else if (Archivist::Arch_outputMethodStr == "SSwD") {
+			archivist = make_shared<SSwD_Archivist>(aveFileColumns);
+			cout << "Using Snapshot with Delay Archivist" << endl;
+		} else {
+			cout << "\n\nERROR: Unrecognized archivist type in configuration!\n  \"" << Archivist::Arch_outputMethodStr << "\" is not defined.\n\nExiting.\n" << endl;
+			exit(1);
+		}
+
 		group = make_shared<Group>(population, optimizer, archivist);
 	}
 
@@ -218,21 +340,21 @@ int main(int argc, const char * argv[]) {
 
 	while (!finished) {
 		world->evaluateFitness(group->population, false);  // evaluate each organism in the population using a World
-		cout << "  evaluation done\n";
+		//cout << "  evaluation done\n";
 		finished = group->archive();  // save data, update memory and delete any unneeded data;
-		cout << "  archive done\n";
+		//cout << "  archive done\n";
 		Global::update++;
 		group->optimize();  // update the population (reproduction and death)
-		cout << "  optimize done\n";
-		cout << "update: " << Global::update - 1 << "   maxFitness: " << group->optimizer->maxFitness << "\n";
+		//cout << "  optimize done\n";
+		cout << "update: " << Global::update - 1 << "   maxFitness: " << group->optimizer->maxFitness << "" << endl;
 	}
 
 	group->archive(1);  // flush any data that has not been output yet
 
-	if (Archivist::Arch_outputMethodStr == "LODwAP") {  // if using LODwAP, write out some info about MRCA
-		shared_ptr<Organism> FinalMRCA = group->population[0]->getMostRecentCommonAncestor(group->population[0]);
-		cout << "MRCA - ID: " << FinalMRCA->ID << " born on: " << FinalMRCA->timeOfBirth << "\n" << FinalMRCA->brain->description();
-		//cout << "\n\n" << FinalMRCA->genome->showCodingRegions();
-	}
+	//if (Archivist::Arch_outputMethodStr == "LODwAP") {  // if using LODwAP, write out some info about MRCA
+	//	shared_ptr<Organism> FinalMRCA = group->population[0]->getMostRecentCommonAncestor(group->population[0]);
+	//	cout << "MRCA - ID: " << FinalMRCA->ID << " born on: " << FinalMRCA->timeOfBirth << endl << FinalMRCA->brain->description() << endl;
+	//	//cout << "\n\n" << FinalMRCA->genome->showCodingRegions();
+	//}
 	return 0;
 }

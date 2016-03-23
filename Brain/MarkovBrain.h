@@ -30,12 +30,12 @@ class MarkovBrain : public AbstractBrain {
 	shared_ptr<Base_GateListBuilder> GLB;
 
  public:
-	static int& defaultNrOfBrainStates;  // default value for number of states in all brains
-	//int nrOfBrainStates;  // the number of states in THIS brain
-	static bool& serialProcessing;  // write directly states (overwrite) - do not use nextStates
+
+//	static bool& cacheResults;
+//	static int& cacheResultsCount;
 
 	static void initializeParameters();
-	static vector<int> defaultNodeMap;
+	vector<int> nodeMap;
 
 	/*
 	 * Builds a look up table to convert genome site values into brain state addresses - this is only used when there is a fixed number of brain states
@@ -49,51 +49,28 @@ class MarkovBrain : public AbstractBrain {
 		return 1;
 	}
 
-	//Genome *genome;
-	vector<double> states;
-	vector<double> nextStates;
-
 	MarkovBrain() = delete;
 
-	MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, int _nrOfStates = defaultNrOfBrainStates);
-	MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> startGenome, int _nrOfStates = defaultNrOfBrainStates);
+	MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes);
+	MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes);
 	virtual ~MarkovBrain() = default;
 
-	virtual void update();
+	virtual void update() override;
 
 	void inOutReMap();
 
-	virtual shared_ptr<AbstractBrain> makeBrainFromGenome(shared_ptr<AbstractGenome> _genome);
+	virtual shared_ptr<AbstractBrain> makeBrainFromGenome(shared_ptr<AbstractGenome> _genome) override;
 
-	virtual string description();
-	virtual vector<string> getStats();
+	virtual string description() override;
+	virtual vector<string> getStats() override;
 
-	virtual int IntFromState(vector<int> I);
-	virtual int IntFromAllStates();
-	virtual void resetBrain();
+	virtual void resetBrain() override;
 	virtual string gateList();
 	virtual vector<vector<int>> getConnectivityMatrix();
 	virtual int brainSize();
-	//set<int> findCodingRegions(int mask);
 	int numGates();
 
- public:
-	inline void setState(const int& state, const double& value) {
-		if (state < (int) states.size()) {
-			states[state] = value;
-		} else {
-			cout << "Writing to invalid brain state - this brain needs more states!\nExiting\n";
-			exit(1);
-		}
-	}
-	inline double getState(const int& state) {
-		if (state < (int) states.size()) {
-			return states[state];
-		} else {
-			cout << "Reading from invalid brain state - this brain needs more states!\nExiting\n";
-			exit(1);
-		}
-	}
+	virtual void initalizeGenome(shared_ptr<AbstractGenome> _genome);
 
 };
 

@@ -22,10 +22,10 @@ using namespace std;
 
 class BaseOptimizer {
  public:
-	static string& Optimizer_MethodStr;
+	const static string& Optimizer_MethodStr;
 
-	static int& elitism;
-	static int& tournamentSize;
+	const static int& elitism;
+	const static int& tournamentSize;
 
  public:
 	double maxFitness;

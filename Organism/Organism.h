@@ -70,8 +70,8 @@ class Organism : public AbstractOrganism {
 	virtual vector<shared_ptr<Organism>> getLOD(shared_ptr<Organism> org);
 	virtual shared_ptr<Organism> getMostRecentCommonAncestor(shared_ptr<Organism> org);
 	virtual shared_ptr<Organism> getMostRecentCommonAncestor(vector<shared_ptr<Organism>> LOD);
-	virtual shared_ptr<Organism> makeMutatedOffspring(shared_ptr<Organism> parent);
-	virtual shared_ptr<Organism> makeMutatedOffspring(vector<shared_ptr<Organism>> from);
+	virtual shared_ptr<Organism> makeMutatedOffspringFrom(shared_ptr<Organism> parent);
+	virtual shared_ptr<Organism> makeMutatedOffspringFromMany(vector<shared_ptr<Organism>> from);
 	virtual void clearHistory();  // clear all historical data (used when only saving real time data)
 };
 

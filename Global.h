@@ -21,20 +21,21 @@ using namespace std;
 class Global {
  public:
 	// parameters
-	static int& randomSeed;  // seed for random number generator, if -1 random number generator will be seeded randomly
-	static int& updates;  // run until there is a MCRA at this time
-	static int& popSize;  // number of genomes in the population
+	static const int& randomSeed;  // seed for random number generator, if -1 random number generator will be seeded randomly
+	static const int& updates;  // run until there is a MCRA at this time
+	static const int& popSize;  // number of genomes in the population
 
-	static string& outputDirectory;  // where files will be written
+	static const string& outputDirectory;  // where files will be written
 
-	static int& bitsPerBrainAddress;  // how many bits are evaluated to determine the brain addresses.
+	static const int& bitsPerBrainAddress;  // how many bits are evaluated to determine the brain addresses.
 	                                  // i.e. ceil(bitsPerBrainAddress/8) = number of genome sites used
+	static const int& bitsPerCodon;
 
 	                                  //////////
 	                                  // Below are non configurable values (not set directly by Parameters.h methods)
 	                                  //////////
 	static int update;  // the current "time"
-	static set<int> inUseGateTypes;  // this is global - a list of the start codeons for gates being used
+
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Global__) */

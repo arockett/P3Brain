@@ -27,11 +27,11 @@ class FeedbackGate : public Gate {
 	FeedbackGate() = delete;
 	FeedbackGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
 	virtual ~FeedbackGate() = default;
-	virtual void update(vector<double> & states, vector<double> & nextStates);
-	virtual string description();
+	virtual void update(vector<double> & states, vector<double> & nextStates) override;
+	virtual string description() override;
 	virtual void applyNodeMap(vector<int> nodeMap, int maxNodes);
-	virtual void resetGate(void);
-	virtual vector<int> getIns();
+	virtual void resetGate(void) override;
+	virtual vector<int> getIns() override;
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Feedback_Gate__) */

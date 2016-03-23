@@ -14,9 +14,15 @@
 #include "../Utilities/Utilities.h"
 #include "../Utilities/Data.h"
 
-int& World::repeats = Parameters::register_parameter("repeats", 3, "Number of times to test each Genome per generation", "WORLD");
+const int& World::repeats = Parameters::register_parameter("repeats", 3, "Number of times to test each Genome per generation", "WORLD");
 
 World::World() {
+	inputNodesCount = 1;
+	outputNodesCount = 100;
+
+	// columns to be added to ave file
+	aveFileColumns.clear();
+	aveFileColumns.push_back("score");
 }
 
 World::~World() {
@@ -24,18 +30,38 @@ World::~World() {
 
 void World::evaluateFitness(vector<shared_ptr<Organism>> population, bool analyse) {
 	for (size_t i = 0; i < population.size(); i++) {
+		double score;
 		double scoreTotal = 0.0;
 		for (int r = 0; r < World::repeats; r++) {
-			scoreTotal += testIndividual(population[i], analyse);
+			score = testIndividual(population[i], analyse);
+			scoreTotal += score;
+			population[i]->dataMap.Append("allscore", score);
 		}
 		population[i]->score = (scoreTotal / (double) World::repeats);
-		population[i]->dataMap.Set("score", population[i]->score);
+		//cout << population[i]->score << " " << flush;
+		//population[i]->dataMap.Set("score", population[i]->score);
 		population[i]->dataMap.Set("update", Global::update);
 	}
+	//cout << "\n";
 }
 
-double World::testIndividual(shared_ptr<Organism> org, bool analyse) {
-	return 1.0;
+// score is number of outputs set to 1 (i.e. output > 0) squared
+double World::testIndividual(shared_ptr<Organism> org, bool analyse, bool show) {
+	org->brain->resetBrain();
+	org->brain->setInput(0,1); // give the brain a constant 1 (for wire brain)
+	org->brain->update();
+	double w = 0.0;
+	for (int i = 0; i < org->brain->nrOutNodes; i++) {
+		w += Bit(org->brain->readOutput(i)) & 1;
+	}
+	return w * w;
+}
+
+int World::requiredInputs() {
+	return inputNodesCount;
+}
+int World::requiredOutputs() {
+	return outputNodesCount;
 }
 
 ///* *** Example World Implementation *** */

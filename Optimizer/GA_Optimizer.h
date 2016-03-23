@@ -15,7 +15,7 @@ using namespace std;
 
 class GA_Optimizer : public BaseOptimizer {
  public:
-	virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
+	virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population) override;
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__GA_Optimizer__) */

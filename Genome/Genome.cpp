@@ -14,24 +14,21 @@
 
 // Initialize Parameters
 
-int& Genome::initialPloidy = Parameters::register_parameter("ploidy", 1, "number of copies of each chromosome", "GENOME");
-int& Genome::initialChromosomes = Parameters::register_parameter("chromosomes", 1, "number of chromosome pairs (i.e. if chromosomes = 2 and ploidy = 2 there will be 4 chromosomes in the genome)", "GENOME");
+const int& Genome::initialPloidy = Parameters::register_parameter("ploidy", 1, "number of copies of each chromosome", "GENOME");
+const int& Genome::initialChromosomes = Parameters::register_parameter("chromosomes", 1, "number of chromosome pairs (i.e. if chromosomes = 2 and ploidy = 2 there will be 4 chromosomes in the genome)", "GENOME");
 
-int& Genome::initialChromosomeSize = Parameters::register_parameter("chromosomeSizeInitial", 1000, "starting size for all chromosomes in genome (genome size will be chromosomeSizeInitial * number of chromosomes * ploidy)", "GENOME");
-double& Genome::pointMutationRate = Parameters::register_parameter("pointMutationRate", 0.005, "per site mutation rate", "GENOME");
-double& Genome::insertionRate = Parameters::register_parameter("mutationCopyRate", 0.00002, "per genome insertion/deletion rate", "GENOME");
-int& Genome::insertionMinSize = Parameters::register_parameter("mutationCopyMinSize", 10, "minimum size of insertion mutation", "GENOME");
-int& Genome::insertionMaxSize = Parameters::register_parameter("mutationCopyMaxSize", 200, "maximum size of insertion mutation", "GENOME");
-double& Genome::deletionRate = Parameters::register_parameter("mutationDeletionRate", 0.00002, "insertion rate per 1000 genome sites", "GENOME");
-int& Genome::deletionMinSize = Parameters::register_parameter("mutationDeletionMinSize", 10, "minimum size of insertion mutation", "GENOME");
-int& Genome::deletionMaxSize = Parameters::register_parameter("mutationDeletionMaxSize", 200, "maximum size of insertion mutation", "GENOME");
-int& Genome::maxChromosomeSize = Parameters::register_parameter("chromosomeSizeMin", Genome::deletionMaxSize * 2, "if a chromosome is smaller then this, mutations will only increase chromosome size", "GENOME");
-int& Genome::minChromosomeSize = Parameters::register_parameter("chromosomeSizeMax", 20000, "if a chromosome is larger then this, mutations will only decrease chromosome size", "GENOME");
+const int& Genome::initialChromosomeSize = Parameters::register_parameter("chromosomeSizeInitial", 10000, "starting size for all chromosomes in genome (genome size will be chromosomeSizeInitial * number of chromosomes * ploidy)", "GENOME");
+const double& Genome::pointMutationRate = Parameters::register_parameter("pointMutationRate", 0.005, "per site mutation rate", "GENOME");
+const double& Genome::insertionRate = Parameters::register_parameter("mutationCopyRate", 0.00002, "per genome insertion/deletion rate", "GENOME");
+const int& Genome::insertionMinSize = Parameters::register_parameter("mutationCopyMinSize", 10, "minimum size of insertion mutation", "GENOME");
+const int& Genome::insertionMaxSize = Parameters::register_parameter("mutationCopyMaxSize", 200, "maximum size of insertion mutation", "GENOME");
+const double& Genome::deletionRate = Parameters::register_parameter("mutationDeletionRate", 0.00002, "insertion rate per 1000 genome sites", "GENOME");
+const int& Genome::deletionMinSize = Parameters::register_parameter("mutationDeletionMinSize", 10, "minimum size of insertion mutation", "GENOME");
+const int& Genome::deletionMaxSize = Parameters::register_parameter("mutationDeletionMaxSize", 200, "maximum size of insertion mutation", "GENOME");
+const int& Genome::maxChromosomeSize = Parameters::register_parameter("chromosomeSizeMin", Genome::deletionMaxSize * 2, "if a chromosome is smaller then this, mutations will only increase chromosome size", "GENOME");
+const int& Genome::minChromosomeSize = Parameters::register_parameter("chromosomeSizeMax", 20000, "if a chromosome is larger then this, mutations will only decrease chromosome size", "GENOME");
 
-int& Genome::crossCount = Parameters::register_parameter("genomecrossCount", 3, "number of crosses when performing crossover", "GENOME");
-
-// define columns to be written to genome files
-vector<string> Genome::genomeFileColumns = { "update", "ID", "sitesCount", "chromosomeCount", "alphabetSize", "ploidy", "chromosomeLengths", "sites" };
+const int& Genome::crossCount = Parameters::register_parameter("genomecrossCount", 3, "number of crosses when performing crossover", "GENOME");
 
 // constructor
 Genome::Handler::Handler(shared_ptr<AbstractGenome> _genome, bool _readDirection) {
@@ -49,9 +46,17 @@ void Genome::Handler::resetHandler() {
 		siteIndex = genome->chromosomes[chromosomeIndex]->size() - 1;  // set to last site in last chromosome
 	}
 	resetEOG();
+	resetEOC();
 }
 
-
+void Genome::Handler::resetHandlerOnChromosome() {
+	if (readDirection) {  // if reading forward
+		siteIndex = 0;
+	} else {  // if reading backwards
+		siteIndex = genome->chromosomes[chromosomeIndex]->size() - 1;  // set to last site in last chromosome
+	}
+	resetEOC();
+}
 // modulateIndex checks to see if the current chromosomeIndex and siteIndex are out of range. if they are
 // it uses readDirection to resolve them.	virtual void copyFrom(shared_ptr<Genome> from) {
 
@@ -66,18 +71,20 @@ void Genome::Handler::modulateIndex() {
 		if (chromosomeIndex >= (int) genome->chromosomes.size()) {
 			chromosomeIndex = 0;  // reset chromosomeIndex
 			EOG = true;  // if we are past the last chromosome then EOG = true
+			EOC = true;
 		}
 
 		// now that we know that the chromosome index is in range, check the site index
 		if (genome->chromosomes[chromosomeIndex]->modulateIndex(siteIndex)) {
 			chromosomeIndex++;	// if the site index is out of range, increment the chromosomeIndex
-			siteIndex = 0;		// ... and reset the site index
 			// now that we know that the site index is also in range, we have to check the chromosome index again!
 			if (chromosomeIndex >= (int) genome->chromosomes.size()) {
 				chromosomeIndex = 0;	// if the site index is out of range, increment the chromosomeIndex
 				siteIndex = 0;			// ... and reset the site index
 				EOG = true;
 			};
+			siteIndex = 0;		// ... and reset the site index
+			EOC = true;
 		}
 	} else {  //reading backwards!
 		// first see if we are past last chromosome
@@ -85,6 +92,7 @@ void Genome::Handler::modulateIndex() {
 			chromosomeIndex = ((int) genome->chromosomes.size()) - 1;  // reset chromosomeIndex (to last chromosome)
 			siteIndex = genome->chromosomes[chromosomeIndex]->size() - 1;  // reset siteIndex (to last site in this chromosome)
 			EOG = true;  // if we are past the last chromosome then EOG = true
+			EOC = true;
 		}
 
 		// now that we know that the chromosome index is in range, check the site index
@@ -96,6 +104,7 @@ void Genome::Handler::modulateIndex() {
 				EOG = true;
 			}
 			siteIndex = genome->chromosomes[chromosomeIndex]->size() - 1;	// reset siteIndex (to last site in this chromosome)
+			EOC = true;
 		}
 
 	}
@@ -107,7 +116,7 @@ void Genome::Handler::modulateIndex() {
 // i.e. if the chromosome was length 10, and the current siteIndex = 0, advanceIndex(15) will advance to
 // site 5 of the next chromosome. Should this be fixed?!??
 void Genome::Handler::advanceIndex(int distance) {
-	modulateIndex();
+	//modulateIndex();
 	if (readDirection) {	// reading forward
 		if ((genome->chromosomes[chromosomeIndex]->size() - siteIndex) > distance) {
 			siteIndex += distance;	// if there are enough sites left in the current chromosome, just move siteIndex
@@ -138,6 +147,11 @@ bool Genome::Handler::atEOG() {
 	return EOG;
 }
 
+bool Genome::Handler::atEOC() {
+	modulateIndex();
+	return EOC;
+}
+
 void Genome::Handler::advanceChromosome() {
 	chromosomeIndex += (readDirection) ? 1 : (-1);  //move index
 	siteIndex = 0;	// set siteIndex to 0 so modulateIndex can not advance again
@@ -146,10 +160,13 @@ void Genome::Handler::advanceChromosome() {
 	if (!readDirection) {  // if we are reading backwards, set siteIndex to the last site
 		siteIndex = genome->chromosomes[chromosomeIndex]->size() - 1;
 	}
+	EOC = true;
 }
 
 void Genome::Handler::printIndex() {
-	cout << "chromosomeIndex: " << chromosomeIndex << "  siteIndex: " << siteIndex << "  EOG: " << EOG << "\n";
+	string rd = (readDirection)?"forward":"backwards";
+
+	cout << "chromosomeIndex: " << chromosomeIndex << "  siteIndex: " << siteIndex << "  EOC: " << EOC << "  EOG: " << EOG << "  direction: " << rd << endl;
 }
 
 int Genome::Handler::readInt(int valueMin, int valueMax, int code, int CodingRegionIndex) {
@@ -159,6 +176,15 @@ int Genome::Handler::readInt(int valueMin, int valueMax, int code, int CodingReg
 		advanceChromosome();
 	}
 	return value;
+}
+
+double Genome::Handler::readDouble(double valueMin, double valueMax, int code, int CodingRegionIndex) {
+	double value;
+	if (genome->chromosomes[chromosomeIndex]->siteToDouble(siteIndex, value, valueMin, valueMax, readDirection, code, CodingRegionIndex)) {
+		advanceChromosome();
+	}
+	return value;
+
 }
 
 void Genome::Handler::writeInt(int value, int valueMin, int valueMax) {
@@ -175,10 +201,14 @@ void Genome::Handler::copyTo(shared_ptr<AbstractGenome::Handler> to) {
 	castTo->chromosomeIndex = chromosomeIndex;
 	castTo->siteIndex = siteIndex;
 	castTo->EOG = EOG;
+	castTo->EOC = EOC;
 }
 
 bool Genome::Handler::inTelomere(int length) {
 	modulateIndex();
+	if (atEOC() || atEOG()){
+		return true;
+	}
 	if (readDirection) {  // if reading forward
 		return (siteIndex >= (genome->chromosomes[chromosomeIndex]->size() - length));
 	} else {
@@ -191,14 +221,14 @@ void Genome::Handler::randomize() {
 	siteIndex = Random::getIndex(genome->chromosomes[chromosomeIndex]->size());
 }
 
-vector<vector<int>> Genome::Handler::readTable(vector<int> tableSize, vector<int> tableMaxSize, vector<int> valueRange, int code, int CodingRegionIndex) {
+vector<vector<int>> Genome::Handler::readTable(pair<int,int> tableSize, pair<int,int> tableMaxSize, pair<int,int> valueRange, int code, int CodingRegionIndex) {
 	vector<vector<int>> table;
 	int x = 0;
 	int y = 0;
-	int Y = tableSize[0];
-	int X = tableSize[1];
-	int maxY = tableMaxSize[0];
-	int maxX = tableMaxSize[1];
+	int Y = tableSize.first;
+	int X = tableSize.second;
+	int maxY = tableMaxSize.first;
+	int maxX = tableMaxSize.second;
 
 	table.resize(Y);  // set the number of rows in the table
 
@@ -206,37 +236,53 @@ vector<vector<int>> Genome::Handler::readTable(vector<int> tableSize, vector<int
 		table[y].resize(X);  // set the number of columns in this row
 		for (x = 0; x < X; x++) {
 			//table[y][x] = (Type) (sites[index]);
-			table[y][x] = readInt(valueRange[0], valueRange[1], code, CodingRegionIndex);
+			table[y][x] = readInt(valueRange.first, valueRange.second, code, CodingRegionIndex);
 		}
 		for (; x < maxX; x++) {
-			readInt(valueRange[0], valueRange[1]);  // advance genomeIndex to account for unused entries in the max sized table for this row
+			readInt(valueRange.first, valueRange.second);  // advance genomeIndex to account for unused entries in the max sized table for this row
 		}
 	}
 	for (; y < (maxY); y++) {
 		for (x = 0; x < maxX; x++) {
-			readInt(valueRange[0], valueRange[1]);  // advance to account for unused rows
+			readInt(valueRange.first, valueRange.second);  // advance to account for unused rows
 		}
 	}
 	return table;
 }
 
+// make an empty genome and ploidy = 1
 Genome::Genome() {
 	ploidy = 1;
+	// define columns to be written to genome files
+	genomeFileColumns.clear();
+	genomeFileColumns.push_back("update");
+	genomeFileColumns.push_back("ID");
+	genomeFileColumns.push_back("sitesCount");
+	genomeFileColumns.push_back("chromosomeCount");
+	genomeFileColumns.push_back("alphabetSize");
+	genomeFileColumns.push_back("ploidy");
+	genomeFileColumns.push_back("chromosomeLengths");
+	genomeFileColumns.push_back("sites");
+	// define columns to added to ave files
+	aveFileColumns.clear();
+	aveFileColumns.push_back("genomeLength");
 }
 
-Genome::Genome(shared_ptr<AbstractChromosome> _chromosome) {
-	ploidy = 1;
+// make a genome with 1 chromosome
+Genome::Genome(shared_ptr<AbstractChromosome> _chromosome) : Genome() {
+	//ploidy = 1;
 	chromosomes.push_back(_chromosome->makeLike());
 	/////////chromosomes[0]->fillRandom();  // resize and set with random values
 	recordDataMap();
 }
 
-Genome::Genome(shared_ptr<AbstractChromosome> _chromosome, int chromosomeCount, int _plodiy) {
+// make a genome with 1 or more chromosome and ploidy >= 1
+Genome::Genome(shared_ptr<AbstractChromosome> _chromosome, int chromosomeCount, int _plodiy) : Genome() {
+	//ploidy = _plodiy;
 	if (_plodiy < 1) {
 		cout << "Error: Genome must have plodiy >= 1";
 		exit(1);
 	}
-	ploidy = _plodiy;
 	if (chromosomeCount < 1) {
 		cout << "Error: Genome must have at least one chromosome";
 		exit(1);
@@ -248,7 +294,7 @@ Genome::Genome(shared_ptr<AbstractChromosome> _chromosome, int chromosomeCount, 
 	recordDataMap();
 }
 
-shared_ptr<AbstractGenome::Handler> Genome::newHandler(shared_ptr<AbstractGenome> _genome, bool _readDirection){
+shared_ptr<AbstractGenome::Handler> Genome::newHandler(shared_ptr<AbstractGenome> _genome, bool _readDirection) {
 	////////////////////////////////////cout << "In Genome::newHandler()" << endl;
 	for (auto chromosome : chromosomes) {
 		if (chromosome->size() == 0) {
@@ -258,6 +304,10 @@ shared_ptr<AbstractGenome::Handler> Genome::newHandler(shared_ptr<AbstractGenome
 	}
 
 	return make_shared<Handler>(_genome, _readDirection);
+}
+
+double Genome::alphabetSize(){
+	return chromosomes[0]->alphabetSize;
 }
 
 // randomize this genomes contents
@@ -347,7 +397,7 @@ void Genome::mutate() {
 
 // make a mutated genome. from this genome
 // the undefined action is to return a new genome
-shared_ptr<AbstractGenome> Genome::makeMutatedGenome(shared_ptr<AbstractGenome> parent) {
+shared_ptr<AbstractGenome> Genome::makeMutatedGenomeFrom(shared_ptr<AbstractGenome> parent) {
 	auto newGenome = make_shared<Genome>();
 	newGenome->copyFrom(parent);
 	newGenome->mutate();
@@ -362,7 +412,8 @@ shared_ptr<AbstractGenome> Genome::makeMutatedGenome(shared_ptr<AbstractGenome> 
 // each parents 0 chromosome is crossed to make a new 0 chromosome, then each parents 1 chromosome...
 // if ploidy > 1 then the number of parents must match ploidy (this may be extended in the future)
 // in this case, each parent crosses all of its chromosomes and contributs the result as a new chromosome
-shared_ptr<AbstractGenome> Genome::makeMutatedGenome(vector<shared_ptr<AbstractGenome>> parents) {
+shared_ptr<AbstractGenome> Genome::makeMutatedGenomeFromMany(vector<shared_ptr<AbstractGenome>> parents) {
+//	cout << "In Genome::makeMutatedGenome(vector<shared_ptr<AbstractGenome>> parents)\n";
 	// first, check to make sure that parent genomes are conpatable.
 	auto castParent0 = dynamic_pointer_cast<Genome>(parents[0]);  // we will be pulling all sorts of stuff from this genome so lets just cast it once.
 	int testPloidy = castParent0->ploidy;
@@ -393,7 +444,7 @@ shared_ptr<AbstractGenome> Genome::makeMutatedGenome(vector<shared_ptr<AbstractG
 			}
 			newGenome->chromosomes[newGenome->chromosomes.size() - 1]->crossover(parentChromosomes, newGenome->PT.lookup("genomecrossCount"));  // create a crossover chromosome
 		}
-	} else if (ploidy == (int) parents.size()) {  // if diploid than cross chromosomes from all parents
+	} else if (ploidy == (int) parents.size()) {  // if multi ploid than cross chromosomes from all parents
 		int setCount = castParent0->chromosomes.size() / ploidy;  // number of sets of chromosomes
 		for (int currSet = 0; currSet < setCount; currSet++) {
 			int parentCount = 0;
@@ -415,6 +466,7 @@ shared_ptr<AbstractGenome> Genome::makeMutatedGenome(vector<shared_ptr<AbstractG
 
 	newGenome->mutate();
 	newGenome->recordDataMap();
+//	cout << "  Leaving Genome::makeMutatedGenome(vector<shared_ptr<AbstractGenome>> parents)\n";
 	return newGenome;
 }
 
@@ -501,4 +553,11 @@ string Genome::genomeToStr() {
 	return S;
 }
 
+
+void Genome::printGenome() {
+	cout << "alphabetSize: " << alphabetSize() << "  chromosomes: " << chromosomes.size() <<  "  ploidy: " << ploidy << endl;
+	for (size_t c = 0; c < chromosomes.size(); c++) {
+		cout << c << " : " << chromosomes[c]->size() << " : " << chromosomes[c]->chromosomeToStr() << endl;
+	}
+}
 

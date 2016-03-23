@@ -89,15 +89,16 @@ template<class T> bool Chromosome<T>::writeInt(int &siteIndex, int value, int va
 		valueMin = temp;
 	}
 	vector < T > decomposedValue;
-	int writeValueSize = valueMax - valueMin + 1;
-	if (writeValueSize < value) {
+	int writeValueBase = valueMax - valueMin + 1;
+	value = value - valueMin;
+	if (writeValueBase < value) {
 		cout << "ERROR : attempting to write value to chromosome. \n value is too large :: (valueMax - valueMin + 1) < value!\n";
 		exit(1);
 	}
-	while (writeValueSize > alphabetSize) {  // load value in alphabetSize chunks into decomposedValue
+	while (writeValueBase > alphabetSize) {  // load value in alphabetSize chunks into decomposedValue
 		decomposedValue.push_back(value % ((int) alphabetSize));
 		value = value / alphabetSize;
-		writeValueSize = writeValueSize / alphabetSize;
+		writeValueBase = writeValueBase / alphabetSize;
 	}
 	decomposedValue.push_back(value);
 	EOC = modulateIndex(siteIndex);  // make sure that the index is in range
