@@ -57,7 +57,7 @@ int main(int argc, const char * argv[]) {
 		random_device rd;
 		int temp = rd();
 		Random::getCommonGenerator().seed(temp);
-		cout << "Generating Random Seed\n  "<< temp <<endl;
+		cout << "Generating Random Seed\n  " << temp << endl;
 	} else {
 		Random::getCommonGenerator().seed(Global::randomSeed);
 		cout << "Using Random Seed: " << Global::randomSeed << endl;
@@ -239,29 +239,48 @@ int main(int argc, const char * argv[]) {
 
 	{
 
-
 		Global::update = -1;  // before there was time, there was a progenitor
 
-		auto templateChromosome = make_shared<Chromosome<unsigned char>>(Genome::initialChromosomeSize, 256);
-		auto templateGenome = make_shared<Genome>(templateChromosome, Genome::initialChromosomes, Genome::initialPloidy);
-
 		//auto templateGenome = make_shared<CircularGenome<double>>(CircularGenomeParameters::initialGenomeSize,256);
-
-//		vector<shared_ptr<AbstractGenome>> genomes;
-//		for (int i = 0; i < 500; i++) {
-//			cout << i << " " << flush;
-//			initalGenome->loadGenomes("genome_10.csv", genomes);
-////--//		for (auto g : genomes){
-////--//			cout << g->genomeToStr() << "\n";
-////--//		}
-//		}
-//		exit(17);
+		shared_ptr<AbstractGenome> templateGenome;
+		if (AbstractGenome::genomeTypeStr == "Multi") {
+			shared_ptr<AbstractChromosome> templateChromosome;
+			if (AbstractGenome::genomeSitesType == "unsigned char"){
+				templateChromosome = make_shared<Chromosome<unsigned char>>(MultiGenome::initialChromosomeSize, AbstractGenome::alphabetSize);
+			} else if (AbstractGenome::genomeSitesType == "int"){
+				templateChromosome = make_shared<Chromosome<int>>(MultiGenome::initialChromosomeSize, AbstractGenome::alphabetSize);
+			} else if (AbstractGenome::genomeSitesType == "double"){
+				templateChromosome = make_shared<Chromosome<double>>(MultiGenome::initialChromosomeSize, AbstractGenome::alphabetSize);
+			} else if (AbstractGenome::genomeSitesType == "bool"){
+				templateChromosome = make_shared<Chromosome<bool>>(MultiGenome::initialChromosomeSize, AbstractGenome::alphabetSize);
+			} else {
+				cout << "\n\nERROR: Unrecognized genomeSitesType in configuration!\n  \"" << AbstractGenome::genomeSitesType << "\" is not defined.\n\nExiting.\n" << endl;
+				exit(1);
+			}
+			templateGenome = make_shared<MultiGenome>(templateChromosome, MultiGenome::initialChromosomes, MultiGenome::initialPloidy);
+		} else if (AbstractGenome::genomeTypeStr == "Circular") {
+			if (AbstractGenome::genomeSitesType == "unsigned char"){
+				templateGenome = make_shared<CircularGenome<unsigned char>>(CircularGenomeParameters::initialGenomeSize, AbstractGenome::alphabetSize);
+			} else if (AbstractGenome::genomeSitesType == "int"){
+				templateGenome = make_shared<CircularGenome<int>>(CircularGenomeParameters::initialGenomeSize, AbstractGenome::alphabetSize);
+			} else if (AbstractGenome::genomeSitesType == "double"){
+				templateGenome = make_shared<CircularGenome<double>>(CircularGenomeParameters::initialGenomeSize, AbstractGenome::alphabetSize);
+			} else if (AbstractGenome::genomeSitesType == "bool"){
+				templateGenome = make_shared<CircularGenome<bool>>(CircularGenomeParameters::initialGenomeSize, AbstractGenome::alphabetSize);
+			} else {
+				cout << "\n\nERROR: Unrecognized genomeSitesType in configuration!\n  \"" << AbstractGenome::genomeSitesType << "\" is not defined.\n\nExiting.\n" << endl;
+				exit(1);
+			}
+		} else {
+			cout << "\n\nERROR: Unrecognized genome type in configuration!\n  \"" << AbstractGenome::genomeTypeStr << "\" is not defined.\n\nExiting.\n" << endl;
+			exit(1);
+		}
 
 		shared_ptr<AbstractBrain> templateBrain;
 		if (AbstractBrain::brainTypeStr == "Markov") {
-			templateBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>(),world->requiredInputs(),world->requiredOutputs(),AbstractBrain::hiddenNodes);
+			templateBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>(), world->requiredInputs(), world->requiredOutputs(), AbstractBrain::hiddenNodes);
 		} else if (AbstractBrain::brainTypeStr == "Wire") {
-			templateBrain = make_shared<WireBrain>(world->requiredInputs(),world->requiredOutputs(),AbstractBrain::hiddenNodes);
+			templateBrain = make_shared<WireBrain>(world->requiredInputs(), world->requiredOutputs(), AbstractBrain::hiddenNodes);
 		} else {
 			cout << "\n\nERROR: Unrecognized brain type in configuration!\n  \"" << AbstractBrain::brainTypeStr << "\" is not defined.\n\nExiting.\n" << endl;
 			exit(1);
@@ -275,7 +294,7 @@ int main(int argc, const char * argv[]) {
 
 		for (int i = 0; i < Global::popSize; i++) {
 			auto newGenome = templateGenome->makeLike();
-			templateBrain->initalizeGenome(newGenome); // use progenitors brain to prepare genome (add start codons, change ratio of site values, etc)
+			templateBrain->initalizeGenome(newGenome);  // use progenitors brain to prepare genome (add start codons, change ratio of site values, etc)
 			auto newOrg = make_shared<Organism>(progenitor, newGenome);
 			newOrg->gender = Random::getInt(0, 1);  // assign a random gender to the new org
 			population.push_back(newOrg);  // add a new org to population using progenitors template and a new random genome
@@ -317,8 +336,6 @@ int main(int argc, const char * argv[]) {
 			cout << "\n\nERROR: Unrecognized optimizer type in configuration!\n  \"" << BaseOptimizer::Optimizer_MethodStr << "\" is not defined.\n\nExiting.\n" << endl;
 			exit(1);
 		}
-
-
 
 		vector<string> aveFileColumns;
 		aveFileColumns.clear();

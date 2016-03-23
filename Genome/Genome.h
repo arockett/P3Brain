@@ -31,6 +31,10 @@ class AbstractGenome {
 
  public:
 
+	static const string& genomeTypeStr;
+	static const int& alphabetSize;
+	static const string& genomeSitesType;
+
 	// Handlers are how you access Genomes for reading and writting.
 	// to get a handle for a genome call that that genomes newHandler() method
 	class Handler {
