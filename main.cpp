@@ -22,6 +22,7 @@
 #include "Brain/WireBrain.h"
 
 #include "Genome/Genome.h"
+#include "Genome/MultiGenome.h"
 #include "Genome/CircularGenome.h"
 
 #include "GateListBuilder/GateListBuilder.h"

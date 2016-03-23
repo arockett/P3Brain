@@ -167,7 +167,7 @@ public:
 // the undefined action is to return an empty vector
 	virtual vector<string> getStats() override;
 
-	virtual void recordDataMap();
+	virtual void recordDataMap() override;
 
 	// load all genomes from a file
 	virtual void loadGenomes(string fileName, vector<shared_ptr<AbstractGenome>> &genomes) override;
