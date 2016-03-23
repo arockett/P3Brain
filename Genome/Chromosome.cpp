@@ -264,7 +264,6 @@ template<class T> void Chromosome<T>::insertSegment(shared_ptr<AbstractChromosom
 
 template<class T> void Chromosome<T>::mutatePoint() {
 	sites[Random::getIndex(sites.size())] = Random::getIndex(alphabetSize);
-
 }
 
 // mutate chromosome by getting a copy of a segment of this chromosome and

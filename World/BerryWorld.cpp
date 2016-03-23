@@ -308,7 +308,7 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 
 		// inputNodesCount is now set to the first output Brain State Address. we will not move it until the next world update!
 		if (clearOutputs) {
-			org->brain->resetBrain();
+			org->brain->resetOutputs();
 		}
 
 //		if (analyse) {  // gather some data before and after running update

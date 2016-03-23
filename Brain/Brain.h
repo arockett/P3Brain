@@ -71,6 +71,12 @@ public:
 		}
 	}
 
+	virtual void inline resetOutputs() {
+		for (int i = nrInNodes; i < (nrInNodes + nrOutNodes); i++) {
+			nodes[i] = 0.0;
+		}
+	}
+
 	inline void setInput(const int& nodeAddress, const double& value) {
 		if (nodeAddress < nrInNodes) {
 			nodes[nodeAddress] = value;

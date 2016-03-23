@@ -22,6 +22,7 @@
 #include "Brain/WireBrain.h"
 
 #include "Genome/Genome.h"
+#include "Genome/CircularGenome.h"
 
 #include "GateListBuilder/GateListBuilder.h"
 
@@ -120,8 +121,10 @@ int main(int argc, const char * argv[]) {
 //	///////////////////////// test reading a writing to genomes ///////////////////////////////////////////
 //	auto initalChromosome = make_shared<Chromosome<int>>(200, 10);
 //	auto initalGenome = make_shared<Genome>(initalChromosome, 2, 1);
-//	auto initalBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
-//	int testStartCode = 43;
+//	auto initalGenome = make_shared<CircularGenome<int>>(100,256);
+//	auto initalGenome2 = make_shared<CircularGenome<int>>(100,256);
+//	shared_ptr<AbstractGenome> initalGenome3;
+//	auto initalBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>(),2,3,4);
 //	initalGenome->fillAcending();
 //	initalGenome->printGenome();
 //
@@ -140,13 +143,23 @@ int main(int argc, const char * argv[]) {
 //
 //	initalGenome->printGenome();
 //
-//	exit(1);
+//	initalGenome->fillAcending();
+//	initalGenome2->fillConstant(5);
+//	initalGenome->printGenome();
+//	initalGenome2->printGenome();
+//
+//	initalGenome3 = initalGenome->makeMutatedGenomeFromMany({initalGenome,initalGenome2});
+//	initalGenome3->printGenome();
+//
+
+	//exit(1);
 //	///////////////////////// end test reading a writing to genomes ///////////////////////////////////////////
 //
 //	///////////////////////// test genome to gate translation /////////////////////////////////////////////////
 //	auto initalChromosome = make_shared<Chromosome<int>>(400, 2);
 //	auto initalGenome = make_shared<Genome>(initalChromosome, 2, 2);
-//	auto initalBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
+//	auto initalGenome = make_shared<CircularGenome<int>>(1000,256);
+//	auto initalBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>(),2,3,4);
 //	int testStartCode = 43;
 //	initalGenome->fillAcending();
 //	initalGenome->printGenome();
@@ -226,11 +239,12 @@ int main(int argc, const char * argv[]) {
 	{
 
 
-		// a progenitor must exist - that is, one ancestor genome
 		Global::update = -1;  // before there was time, there was a progenitor
-		//shared_ptr<MarkovBrain> tesBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>());
-		auto initalChromosome = make_shared<Chromosome<unsigned char>>(Genome::initialChromosomeSize, 256);
-		auto initalGenome = make_shared<Genome>(initalChromosome, Genome::initialChromosomes, Genome::initialPloidy);
+
+		auto templateChromosome = make_shared<Chromosome<unsigned char>>(Genome::initialChromosomeSize, 256);
+		auto templateGenome = make_shared<Genome>(templateChromosome, Genome::initialChromosomes, Genome::initialPloidy);
+
+		//auto templateGenome = make_shared<CircularGenome<double>>(CircularGenomeParameters::initialGenomeSize,256);
 
 //		vector<shared_ptr<AbstractGenome>> genomes;
 //		for (int i = 0; i < 500; i++) {
@@ -242,29 +256,31 @@ int main(int argc, const char * argv[]) {
 //		}
 //		exit(17);
 
-		shared_ptr<AbstractBrain> initalBrain;
+		shared_ptr<AbstractBrain> templateBrain;
 		if (AbstractBrain::brainTypeStr == "Markov") {
-			initalBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>(),world->requiredInputs(),world->requiredOutputs(),AbstractBrain::hiddenNodes);
+			templateBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>(),world->requiredInputs(),world->requiredOutputs(),AbstractBrain::hiddenNodes);
 		} else if (AbstractBrain::brainTypeStr == "Wire") {
-			initalBrain = make_shared<WireBrain>(world->requiredInputs(),world->requiredOutputs(),AbstractBrain::hiddenNodes);
+			templateBrain = make_shared<WireBrain>(world->requiredInputs(),world->requiredOutputs(),AbstractBrain::hiddenNodes);
 		} else {
 			cout << "\n\nERROR: Unrecognized brain type in configuration!\n  \"" << AbstractBrain::brainTypeStr << "\" is not defined.\n\nExiting.\n" << endl;
 			exit(1);
 		}
 
-		shared_ptr<Organism> progenitor = make_shared<Organism>(initalGenome, initalBrain);  // make a organism with a genome and brain (if you need to change the types here is where you do it)
+		shared_ptr<Organism> progenitor = make_shared<Organism>(templateGenome, templateBrain);  // make a organism with a genome and brain - progenitor serves as an ancestor to all and a template organism
 
 		Global::update = 0;  // the beginning of time - now we construct the first population
+
 		vector<shared_ptr<Organism>> population;
 
 		for (int i = 0; i < Global::popSize; i++) {
-			shared_ptr<Genome> genome = make_shared<Genome>(initalChromosome, Genome::initialChromosomes, Genome::initialPloidy);
-			progenitor->brain->initalizeGenome(genome);
-			shared_ptr<Organism> org = make_shared<Organism>(progenitor, genome);
-			population.push_back(org);  // add a new org to population using progenitors template and a new random genome
-			population[population.size() - 1]->gender = Random::getInt(0, 1);  // assign a random gender to the new org
+			auto newGenome = templateGenome->makeLike();
+			templateBrain->initalizeGenome(newGenome); // use progenitors brain to prepare genome (add start codons, change ratio of site values, etc)
+			auto newOrg = make_shared<Organism>(progenitor, newGenome);
+			newOrg->gender = Random::getInt(0, 1);  // assign a random gender to the new org
+			population.push_back(newOrg);  // add a new org to population using progenitors template and a new random genome
 		}
 		progenitor->kill();  // the progenitor has served it's purpose.
+
 /////// to test genome to brain conversion and coding regions, set popsize = 1 and uncomment the block below this comment
 //		shared_ptr<Organism> test_org = dynamic_pointer_cast<Organism>(population[0]);
 //		shared_ptr<Genome> test_genome = dynamic_pointer_cast<Genome>(test_org->genome);

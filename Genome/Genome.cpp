@@ -18,11 +18,11 @@ const int& Genome::initialPloidy = Parameters::register_parameter("ploidy", 1, "
 const int& Genome::initialChromosomes = Parameters::register_parameter("chromosomes", 1, "number of chromosome pairs (i.e. if chromosomes = 2 and ploidy = 2 there will be 4 chromosomes in the genome)", "GENOME");
 
 const int& Genome::initialChromosomeSize = Parameters::register_parameter("chromosomeSizeInitial", 10000, "starting size for all chromosomes in genome (genome size will be chromosomeSizeInitial * number of chromosomes * ploidy)", "GENOME");
-const double& Genome::pointMutationRate = Parameters::register_parameter("pointMutationRate", 0.005, "per site mutation rate", "GENOME");
-const double& Genome::insertionRate = Parameters::register_parameter("mutationCopyRate", 0.00002, "per genome insertion/deletion rate", "GENOME");
+const double& Genome::pointMutationRate = Parameters::register_parameter("pointMutationRate", 0.005, "per site point mutation rate", "GENOME");
+const double& Genome::insertionRate = Parameters::register_parameter("mutationCopyRate", 0.00002, "per site insertion rate", "GENOME");
 const int& Genome::insertionMinSize = Parameters::register_parameter("mutationCopyMinSize", 10, "minimum size of insertion mutation", "GENOME");
 const int& Genome::insertionMaxSize = Parameters::register_parameter("mutationCopyMaxSize", 200, "maximum size of insertion mutation", "GENOME");
-const double& Genome::deletionRate = Parameters::register_parameter("mutationDeletionRate", 0.00002, "insertion rate per 1000 genome sites", "GENOME");
+const double& Genome::deletionRate = Parameters::register_parameter("mutationDeletionRate", 0.00002, "per site deletion rate", "GENOME");
 const int& Genome::deletionMinSize = Parameters::register_parameter("mutationDeletionMinSize", 10, "minimum size of insertion mutation", "GENOME");
 const int& Genome::deletionMaxSize = Parameters::register_parameter("mutationDeletionMaxSize", 200, "maximum size of insertion mutation", "GENOME");
 const int& Genome::maxChromosomeSize = Parameters::register_parameter("chromosomeSizeMin", Genome::deletionMaxSize * 2, "if a chromosome is smaller then this, mutations will only increase chromosome size", "GENOME");
@@ -289,13 +289,12 @@ Genome::Genome(shared_ptr<AbstractChromosome> _chromosome, int chromosomeCount, 
 	}
 	for (int i = 0; i < (chromosomeCount * _plodiy); i++) {
 		chromosomes.push_back(_chromosome->makeLike());
-		/////////chromosomes[i]->fillRandom();  // resize and set with random values
 	}
 	recordDataMap();
 }
 
 shared_ptr<AbstractGenome::Handler> Genome::newHandler(shared_ptr<AbstractGenome> _genome, bool _readDirection) {
-	////////////////////////////////////cout << "In Genome::newHandler()" << endl;
+	//cout << "In Genome::newHandler()" << endl;
 	for (auto chromosome : chromosomes) {
 		if (chromosome->size() == 0) {
 			cout << "Warning! :: you are creating a grenome handler to a genome with and empty chromosome. This is not allowed!\nExiting!\n\n";
@@ -306,7 +305,7 @@ shared_ptr<AbstractGenome::Handler> Genome::newHandler(shared_ptr<AbstractGenome
 	return make_shared<Handler>(_genome, _readDirection);
 }
 
-double Genome::alphabetSize(){
+double Genome::getAlphabetSize(){
 	return chromosomes[0]->alphabetSize;
 }
 
@@ -555,7 +554,7 @@ string Genome::genomeToStr() {
 
 
 void Genome::printGenome() {
-	cout << "alphabetSize: " << alphabetSize() << "  chromosomes: " << chromosomes.size() <<  "  ploidy: " << ploidy << endl;
+	cout << "alphabetSize: " << getAlphabetSize() << "  chromosomes: " << chromosomes.size() <<  "  ploidy: " << ploidy << endl;
 	for (size_t c = 0; c < chromosomes.size(); c++) {
 		cout << c << " : " << chromosomes[c]->size() << " : " << chromosomes[c]->chromosomeToStr() << endl;
 	}

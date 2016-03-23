@@ -6,8 +6,8 @@
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
 //
 
-#ifndef __BasicMarkovBrainTemplate__Genome__
-#define __BasicMarkovBrainTemplate__Genome__
+#ifndef __BasicMarkovBrainTemplate__CircularGenome__
+#define __BasicMarkovBrainTemplate__CircularGenome__
 
 #include <stdlib.h>
 #include <vector>
@@ -17,7 +17,7 @@
 #include <sstream>
 #include <utility>
 
-#include "Chromosome.h"
+#include "Genome.h"
 
 #include "../Utilities/Utilities.h"
 #include "../Utilities/Data.h"
@@ -27,151 +27,9 @@
 
 using namespace std;
 
-class AbstractGenome {
-
- public:
-
-	// Handlers are how you access Genomes for reading and writting.
-	// to get a handle for a genome call that that genomes newHandler() method
-	class Handler {
- 	public:
-		//shared_ptr<AbstractGenome> genome;
-		bool readDirection;  // true = forward, false = backwards
-		bool EOG;  // end of genome
-		bool EOC;  // end of chromosome - in this context chromosome is a subsection of the genome
-				// which after having passed we may want to perform some different behavior
-
-		Handler() {
-			readDirection = true;
-			EOG = false;
-			EOC = false;
-		}
-
-		Handler(shared_ptr<AbstractGenome> _genome, bool _readDirection = true) {
-			readDirection = _readDirection;
-			EOG = false;
-			EOC = false;
-		}
-
-		virtual void resetEOG() {
-			EOG = false;
-			EOC = false;
-		}
-
-		virtual void resetEOC() {
-			EOC = false;
-		}
-
-		virtual void setReadDirection(bool _readDirection) {
-			readDirection = _readDirection;
-		}
-
-		virtual void toggleReadDirection() {
-			readDirection = !readDirection;
-		}
-
-		virtual void resetHandler() = 0;
-		virtual void resetHandlerOnChromosome() = 0;
-
-		virtual ~Handler() {
-		}
-
-		//// convert genome sites at location index into a value in range [min,max] and advance index to the next unused site
-		//// any sites used will be assigned code in codingRegions
-		//// no undefined action, this function must be defined
-		virtual int readInt(int valueMin, int valueMax, int code = -1, int CodingRegionIndex = 0) = 0;
-
-		virtual double readDouble(double valueMin, double valueMax, int code = -1, int CodingRegionIndex = 0) {
-			cout << "ERROR: readDouble(double valueMin, double valueMax, int code = -1, int CodingRegionIndex = 0) in AbstractGenome::Handler was called!\n This has not been implemented yet the chromosome class you are using!\n";
-			exit(1);
-			return 0.0;
-		}
-
-		virtual void writeInt(int value, int valueMin, int valueMax) = 0;
-		virtual vector<vector<int>> readTable(pair<int,int> tableSize, pair<int,int> tableMaxSize, pair<int,int> valueRange, int code = -1, int CodingRegionIndex = 0)=0;
-		virtual void advanceIndex(int distance = 1) = 0;
-
-		virtual void copyTo(shared_ptr<Handler> to) = 0;
-
-		virtual bool atEOG() {
-			return false;
-		}
-
-		virtual bool atEOC() {
-			return false;
-		}
-
-		virtual void printIndex() = 0;
-
-		virtual bool inTelomere(int length) {
-			return false;
-		}
-
-		virtual void randomize() = 0;
-	};
-
-	DataMap dataMap;
-	vector<string> genomeFileColumns;  // = {"ID","alphabetSize","chromosomeCount","chromosomeLength","sitesCount","genomeAncestors","sites"};
-	vector<string> aveFileColumns;  // = {"genomeLength"};
-
-
-	AbstractGenome() = default;
-
-	virtual ~AbstractGenome() = default;
-	//virtual shared_ptr<AbstractGenome::Handler> newHandler(shared_ptr<AbstractGenome> _genome, bool _readDirection = true) override {
-
-	virtual shared_ptr<AbstractGenome> makeLike() = 0;
-
-	virtual shared_ptr<AbstractGenome::Handler> newHandler(shared_ptr<AbstractGenome> _genome, bool _readDirection = true) = 0;
-	virtual double getAlphabetSize() = 0;
-
-	virtual void copyFrom(shared_ptr<AbstractGenome> from) = 0;
-
-	virtual void fillRandom() = 0;
-
-	//// gets data about genome which can be added to a data map
-	//// data is in pairs of strings (key, value)
-	//// the undefined action is to return an empty vector
-	virtual vector<string> getStats() {
-		vector<string> data;
-		cout << "Warning! In AbstractGenome::getStats()...\n";
-		return data;
-	}
-
-	virtual string genomeToStr() {
-		cout << "Warning! In AbstractGenome::genomeToStr()...\n";
-		return "";
-	}
-
-	virtual void printGenome() {
-		cout << "Warning! In AbstractGenome::printGenome()...\n";
-	}
-
-	virtual void loadGenome(string fileName, string key, string keyValue) {
-	}
-
-	virtual void loadGenomes(string fileName, vector<shared_ptr<AbstractGenome>> &genomes) {
-	}
-
-	virtual bool isEmpty() = 0;
-
-	virtual void mutate() = 0;
-	virtual shared_ptr<AbstractGenome> makeMutatedGenomeFrom(shared_ptr<AbstractGenome> parent) = 0;
-	virtual shared_ptr<AbstractGenome> makeMutatedGenomeFromMany(vector<shared_ptr<AbstractGenome>> parents) = 0;
-
-	virtual int countSites(){
-		cout << "Warning! In AbstractGenome::countSites()...\n";
-		return 0;
-	}
-
-};
-
-class Genome : public AbstractGenome {
- public:
-
-	static const int& initialPloidy;
-	static const int& initialChromosomes;
-	static const int& initialChromosomeSize;
+class CircularGenomeParameters {
+public:
+	static const int& initialGenomeSize;
 	static const double& pointMutationRate;
 	static const double& insertionRate;
 	static const int& insertionMinSize;
@@ -179,15 +37,20 @@ class Genome : public AbstractGenome {
 	static const double& deletionRate;
 	static const int& deletionMinSize;
 	static const int& deletionMaxSize;
-	static const int& maxChromosomeSize;
-	static const int& minChromosomeSize;
+	static const int& maxGenomeSize;
+	static const int& minGenomeSize;
 	static const int& crossCount;  // number of crosses to make when performing crossover
+};
 
-	class Handler : public AbstractGenome::Handler {
- 	public:
-		shared_ptr<Genome> genome;
+template<class T>
+class CircularGenome: public AbstractGenome {
+
+public:
+
+	class Handler: public AbstractGenome::Handler {
+	public:
+		shared_ptr<CircularGenome> genome;
 		int siteIndex;
-		int chromosomeIndex;
 
 		Handler() = delete;
 
@@ -218,7 +81,6 @@ class Genome : public AbstractGenome {
 		virtual bool atEOG() override;
 		virtual bool atEOC() override;
 
-		virtual void advanceChromosome();
 		virtual void printIndex() override;
 		virtual int readInt(int valueMin, int valueMax, int code = -1, int CodingRegionIndex = 0) override;
 		virtual double readDouble(double valueMin, double valueMax, int code = -1, int CodingRegionIndex = 0) override;
@@ -230,23 +92,28 @@ class Genome : public AbstractGenome {
 		virtual bool inTelomere(int length) override;
 		// move this handler to a random location in genome
 		virtual void randomize() override;
-		virtual vector<vector<int>> readTable(pair<int,int> tableSize, pair<int,int> tableMaxSize, pair<int,int> valueRange, int code = -1, int CodingRegionIndex = 0) override;
+		virtual vector<vector<int>> readTable(pair<int, int> tableSize, pair<int, int> tableMaxSize, pair<int, int> valueRange, int code = -1, int CodingRegionIndex = 0) override;
 
 	};
- public:
+
 	ParametersTable PT;
-	int ploidy;
-	vector<shared_ptr<AbstractChromosome>> chromosomes;
+	vector<T> sites;
+	double alphabetSize;
 
-	Genome();
-	Genome(shared_ptr<AbstractChromosome> _chromosome);
-	Genome(shared_ptr<AbstractChromosome> _chromosome, int chromosomeCount, int _plodiy = 1);
-	virtual ~Genome() = default;
-
-	virtual shared_ptr<AbstractGenome> makeLike() override {
-		return make_shared < Genome > (chromosomes[0],(int)chromosomes.size()/ploidy,ploidy);
+	CircularGenome(double _alphabetSize = 256) {
+		setupCircularGenome(100,_alphabetSize);
 	}
 
+	CircularGenome(int _size, double _alphabetSize);
+	virtual ~CircularGenome() = default;
+
+	virtual void setupCircularGenome(int _size, double _alphabetSize);
+
+	virtual shared_ptr<AbstractGenome> makeLike() override {
+		return make_shared < CircularGenome < T >> (sites.size(), alphabetSize);
+	}
+
+	virtual int size();
 	virtual shared_ptr<AbstractGenome::Handler> newHandler(shared_ptr<AbstractGenome> _genome, bool _readDirection = true) override;
 
 	virtual double getAlphabetSize() override;
@@ -261,7 +128,7 @@ class Genome : public AbstractGenome {
 	// fill all sites of this genome with value
 	// if "acendingChromosomes" = true, then increment value after each chromosome
 	// This function is to make testing easy.
-	virtual void fillConstant(int value, bool acendingChromosomes = false);
+	virtual void fillConstant(int value);
 
 // Copy functions
 
@@ -271,9 +138,11 @@ class Genome : public AbstractGenome {
 
 // Mutation functions
 
-	virtual int countSites() override;
+	virtual int countSites();
 
 	virtual bool isEmpty() override;
+
+	virtual void pointMutate();
 
 	// apply mutations to this genome
 	virtual void mutate() override;
@@ -313,8 +182,6 @@ class Genome : public AbstractGenome {
 
 	virtual void printGenome() override;
 
+};
 
-}
-;
-
-#endif /* defined(__BasicMarkovBrainTemplate__Genome__) */
+#endif /* defined(__BasicMarkovBrainTemplate__CircularGenome__) */
