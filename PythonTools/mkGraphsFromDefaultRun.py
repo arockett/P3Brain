@@ -10,6 +10,13 @@ import sys
 import getopt
 
 
+####
+#
+# usage()
+#  Display usage
+#
+####
+
 def usage():
 	print()
 	print(sys.argv[0] + ' [-h][-s pdf|png][-l][-c "source,x-axis,[alpha X,][legend location,][style,][line width X,]data1,data2,..."]')
@@ -32,19 +39,18 @@ def usage():
 	print('       data* = columns to graph')
 	print()
 
-
-
 ####
 #
-# BuildMultiPlot(DataMap,NamesList,XCoordinateName='',Columns=1)
+# BuildMultiPlot(DataMap,NamesList,XCoordinateName='',Columns=1,title = '')
 #   Builds a Figure with rows = # elements in Names list.
 #   Each row contains a graph generated from DataMap[NamesList[row#]]
 #
-#   DataMap : a dictornary with data (all entires must have the same number of elements)
+#   DataMap : a dictionary with data (all entires must have the same number of elements)
 #   NamesList : list of names of elements from data to be graphed
 #   XCoordinateName : If specified, this element from the DataMap will determin the XCoordinate scale
 #   Columns : spread the graphs over this many columns, if not defined, there will be 1 column
 #             # of rows is calcualted by the number of columns and the number of elements in NamesList
+#   title : title to display on top of image
 #
 #   Return: the figure created
 #
@@ -91,14 +97,18 @@ def BuildMultiPlotFromDict(DataMap,NamesList,XCoordinateName='',Columns=1,title 
 
 ####
 #
-# BuildPlot(DataMap,NamesList,XCoordinateName='',AddLegend="")
+# BuildPlotFromDict(DataMap,NamesList,XCoordinateName='',AddLegend='',title = '',plotType='-',lineWeight = 2 , alpha = .5)
 #   Builds a figure with a single plot graphing the elements from DataMap named by NamesList.
-#   Axis are labled if possible, and a legend is added.
+#   X Axis is labled if possible, and a legend is added.
 #
-#   DataMap : a dictornary with data (all entires must have the same number of elements)
+#   DataMap : a dictionary with data (all entires must have the same number of elements)
 #   NamesList : list of names of elements from data to be graphed
 #   XCoordinateName : If specified, this element from the DataMap will determin the XCoordinate scale
 #   AddLegend : if defined, places a legend ('upper left','upper right','lower left','lower right')
+#   title : title to display on top of image
+#   plotType : determines how the data will be plotted (- | . | o | * | x | -- | -. | -o | -* | -x | .dif | -dif)
+#   lineWeight : thickness of lines (if any)
+#   alpha : transparancy of plotted data
 #
 #   Return: the figure created
 #
@@ -143,10 +153,12 @@ def BuildPlotFromDict(DataMap,NamesList,XCoordinateName='',AddLegend='',title = 
 
 	  
 def main(argv=None):
+	
+### LOAD ARGUMENTS FROM COMMAND LINE
 	if argv is None:
 		argv = sys.argv
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], "hs:vc:vl")
+		opts, args = getopt.getopt(sys.argv[1:], "hs:vc:vlr:v")
 	except getopt.GetoptError as err:
 		# print help information and exit:
 		print()
@@ -155,6 +167,7 @@ def main(argv=None):
 		sys.exit(2)
 	output = None
 	customOptions = None
+	replicates = None
 	useLOD = False
 	for option, value in opts:
 		if option == "-v":
@@ -164,12 +177,16 @@ def main(argv=None):
 			sys.exit()
 		elif option == "-c":
 			customOptions = value
+		elif option == "-r":
+			replicates = value
 		elif option in ("-s"):
 			output = value
 		elif option in ("-l"):
 			useLOD = True
 		else:
 			assert False, "unhandled option"
+
+### LOAD DATA
 
 	try:
 		ave_csv_file = pandas.read_csv(r'ave.csv')
@@ -190,21 +207,32 @@ def main(argv=None):
 			print ('\nERROR: can not load data on line of descent, "data.csv" can not be found\n')
 			sys.exit()
 
+
+### MAKE DATA LIST (this defines the columns to graph)
+
 	aveList = list(ave_csv_file.columns.values)
 	if "update" in aveList:
 		aveList.remove("update")
 	domList = aveList
 	if useLOD:
 		LODList = aveList
-	
+
+### NOT A CUSTOM GRAPH
+
 	if customOptions == None:	# make default graphs
 		aveGraph = BuildMultiPlotFromDict(ave_csv_file,NamesList = aveList,XCoordinateName='update',Columns=2,title = 'Average')
 		domGraph = BuildMultiPlotFromDict(dominant_csv_file,NamesList = domList,XCoordinateName='update',Columns=2,title = 'Dominant')
 		if useLOD:
 			LODGraph = BuildMultiPlotFromDict(LOD_csv_file,NamesList = LODList,XCoordinateName='update',Columns=2,title = 'Line of Descent')
-	else:	# make a custom graph
-		data_starts_at = 2
-		customList = customOptions.split(',')
+
+### MAKE A CUSTOM GRAPH
+
+	else:
+		data_starts_at = 2 # if there are not optional settings, data to graph starts at [2]
+		customList = customOptions.split(',') # split up custom options
+
+### WHICH TYPE OF DATA ARE WE GRAPHING?
+
 		if customList[0] == 'ave':
 			source = ave_csv_file;
 		elif customList[0] == 'dom':
@@ -213,19 +241,22 @@ def main(argv=None):
 			if not useLOD:
 				print ('\nERROR: must use -l option to use LOD in custom graph"\n')
 				sys.exit()
-
 			source = LOD_csv_file
 		else:
 			print ('\nERROR: options for custom graph must start with "ave", "dom" or, "lod"\n')
 			sys.exit()
-		
+
+### SET THE X-AXIS
+
 		if customList[1] == '':
 			print ('\nERROR: second option (x-axis) for custom graph was blank\n')
 			sys.exit()
 		elif customList[1] not in list(source.columns.values):
 			print ('\nERROR: second option (x-axis) for custom graph "' + customList[1] + '" not found in data\n')
 			sys.exit()
-	
+
+### SET OPTIONAL ALPHA	
+
 		if customList[data_starts_at][:5] == 'alpha':
 			_alpha = customList[data_starts_at]
 			_alpha = _alpha[6:]
@@ -233,18 +264,23 @@ def main(argv=None):
 			data_starts_at = data_starts_at + 1
 		else:
 			_alpha = .5
+			
+### SET OPTIONAL LEGEND LOCATION
 
 		if customList[data_starts_at] in ['upper right','upper left','lower left','lower right','center right','center left','lower center','upper center','center']:
 			legLoc = customList[data_starts_at]
 			data_starts_at = data_starts_at + 1
 		else:
 			legLoc = 'lower right'
-			
+
+### SET OPTIONAL PLOT STYLE
 		if customList[data_starts_at] in ['-','.','o','*','x','--','-.','-o','-*','-x','.dif','-dif']:
 			_plotType = customList[data_starts_at]
 			data_starts_at = data_starts_at + 1
 		else:
 			_plotType = '-dif'
+
+### SET OPTIONAL LINE WIDTH
 
 		if customList[data_starts_at][:10] == 'line width':
 			_lineWeight = int(customList[data_starts_at][11:])
@@ -252,20 +288,26 @@ def main(argv=None):
 		else:
 			_lineWeight = 1
 
+### EXTRACT NAMES OF COLUMNS TO GRAPH
+
 		names = customList[data_starts_at:]
 		for name in names:
 			if name not in list(source.columns.values):
 				print ('\nERROR: data column "' + name + '" for custom graph not found in "' + customList[0] + '" data\n')
 				sys.exit()
-			
-		costomGraph = BuildPlotFromDict(source,NamesList = names,XCoordinateName=customList[1],AddLegend=legLoc,title = '',plotType = _plotType,lineWeight = _lineWeight, alpha = _alpha)
+
+### MAKE THE CUSTOM GRAPH
+
+		customGraph = BuildPlotFromDict(source,NamesList = names,XCoordinateName=customList[1],AddLegend=legLoc,title = '',plotType = _plotType,lineWeight = _lineWeight, alpha = _alpha)
 	
-	
+
+### IF -s IS NOT USED, THEN PRINT GRAPH(S) TO SCREEN
+
 	if output == None:
 		plt.show()
 
+######## SAVE TO A PNG FILE
 
-	######## SAVE TO A PNG FILE
 	if output == 'png':
 		if customOptions == None:
 			aveGraph.savefig('MABE_Graph_Ave.png', dpi=100)
@@ -273,10 +315,9 @@ def main(argv=None):
 			if useLOD:
 				LODGraph.savefig('MABE_Graph_LOD.png', dpi=100)
 		else:
-			costomGraph.savefig('MABE_CustomGraph.png', dpi=100)
+			customGraph.savefig('MABE_CustomGraph.png', dpi=100)
 
-
-	######## SAVE TO A PDF FILE
+######## SAVE TO A PDF FILE
 
 	if output == 'pdf':
 		if customOptions == None:
@@ -287,7 +328,7 @@ def main(argv=None):
 				pp.savefig(LODGraph)
 		else:
 			pp = PdfPages('MABE_CustomGraph.pdf')
-			pp.savefig(costomGraph)
+			pp.savefig(customGraph)
 
 		pp.close()
 

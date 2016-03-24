@@ -120,27 +120,60 @@ int main(int argc, const char * argv[]) {
 	//////////////////
 
 //	///////////////////////// test reading a writing to genomes ///////////////////////////////////////////
+// for mutigenome...
 //	auto initalChromosome = make_shared<Chromosome<int>>(200, 10);
-//	auto initalGenome = make_shared<Genome>(initalChromosome, 2, 1);
-//	auto initalGenome = make_shared<CircularGenome<int>>(100,256);
-//	auto initalGenome2 = make_shared<CircularGenome<int>>(100,256);
+//	auto initalGenome = make_shared<MultiGenome>(initalChromosome, 2, 1);
+//	auto initalGenome2 = make_shared<MultiGenome>(initalChromosome, 2, 1);
+// for circularGenome:
+//	auto initalGenome = make_shared<CircularGenome<int>>(100, 10);
+//	auto initalGenome2 = make_shared<CircularGenome<int>>(100, 10);
 //	shared_ptr<AbstractGenome> initalGenome3;
-//	auto initalBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>(),2,3,4);
+//	auto initalBrain = make_shared<MarkovBrain>(make_shared<Classic_GateListBuilder>(), 2, 3, 4);
 //	initalGenome->fillAcending();
 //	initalGenome->printGenome();
 //
-//	auto handler = initalGenome->newHandler(initalGenome,1);
+//	auto handler = initalGenome->newHandler(initalGenome, 1);
 //
-//	handler->writeInt(200,182,255);
-//	handler->writeInt(8,7,25);
-//	handler->writeInt(5,2,8);
-//	handler->writeInt(3,1,9);
+//	handler->writeInt(5, 0, 9);
+//	cout << "\n";
+//	initalGenome->printGenome();
+//	handler->writeInt(89, 0, 99);
+//	cout << "\n";
+//	initalGenome->printGenome();
+//	handler->setReadDirection(0);
+//	handler->writeInt(54, 0, 99);
+//	cout << "\n";
+//	initalGenome->printGenome();
+//	handler->writeInt(321, 0, 999);
+//	initalGenome->printGenome();
+//	cout << "\n";
+//	handler->writeInt(321, 0, 999);
+//	initalGenome->printGenome();
+//	cout << "\n";
+//
+//	handler->setReadDirection(1);
+//
+//	handler->writeInt(987, 0, 999);
+//	initalGenome->printGenome();
+//	cout << "\n";
+//
+//	handler->writeInt(987, 0, 999);
+//	initalGenome->printGenome();
+//	cout << "\n";
+//
+//	handler->writeInt(987, 0, 999);
+//	initalGenome->printGenome();
+//	cout << "\n\n\n";
+//
+//
 //	handler->resetHandler();
+//	initalGenome->printGenome();
 //
-//	cout << handler->readInt(182,255) << endl;
-//	cout << handler->readInt(7,25) << endl;
-//	cout << handler->readInt(2,8) << endl;
-//	cout << handler->readInt(1,9) << endl;
+//	cout << "\n\n\n\n";
+//	cout << handler->readInt(182, 255) << endl;
+//	cout << handler->readInt(7, 25) << endl;
+//	cout << handler->readInt(2, 8) << endl;
+//	cout << handler->readInt(1, 9) << endl;
 //
 //	initalGenome->printGenome();
 //
@@ -149,13 +182,12 @@ int main(int argc, const char * argv[]) {
 //	initalGenome->printGenome();
 //	initalGenome2->printGenome();
 //
-//	initalGenome3 = initalGenome->makeMutatedGenomeFromMany({initalGenome,initalGenome2});
+//	initalGenome3 = initalGenome->makeMutatedGenomeFromMany( { initalGenome, initalGenome2 });
 //	initalGenome3->printGenome();
 //
-
-	//exit(1);
+//	exit(1);
 //	///////////////////////// end test reading a writing to genomes ///////////////////////////////////////////
-//
+
 //	///////////////////////// test genome to gate translation /////////////////////////////////////////////////
 //	auto initalChromosome = make_shared<Chromosome<int>>(400, 2);
 //	auto initalGenome = make_shared<Genome>(initalChromosome, 2, 2);
@@ -245,13 +277,13 @@ int main(int argc, const char * argv[]) {
 		shared_ptr<AbstractGenome> templateGenome;
 		if (AbstractGenome::genomeTypeStr == "Multi") {
 			shared_ptr<AbstractChromosome> templateChromosome;
-			if (AbstractGenome::genomeSitesType == "unsigned char"){
+			if (AbstractGenome::genomeSitesType == "unsigned char") {
 				templateChromosome = make_shared<Chromosome<unsigned char>>(MultiGenome::initialChromosomeSize, AbstractGenome::alphabetSize);
-			} else if (AbstractGenome::genomeSitesType == "int"){
+			} else if (AbstractGenome::genomeSitesType == "int") {
 				templateChromosome = make_shared<Chromosome<int>>(MultiGenome::initialChromosomeSize, AbstractGenome::alphabetSize);
-			} else if (AbstractGenome::genomeSitesType == "double"){
+			} else if (AbstractGenome::genomeSitesType == "double") {
 				templateChromosome = make_shared<Chromosome<double>>(MultiGenome::initialChromosomeSize, AbstractGenome::alphabetSize);
-			} else if (AbstractGenome::genomeSitesType == "bool"){
+			} else if (AbstractGenome::genomeSitesType == "bool") {
 				templateChromosome = make_shared<Chromosome<bool>>(MultiGenome::initialChromosomeSize, AbstractGenome::alphabetSize);
 			} else {
 				cout << "\n\nERROR: Unrecognized genomeSitesType in configuration!\n  \"" << AbstractGenome::genomeSitesType << "\" is not defined.\n\nExiting.\n" << endl;
@@ -259,13 +291,13 @@ int main(int argc, const char * argv[]) {
 			}
 			templateGenome = make_shared<MultiGenome>(templateChromosome, MultiGenome::initialChromosomes, MultiGenome::initialPloidy);
 		} else if (AbstractGenome::genomeTypeStr == "Circular") {
-			if (AbstractGenome::genomeSitesType == "unsigned char"){
+			if (AbstractGenome::genomeSitesType == "unsigned char") {
 				templateGenome = make_shared<CircularGenome<unsigned char>>(CircularGenomeParameters::initialGenomeSize, AbstractGenome::alphabetSize);
-			} else if (AbstractGenome::genomeSitesType == "int"){
+			} else if (AbstractGenome::genomeSitesType == "int") {
 				templateGenome = make_shared<CircularGenome<int>>(CircularGenomeParameters::initialGenomeSize, AbstractGenome::alphabetSize);
-			} else if (AbstractGenome::genomeSitesType == "double"){
+			} else if (AbstractGenome::genomeSitesType == "double") {
 				templateGenome = make_shared<CircularGenome<double>>(CircularGenomeParameters::initialGenomeSize, AbstractGenome::alphabetSize);
-			} else if (AbstractGenome::genomeSitesType == "bool"){
+			} else if (AbstractGenome::genomeSitesType == "bool") {
 				templateGenome = make_shared<CircularGenome<bool>>(CircularGenomeParameters::initialGenomeSize, AbstractGenome::alphabetSize);
 			} else {
 				cout << "\n\nERROR: Unrecognized genomeSitesType in configuration!\n  \"" << AbstractGenome::genomeSitesType << "\" is not defined.\n\nExiting.\n" << endl;
