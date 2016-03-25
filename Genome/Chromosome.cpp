@@ -69,7 +69,7 @@ template<class T> bool Chromosome<T>::readInt(int &siteIndex, int &value, int va
 	value = (int) sites[siteIndex];
 	codingRegions.assignCode(code, siteIndex, CodingRegionIndex);
 	int EOC = advanceIndex(siteIndex, readDirection);  // EOC = end of chromosome
-	while ((valueMax - valueMin + 1) > currentMax) {  // we don't have enough bits of information
+	while ((valueMax - valueMin + 1) > currentMax && !EOC) {  // we don't have enough bits of information NOTE: "!EOC" means that we stop at end of chromosome!
 		value = (value * alphabetSize) + (int) sites[siteIndex];  // next site
 		codingRegions.assignCode(code, siteIndex, CodingRegionIndex);
 		EOC = EOC | advanceIndex(siteIndex, readDirection);
@@ -102,7 +102,7 @@ template<class T> bool Chromosome<T>::writeInt(int &siteIndex, int value, int va
 	}
 	decomposedValue.push_back(value);
 	EOC = modulateIndex(siteIndex);  // make sure that the index is in range
-	while (decomposedValue.size() > 0) {  // starting with the last element in decomposedValue, copy into genome.
+	while (decomposedValue.size() > 0 && !EOC) {  // starting with the last element in decomposedValue, copy into genome. NOTE: "!EOC" means that we stop at end of chromosome!
 		sites[siteIndex] = decomposedValue[decomposedValue.size() - 1];
 		EOC = EOC | advanceIndex(siteIndex, readDirection);
 		decomposedValue.pop_back();
@@ -264,7 +264,6 @@ template<class T> void Chromosome<T>::insertSegment(shared_ptr<AbstractChromosom
 
 template<class T> void Chromosome<T>::mutatePoint() {
 	sites[Random::getIndex(sites.size())] = Random::getIndex(alphabetSize);
-
 }
 
 // mutate chromosome by getting a copy of a segment of this chromosome and
