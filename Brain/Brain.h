@@ -81,7 +81,16 @@ public:
 		if (nodeAddress < nrInNodes) {
 			nodes[nodeAddress] = value;
 		} else {
-			cout << "Writing to invalid input node (" << nodeAddress << ") - this brain needs more input nodes!\nExiting" << endl;
+			cout << "in Brain::setInput() : Writing to invalid input node (" << nodeAddress << ") - this brain needs more input nodes!\nExiting" << endl;
+			exit(1);
+		}
+	}
+
+	inline void setNode(const int& nodeAddress, const double& value) {
+		if (nodeAddress < nrInNodes + nrOutNodes + nrHiddenNodes) {
+			nodes[nodeAddress] = value;
+		} else {
+			cout << "in Brain::setNode() :Writing to invalid input node (" << nodeAddress << ") - this brain needs more nodes!\nExiting" << endl;
 			exit(1);
 		}
 	}
@@ -90,7 +99,7 @@ public:
 		if (nodeAddress < nrInNodes) {
 			return nodes[nodeAddress];
 		} else {
-			cout << "Reading from invalid input node (" << nodeAddress << ") - this brain needs more input nodes!\nExiting" << endl;
+			cout << "in Brain::readInput() : Reading from invalid input node (" << nodeAddress << ") - this brain needs more input nodes!\nExiting" << endl;
 			exit(1);
 		}
 	}
@@ -99,9 +108,22 @@ public:
 		if (nodeAddress < nrOutNodes) {
 			return nodes[nodeAddress + nrInNodes];
 		} else {
-			cout << "Reading from invalid output node (" << nodeAddress << ") - this brain needs more output nodes!\nExiting" << endl;
+			cout << "in Brain::readOutput() : Reading from invalid output node (" << nodeAddress << ") - this brain needs more output nodes!\nExiting" << endl;
 			exit(1);
 		}
+	}
+
+	inline double ReadNode(const int& nodeAddress) {
+		if (nodeAddress < nrInNodes + nrOutNodes + nrHiddenNodes) {
+			return nodes[nodeAddress];
+		} else {
+			cout << "in Brain::ReadNode() :Writing to invalid input node (" << nodeAddress << ") - this brain needs more nodes!\nExiting" << endl;
+			exit(1);
+		}
+	}
+
+	inline vector<double> ReadAllNodes(const int& nodeAddress) {
+		return nodes;
 	}
 
 	// converts the value of each value in nodes[] to bit and converts the bits to an int

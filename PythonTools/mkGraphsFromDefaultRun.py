@@ -45,11 +45,13 @@ def usage():
 #   Builds a Figure with rows = # elements in Names list.
 #   Each row contains a graph generated from DataMap[NamesList[row#]]
 #
+#	MultiDataMap : a dictionary or dictionary with data (all entires must have the same number of elements)
+#				e.g. if DataMap is Ave, this can be raw data - if this is not empty it will display at 20% alpha
 #   DataMap : a dictionary with data (all entires must have the same number of elements)
 #   NamesList : list of names of elements from data to be graphed
 #   XCoordinateName : If specified, this element from the DataMap will determin the XCoordinate scale
 #   Columns : spread the graphs over this many columns, if not defined, there will be 1 column
-#             # of rows is calcualted by the number of columns and the number of elements in NamesList
+#				number of rows is calcualted by the number of columns and the number of elements in NamesList
 #   title : title to display on top of image
 #
 #   Return: the figure created
@@ -57,7 +59,7 @@ def usage():
 ####
 
 
-def BuildMultiPlotFromDict(DataMap,NamesList,XCoordinateName='',Columns=1,title = ''):
+def BuildMultiPlotFromDict(MultiDataMap,AveDataMap,NamesList,XCoordinateName='',Columns=1,title = ''):
 	fig = plt.figure(figsize=(20,10))                                                # create a new figure
 	fig.subplots_adjust(hspace=.35)
 
@@ -67,10 +69,16 @@ def BuildMultiPlotFromDict(DataMap,NamesList,XCoordinateName='',Columns=1,title 
 	Rows = math.ceil(float(len(NamesList))/float(Columns))      # calcualate how many rows we need
   
 	if (XCoordinateName==''):                                   # if there is no XCoordinateName
-		XLimit = len(NamesList[0])
+		XLimit = len(AveDataMap[NamesList[0]])
 		for count in range(len(NamesList)):                       # for each name
 			ax = plt.subplot(Rows,Columns,count+1)                       # go to the count-th row of in our figure (with len(NamesList) rows)
-			plt.plot(DataMap[NamesList[count]],label=NamesList[count])
+			if len(AveDataMap) > 0:
+				plt.plot(AveDataMap[NamesList[count]],label=NamesList[count])
+			if len(MultiDataMap) > 0:
+				for map in MultiDataMap:
+					print ("X")
+					plt.plot(MultiDataMap[name][NamesList[count]],label=NamesList[count],alpha = .2)
+	
                                                               # plot the data for each element in name in it's own plot
 			plt.title(NamesList[count], fontsize=16) 	              # set the title for this plot
 			ax.title.set_position([.5, .97])
@@ -80,11 +88,15 @@ def BuildMultiPlotFromDict(DataMap,NamesList,XCoordinateName='',Columns=1,title 
 			ax.xaxis.set_tick_params(pad=2)
 			plt.xlim([0,XLimit])
 	else:                                                       # else, there is a XCoordinateName
-		XLimit = max(DataMap[XCoordinateName])
+		XLimit = max(AveDataMap[XCoordinateName])
 		for count in range(len(NamesList)):                       # for each name
 			ax = plt.subplot(Rows,Columns,count+1)                       # go to the count-th row of in our figure (with len(NamesList) rows)
-			plt.plot(DataMap[XCoordinateName],DataMap[NamesList[count]],label=NamesList[count])
-                                                              # plot the data for each element in name in it's own plot
+			if len(AveDataMap) > 0:
+				plt.plot(AveDataMap[XCoordinateName],AveDataMap[NamesList[count]],label=NamesList[count])
+			if len(MultiDataMap) > 0:
+				for name in MultiDataMap:
+					plt.plot(MultiDataMap[name][XCoordinateName],MultiDataMap[name][NamesList[count]],label=NamesList[count], alpha = .2)
+                                                             # plot the data for each element in name in it's own plot
 			plt.title(NamesList[count], fontsize=16)                # set the title for this plot
 			ax.title.set_position([.5, .97])
 			for label in (ax.get_xticklabels() + ax.get_yticklabels()):
@@ -188,40 +200,89 @@ def main(argv=None):
 
 ### LOAD DATA
 
-	try:
-		ave_csv_file = pandas.read_csv(r'ave.csv')
-	except:
-		print ('\nERROR: can not load aveage data, "ave.csv" can not be found\n')
-		sys.exit()
+	allAve = {};
+	allDom = {};
+	allLOD = {};
 
-	try:
-		dominant_csv_file = pandas.read_csv(r'dominant.csv')
-	except:
-		print ('\nERROR: can not load dominant data, "dominant.csv" can not be found\n')
-		sys.exit()
-
-	if useLOD:
+	replicateNames = [];
+	if replicates == None:
+		replicateNames.append('./')
+	else:
+		replicateNames = replicates.split(',') # split up custom options
+		
+	for name in replicateNames:
 		try:
-			LOD_csv_file = pandas.read_csv(r'data.csv')
+			allAve[name] = pandas.read_csv(name+'ave.csv')
 		except:
-			print ('\nERROR: can not load data on line of descent, "data.csv" can not be found\n')
+			print ('\nERROR: can not load aveage data, "' + name + 'ave.csv" can not be found\n')
 			sys.exit()
 
+		try:
+			allDom[name] = pandas.read_csv(name+'dominant.csv')
+		except:
+			print ('\nERROR: can not load dominant data, "' + name + 'dominant.csv" can not be found\n')
+			sys.exit()
+
+		if useLOD:
+			try:
+				allLOD = pandas.read_csv(name+'data.csv')
+			except:
+				print ('\nERROR: can not load data on line of descent, "' + name + 'data.csv" can not be found\n')
+				sys.exit()
+
+	ave_csv_file = allAve[replicateNames[0]]
+	dominant_csv_file = allDom[replicateNames[0]]
 
 ### MAKE DATA LIST (this defines the columns to graph)
 
-	aveList = list(ave_csv_file.columns.values)
+	aveList = list(allAve[replicateNames[0]].columns.values)
 	if "update" in aveList:
-		aveList.remove("update")
+		aveList.remove('update')
 	domList = aveList
 	if useLOD:
 		LODList = aveList
 
+### FIND NUMBER OF ROWS
+
+	rows = len(allAve[replicateNames[0]][aveList[0]])
+
+### GET AVERAGES AND ERROR
+
+# first make placeholders
+	aveAve = allAve[replicateNames[0]].copy(deep=True)
+	errorAve = aveAve.copy(deep=True)
+	aveDom = aveAve.copy(deep=True)
+	errorDom = aveAve.copy(deep=True)
+	if useLOD:
+		aveLOD = aveAve.copy(deep=True)
+		errorLOD = aveAve.copy(deep=True)
+
+# now visit all the places
+	for row in list(range(0,rows)):
+		for colName in aveList:
+			aveSum = 0
+			domSum = 0
+			LODSum = 0
+			for repName in replicateNames:
+				aveSum = aveSum + allAve[repName][colName][row];
+				domSum = domSum + allDom[repName][colName][row];
+				if useLOD:
+					LODSum = LODSum + allLOD[repName][colName][row];
+			aveAve[colName][row] = aveSum/len(replicateNames)
+			aveDom[colName][row] = domSum/len(replicateNames)
+			if useLOD:
+				aveLOD[colName][row] = LODSum/len(replicateNames)
+
+			
+
+
 ### NOT A CUSTOM GRAPH
 
 	if customOptions == None:	# make default graphs
-		aveGraph = BuildMultiPlotFromDict(ave_csv_file,NamesList = aveList,XCoordinateName='update',Columns=2,title = 'Average')
-		domGraph = BuildMultiPlotFromDict(dominant_csv_file,NamesList = domList,XCoordinateName='update',Columns=2,title = 'Dominant')
+		#aveGraph = BuildMultiPlotFromDict(ave_csv_file,NamesList = aveList,XCoordinateName='update',Columns=2,title = 'Average')
+		#domGraph = BuildMultiPlotFromDict(dominant_csv_file,NamesList = domList,XCoordinateName='update',Columns=2,title = 'Dominant')
+		aveGraph = BuildMultiPlotFromDict(allAve,aveAve,NamesList = aveList,XCoordinateName='update',Columns=2,title = 'Average')
+		domGraph = BuildMultiPlotFromDict(allDom,aveDom,NamesList = domList,XCoordinateName='update',Columns=2,title = 'Dominant')
 		if useLOD:
 			LODGraph = BuildMultiPlotFromDict(LOD_csv_file,NamesList = LODList,XCoordinateName='update',Columns=2,title = 'Line of Descent')
 
@@ -234,14 +295,14 @@ def main(argv=None):
 ### WHICH TYPE OF DATA ARE WE GRAPHING?
 
 		if customList[0] == 'ave':
-			source = ave_csv_file;
+			source = aveAve;
 		elif customList[0] == 'dom':
-			source = dominant_csv_file
+			source = aveDom
 		elif customList[0] == 'LOD':
 			if not useLOD:
 				print ('\nERROR: must use -l option to use LOD in custom graph"\n')
 				sys.exit()
-			source = LOD_csv_file
+			source = aveLOD
 		else:
 			print ('\nERROR: options for custom graph must start with "ave", "dom" or, "lod"\n')
 			sys.exit()
@@ -334,8 +395,8 @@ def main(argv=None):
 
   
 if __name__ == "__main__":
-	try:
+	#try:
 		main()
-	except:
-		print ("\nERROR: error in input... use -h option for help\n")
-		sys.exit()
+	#except:
+		#print ("\nERROR: error in input... use -h option for help\n")
+		#sys.exit()

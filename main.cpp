@@ -277,7 +277,7 @@ int main(int argc, const char * argv[]) {
 		shared_ptr<AbstractGenome> templateGenome;
 		if (AbstractGenome::genomeTypeStr == "Multi") {
 			shared_ptr<AbstractChromosome> templateChromosome;
-			if (AbstractGenome::genomeSitesType == "unsigned char") {
+			if (AbstractGenome::genomeSitesType == "char") {
 				templateChromosome = make_shared<Chromosome<unsigned char>>(MultiGenome::initialChromosomeSize, AbstractGenome::alphabetSize);
 			} else if (AbstractGenome::genomeSitesType == "int") {
 				templateChromosome = make_shared<Chromosome<int>>(MultiGenome::initialChromosomeSize, AbstractGenome::alphabetSize);
@@ -291,7 +291,7 @@ int main(int argc, const char * argv[]) {
 			}
 			templateGenome = make_shared<MultiGenome>(templateChromosome, MultiGenome::initialChromosomes, MultiGenome::initialPloidy);
 		} else if (AbstractGenome::genomeTypeStr == "Circular") {
-			if (AbstractGenome::genomeSitesType == "unsigned char") {
+			if (AbstractGenome::genomeSitesType == "char") {
 				templateGenome = make_shared<CircularGenome<unsigned char>>(CircularGenomeParameters::initialGenomeSize, AbstractGenome::alphabetSize);
 			} else if (AbstractGenome::genomeSitesType == "int") {
 				templateGenome = make_shared<CircularGenome<int>>(CircularGenomeParameters::initialGenomeSize, AbstractGenome::alphabetSize);
