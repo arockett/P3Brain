@@ -34,7 +34,7 @@ class MarkovBrain : public AbstractBrain {
 //	static bool& cacheResults;
 //	static int& cacheResultsCount;
 
-	static void initializeParameters();
+	//static void initializeParameters();
 	vector<int> nodeMap;
 
 	/*
@@ -50,6 +50,8 @@ class MarkovBrain : public AbstractBrain {
 	}
 
 	MarkovBrain() = delete;
+
+	MarkovBrain(vector<shared_ptr<Gate>> _gates, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes);
 
 	MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes);
 	MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes);
