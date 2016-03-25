@@ -12,7 +12,7 @@ vector<shared_ptr<Gate>> Classic_GateListBuilder::buildGateListAndGetAllValues(s
 
 	vector<shared_ptr<Gate>> gates;
 	int codonMax = (1 << Global::bitsPerCodon) - 1;
-	bool mustReadAll = codonMax > genome->alphabetSize();
+	bool mustReadAll = codonMax > genome->getAlphabetSize();
 
 	bool translation_Complete = false;
 

@@ -78,7 +78,6 @@ bool LODwAP_Archivist::archive(vector<shared_ptr<Organism>> population, int flus
 		if (writeDataFile) {
 			while ((effective_MRCA->timeOfBirth >= nextDataWrite) && (nextDataWrite <= Global::updates)) {  // if there is convergence before the next data interval
 				shared_ptr<Organism> current = LOD[nextDataWrite - lastPrune];
-				cout << "A" << endl;
 				if (LODwAP_Arch_DataFileConvertAllLists) {
 					DataMap TempMap;
 					for (auto key : current->dataMap.getKeys()) {
@@ -97,7 +96,6 @@ bool LODwAP_Archivist::archive(vector<shared_ptr<Organism>> population, int flus
 							}
 						} else {
 							TempMap.Set(key, current->dataMap.Get(key));
-							cout << key << " = " << current->dataMap.Get(key) << endl;
 						}
 					}
 					for (auto file : files) {  // for each file in files
