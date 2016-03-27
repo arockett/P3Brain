@@ -266,6 +266,10 @@ CircularGenome<int>::CircularGenome(int _size, double _alphabetSize) {
 }
 template<>
 CircularGenome<bool>::CircularGenome(int _size, double _alphabetSize) {
+	if (_alphabetSize != 2) {
+		cout << "ERROR: in CircularGenome constructor, alphabetSize for bool must be 2!\n";
+		exit(1);
+	}
 	setupCircularGenome(_size, _alphabetSize);
 }
 template<>
@@ -274,6 +278,10 @@ CircularGenome<double>::CircularGenome(int _size, double _alphabetSize) {
 }
 template<>
 CircularGenome<unsigned char>::CircularGenome(int _size, double _alphabetSize) {
+	if (_alphabetSize > 256 || _alphabetSize < 2) {
+		cout << "ERROR: in CircularGenome constructor, alphabetSize for unsigned char must be 2 or greater and 256 or less!\n";
+		exit(1);
+	}
 	setupCircularGenome(_size, _alphabetSize);
 }
 
@@ -525,45 +533,45 @@ void CircularGenome<T>::recordDataMap() {
 
 // load all genomes from a file
 template<class T>
-void CircularGenome<T>::loadGenomes(string fileName, vector<shared_ptr<AbstractGenome>> &genomes) {
-//	genomes.clear();
-//	std::ifstream FILE(fileName);
-//	string rawLine;
-//	int _update, _ID, _sitesCount, _chromosomeCount, _ploidy;
-//	double _alphabetSize;
-//	vector<int> _chromosomeLengths;
-//	char rubbish;
-//	if (FILE.is_open()) {  // if the file named by configFileName can be opened
-//		getline(FILE, rawLine);  // bypass first line
-//		while (getline(FILE, rawLine)) {  // keep loading one line from the file at a time into "line" until we get to the end of the file
-//			std::stringstream ss(rawLine);
-////				ss >> target;
-////				if (ss.fail()) {
-////					return false;
-////				} else {
-////					string remaining;
-////					ss >> remaining;
-////					// stream failure means nothing left in stream, which is what we want
-////					return ss.fail();
-////				}
-//			ss >> _update >> rubbish >> _ID >> rubbish >> _sitesCount >> rubbish >> _chromosomeCount >> rubbish >> _alphabetSize >> rubbish >> _ploidy >> rubbish >> rubbish >> rubbish;
-//			_chromosomeLengths.resize(_chromosomeCount);
-//			for (int i = 0; i < _chromosomeCount; i++) {
-//				ss >> _chromosomeLengths[i] >> rubbish;
-//			}
-//			ss >> rubbish >> rubbish >> rubbish >> rubbish;
-//
-//			shared_ptr<Genome> newGenome = make_shared<Genome>(chromosomes[0], _chromosomeCount / _ploidy, _ploidy);
-//			for (int i = 0; i < _chromosomeCount; i++) {
-//				newGenome->chromosomes[i]->readChromosomeFromSS(ss, _chromosomeLengths[i]);
-//			}
-//			newGenome->dataMap.Set("update", _update);
-//			newGenome->dataMap.Set("ID", _ID);
-//			newGenome->ploidy = _ploidy;
-//			genomes.push_back(newGenome);
-//		}
-//	}
-//
+void CircularGenome<T>::loadGenomeFile(string fileName, vector<shared_ptr<AbstractGenome>> &genomes) {
+	genomes.clear();
+	std::ifstream FILE(fileName);
+	string rawLine;
+	int _update, _ID, _genomeLength;
+	double _alphabetSize;
+	double value;
+	char rubbish;
+	if (FILE.is_open()) {  // if the file named by configFileName can be opened
+		getline(FILE, rawLine);  // bypass first line
+		while (getline(FILE, rawLine)) {  // keep loading one line from the file at a time into "line" until we get to the end of the file
+			std::stringstream ss(rawLine);
+//				ss >> target;
+//				if (ss.fail()) {
+//					return false;
+//				} else {
+//					string remaining;
+//					ss >> remaining;
+//					// stream failure means nothing left in stream, which is what we want
+//					return ss.fail();
+//				}
+			ss >> _update >> rubbish >> _ID >> rubbish >> _alphabetSize >> rubbish >> _genomeLength >> rubbish >> rubbish >> rubbish;
+
+			shared_ptr<CircularGenome> newGenome = make_shared<CircularGenome>(_alphabetSize);
+			newGenome->sites.clear();
+			for (int i = 0; i < _genomeLength; i++) {
+				ss >> value >> rubbish;
+				newGenome->sites.push_back(value);
+			}
+			newGenome->dataMap.Set("update", _update);
+			newGenome->dataMap.Set("ID", _ID);
+			genomes.push_back(newGenome);
+		}
+	} else {
+		cout << "\n\nERROR: In CircularGenome::loadGenomeFile, unable to open file \"" << fileName << "\"\n\nExiting\n" << endl;
+		exit(1);
+	}
+
+
 }
 // load a genome from CSV file with headers - will return genome from saved organism with key / keyvalue pair
 // the undefined action is to take no action
@@ -589,9 +597,7 @@ string CircularGenome<T>::genomeToStr() {
 template<class T>
 void CircularGenome<T>::printGenome() {
 	cout << "alphabetSize: " << getAlphabetSize() << endl;
-	for (int i = 0; i < sites.size(); i++) {
-		cout << sites[i] << " ";
-	}
+	cout << genomeToStr();
 	cout << endl;
 }
 

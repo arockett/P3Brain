@@ -124,6 +124,16 @@ public:
 		connectionsCount = 0;
 		int wireCount = 0;
 
+		// establish I/O
+		if ((width * depth * height) < (nrOfBrainNodes * worldConnectionsSeparation)) {
+			cout << "ERROR: WireBrain requires a bigger brain width * depth * height must be >= (nrOfNodes * worldConnectionsSeparation)!\nExiting\n" << endl;
+			exit(1);
+		}
+		for (int i = 0; i < nrOfBrainNodes; i++) {
+			nodesAddresses[i] = worldConnectionsSeparation * i;
+			nodesNextAddresses[i] = ((width * depth * height) - 1) - (worldConnectionsSeparation * i);
+		}
+
 		if (genomeDecodingMethod == "bitmap") {
 			// load genome into allCells
 			auto genomeHandler = genome->newHandler(genome, true);
@@ -326,6 +336,14 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // The following block creates a "manageable" brain for testing ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//		if ((width * depth * height) < (nrOfBrainNodes * worldConnectionsSeparation)) {
+//			cout << "ERROR: WireBrain requires a bigger brain width * depth * height must be >= (nrOfNodes * worldConnectionsSeparation)!\nExiting\n" << endl;
+//			exit(1);
+//		}
+//		for (int i = 0; i < nrOfBrainNodes; i++) {
+//			nodesAddresses[i] = worldConnectionsSeparation * i;
+//			nodesNextAddresses[i] = ((width * depth * height) - 1) - (worldConnectionsSeparation * i);
+//		}
 //				width = 7;
 //				height = 7;
 //				depth = 3;
@@ -379,6 +397,76 @@ public:
 ////////^///////////////^///////////////////^///////////////////^/////////////////^////////////////////////////^////////////////////////////////
 // a "manageable" brain for testing ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// The following block creates a "manageable" brain for testing ////////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		width = 7;
+		height = 7;
+		depth = 4;
+		allCells.resize(0);
+		nextAllCells.resize(0);
+		neighbors.resize(0);
+
+		allCells.resize(width * depth * height);
+		nextAllCells.resize(width * depth * height);
+		neighbors.resize(width * depth * height);
+		wireAddresses.resize(0);
+
+		connectionsCount = 0;
+		wireCount = 0;
+
+		if ((width * depth * height) < (nrOfBrainNodes * worldConnectionsSeparation)) {
+			cout << "ERROR: WireBrain requires a bigger brain width * depth * height must be >= (nrOfNodes * worldConnectionsSeparation)!\nExiting\n" << endl;
+			exit(1);
+		}
+		for (int i = 0; i < nrOfBrainNodes; i++) {
+			nodesAddresses[i] = worldConnectionsSeparation * i;
+			nodesNextAddresses[i] = ((width * depth * height) - 1) - (worldConnectionsSeparation * i);
+		}
+
+		allCells = {
+			1,1,1,0,0,0,0,
+			0,1,1,0,0,0,0,
+			0,0,1,0,0,0,0,
+			0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,
+			0,0,0,0,0,1,0,
+			0,0,0,1,1,1,1,
+
+			0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,
+			0,0,0,0,0,1,0,
+			0,0,0,0,1,1,0,
+			0,0,0,0,1,1,0,
+			0,0,0,0,0,1,0,
+			0,0,0,1,1,1,1,
+
+			1,1,1,1,1,1,0,
+			1,0,0,0,0,0,0,
+			1,0,0,0,0,0,0,
+			1,0,0,0,0,0,0,
+			1,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,
+
+			0,0,0,0,0,0,1,
+			0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,
+			1,1,0,0,0,0,0,
+			1,1,0,1,1,1,1};
+
+		for (int l = 0; l < (int) allCells.size(); l++) {
+			if (allCells[l] == WIRE) {
+				wireAddresses.push_back(l);
+				wireCount++;
+			}
+		}
+		////////^///////////////^///////////////////^///////////////////^/////////////////^////////////////////////////^////////////////////////////////
+		// a "manageable" brain for testing ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		// make neighbor connections
 		for (auto l : wireAddresses) {  // for every cell
@@ -441,22 +529,91 @@ public:
 				}
 			}
 		}
-		if ((width * depth * height) < (nrOfBrainNodes * worldConnectionsSeparation)) {
-			cout << "ERROR: WireBrain requires a bigger brain width * depth * height must be >= (nrOfNodes * worldConnectionsSeparation)!\nExiting\n" << endl;
-			exit(1);
+
+		// prune unconnected wire
+
+		vector<int> wirePruneList;
+		vector<vector<int>> clusterList;
+		clusterList.clear();
+		int currentClusterIndex = 0;
+		vector<int> currentToCheckList;
+
+		int currentCell;
+		wirePruneList = wireAddresses;  // all of the cells to check
+
+		while (wirePruneList.size() > 0) {
+			clusterList.resize(currentClusterIndex + 1);
+			currentToCheckList.clear();
+			clusterList[currentClusterIndex].push_back(wirePruneList[0]);  // add the first cell in the prune list to the currentList
+			currentToCheckList.push_back(wirePruneList[0]);  // and also to the ToCheckList
+			wirePruneList[0] = wirePruneList[wirePruneList.size() - 1];  // remove this cell from the list of cells to check
+			wirePruneList.pop_back();
+
+			while (currentToCheckList.size() > 0) {
+				currentCell = currentToCheckList[0];
+				currentToCheckList[0] = currentToCheckList[currentToCheckList.size() - 1];
+				currentToCheckList.pop_back();
+
+				for (int n : neighbors[currentCell]) {  // for each neighbor of this cell...
+					if (find(wirePruneList.begin(), wirePruneList.end(), n) != wirePruneList.end()) {  // if that neighbor has not already been visited
+						clusterList[currentClusterIndex].push_back(n);  // add it to the cluster
+						currentToCheckList.push_back(n);  // also add it to a list of cells that we need to check
+						int index = 0;
+						for (size_t i = 0; i < wirePruneList.size(); i++) {  // get the index of this neighbor
+							if (wirePruneList[i] == n) {
+								index = i;
+							}
+						}
+						wirePruneList[index] = wirePruneList[wirePruneList.size() - 1];  // remove this neighbor from the wirePruneList
+						wirePruneList.pop_back();
+					}
+				}
+			}
+			currentClusterIndex++;
 		}
-		for (int i = 0; i < nrOfBrainNodes; i++) {
-			nodesAddresses[i] = worldConnectionsSeparation * i;
-			nodesNextAddresses[i] = ((width * depth * height) - 1) - (worldConnectionsSeparation * i);
+
+		// now that we have clusters, determine for each cluster if it connects to an input, an output, or both
+
+		vector<bool> clusterIsInputConnected;
+		vector<bool> clusterIsOutputConnected;
+
+		clusterIsInputConnected.resize(clusterList.size());
+		clusterIsOutputConnected.resize(clusterList.size());
+
+		for (size_t c = 0; c < clusterList.size(); c++) {
+			for (auto e : clusterList[c]) {
+				for (auto v : nodesAddresses) {
+					if (e == v) {
+						clusterIsInputConnected[c] = true;
+					}
+				}
+				for (auto v : nodesNextAddresses) {
+					if (e == v) {
+						clusterIsOutputConnected[c] = true;
+					}
+				}
+			}
 		}
+		for (size_t c = 0; c < clusterList.size(); c++) {
+			cout << "cluster[" << c << "]\t input connected: " << clusterIsInputConnected[c] << "\t output connected: " << clusterIsOutputConnected[c] << endl;
+			for (auto e : clusterList[c]) {
+				cout << e << " ";
+			}
+			cout << endl;
+		}
+
+		cout << "HERE" << endl;
+		displayBrainState();
+		exit(1);
 		//cout << "  made wire brain with : " << connectionsCount << " connections and " << wireCount << " wires." << endl;
 		// columns to be added to ave file
 		aveFileColumns.clear();
 		aveFileColumns.push_back("wireBrainWireCount");
 		aveFileColumns.push_back("wireBrainConnectionsCount");
 
-
 	}
+
+
 
 	virtual ~WireBrain() = default;
 
@@ -520,8 +677,11 @@ public:
 			//cout << i << " " << nodesNextAddresses[i] << " " << nodesNext[i] <<endl;
 		}
 	}
-
 	virtual void update() override {
+		update(false);
+	}
+
+	virtual void update(bool recordActivity) {
 		//cout << "in update()"<<endl;
 
 		/// first see if we we already know this input
@@ -564,12 +724,15 @@ public:
 					//allCells[0]=CHARGE;
 					/////////////////////////////
 				}
-				//SaveBrainState();
+				if (recordActivity) {
+					SaveBrainState("wireBrain.run");
+				}
 				for (int count = 0; count < chargeUpdatesPerUpdate; count++) {
 					chargeUpdate();
-					//SaveBrainState();
+					if (recordActivity) {
+						SaveBrainState("wireBrain.run");
+					}
 				}
-				//exit(1);
 				//////
 				// set lookup table value!
 				//////
@@ -602,7 +765,7 @@ public:
 
 	}
 
-	virtual void SaveBrainState() {
+	virtual void SaveBrainState(string fileName) {
 //		for (int i = 0; i < nrOfNodes; i++) {
 //			int l = nodesAddresses[i];
 //			int cellX = (l % (width * height)) % width;  // find this cells x,y,z location in brain
@@ -628,7 +791,7 @@ public:
 				stateNow += "D";
 			}
 		}
-		FileManager::writeToFile("wireBrain.run", stateNow, to_string(width) + ',' + to_string(height) + ',' + to_string(depth));  //fileName, data, header - used when you want to output formatted data (i.e. genomes)
+		FileManager::writeToFile(fileName, stateNow, to_string(width) + ',' + to_string(height) + ',' + to_string(depth));  //fileName, data, header - used when you want to output formatted data (i.e. genomes)
 //		for (int i = 0; i < nrOfNodes; i++) {
 //			int l = nodesNextAddresses[i];
 //			int cellX = (l % (width * height)) % width;  // find this cells x,y,z location in brain
@@ -655,6 +818,7 @@ public:
 		cout << endl;
 		cout << "---------------------------------------------------\n";
 
+		int i = 0;
 		int w = 0;
 		int d = 0;
 
@@ -662,13 +826,13 @@ public:
 			if (cell == 0) {
 				cout << " ";
 			} else if (cell == 1) {
-				cout << ".";
+				cout << i << " ";//".";
 			} else if (cell == CHARGE) {
 				cout << "O";
 			} else {
 				cout << "-";
 			}
-
+			i++;
 			w++;
 			d++;
 			if (w == width) {

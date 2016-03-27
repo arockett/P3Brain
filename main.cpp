@@ -402,20 +402,49 @@ int main(int argc, const char * argv[]) {
 // evolution loop
 //////////////////
 
-	bool finished = false;  // when the archivist says we are done, we can stop!
+	if (Global::mode == "run") {
+		bool finished = false;  // when the archivist says we are done, we can stop!
 
-	while (!finished) {
-		world->evaluateFitness(group->population, false);  // evaluate each organism in the population using a World
-		//cout << "  evaluation done\n";
-		finished = group->archive();  // save data, update memory and delete any unneeded data;
-		//cout << "  archive done\n";
-		Global::update++;
-		group->optimize();  // update the population (reproduction and death)
-		//cout << "  optimize done\n";
-		cout << "update: " << Global::update - 1 << "   maxFitness: " << group->optimizer->maxFitness << "" << endl;
+		while (!finished) {
+			world->evaluateFitness(group->population, false);  // evaluate each organism in the population using a World
+			//cout << "  evaluation done\n";
+			finished = group->archive();  // save data, update memory and delete any unneeded data;
+			//cout << "  archive done\n";
+			Global::update++;
+			group->optimize();  // update the population (reproduction and death)
+			//cout << "  optimize done\n";
+			cout << "update: " << Global::update - 1 << "   maxFitness: " << group->optimizer->maxFitness << "" << endl;
+		}
+
+		group->archive(1);  // flush any data that has not been output yet
+	} else if (Global::mode == "test") {
+
+		vector<shared_ptr<AbstractGenome>> mg;
+		cout << "A\n";
+		group->population[0]->genome->loadGenomeFile("genome_20000.csv", mg);
+		cout << "B\n";
+
+		vector<shared_ptr<Organism>> testPopulation;
+		for (auto g : mg){
+			auto newOrg = make_shared<Organism>(group->population[0], g);
+			testPopulation.push_back(newOrg);  // add a new org to population using progenitors template and a new random genome
+		}
+		cout << "C\n";
+
+		//shared_ptr<Group> testGroup = make_shared<Group>(testPopulation, group->optimizer, group->archivist);
+		cout << "D\n";
+		world->evaluateFitness({testPopulation[1]},false);
+		cout << "E\n";
+
+//		for (auto o : testPopulation){
+//			cout << o->score << " " << o->genome->dataMap.Get("ID") << endl;
+//		}
+
+	} else {
+		cout << "\n\nERROR: Unrecognized mode set in configuration!\n  \"" << Global::mode << "\" is not defined.\n\nExiting.\n" << endl;
+		exit(1);
 	}
 
-	group->archive(1);  // flush any data that has not been output yet
 
 	//if (Archivist::Arch_outputMethodStr == "LODwAP") {  // if using LODwAP, write out some info about MRCA
 	//	shared_ptr<Organism> FinalMRCA = group->population[0]->getMostRecentCommonAncestor(group->population[0]);

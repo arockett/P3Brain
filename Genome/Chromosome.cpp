@@ -188,7 +188,7 @@ template<class T> void Chromosome<T>::fillConstant(const int value) {
 }
 
 template<class T> void Chromosome<T>::readChromosomeFromSS(std::stringstream &ss, int _chromosomeLength) {
-	int value;
+	double value;
 	char rubbish;
 	sites.clear();
 	for (int i = 0; i < _chromosomeLength; i++) {
@@ -387,7 +387,7 @@ sites.resize(chromosomeLength);
 
 template<> Chromosome<unsigned char>::Chromosome(int chromosomeLength, double _alphabetSize) {
 if (_alphabetSize > 256 || _alphabetSize < 2) {
-	cout << "ERROR: alphabetSize for unsigned char must be 2 or greater and 256 or less!\n";
+	cout << "ERROR: in Chromosome constructor, alphabetSize for unsigned char must be 2 or greater and 256 or less!\n";
 	exit(1);
 }
 alphabetSize = _alphabetSize;
@@ -407,7 +407,7 @@ sites.resize(chromosomeLength);
 
 template<> Chromosome<bool>::Chromosome(int chromosomeLength, double _alphabetSize) {
 if (_alphabetSize != 2) {
-	cout << "ERROR: alphabetSize for bool must be 2!\n";
+	cout << "ERROR: in Chromosome constructor, alphabetSize for bool must be 2!\n";
 	exit(1);
 }
 alphabetSize = 2;
@@ -424,7 +424,7 @@ exit(1);
 
 template<> Chromosome<int>::Chromosome(int chromosomeLength, double _alphabetSize) {
 if (_alphabetSize < 2) {
-	cout << "ERROR: alphabetSize for int must be 2 or greater!\n";
+	cout << "ERROR: in Chromosome constructor, alphabetSize for int must be 2 or greater!\n";
 	exit(1);
 }
 alphabetSize = _alphabetSize;
