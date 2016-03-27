@@ -420,25 +420,20 @@ int main(int argc, const char * argv[]) {
 	} else if (Global::mode == "test") {
 
 		vector<shared_ptr<AbstractGenome>> mg;
-		cout << "A\n";
-		group->population[0]->genome->loadGenomeFile("genome_20000.csv", mg);
-		cout << "B\n";
+		group->population[0]->genome->loadGenomeFile("genome_19000.csv", mg);
 
 		vector<shared_ptr<Organism>> testPopulation;
 		for (auto g : mg){
 			auto newOrg = make_shared<Organism>(group->population[0], g);
 			testPopulation.push_back(newOrg);  // add a new org to population using progenitors template and a new random genome
 		}
-		cout << "C\n";
 
 		//shared_ptr<Group> testGroup = make_shared<Group>(testPopulation, group->optimizer, group->archivist);
-		cout << "D\n";
-		world->evaluateFitness({testPopulation[1]},false);
-		cout << "E\n";
+		world->evaluateFitness(testPopulation,false);
 
-//		for (auto o : testPopulation){
-//			cout << o->score << " " << o->genome->dataMap.Get("ID") << endl;
-//		}
+		for (auto o : testPopulation){
+			cout << o->score << " " << o->genome->dataMap.Get("ID") << endl;
+		}
 
 	} else {
 		cout << "\n\nERROR: Unrecognized mode set in configuration!\n  \"" << Global::mode << "\" is not defined.\n\nExiting.\n" << endl;

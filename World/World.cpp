@@ -34,12 +34,12 @@ void World::evaluateFitness(vector<shared_ptr<Organism>> population, bool analys
 		double scoreTotal = 0.0;
 		for (int r = 0; r < World::repeats; r++) {
 			score = testIndividual(population[i], analyse);
+			//cout << score << "," << flush;
 			scoreTotal += score;
 			population[i]->dataMap.Append("allscore", score);
 		}
 		population[i]->score = (scoreTotal / (double) World::repeats);
-		//cout << population[i]->score << " " << flush;
-		//population[i]->dataMap.Set("score", population[i]->score);
+		//cout << " -> " << population[i]->score << " ... " << flush;
 		population[i]->dataMap.Set("update", Global::update);
 	}
 	//cout << "\n";

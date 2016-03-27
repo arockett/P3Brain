@@ -25,7 +25,6 @@
 
 // define the wire states
 
-#define DECAY 2
 #define WIRE 1
 #define HOLLOW 0
 
@@ -39,6 +38,7 @@ using namespace std;
 
 class WireBrain: public AbstractBrain {
 
+	static const bool& allowNegativeCharge;
 	static const int& defaultWidth;
 	static const int& defaultHeight;
 	static const int& defaultDepth;
@@ -67,6 +67,7 @@ class WireBrain: public AbstractBrain {
 	static const string& wiregenesSquiggleWireDirections;
 
 	const int CHARGE = 2 + decayDuration;
+	const int NEGCHARGE = CHARGE * -1;
 
 public:
 
@@ -121,9 +122,6 @@ public:
 			}
 		}
 
-		connectionsCount = 0;
-		int wireCount = 0;
-
 		// establish I/O
 		if ((width * depth * height) < (nrOfBrainNodes * worldConnectionsSeparation)) {
 			cout << "ERROR: WireBrain requires a bigger brain width * depth * height must be >= (nrOfNodes * worldConnectionsSeparation)!\nExiting\n" << endl;
@@ -141,7 +139,6 @@ public:
 				allCells[l] = genomeHandler->readInt(0, 1);  // 1 (WIRE) will be assigned initialFillRatio % of the time
 				if (allCells[l] == WIRE) {
 					wireAddresses.push_back(l);
-					wireCount++;
 				}
 			}
 		} else if (genomeDecodingMethod == "wiregenes") {
@@ -281,7 +278,6 @@ public:
 						if (allCells[wireIndex] != WIRE) {  // if this cell is not already wire...
 							allCells[wireIndex] = WIRE;  // make this cell wire
 							wireAddresses.push_back(wireIndex);  // add this cell to wireAddresses
-							wireCount++;
 						}
 						//cout << X << "," << Y << "," << Z << endl;
 						X += dList[feature[4]][0];  // move in direction to the next cell in this wire
@@ -314,7 +310,6 @@ public:
 						if (allCells[wireIndex] != WIRE) {  // if this cell is not already wire...
 							allCells[wireIndex] = WIRE;  // make this cell wire
 							wireAddresses.push_back(wireIndex);  // add this cell to wireAddresses
-							wireCount++;
 						}
 						//cout << X << "," << Y << "," << Z << endl;
 						X += dList[feature[index]][0];  // move in direction indicated by the next three values in feature
@@ -401,69 +396,67 @@ public:
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// The following block creates a "manageable" brain for testing ////////////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		width = 7;
-		height = 7;
-		depth = 4;
-		allCells.resize(0);
-		nextAllCells.resize(0);
-		neighbors.resize(0);
-
-		allCells.resize(width * depth * height);
-		nextAllCells.resize(width * depth * height);
-		neighbors.resize(width * depth * height);
-		wireAddresses.resize(0);
-
-		connectionsCount = 0;
-		wireCount = 0;
-
-		if ((width * depth * height) < (nrOfBrainNodes * worldConnectionsSeparation)) {
-			cout << "ERROR: WireBrain requires a bigger brain width * depth * height must be >= (nrOfNodes * worldConnectionsSeparation)!\nExiting\n" << endl;
-			exit(1);
-		}
-		for (int i = 0; i < nrOfBrainNodes; i++) {
-			nodesAddresses[i] = worldConnectionsSeparation * i;
-			nodesNextAddresses[i] = ((width * depth * height) - 1) - (worldConnectionsSeparation * i);
-		}
-
-		allCells = {
-			1,1,1,0,0,0,0,
-			0,1,1,0,0,0,0,
-			0,0,1,0,0,0,0,
-			0,0,0,0,0,0,0,
-			0,0,0,0,0,0,0,
-			0,0,0,0,0,1,0,
-			0,0,0,1,1,1,1,
-
-			0,0,0,0,0,0,0,
-			0,0,0,0,0,0,0,
-			0,0,0,0,0,1,0,
-			0,0,0,0,1,1,0,
-			0,0,0,0,1,1,0,
-			0,0,0,0,0,1,0,
-			0,0,0,1,1,1,1,
-
-			1,1,1,1,1,1,0,
-			1,0,0,0,0,0,0,
-			1,0,0,0,0,0,0,
-			1,0,0,0,0,0,0,
-			1,0,0,0,0,0,0,
-			0,0,0,0,0,0,0,
-			0,0,0,0,0,0,0,
-
-			0,0,0,0,0,0,1,
-			0,0,0,0,0,0,0,
-			0,0,0,0,0,0,0,
-			0,0,0,0,0,0,0,
-			0,0,0,0,0,0,0,
-			1,1,0,0,0,0,0,
-			1,1,0,1,1,1,1};
-
-		for (int l = 0; l < (int) allCells.size(); l++) {
-			if (allCells[l] == WIRE) {
-				wireAddresses.push_back(l);
-				wireCount++;
-			}
-		}
+//		width = 7;
+//		height = 7;
+//		depth = 4;
+//		allCells.resize(0);
+//		nextAllCells.resize(0);
+//		neighbors.resize(0);
+//
+//		allCells.resize(width * depth * height);
+//		nextAllCells.resize(width * depth * height);
+//		neighbors.resize(width * depth * height);
+//		wireAddresses.resize(0);
+//
+//		connectionsCount = 0;
+//
+//		if ((width * depth * height) < (nrOfBrainNodes * worldConnectionsSeparation)) {
+//			cout << "ERROR: WireBrain requires a bigger brain width * depth * height must be >= (nrOfNodes * worldConnectionsSeparation)!\nExiting\n" << endl;
+//			exit(1);
+//		}
+//		for (int i = 0; i < nrOfBrainNodes; i++) {
+//			nodesAddresses[i] = worldConnectionsSeparation * i;
+//			nodesNextAddresses[i] = ((width * depth * height) - 1) - (worldConnectionsSeparation * i);
+//		}
+//
+//		allCells = {
+//			1,1,1,0,0,0,1,
+//			0,1,1,0,0,0,0,
+//			0,0,1,0,0,0,0,
+//			0,0,0,0,0,0,0,
+//			0,0,0,0,0,0,0,
+//			0,0,0,0,0,1,0,
+//			0,0,0,1,1,1,1,
+//
+//			0,0,0,0,0,0,0,
+//			0,0,0,0,0,0,0,
+//			0,0,0,0,0,1,0,
+//			0,0,0,0,1,1,0,
+//			0,0,0,0,1,1,0,
+//			0,0,0,0,0,1,0,
+//			0,0,0,1,1,1,1,
+//
+//			1,1,1,1,1,1,0,
+//			1,0,0,0,0,0,0,
+//			1,0,0,0,0,0,0,
+//			1,0,0,0,0,0,0,
+//			1,0,0,0,0,0,0,
+//			0,0,0,0,0,0,0,
+//			0,0,0,0,0,0,0,
+//
+//			0,0,0,0,0,0,1,
+//			0,0,0,0,0,0,0,
+//			0,0,0,0,0,0,0,
+//			0,0,0,0,0,0,0,
+//			0,0,0,0,0,1,1,
+//			1,1,0,0,0,0,0,
+//			1,1,0,1,1,1,1};
+//
+//		for (int l = 0; l < (int) allCells.size(); l++) {
+//			if (allCells[l] == WIRE) {
+//				wireAddresses.push_back(l);
+//			}
+//		}
 		////////^///////////////^///////////////////^///////////////////^/////////////////^////////////////////////////^////////////////////////////////
 		// a "manageable" brain for testing ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -484,7 +477,7 @@ public:
 							//cout << "  valid\n";
 							int neighborIndex = testX + (testY * width) + (testZ * (width * height));
 							if ((allCells[neighborIndex] == WIRE) && (l != neighborIndex)) {
-								connectionsCount++;
+								//connectionsCount++;
 								neighbors[l].push_back(neighborIndex);
 							}
 						}
@@ -494,7 +487,10 @@ public:
 		}
 
 		// add wiregenes wormholes
+		vector<pair<int, int>> wormholeList;
+		wormholeList.clear();
 		if (genomeDecodingMethod == "wiregenes") {
+
 			int sourceX, sourceY, sourceZ;
 			int destinationX, destinationY, destinationZ;
 			int sourceIndex, destinationIndex;
@@ -513,18 +509,20 @@ public:
 				destinationIndex = destinationX + (destinationY * width) + (destinationZ * (width * height));
 				if (allCells[sourceIndex] == WIRE && allCells[destinationIndex] == WIRE) {
 					if (wiregenesWormholesBidirectional == 0) {
-						neighbors[destinationIndex].push_back(sourceIndex);
-						connectionsCount++;
+						//neighbors[destinationIndex].push_back(sourceIndex);
+						wormholeList.push_back( { sourceIndex, destinationIndex });
+						//connectionsCount++;
 					}
 					if (wiregenesWormholesBidirectional == 1) {
-						(feature[6]) ? neighbors[destinationIndex].push_back(sourceIndex) : neighbors[sourceIndex].push_back(destinationIndex);
-						connectionsCount++;
+						//(feature[6]) ? neighbors[destinationIndex].push_back(sourceIndex) : neighbors[sourceIndex].push_back(destinationIndex);
+						(feature[6]) ? wormholeList.push_back( { sourceIndex, destinationIndex }) : wormholeList.push_back( { destinationIndex, sourceIndex });
+						//connectionsCount++;
 					}
 					if (wiregenesWormholesBidirectional == 2) {
-						neighbors[destinationIndex].push_back(sourceIndex);
-						connectionsCount++;
-						neighbors[sourceIndex].push_back(destinationIndex);
-						connectionsCount++;
+						wormholeList.push_back( { sourceIndex, destinationIndex });
+						wormholeList.push_back( { destinationIndex, sourceIndex });
+						//connectionsCount++;
+						//connectionsCount++;
 					}
 				}
 			}
@@ -581,6 +579,8 @@ public:
 		clusterIsOutputConnected.resize(clusterList.size());
 
 		for (size_t c = 0; c < clusterList.size(); c++) {
+			clusterIsInputConnected[c] = false;
+			clusterIsOutputConnected[c] = false;
 			for (auto e : clusterList[c]) {
 				for (auto v : nodesAddresses) {
 					if (e == v) {
@@ -594,26 +594,120 @@ public:
 				}
 			}
 		}
-		for (size_t c = 0; c < clusterList.size(); c++) {
-			cout << "cluster[" << c << "]\t input connected: " << clusterIsInputConnected[c] << "\t output connected: " << clusterIsOutputConnected[c] << endl;
-			for (auto e : clusterList[c]) {
-				cout << e << " ";
+
+		size_t i = 0;
+		bool changedState = true;
+		int targetCluster, sourceCluster;
+
+		while (changedState == true) {
+			i = 0;
+			changedState = false;
+			while (i < wormholeList.size()) {  // if there are still wormholes to check, or the state of clusters has changed
+				//cout << i << "  current wormholeList : ";
+				//for (auto w : wormholeList) {
+				//	cout << w.first << "->" << w.second << "  ";
+				//}
+				//cout << endl;
+				targetCluster = -1;
+				sourceCluster = -1;
+				for (size_t c = 0; c < clusterList.size(); c++) {
+					for (size_t v = 0; v < clusterList[c].size(); v++) {
+						//cout << "check for source: " << wormholeList[i].first << " =?= " << clusterList[c][v] << endl;
+						//cout << "check for target: " << wormholeList[i].second << " =?= " << clusterList[c][v] << endl;
+						if (wormholeList[i].first == clusterList[c][v]) {
+							sourceCluster = c;
+							//cout << "  source cluster set to: " << sourceCluster << endl;
+						}
+						if (wormholeList[i].second == clusterList[c][v]) {
+							targetCluster = c;
+							//cout << "  target cluster set to: " << targetCluster << endl;
+						}
+					}
+				}
+				//cout << "   source cluster = " << sourceCluster << "  ->  target cluster = " << targetCluster << endl;
+				if (sourceCluster == targetCluster) {  // wormhole source and target are in the same cluster.
+					neighbors[wormholeList[i].second].push_back(wormholeList[i].first);  // now wormholeList[i].first will transmit charge to wormholeList[i].second
+					//cout << "** same cluster: " << wormholeList[i].first << "  " << wormholeList[i].second << endl;
+					wormholeList[i] = wormholeList[wormholeList.size() - 1];  // remove this wormhole from the list
+					wormholeList.pop_back();
+				} else if (sourceCluster == -1 || targetCluster == -1) {  // at least one end of the wormhole is not wire
+				//cout << "** unconnected: " << wormholeList[i].first << "  " << wormholeList[i].second << endl;
+					wormholeList[i] = wormholeList[wormholeList.size() - 1];  // remove this wormhole from the list
+					wormholeList.pop_back();
+				} else {  // wormhole connects two clusters
+					//cout << "** diffrent cluster: " << wormholeList[i].first << "  " << wormholeList[i].second << endl;
+					if (clusterIsInputConnected[sourceCluster] && !clusterIsInputConnected[targetCluster]) {  // the source cluster is connected to an input, but the target cluster is not
+						clusterIsInputConnected[targetCluster] = true;  // note that the target cluster now is connected to an input
+						changedState = true;  // we have changed state and will need to check again
+						//cout << "  ** cluster " << targetCluster << " now input connected" << endl;
+					}
+					if (clusterIsOutputConnected[targetCluster] && !clusterIsOutputConnected[sourceCluster]) {  // the target cluster is connected to an output, but the source cluster is not
+						clusterIsOutputConnected[sourceCluster] = true;  // note that the source cluster now is connected to an output
+						changedState = true;  // we have changed state and will need to check again
+						//cout << "  ** cluster " << sourceCluster << " now output connected" << endl;
+					}
+					if (clusterIsInputConnected[sourceCluster] && clusterIsOutputConnected[targetCluster]) {  // if both clusters are connected to input and output...
+						neighbors[wormholeList[i].second].push_back(wormholeList[i].first);  // now wormholeList[i].first will transmit charge to wormholeList[i].second
+						//cout << "  ** added wormhole connection " << wormholeList[i].first << "->" << wormholeList[i].second << endl;
+						wormholeList[i] = wormholeList[wormholeList.size() - 1];  // remove this wormhole from the list
+						wormholeList.pop_back();
+					} else {
+						i++;
+					}
+				}
 			}
-			cout << endl;
 		}
 
-		cout << "HERE" << endl;
-		displayBrainState();
-		exit(1);
+		//cout << "after correcting for wormholes, wormholeList : ";
+		//for (auto w : wormholeList) {
+		//	cout << w.first << "->" << w.second << "  ";
+		//}
+
+		//for (size_t c = 0; c < clusterList.size(); c++) {
+		//cout << "cluster[" << c << "]\t input connected: " << clusterIsInputConnected[c] << "\t output connected: " << clusterIsOutputConnected[c] << endl;
+		//for (auto e : clusterList[c]) {
+		//cout << e << " ";
+		//}
+		//cout << endl;
+		//}
+
+		//displayBrainState();
+
+		// now update wireAddresses to only include connected wire
+		int wireCount = 0;
+		wireAddresses.clear();
+		for (size_t c = 0; c < clusterList.size(); c++) {
+			if (clusterIsInputConnected[c] && clusterIsOutputConnected[c]) {
+				wireAddresses.insert(wireAddresses.end(), clusterList[c].begin(), clusterList[c].end());
+				wireCount += (int) clusterList[c].size();
+			}
+		}
+
+		// update the connectionsCount
+		connectionsCount = 0;
+		for (auto w : wireAddresses) {
+			connectionsCount += (int) neighbors[w].size();
+		}
+		//cout << connectionsCount;
+
+		// now update allCells
+		vector<int> newAllCells;
+		newAllCells.resize(width * depth * height);
+		for (auto w : wireAddresses) {
+			newAllCells[w] = 1;
+		}
+		swap(newAllCells, allCells);
+
+		//displayBrainState();
+
 		//cout << "  made wire brain with : " << connectionsCount << " connections and " << wireCount << " wires." << endl;
+
 		// columns to be added to ave file
 		aveFileColumns.clear();
 		aveFileColumns.push_back("wireBrainWireCount");
 		aveFileColumns.push_back("wireBrainConnectionsCount");
 
 	}
-
-
 
 	virtual ~WireBrain() = default;
 
@@ -661,9 +755,9 @@ public:
 		if (constantInputs) {
 			for (int i = 0; i < nrOfBrainNodes; i++) {  // for each input cell
 				//evalCount++;
-				if (nodes[i] == 1) {  // if this node is on
-					if (allCells[nodesAddresses[i]] == WIRE || allCells[nodesAddresses[i]] == DECAY) {  // if the connected location is uncharged wireAddresses...
-						allCells[nodesAddresses[i]] = CHARGE;  // charge it.
+				if (nodes[i] != 0) {  // if this node is on
+					if (allCells[nodesAddresses[i]] != HOLLOW) {  // if the connected location is uncharged wireAddresses...
+						allCells[nodesAddresses[i]] = CHARGE * Bit(nodes[i]);  // charge it.
 						//evalToCharge++;
 					}
 				}
@@ -677,6 +771,72 @@ public:
 			//cout << i << " " << nodesNextAddresses[i] << " " << nodesNext[i] <<endl;
 		}
 	}
+
+	virtual void chargeUpdateTrit() {
+		//cout << "in chargeUpdate()" << endl;
+		//int wireCount = 0;
+		//int evalCount = 0;
+		//int evalToCharge = 0;
+		//int evalToDecay = 0;
+		//int evalToWire = 0;
+
+		nextAllCells = allCells;
+
+		// propagate charge in the brain
+		int chargeCount;
+		for (auto cellAddress : wireAddresses) {
+			//wireCount++;
+			nextAllCells[cellAddress] = 1;
+			if (allCells[cellAddress] == WIRE) {
+				chargeCount = 0;
+				int nc = (int) neighbors[cellAddress].size() - 1;  // get the number of neighbors which are wire
+				while (nc >= 0) {  // for each neighbor
+					if (allCells[neighbors[cellAddress][nc]] == CHARGE) {  // if that neighbor is charged
+						chargeCount++;
+						//nextAllCells[cellAddress] = CHARGE;  // set this WIRE to CHARGE
+					}
+					if (allCells[neighbors[cellAddress][nc]] == NEGCHARGE) {  // if that neighbor is charged
+						chargeCount--;
+						//nextAllCells[cellAddress] = CHARGE;  // set this WIRE to CHARGE
+					}
+					nc--;
+				}
+				if (chargeCount > 0 && chargeCount < overchargeThreshold) {
+					nextAllCells[cellAddress] = CHARGE;  // if overcharged, change back to WIRE
+					//evalToCharge++;
+				} else if (chargeCount < 0 && chargeCount > (overchargeThreshold * -1)) {
+					nextAllCells[cellAddress] = NEGCHARGE;
+				}
+				//cout << "  " << cellAddress << " " << nextAllCells[cellAddress] << endl;
+			} else if (allCells[cellAddress] == NEGCHARGE) {
+				nextAllCells[cellAddress] = CHARGE - 1;
+			} else {  // this wire is currently either charged or in decay
+				nextAllCells[cellAddress] = allCells[cellAddress] - 1;
+			}
+		}
+		allCells = nextAllCells;
+
+		// if constantInputs, rechage the inputs
+		if (constantInputs) {
+			for (int i = 0; i < nrOfBrainNodes; i++) {  // for each input cell
+				//evalCount++;
+				if (nodes[i] != 0) {  // if this node is on
+					if (allCells[nodesAddresses[i]] != HOLLOW) {  // if the connected location is uncharged wireAddresses...
+						allCells[nodesAddresses[i]] = CHARGE * Trit(nodes[i]);  // charge it.
+						//evalToCharge++;
+					}
+				}
+			}
+		}
+		// read and accumulate outputs
+		// NOTE: output cells can go into charge/decay sets
+		for (int i = 0; i < nrOfBrainNodes; i++) {
+			//cout << i << " " << nodesNextAddresses[i] << " " << nodesNext[i] <<endl;
+			nextNodes[i] = nextNodes[i] + allCells[nodesNextAddresses[i]];
+			//cout << i << " " << nodesNextAddresses[i] << " " << nodesNext[i] <<endl;
+		}
+	}
+
 	virtual void update() override {
 		update(false);
 	}
@@ -717,8 +877,14 @@ public:
 				}
 				for (int i = 0; i < nrOfBrainNodes; i++) {  // set up inputs and outputs
 					nextNodes[i] = 0;  // reset all nodesNext
-					if (nodes[i] == 1 && allCells[nodesAddresses[i]] == WIRE) {  // for each node if it is on and connects to wire
-						allCells[nodesAddresses[i]] = CHARGE;  // charge the wire
+					if (!allowNegativeCharge) {
+						if (Bit(nodes[i]) == 1 && allCells[nodesAddresses[i]] == WIRE) {  // for each node if it is on and connects to wire
+							allCells[nodesAddresses[i]] = CHARGE;  // charge the wire
+						}
+					} else {
+						if (Trit(nodes[i]) != 0 && allCells[nodesAddresses[i]] == WIRE) {  // for each node if it is on and connects to wire
+							allCells[nodesAddresses[i]] = CHARGE * Trit(nodes[i]);  // charge the wire
+						}
 					}
 					//// for testing only!!!////
 					//allCells[0]=CHARGE;
@@ -728,7 +894,11 @@ public:
 					SaveBrainState("wireBrain.run");
 				}
 				for (int count = 0; count < chargeUpdatesPerUpdate; count++) {
-					chargeUpdate();
+					if (!allowNegativeCharge) {
+						chargeUpdate();
+					} else {
+						chargeUpdateTrit();
+					}
 					if (recordActivity) {
 						SaveBrainState("wireBrain.run");
 					}
@@ -787,6 +957,8 @@ public:
 				stateNow += "W";
 			} else if (cell == CHARGE) {
 				stateNow += "C";
+			} else if (cell == NEGCHARGE) {
+				stateNow += "N";
 			} else {
 				stateNow += "D";
 			}
@@ -818,7 +990,7 @@ public:
 		cout << endl;
 		cout << "---------------------------------------------------\n";
 
-		int i = 0;
+		//int i = 0;
 		int w = 0;
 		int d = 0;
 
@@ -826,13 +998,15 @@ public:
 			if (cell == 0) {
 				cout << " ";
 			} else if (cell == 1) {
-				cout << i << " ";//".";
+				cout << ".";
 			} else if (cell == CHARGE) {
-				cout << "O";
-			} else {
+				cout << "+";
+			} else if (cell == NEGCHARGE) {
 				cout << "-";
+			} else {
+				cout << "o";
 			}
-			i++;
+			//i++;
 			w++;
 			d++;
 			if (w == width) {
