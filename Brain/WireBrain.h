@@ -789,17 +789,28 @@ public:
 			nextAllCells[cellAddress] = 1;
 			if (allCells[cellAddress] == WIRE) {
 				chargeCount = 0;
-				int nc = (int) neighbors[cellAddress].size() - 1;  // get the number of neighbors which are wire
-				while (nc >= 0) {  // for each neighbor
-					if (allCells[neighbors[cellAddress][nc]] == CHARGE) {  // if that neighbor is charged
+//				int nc = (int) neighbors[cellAddress].size() - 1;  // get the number of neighbors which are wire
+//				while (nc >= 0) {  // for each neighbor
+//					if (allCells[neighbors[cellAddress][nc]] == CHARGE) {  // if that neighbor is charged
+//						chargeCount++;
+//						//nextAllCells[cellAddress] = CHARGE;  // set this WIRE to CHARGE
+//					}
+//					if (allCells[neighbors[cellAddress][nc]] == NEGCHARGE) {  // if that neighbor is charged
+//						chargeCount--;
+//						//nextAllCells[cellAddress] = CHARGE;  // set this WIRE to CHARGE
+//					}
+//					nc--;
+//				}
+
+				for (auto n : neighbors[cellAddress]) {
+					if (allCells[n] == CHARGE) {  // if that neighbor is charged
 						chargeCount++;
 						//nextAllCells[cellAddress] = CHARGE;  // set this WIRE to CHARGE
 					}
-					if (allCells[neighbors[cellAddress][nc]] == NEGCHARGE) {  // if that neighbor is charged
+					if (allCells[n] == NEGCHARGE) {  // if that neighbor is charged
 						chargeCount--;
 						//nextAllCells[cellAddress] = CHARGE;  // set this WIRE to CHARGE
 					}
-					nc--;
 				}
 				if (chargeCount > 0 && chargeCount < overchargeThreshold) {
 					nextAllCells[cellAddress] = CHARGE;  // if overcharged, change back to WIRE
@@ -838,10 +849,6 @@ public:
 	}
 
 	virtual void update() override {
-		update(false);
-	}
-
-	virtual void update(bool recordActivity) {
 		//cout << "in update()"<<endl;
 
 		/// first see if we we already know this input
@@ -900,7 +907,7 @@ public:
 						chargeUpdateTrit();
 					}
 					if (recordActivity) {
-						SaveBrainState("wireBrain.run");
+						SaveBrainState(recordActivityFileName);
 					}
 				}
 				//////

@@ -268,7 +268,6 @@ int main(int argc, const char * argv[]) {
 //	///////////////////////// test end ///////////////////////////////////////////
 
 	shared_ptr<Group> group;
-
 	{
 
 		Global::update = -1;  // before there was time, there was a progenitor
@@ -332,6 +331,7 @@ int main(int argc, const char * argv[]) {
 			population.push_back(newOrg);  // add a new org to population using progenitors template and a new random genome
 		}
 		progenitor->kill();  // the progenitor has served it's purpose.
+		cout << "Population of " << Global::popSize << " organisms with " << AbstractGenome::genomeTypeStr << "<" << AbstractGenome::genomeSitesType << "> genomes and " << AbstractBrain::brainTypeStr << " brains." << endl;
 
 /////// to test genome to brain conversion and coding regions, set popsize = 1 and uncomment the block below this comment
 //		shared_ptr<Organism> test_org = dynamic_pointer_cast<Organism>(population[0]);
@@ -420,16 +420,19 @@ int main(int argc, const char * argv[]) {
 	} else if (Global::mode == "test") {
 
 		vector<shared_ptr<AbstractGenome>> mg;
-		group->population[0]->genome->loadGenomeFile("genome_19000.csv", mg);
+		group->population[0]->genome->loadGenomeFile("genome_20000.csv", mg);
 
 		vector<shared_ptr<Organism>> testPopulation;
 		for (auto g : mg){
 			auto newOrg = make_shared<Organism>(group->population[0], g);
+			newOrg->brain->setRecordActivity(true);
+			newOrg->brain->setRecordFileName("wireBrain.run");
 			testPopulation.push_back(newOrg);  // add a new org to population using progenitors template and a new random genome
 		}
 
 		//shared_ptr<Group> testGroup = make_shared<Group>(testPopulation, group->optimizer, group->archivist);
-		world->evaluateFitness(testPopulation,false);
+		world->worldUpdates = 400;
+		world->evaluateFitness({testPopulation[1]},false);
 
 		for (auto o : testPopulation){
 			cout << o->score << " " << o->genome->dataMap.Get("ID") << endl;
@@ -439,7 +442,6 @@ int main(int argc, const char * argv[]) {
 		cout << "\n\nERROR: Unrecognized mode set in configuration!\n  \"" << Global::mode << "\" is not defined.\n\nExiting.\n" << endl;
 		exit(1);
 	}
-
 
 	//if (Archivist::Arch_outputMethodStr == "LODwAP") {  // if using LODwAP, write out some info about MRCA
 	//	shared_ptr<Organism> FinalMRCA = group->population[0]->getMostRecentCommonAncestor(group->population[0]);

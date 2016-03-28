@@ -38,7 +38,7 @@ class BerryWorld : public World {
 
 	// Parameters
 	static const double& TSK;
-	static const int& worldUpdates;
+	static const int& defaultWorldUpdates;
 	static const int& foodTypes;
 	static const double& rewardForFood1;
 	static const double& rewardForFood2;
@@ -82,6 +82,8 @@ class BerryWorld : public World {
 	static const bool& recordFoodListEatEmpty;
 	static const bool& recordFoodListNoEat;
 	// end parameters
+
+	int worldUpdates;
 
 	int foodRatioTotal;  // sum of ratioFood for foods in use
 	vector<int> foodRatioLookup;

@@ -13,52 +13,34 @@
 #include "../Utilities/Random.h"
 #include "../Utilities/Utilities.h"
 
-/* *** GP Gate implementation *** */
-union intToFloatBitByBit {
-	int I;
-	float F;
-};
 
-GPGate::GPGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
+const double& GPGate::constValueMin = Parameters::register_parameter("gpGate_constValueMin", -1, "for the const values, min value the genome can generate", "GATES - GP");
+const double& GPGate::constValueMax = Parameters::register_parameter("gpGate_constValueMax", 1, "for the const values, max value the genome can generate", "GATES - GP");
+
+/* *** GP Gate implementation *** */
+
+//GPGate::GPGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
+GPGate::GPGate(pair<vector<int>, vector<int>> _addresses, int _operation, vector<double> _constValues, int gateID) {
 
 	ID = gateID;
-//
-//	int i;
-//	inputs.clear();
-//	outputs.clear();
-//	int numOutputs;
-//
-//	// get numInputs inputs and numOutputs outputs, advance k (genomeIndex) as if we had gotten 4 of each and record this in codingRegions
-//	getInputsAndOutputs( { 1, 4 }, { 1, 4 }, genomeHandler, genome, gateID);  // (insRange, outsRange,currentIndexInGenome,genome,codingRegions)
-//	numOutputs = outputs.size();
-//
-//	myGateType = genomeHandler->readInt(0, 8, Gate::DATA_CODE, gateID);  //genome->sites[(genomeIndex++) % genome->sites.size()] % 8;
-//	myValues.clear();
-//	for (i = 0; i < numOutputs; i++) {
-//		intToFloatBitByBit V;
-//		V.I = 0;
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//		for (int j = 0; j < 4; j++) {  // what is this 4??? number of inputs?
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//		        // was : V.I = (V.I << (int) 8) + (int) genome->sites[(genomeIndex++) % genome->sites.size()];
-//			V.I = (V.I << (int) 8) + genomeHandler->readInt(0, 8, Gate::DATA_CODE, gateID);
-//		}
-//		myValues.push_back(V.F);
-//	}
+
+	inputs = _addresses.first;
+	outputs = _addresses.second;
+
+	operation = _operation;
+	constValues = _constValues;
 }
 
 void GPGate::update(vector<double> & states, vector<double> & nextStates) {
 	double retValue = inputs[0];
-	int Z = 0;
+	int index = 0;
 	size_t i, o;
-	bool convReturn = true;
-	switch (myGateType) {
+	bool writeValueAtEnd = true;
+	switch (operation) {
 		case 0:  //constant
-			convReturn = false;
+			writeValueAtEnd = false;
 			for (o = 0; o < outputs.size(); o++)
-				nextStates[outputs[o]] = myValues[o];
+				nextStates[outputs[o]] = constValues[o];
 			break;
 		case 1:  // add
 			for (i = 1; i < inputs.size(); i++)
@@ -77,43 +59,43 @@ void GPGate::update(vector<double> & states, vector<double> & nextStates) {
 				retValue /= states[inputs[i]];
 			break;
 		case 5:  // sin
-			convReturn = false;
+			writeValueAtEnd = false;
 			for (o = 0; o < outputs.size(); o++) {
-				nextStates[outputs[o]] += sin(states[inputs[Z]]);
-				Z = (Z + 1) % (int) inputs.size();
+				nextStates[outputs[o]] += sin(states[inputs[index]]);
+				index = (index + 1) % (int) inputs.size();
 			}
 			break;
 		case 6:  // cos
-			convReturn = false;
+			writeValueAtEnd = false;
 			for (o = 0; o < outputs.size(); o++) {
-				nextStates[outputs[o]] += cos(states[inputs[Z]]);
-				Z = (Z + 1) % (int) inputs.size();
+				nextStates[outputs[o]] += cos(states[inputs[index]]);
+				index = (index + 1) % (int) inputs.size();
 			}
 			break;
 		case 7:  // log
-			convReturn = false;
+			writeValueAtEnd = false;
 			for (o = 0; o < outputs.size(); o++) {
-				if (inputs[Z] > 0.0)
-					nextStates[outputs[o]] += log(states[inputs[Z]]);
-				Z = (Z + 1) % (int) inputs.size();
+				if (inputs[index] > 0.0)
+					nextStates[outputs[o]] += log(states[inputs[index]]);
+				index = (index + 1) % (int) inputs.size();
 			}
 			break;
 		case 8:  // exp
-			convReturn = false;
+			writeValueAtEnd = false;
 			for (o = 0; o < outputs.size(); o++) {
-				nextStates[outputs[o]] += exp(states[inputs[Z]]);
-				Z = (Z + 1) % (int) inputs.size();
+				nextStates[outputs[o]] += exp(states[inputs[index]]);
+				index = (index + 1) % (int) inputs.size();
 			}
 			break;
 	}
-	if (convReturn) {
+	if (writeValueAtEnd) {
 		for (size_t o = 0; o < outputs.size(); o++)
 			nextStates[outputs[o]] += retValue;
 	}
 }
 
 string GPGate::description() {
-	string gateTypeName[8] = { "+", "-", "*", "/", "Sin", "Cos", "Log", "Exp" };
-	return to_string(ID) + ": Genetic Programming " + gateTypeName[myGateType] + "\n" + Gate::description();
+	string gateTypeName[9] = { "fixed constants", "+", "-", "*", "/", "Sin", "Cos", "Log", "Exp" };
+	return to_string(ID) + ": Genetic Programming (" + gateTypeName[operation] + ")\n" + Gate::description();
 }
 

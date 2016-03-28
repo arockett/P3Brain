@@ -19,6 +19,8 @@ const int& Gate_Builder::thGateInitialCount = Parameters::register_parameter("th
 const bool& Gate_Builder::usingTritDeterministicGate = Parameters::register_parameter("tritDeterministicGate", false, "set to true to enable tritDeterministic gates", "GATE TYPES");
 const int& Gate_Builder::tritDeterministicGateInitialCount = Parameters::register_parameter("tritDeterministicGateGate_InitialCount", 3, "seed genome with this many start codons", "GATE TYPES");
 
+const bool& Gate_Builder::usingNeuronGate = Parameters::register_parameter("neuronGate", false, "set to true to enable Neuron gates", "GATE TYPES");
+const int& Gate_Builder::neuronGateInitialCount = Parameters::register_parameter("neuronGateGate_InitialCount", 3, "seed genome with this many start codons", "GATE TYPES");
 
 set<int> Gate_Builder::inUseGateTypes;
 vector<vector<int>> Gate_Builder::gateStartCodes;
@@ -109,12 +111,12 @@ void Gate_Builder::setupGates() {
 			vector<vector<int>> table = genomeHandler->readTable( {1 << addresses.first.size(), addresses.second.size()}, {16, 4}, {0, 1}, Gate::DATA_CODE, gateID);
 
 			//vector<vector<int>> table = genomeHandler->readTable( {16,4}, {16, 4}, {0, 1}, Gate::DATA_CODE, gateID);
-			if (genomeHandler->atEOC()) {
-				shared_ptr<DeterministicGate> nullObj = nullptr;;
-				return nullObj;
-			}
-			return make_shared<DeterministicGate>(addresses,table,gateID);
-		});
+				if (genomeHandler->atEOC()) {
+					shared_ptr<DeterministicGate> nullObj = nullptr;;
+					return nullObj;
+				}
+				return make_shared<DeterministicGate>(addresses,table,gateID);
+			});
 	}
 	if (usingEpsiGate) {
 		int codonOne = 47;
@@ -158,10 +160,32 @@ void Gate_Builder::setupGates() {
 //		AddGate(44, [](shared_ptr<AbstractGenome> genome,shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {return make_shared<FeedbackGate>(genome,genomeHandler,gateID);});
 //		Global::inUseGateTypes.insert(44);
 //	}
-//	if (usingGPGate) {
-//		AddGate(45, [](shared_ptr<AbstractGenome> genome,shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {return make_shared<GPGate>(genome,genomeHandler,gateID);});
-//		Global::inUseGateTypes.insert(45);
-//	}
+	if (usingGPGate) {
+		int codonOne = 45;
+		inUseGateTypes.insert(codonOne);
+		{
+			//gateStartCodes.insert(pair<int, vector<int> >(codonOne, vector<int>()));
+			gateStartCodes[codonOne].push_back(codonOne);
+			gateStartCodes[codonOne].push_back(((1 << Global::bitsPerCodon) - 1) - codonOne);
+		}
+		intialGateCounts[codonOne] = voidGateInitialCount;
+		AddGate(codonOne, [](shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
+			pair<vector<int>,vector<int>> addresses = getInputsAndOutputs( {1, 4}, {1, 4}, genomeHandler, gateID);
+			int operation = genomeHandler->readInt(0, 8, Gate::DATA_CODE, gateID);
+			vector<double> constValues;
+			for (int i = 0; i < 4; i++) {
+				constValues.push_back(genomeHandler->readDouble(GPGate::constValueMin, GPGate::constValueMax, Gate::DATA_CODE, gateID));
+			}
+			if (genomeHandler->atEOC()) {
+				shared_ptr<GPGate> nullObj = nullptr;;
+				return nullObj;
+			}
+			return make_shared<GPGate>(addresses,operation, constValues, gateID);
+		});
+
+		//GPGate(pair<vector<int>, vector<int>> _addresses, int _operation, vector<double> _constValues, int gateID);
+
+	}
 //	if (usingThGate) {
 //		AddGate(46, [](shared_ptr<AbstractGenome> genome,shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {return make_shared<Thresholdgate>(genome,genomeHandler,gateID);});
 //		Global::inUseGateTypes.insert(46);
@@ -185,7 +209,47 @@ void Gate_Builder::setupGates() {
 			return make_shared<TritDeterministicGate>(addresses,table,gateID);
 		});
 	}
+	if (usingNeuronGate) {
+		int codonOne = 50;
+		inUseGateTypes.insert(codonOne);
+		{
+			gateStartCodes[codonOne].push_back(codonOne);
+			gateStartCodes[codonOne].push_back(((1 << Global::bitsPerCodon) - 1) - codonOne);
+		}
+		intialGateCounts[codonOne] = neuronGateInitialCount;
+		AddGate(codonOne, [](shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
 
+			int numInputs = genomeHandler->readInt(NeuronGate::defaultNumInputsMin, NeuronGate::defaultNumInputsMax, Gate::IN_COUNT_CODE, gateID);
+			vector<int> inputs;
+			inputs.resize(numInputs);
+			getSomeBrainAddresses(numInputs, NeuronGate::defaultNumInputsMax, inputs, genomeHandler, Gate::IN_ADDRESS_CODE, gateID);
+
+			int output = genomeHandler->readInt(0, (1 << Global::bitsPerBrainAddress) - 1, Gate::OUT_ADDRESS_CODE, gateID);
+
+			int dischargeBehavior = NeuronGate::defaultDischargeBehavior;
+			if (dischargeBehavior == -1){
+				dischargeBehavior = genomeHandler->readInt(0, 2, Gate::DATA_CODE, gateID);
+			}
+			double thresholdValue = genomeHandler->readDouble(NeuronGate::defaultThresholdMin, NeuronGate::defaultThresholdMax, Gate::DATA_CODE, gateID);
+
+			bool thresholdActivates = 1;
+			if (NeuronGate::defaultAllowRepression == 1){
+				thresholdActivates = genomeHandler->readInt(0, 1, Gate::DATA_CODE, gateID);
+			}
+
+			double decayRate = genomeHandler->readDouble(NeuronGate::defaultDecayRateMin, NeuronGate::defaultDecayRateMax, Gate::DATA_CODE, gateID);
+			double deliveryCharge = genomeHandler->readDouble(NeuronGate::defaultDeliveryChargeMin, NeuronGate::defaultDeliveryChargeMax, Gate::DATA_CODE, gateID);
+			double deliveryError = NeuronGate::defaultDeliveryError;
+
+			if (genomeHandler->atEOC()) {
+				shared_ptr<NeuronGate> nullObj = nullptr;;
+				return nullObj;
+			}
+			//cout << " ... " << output << " dchB: " << dischargeBehavior << " th:" <<  thresholdValue << " thAC:" << thresholdActivates << " DR: " << decayRate << " DC:" <<  deliveryCharge << " DE:" << deliveryError << " gateID:" << gateID << endl;
+				return make_shared<NeuronGate>(inputs, output, dischargeBehavior, thresholdValue, thresholdActivates, decayRate, deliveryCharge, deliveryError, gateID);
+				//return make_shared<NeuronGate>(inputs,  output,  dischargeBehavior,  thresholdValue,  thresholdActivates,  decayRate,  deliveryCharge,  deliveryError,  gateID);
+			});
+	}
 }
 
 /* *** some c++ 11 magic to speed up translation from genome to gates *** */
