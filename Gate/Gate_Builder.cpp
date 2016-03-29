@@ -227,13 +227,13 @@ void Gate_Builder::setupGates() {
 			int output = genomeHandler->readInt(0, (1 << Global::bitsPerBrainAddress) - 1, Gate::OUT_ADDRESS_CODE, gateID);
 
 			int dischargeBehavior = NeuronGate::defaultDischargeBehavior;
-			if (dischargeBehavior == -1){
+			if (dischargeBehavior == -1) {
 				dischargeBehavior = genomeHandler->readInt(0, 2, Gate::DATA_CODE, gateID);
 			}
 			double thresholdValue = genomeHandler->readDouble(NeuronGate::defaultThresholdMin, NeuronGate::defaultThresholdMax, Gate::DATA_CODE, gateID);
 
 			bool thresholdActivates = 1;
-			if (NeuronGate::defaultAllowRepression == 1){
+			if (NeuronGate::defaultAllowRepression == 1) {
 				thresholdActivates = genomeHandler->readInt(0, 1, Gate::DATA_CODE, gateID);
 			}
 
@@ -241,14 +241,20 @@ void Gate_Builder::setupGates() {
 			double deliveryCharge = genomeHandler->readDouble(NeuronGate::defaultDeliveryChargeMin, NeuronGate::defaultDeliveryChargeMax, Gate::DATA_CODE, gateID);
 			double deliveryError = NeuronGate::defaultDeliveryError;
 
+			int ThresholdFromNode = -1;
+			int DeliveryChargeFromNode = -1;
+			if (NeuronGate::defaultThresholdFromNode) {
+				ThresholdFromNode = genomeHandler->readInt(0, (1 << Global::bitsPerBrainAddress) - 1, Gate::IN_ADDRESS_CODE, gateID);
+			}
+			if (NeuronGate::defaultDeliveryChargeFromNode) {
+				DeliveryChargeFromNode = genomeHandler->readInt(0, (1 << Global::bitsPerBrainAddress) - 1, Gate::IN_ADDRESS_CODE, gateID);
+			}
 			if (genomeHandler->atEOC()) {
 				shared_ptr<NeuronGate> nullObj = nullptr;;
 				return nullObj;
 			}
-			//cout << " ... " << output << " dchB: " << dischargeBehavior << " th:" <<  thresholdValue << " thAC:" << thresholdActivates << " DR: " << decayRate << " DC:" <<  deliveryCharge << " DE:" << deliveryError << " gateID:" << gateID << endl;
-				return make_shared<NeuronGate>(inputs, output, dischargeBehavior, thresholdValue, thresholdActivates, decayRate, deliveryCharge, deliveryError, gateID);
-				//return make_shared<NeuronGate>(inputs,  output,  dischargeBehavior,  thresholdValue,  thresholdActivates,  decayRate,  deliveryCharge,  deliveryError,  gateID);
-			});
+			return make_shared<NeuronGate>(inputs, output, dischargeBehavior, thresholdValue, thresholdActivates, decayRate, deliveryCharge, deliveryError, ThresholdFromNode, DeliveryChargeFromNode, gateID);
+		});
 	}
 }
 

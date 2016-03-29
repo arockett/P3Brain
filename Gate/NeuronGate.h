@@ -20,19 +20,20 @@
 class NeuronGate: public Gate {
 public:
 
-	static const int defaultNumInputsMin;
-	static const int defaultNumInputsMax;
-	static const int defaultDischargeBehavior; //-1 or 0,1,2;
-	static const double defaultThresholdMin;
-	static const double defaultThresholdMax;
+	static const int& defaultNumInputsMin;
+	static const int& defaultNumInputsMax;
+	static const int& defaultDischargeBehavior;
+	static const double& defaultThresholdMin;
+	static const double& defaultThresholdMax;
+	static const bool& defaultThresholdFromNode;
 
-	static const bool defaultAllowRepression; // if false, neuronGates fire if they exceed charge, if true, gates can exist which always fire, unless they exceed charge
-	static const double defaultDecayRateMin;
-	static const double defaultDecayRateMax;
-	static const double defaultDeliveryChargeMin; //
-	static const double defaultDeliveryChargeMax; //
-	static const double defaultDeliveryError;
-
+	static const bool& defaultAllowRepression;
+	static const double& defaultDecayRateMin;
+	static const double& defaultDecayRateMax;
+	static const double& defaultDeliveryChargeMin;
+	static const double& defaultDeliveryChargeMax;
+	static const bool& defaultDeliveryChargeFromNode;
+	static const double& defaultDeliveryError;
 
 	int dischargeBehavior;  // what to do when the gate delivers a charge
 	double thresholdValue;  // threshold when this gate will fire (if negative, then fire when currentCharge < threshold)
@@ -43,11 +44,14 @@ public:
 
 	double currentCharge;
 
+	int thresholdFromNode;
+	int deliveryChargeFromNode;
+
 	//double costOfDecay;
 	//double costOfDelivery;
 
 	NeuronGate() = delete;
-	NeuronGate(vector<int> ins, int out, int _dischargeBehavior, double _thresholdValue, bool _thresholdActivates, double _decayRate, double _deliveryCharge, double _deliveryError, int _ID) {
+	NeuronGate(vector<int> ins, int out, int _dischargeBehavior, double _thresholdValue, bool _thresholdActivates, double _decayRate, double _deliveryCharge, double _deliveryError, int _thresholdFromNode, int _deliveryChargeFromNode, int _ID) {
 		ID = _ID;
 		inputs = ins;
 		outputs.clear();
@@ -59,6 +63,9 @@ public:
 		deliveryCharge = _deliveryCharge;
 		deliveryError = _deliveryError;
 		currentCharge = 0;
+
+		thresholdFromNode = _thresholdFromNode;
+		deliveryChargeFromNode = _deliveryChargeFromNode;
 	}
 
 	virtual ~NeuronGate() = default;
@@ -77,16 +84,23 @@ public:
 		//cout << "->" << currentCharge << endl;
 		// if currCharge is >= Th, fire
 		//   reduce currCharge
+
+		if (thresholdFromNode != -1) {
+			//cout << "threshold set from (" << thresholdFromNode << ") = ";
+			thresholdValue = nodes[thresholdFromNode];
+			//cout << thresholdValue << endl;
+		}
+
 		if (thresholdActivates) {  // fire if currCharge is greater than a positive threshold or less than a negative threshold
 			if (((Trit(currentCharge) * currentCharge) > (Trit(thresholdValue) * thresholdValue)) && (Trit(currentCharge) == Trit(currentCharge))) {
 				fire = true;
 			}
-		} else { // threshold represses. fire always unless currCharge is greater than a positive threshold (or less than a negative threshold)
-			if (Trit(thresholdValue) == 1) { // if thresholdValue is positive
+		} else {  // threshold represses. fire always unless currCharge is greater than a positive threshold (or less than a negative threshold)
+			if (Trit(thresholdValue) == 1) {  // if thresholdValue is positive
 				if (currentCharge < thresholdValue) {
 					fire = true;
 				}
-			} else { // if threshold is negative (or 0)
+			} else {  // if threshold is negative (or 0)
 				if (currentCharge > thresholdValue) {
 					fire = true;
 				}
@@ -95,7 +109,14 @@ public:
 
 		if (fire) {
 			//cout << "Fire!" <<  endl;
-			nextnodes[outputs[0]] += deliveryCharge - Random::getDouble(0, deliveryError);
+			if (deliveryChargeFromNode == -1) {
+				nextnodes[outputs[0]] += deliveryCharge - Random::getDouble(0, deliveryError);
+			} else {
+				//cout << "charge from (" << deliveryChargeFromNode << ") = " << nodes[deliveryChargeFromNode] << endl;
+				//cout << "  " << nextnodes[outputs[0]];
+				nextnodes[outputs[0]] += nodes[deliveryChargeFromNode] - Random::getDouble(0, deliveryError);
+				//cout << "  " << nextnodes[outputs[0]] << endl;
+			}
 			if (dischargeBehavior == 0) {
 				currentCharge = 0;
 			}
@@ -110,8 +131,6 @@ public:
 		}
 
 	}
-
-//void setupForBits(int* Ins, int nrOfIns, int Out, int logic);
 
 	virtual string description() override {
 		string s = "Gate " + to_string(ID) + " is a Neuron Gate with " + to_string(inputs.size()) + " inputs (";
@@ -130,25 +149,20 @@ public:
 		return s;
 	}
 
-//double voidOutput;
+	void applyNodeMap(vector<int> nodeMap, int maxNodes) override {
+		Gate::applyNodeMap(nodeMap, maxNodes);
+		if (thresholdFromNode != -1) {
+			thresholdFromNode = nodeMap[thresholdFromNode] % maxNodes;
+		}
+		if (deliveryChargeFromNode != -1) {
+			deliveryChargeFromNode = nodeMap[deliveryChargeFromNode] % maxNodes;
+		}
+	}
+
+	void resetGate() override {
+		currentCharge = 0;
+	}
+
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__NeuronGate__) */
-
-//NeuronGate::NeuronGate(pair<vector<int>, vector<int>> addresses, int _ID) {
-//	ID = _ID;
-//	inputs = addresses.first;
-//	outputs = addresses.second;
-//}
-//
-//void TritDeterministicGate::update(vector<double> & nodes, vector<double> & nextNodes) {
-//	int input = vectorToTritToInt(nodes,inputs,true);  // converts the input values into an index
-//	for (size_t i = 0; i < outputs.size(); i++) {
-//		nextNodes[outputs[i]] += table[input][i];
-//	}
-//}
-//
-//string TritDeterministicGate::description() {
-//	return "Gate " + to_string(ID) + " is a Trit Deterministic " + Gate::description();
-//}
-

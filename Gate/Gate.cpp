@@ -29,7 +29,7 @@ void Gate::applyNodeMap(vector<int> nodeMap, int maxNodes) {
 	}
 }
 
-void Gate::resetGate(void) {
+void Gate::resetGate() {
 	//nothing to reset here!
 }
 
