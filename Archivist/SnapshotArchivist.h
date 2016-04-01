@@ -8,11 +8,11 @@
 #ifndef __BasicMarkovBrainTemplate__snapshot_Archivist__
 #define __BasicMarkovBrainTemplate__snapshot_Archivist__
 
-#include "Archivist.h"
+#include "DefaultArchivist.h"
 
 using namespace std;
 
-class Snapshot_Archivist : public Archivist {  // SnapShot
+class SnapshotArchivist : public DefaultArchivist {  // SnapShot
  public:
 	static const int& SS_Arch_dataInterval;  // how often to save data
 	static const int& SS_Arch_genomeInterval;  // how often to save genomes
@@ -28,9 +28,9 @@ class Snapshot_Archivist : public Archivist {  // SnapShot
 	bool writeDataFiles;  // if true, write data file
 	bool writeGenomeFiles;  // if true, write genome file
 
-	Snapshot_Archivist(vector<string> aveFileColumns = {});
+	SnapshotArchivist(vector<string> aveFileColumns = {});
 
-	~Snapshot_Archivist() = default;
+	~SnapshotArchivist() = default;
 
 	void saveSnapshotData(vector<shared_ptr<Organism>> population, int update);
 

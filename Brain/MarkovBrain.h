@@ -15,19 +15,19 @@
 #include <set>
 #include <vector>
 
-#include "Brain.h"
 #include "../Gate/Gate_Builder.h"
 #include "../GateListBuilder/GateListBuilder.h"
-#include "../Genome/Genome.h"
+#include "../Genome/AbstractGenome.h"
 
 #include "../Utilities/Parameters.h"
+#include "AbstractBrain.h"
 
 using namespace std;
 
 class MarkovBrain : public AbstractBrain {
  protected:
 	vector<shared_ptr<Gate>> gates;
-	shared_ptr<Base_GateListBuilder> GLB;
+	shared_ptr<AbstractGateListBuilder> GLB;
 
  public:
 
@@ -53,8 +53,8 @@ class MarkovBrain : public AbstractBrain {
 
 	MarkovBrain(vector<shared_ptr<Gate>> _gates, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes);
 
-	MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes);
-	MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes);
+	MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes);
+	MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes);
 	virtual ~MarkovBrain() = default;
 
 	virtual void update() override;

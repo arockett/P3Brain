@@ -19,11 +19,13 @@ import getopt
 
 def usage():
 	print()
-	print(sys.argv[0] + ' [-h][-s pdf|png][-l][-c "source,x-axis,[alpha X,][legend location,][style,][line width X,]data1,data2,..."]')
+	print(sys.argv[0] + ' [-h][-t title][-s pdf|png][-l][-c "source,x-axis,[alpha X,][legend location,][style,][line width X,]data1,data2,..."]')
 	print()
 	print('  -h show this help message')
 	print('  -s do not display graph(s), save image(s) instead ("pdf" or "png" format)')
 	print('  -l also load and graph Line of Decent (data.csv)')
+	print('  -t add a prefix to a title')
+	print('  -n number of columns in table (non-custom)')
 	print('  -c make a custom graph - arguments must be in order, optional arguments can be left out')
 	print('       source = ave | dom | LOD (for LOD, must also use -l flag)')
 	print('       x-axis = which column to use for x-axis')
@@ -170,7 +172,7 @@ def main(argv=None):
 	if argv is None:
 		argv = sys.argv
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], "hs:vc:vlr:v")
+		opts, args = getopt.getopt(sys.argv[1:], "h-n:vt:vs:vc:vlr:v")
 	except getopt.GetoptError as err:
 		# print help information and exit:
 		print()
@@ -178,7 +180,9 @@ def main(argv=None):
 		usage()
 		sys.exit(2)
 	output = None
+	graphRows = 2
 	customOptions = None
+	customTitle = ''
 	replicates = None
 	useLOD = False
 	for option, value in opts:
@@ -187,6 +191,10 @@ def main(argv=None):
 		elif option in ("-h"):
 			usage()
 			sys.exit()
+		elif option == "-t":
+			customTitle = value
+		elif option == "-n":
+			graphRows = value
 		elif option == "-c":
 			customOptions = value
 		elif option == "-r":
@@ -279,12 +287,10 @@ def main(argv=None):
 ### NOT A CUSTOM GRAPH
 
 	if customOptions == None:	# make default graphs
-		#aveGraph = BuildMultiPlotFromDict(ave_csv_file,NamesList = aveList,XCoordinateName='update',Columns=2,title = 'Average')
-		#domGraph = BuildMultiPlotFromDict(dominant_csv_file,NamesList = domList,XCoordinateName='update',Columns=2,title = 'Dominant')
-		aveGraph = BuildMultiPlotFromDict(allAve,aveAve,NamesList = aveList,XCoordinateName='update',Columns=2,title = 'Average')
-		domGraph = BuildMultiPlotFromDict(allDom,aveDom,NamesList = domList,XCoordinateName='update',Columns=2,title = 'Dominant')
+		aveGraph = BuildMultiPlotFromDict(allAve,aveAve,NamesList = aveList,XCoordinateName='update',Columns=graphRows,title = customTitle + ' ' + 'Average')
+		domGraph = BuildMultiPlotFromDict(allDom,aveDom,NamesList = domList,XCoordinateName='update',Columns=graphRows,title = customTitle + ' ' + 'Dominant')
 		if useLOD:
-			LODGraph = BuildMultiPlotFromDict(LOD_csv_file,NamesList = LODList,XCoordinateName='update',Columns=2,title = 'Line of Descent')
+			LODGraph = BuildMultiPlotFromDict(LOD_csv_file,NamesList = LODList,XCoordinateName='update',Columns=graphRows,title = customTitle + ' ' + 'Line of Descent')
 
 ### MAKE A CUSTOM GRAPH
 
@@ -359,41 +365,46 @@ def main(argv=None):
 
 ### MAKE THE CUSTOM GRAPH
 
-		customGraph = BuildPlotFromDict(source,NamesList = names,XCoordinateName=customList[1],AddLegend=legLoc,title = '',plotType = _plotType,lineWeight = _lineWeight, alpha = _alpha)
+		customGraph = BuildPlotFromDict(source,NamesList = names, XCoordinateName=customList[1], AddLegend=legLoc, title = customTitle + ' from ' + customList[0], plotType = _plotType,lineWeight = _lineWeight, alpha = _alpha)
 	
 
 ### IF -s IS NOT USED, THEN PRINT GRAPH(S) TO SCREEN
 
 	if output == None:
 		plt.show()
+		
+######## SAVE TO FILE
+	
+	customTitle = customTitle + ' '
 
 ######## SAVE TO A PNG FILE
 
 	if output == 'png':
 		if customOptions == None:
-			aveGraph.savefig('MABE_Graph_Ave.png', dpi=100)
-			domGraph.savefig('MABE_Graph_Dom.png', dpi=100)
+			aveGraph.savefig(customTitle + 'MABE_Graph_Ave.png', dpi=100)
+			domGraph.savefig(customTitle + 'MABE_Graph_Dom.png', dpi=100)
 			if useLOD:
-				LODGraph.savefig('MABE_Graph_LOD.png', dpi=100)
+				LODGraph.savefig(customTitle + 'MABE_Graph_LOD.png', dpi=100)
 		else:
-			customGraph.savefig('MABE_CustomGraph.png', dpi=100)
+			customGraph.savefig(customTitle + 'MABE_CustomGraph.png', dpi=100)
 
 ######## SAVE TO A PDF FILE
 
 	if output == 'pdf':
 		if customOptions == None:
-			pp = PdfPages('MABE_Graphs.pdf')
+			pp = PdfPages(customTitle + 'MABE_Graphs.pdf')
 			pp.savefig(aveGraph)
 			pp.savefig(domGraph)
 			if useLOD:
 				pp.savefig(LODGraph)
 		else:
-			pp = PdfPages('MABE_CustomGraph.pdf')
+			pp = PdfPages(customTitle + 'MABE_CustomGraph.pdf')
 			pp.savefig(customGraph)
 
 		pp.close()
 
-  
+######## MAIN
+
 if __name__ == "__main__":
 	#try:
 		main()

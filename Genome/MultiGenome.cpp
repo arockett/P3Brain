@@ -493,7 +493,7 @@ void MultiGenome::recordDataMap() {
 }
 
 // load all genomes from a file
-void MultiGenome::loadGenomes(string fileName, vector<shared_ptr<AbstractGenome>> &genomes) {
+void MultiGenome::loadGenomeFile(string fileName, vector<shared_ptr<AbstractGenome>> &genomes) {
 	genomes.clear();
 	std::ifstream FILE(fileName);
 	string rawLine;
@@ -530,8 +530,10 @@ void MultiGenome::loadGenomes(string fileName, vector<shared_ptr<AbstractGenome>
 			newGenome->ploidy = _ploidy;
 			genomes.push_back(newGenome);
 		}
+	} else {
+		cout << "\n\nERROR: In MultiGenome::loadGenomeFile, unable to open file \"" << fileName << "\"\n\nExiting\n" << endl;
+		exit(1);
 	}
-
 }
 // load a genome from CSV file with headers - will return genome from saved organism with key / keyvalue pair
 // the undefined action is to take no action

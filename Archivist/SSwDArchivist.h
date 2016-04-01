@@ -8,11 +8,11 @@
 #ifndef __BasicMarkovBrainTemplate__SSwD_Archivist__
 #define __BasicMarkovBrainTemplate__SSwD_Archivist__
 
-#include "Archivist.h"
+#include "DefaultArchivist.h"
 
 using namespace std;
 
-class SSwD_Archivist : public Archivist {  // SnapShot with Delay
+class SSwDArchivist : public DefaultArchivist {  // SnapShot with Delay
  public:
 	static const int& SSwD_Arch_dataInterval;  // how often to write out data
 	static const int& SSwD_Arch_genomeInterval;  // how often to write out genomes
@@ -43,9 +43,9 @@ class SSwD_Archivist : public Archivist {  // SnapShot with Delay
 	map<int, vector<weak_ptr<Organism>>> checkpoints;  // used by SSwD only - this keeps lists of orgs that may be written (if they have living decendents)
 	// key is Global::nextGenomeWrite or Global::nextDataWrite
 
-	SSwD_Archivist(vector<string> aveFileColumns = {});
+	SSwDArchivist(vector<string> aveFileColumns = {});
 
-	virtual ~SSwD_Archivist() = default;
+	virtual ~SSwDArchivist() = default;
 
 	///// CLEANUP / DELETE STALE CHECKPOINTS
 	// if a checkpoint is from before Global::update - archivist::intervalDelay than delete the checkpoint

@@ -8,7 +8,7 @@
 
 #include "GateListBuilder.h"
 
-vector<shared_ptr<Gate>> Classic_GateListBuilder::buildGateListAndGetAllValues(shared_ptr<AbstractGenome> genome, int nrOfBrainStates, int maxValue, vector<int> &genomeHeadValues, int genomeHeadValuesCount, vector<vector<int>> &genomePerGateValues, int genomePerGateValuesCount) {
+vector<shared_ptr<Gate>> ClassicGateListBuilder::buildGateListAndGetAllValues(shared_ptr<AbstractGenome> genome, int nrOfBrainStates, int maxValue, vector<int> &genomeHeadValues, int genomeHeadValuesCount, vector<vector<int>> &genomePerGateValues, int genomePerGateValuesCount) {
 
 	vector<shared_ptr<Gate>> gates;
 	int codonMax = (1 << Global::bitsPerCodon) - 1;
@@ -43,10 +43,9 @@ vector<shared_ptr<Gate>> Classic_GateListBuilder::buildGateListAndGetAllValues(s
 					translation_Complete = true;
 				}
 				genomeHandler->resetHandlerOnChromosome();  // reset to start of this chromosome
-				genomeHandler->copyTo(placeHolderGenomeHandler); // move placeholder to the next chromosome aswell so mustReadAll method works
+				genomeHandler->copyTo(placeHolderGenomeHandler);  // move placeholder to the next chromosome aswell so mustReadAll method works
 				testSite2Value = genomeHandler->readInt(0, codonMax);  // place first value in new chromosome in testSite2 so !mustReadAll method works
-			} else if (testSite1Value + testSite2Value == codonMax) {  // if we found a start codon
-				if (Gate_Builder::makeGate[testSite1Value] != nullptr) {  // and that start codon codes to an in use gate class
+			} else if (Gate_Builder::gateStartCodes[testSite1Value].size() != 0 && Gate_Builder::gateStartCodes[testSite1Value][1] == testSite2Value) {  // if we found a start codon
 					genomeHandler->copyTo(gateGenomeHandler);
 					gateGenomeHandler->toggleReadDirection();
 					gateGenomeHandler->readInt(0, codonMax);  // move back 2 start codon values
@@ -66,11 +65,10 @@ vector<shared_ptr<Gate>> Classic_GateListBuilder::buildGateListAndGetAllValues(s
 						}
 						if (!gateGenomeHandler->atEOC()) {  // we may run out of space while reading the perGate sites...
 							gates.push_back(newGate);
-							//genomePerGateValues.push_back(thisGatesValues);
+							genomePerGateValues.push_back(thisGatesValues);
 						}
 					}
 					gateCount++;
-				}
 			}
 			if (mustReadAll) {  // if start codon values are bigger then the alphabetSize of the genome, we must step forward one genome site at a time (slow)
 				placeHolderGenomeHandler->advanceIndex();

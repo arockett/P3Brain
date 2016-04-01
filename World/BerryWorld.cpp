@@ -8,13 +8,8 @@
 
 #include "BerryWorld.h"
 
-#include "../Utilities/Random.h"
-#include "../Utilities/Utilities.h"
-
-/* *** implementation of the World *** */
-
 const double& BerryWorld::TSK = Parameters::register_parameter("BERRY_taskSwitchingCost", 1.4, "cost to change food sources", "WORLD - BERRY");
-const int& BerryWorld::worldUpdates = Parameters::register_parameter("BERRY_WorldUpdates", 400, "amount of time an brain is tested", "WORLD - BERRY");
+const int& BerryWorld::defaultWorldUpdates = Parameters::register_parameter("BERRY_WorldUpdates", 400, "amount of time an brain is tested", "WORLD - BERRY");
 
 const int& BerryWorld::foodTypes = Parameters::register_parameter("BERRY_foodTypes", 2, "number of types of food", "WORLD - BERRY");
 const double& BerryWorld::rewardForFood1 = Parameters::register_parameter("BERRY_rewardForFood1", 1.0, "reward for eating a Food1", "WORLD - BERRY");
@@ -60,6 +55,8 @@ const bool& BerryWorld::recordFoodListNoEat = Parameters::register_parameter("BE
 
 
 BerryWorld::BerryWorld() {
+
+	worldUpdates = defaultWorldUpdates;
 
 	if (foodTypes < 1 || foodTypes > 8) {
 		cout << "In BerryWorld you either have too few or too many foodTypes (must be >0 and <=8)\n\nExiting\n\n";
@@ -412,11 +409,6 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 	org->dataMap.Append("alltotal", total_eaten);  // total food eaten (regardless of type)
 
 	org->dataMap.Append("allswitches", switches);
-	//org->dataMap.Append("allscore", score);
-
-//	if (analyse) {
-//		org->dataMap.Set("phi", Analyse::computeAtomicPhi(stateCollector, org->brain->nrOfBrainNodes));
-//	}
 
 	return score;
 }
