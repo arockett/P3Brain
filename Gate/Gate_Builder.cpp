@@ -25,6 +25,7 @@ const int& Gate_Builder::neuronGateInitialCount = Parameters::register_parameter
 set<int> Gate_Builder::inUseGateTypes;
 vector<vector<int>> Gate_Builder::gateStartCodes;
 map<int, int> Gate_Builder::intialGateCounts;
+set<string> Gate_Builder::inUseGateNames;
 
 // *** General tools for All Gates ***
 
@@ -76,6 +77,7 @@ void Gate_Builder::setupGates() {
 	}
 	gateStartCodes.resize(1 << Global::bitsPerCodon);
 	if (usingProbGate) {
+		inUseGateNames.insert("Probabilistic");
 		int codonOne = 42;
 		inUseGateTypes.insert(codonOne);
 		{
@@ -96,6 +98,7 @@ void Gate_Builder::setupGates() {
 		});
 	}
 	if (usingDetGate) {
+		inUseGateNames.insert("Deterministic");
 		int codonOne = 43;
 		inUseGateTypes.insert(codonOne);
 		{
@@ -119,6 +122,7 @@ void Gate_Builder::setupGates() {
 			});
 	}
 	if (usingEpsiGate) {
+		inUseGateNames.insert("FixedEpsilon");
 		int codonOne = 47;
 		inUseGateTypes.insert(codonOne);
 		{
@@ -138,6 +142,7 @@ void Gate_Builder::setupGates() {
 		});
 	}
 	if (usingVoidGate) {
+		inUseGateNames.insert("Void");
 		int codonOne = 48;
 		inUseGateTypes.insert(codonOne);
 		{
@@ -161,6 +166,7 @@ void Gate_Builder::setupGates() {
 //		Global::inUseGateTypes.insert(44);
 //	}
 	if (usingGPGate) {
+		inUseGateNames.insert("GeneticPrograming");
 		int codonOne = 45;
 		inUseGateTypes.insert(codonOne);
 		{
@@ -191,6 +197,7 @@ void Gate_Builder::setupGates() {
 //		Global::inUseGateTypes.insert(46);
 //	}
 	if (usingTritDeterministicGate) {
+		inUseGateNames.insert("TritDeterministic");
 		int codonOne = 49;
 		inUseGateTypes.insert(codonOne);
 		{
@@ -210,6 +217,7 @@ void Gate_Builder::setupGates() {
 		});
 	}
 	if (usingNeuronGate) {
+		inUseGateNames.insert("Neuron");
 		int codonOne = 50;
 		inUseGateTypes.insert(codonOne);
 		{

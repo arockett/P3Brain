@@ -21,6 +21,9 @@ MarkovBrain::MarkovBrain(vector<shared_ptr<Gate>> _gates, int _nrInNodes, int _n
 	// columns to be added to ave file
 	aveFileColumns.clear();
 	aveFileColumns.push_back("gates");
+	for (auto name : Gate_Builder::inUseGateNames) {
+		aveFileColumns.push_back(name + "Gates");
+	}
 }
 
 MarkovBrain::MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes) :
@@ -32,6 +35,9 @@ MarkovBrain::MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, int _nrInNode
 	// columns to be added to ave file
 	aveFileColumns.clear();
 	aveFileColumns.push_back("gates");
+	for (auto name : Gate_Builder::inUseGateNames) {
+		aveFileColumns.push_back(name + "Gates");
+	}
 }
 
 MarkovBrain::MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes) :
@@ -39,13 +45,6 @@ MarkovBrain::MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, shared_ptr<Ab
 	//cout << "in MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrOfBrainStates)\n\tabout to - gates = GLB->buildGateList(genome, nrOfBrainStates);" << endl;
 	gates = GLB->buildGateList(genome, nrOfBrainNodes);
 	inOutReMap();  // map ins and outs from genome values to brain states
-//	for (auto g : gates){
-//		cout << g->description();
-//		cout << endl;
-//	}
-//	cout << "------------------------------------------------------------------"<<endl;
-
-
 }
 
 shared_ptr<AbstractBrain> MarkovBrain::makeBrainFromGenome(shared_ptr<AbstractGenome> _genome) {
@@ -55,7 +54,7 @@ shared_ptr<AbstractBrain> MarkovBrain::makeBrainFromGenome(shared_ptr<AbstractGe
 
 void MarkovBrain::resetBrain() {
 	AbstractBrain::resetBrain();
-	for (size_t i = 0; i < gates.size(); i++){
+	for (size_t i = 0; i < gates.size(); i++) {
 		gates[i]->resetGate();
 	}
 }
@@ -65,7 +64,7 @@ void MarkovBrain::update() {
 	for (size_t i = 0; i < gates.size(); i++) {  //update each gate
 		gates[i]->update(nodes, nextNodes);
 	}
-	swap(nodes,nextNodes);
+	swap(nodes, nextNodes);
 }
 
 void MarkovBrain::inOutReMap() {  // remaps genome site values to valid brain state addresses
@@ -84,6 +83,20 @@ vector<string> MarkovBrain::getStats() {
 	vector<string> dataPairs;
 	dataPairs.push_back("gates");
 	dataPairs.push_back(to_string(gates.size()));
+
+	map <string,int> gatecounts;
+	for (auto n : Gate_Builder::inUseGateNames){
+		gatecounts[n + "Gates"] = 0;
+	}
+	for (auto g : gates) {
+		gatecounts[g->gateType()+"Gates"]++;
+	}
+
+	for (auto n : Gate_Builder::inUseGateNames){
+		dataPairs.push_back(n+"Gates");
+		dataPairs.push_back(to_string(gatecounts[n+"Gates"]));
+	}
+
 	return (dataPairs);
 }
 
