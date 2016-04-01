@@ -5,7 +5,7 @@
 
 #include "Gate.h"
 #include "Feedback_Gate.h"
-#include "GP_Gate.h"
+#include "GPGate.h"
 #include "Threshold_Gate.h"
 #include "TritGate.h"
 #include "NeuronGate.h"

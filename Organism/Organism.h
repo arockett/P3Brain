@@ -13,30 +13,23 @@
 #include <vector>
 #include <unordered_set>
 
-#include "../Brain/MarkovBrain.h"
-#include "../Genome/Genome.h"
+#include "../Brain/AbstractBrain.h"
+#include "../Genome/AbstractGenome.h"
 
 #include "../Utilities/Data.h"
 #include "../Utilities/Parameters.h"
 
 using namespace std;
 
-class AbstractOrganism {
- public:
-	DataMap dataMap;  // holds all data (genome size, score, world data, etc.)
-	map<int, DataMap> snapShotDataMaps;  // Used only with SnapShot with Delay (SSwD) stores contents of dataMap when an ouput interval is reached so that
-	// after the delay we have the correct data for the given time. key is 'update'. This possibly should be wrapped into Archivist.
-
-	AbstractOrganism();
-	virtual ~AbstractOrganism() = 0;
-};
-
-class Organism : public AbstractOrganism {
+class Organism {
  private:
 	static int organismIDCounter;  // used to issue unique ids to Genomes
 	int registerOrganism();  // get an Organism_id (uses organismIDCounter)
 
  public:
+	DataMap dataMap;  // holds all data (genome size, score, world data, etc.)
+	map<int, DataMap> snapShotDataMaps;  // Used only with SnapShot with Delay (SSwD) stores contents of dataMap when an ouput interval is reached so that
+	// after the delay we have the correct data for the given time. key is 'update'. This possibly should be wrapped into Archivist.
 	int gender;  // generally 0=female, 1=male, *=?
 
 	shared_ptr<AbstractGenome> genome;

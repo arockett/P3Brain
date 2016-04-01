@@ -8,11 +8,6 @@
 
 #include "BerryWorld.h"
 
-#include "../Utilities/Random.h"
-#include "../Utilities/Utilities.h"
-
-/* *** implementation of the World *** */
-
 const double& BerryWorld::TSK = Parameters::register_parameter("BERRY_taskSwitchingCost", 1.4, "cost to change food sources", "WORLD - BERRY");
 const int& BerryWorld::defaultWorldUpdates = Parameters::register_parameter("BERRY_WorldUpdates", 400, "amount of time an brain is tested", "WORLD - BERRY");
 
@@ -414,11 +409,6 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 	org->dataMap.Append("alltotal", total_eaten);  // total food eaten (regardless of type)
 
 	org->dataMap.Append("allswitches", switches);
-	//org->dataMap.Append("allscore", score);
-
-//	if (analyse) {
-//		org->dataMap.Set("phi", Analyse::computeAtomicPhi(stateCollector, org->brain->nrOfBrainNodes));
-//	}
 
 	return score;
 }

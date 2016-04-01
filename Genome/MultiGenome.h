@@ -17,15 +17,13 @@
 #include <sstream>
 #include <utility>
 
-#include "Genome.h"
-
-#include "Chromosome.h"
-
 #include "../Utilities/Utilities.h"
 #include "../Utilities/Data.h"
 #include "../Utilities/Parameters.h"
 #include "../Utilities/ParametersTable.h"
 #include "../Utilities/Random.h"
+#include "AbstractChromosome.h"
+#include "AbstractGenome.h"
 
 using namespace std;
 

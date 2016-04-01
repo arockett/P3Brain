@@ -16,14 +16,14 @@
 #include <stdlib.h>
 #include <vector>
 
-#include "../Genome/Genome.h"
+#include "../Genome/AbstractGenome.h"
 #include "../Global.h"
 
 #include "../Utilities/Parameters.h"
 
 using namespace std;
 
-class Gate {  // abstact class. Assumes that a standard genome is being used.
+class Gate {
  public:
 	int ID;
 
@@ -34,9 +34,7 @@ class Gate {  // abstact class. Assumes that a standard genome is being used.
 	static const int OUT_ADDRESS_CODE = 21;
 	static const int DATA_CODE = 30;
 
-	//static void AddGate(int ID, function<shared_ptr<Gate>(shared_ptr<Genome>, int)> theFunction);
-	static void setupGates();
-	//static function<shared_ptr<Gate>(shared_ptr<Genome>, int)> makeGate[256];
+	//static void setupGates();
 
 	Gate() {
 		ID = 0;

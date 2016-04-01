@@ -16,12 +16,11 @@
 #include <unordered_set>
 #include <vector>
 
-#include "Brain.h"
-#include "../Genome/Genome.h"
-
+#include "../Genome/AbstractGenome.h"
 #include "../Utilities/Parameters.h"
 #include "../Utilities/Random.h"
 #include "../Utilities/Utilities.h"
+#include "AbstractBrain.h"
 
 // define the wire states
 

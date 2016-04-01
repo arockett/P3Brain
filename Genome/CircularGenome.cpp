@@ -453,7 +453,7 @@ shared_ptr<AbstractGenome> CircularGenome<T>::makeMutatedGenomeFromMany(vector<s
 	newGenome->alphabetSize = castParent0->alphabetSize;
 	newGenome->PT.copy(castParent0->PT);  // copy ParametersTable from 0th parent
 
-	vector<shared_ptr<AbstractChromosome>> parentChromosomes;
+//	vector<shared_ptr<AbstractChromosome>> parentChromosomes;
 //	for (auto rawParent : parents) {
 //		auto parent = dynamic_pointer_cast<CircularGenome<T>>(rawParent);
 //		parentChromosomes.push_back(parent->chromosomes[i]);  // make a vector that contains the nth chromosome from each parent
