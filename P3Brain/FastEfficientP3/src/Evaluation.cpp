@@ -4,8 +4,8 @@
 // to convert the vector of bool solution into a floating point fitness.
 
 #include "Evaluation.h"
+#include "MarkovBrain.h"
 #include "Tools.h"
-#include "BitBrain.h"
 
 using namespace std;
 
@@ -23,29 +23,14 @@ evaluation::pointer Configuration::get(const string key) {
 */
 MarkovWorld::MarkovWorld( Configuration& config, int run_number )
 {
-    trainingGround = config.get<evaluation::pointer>("world")();
-
-    string type = config.get<string>( "decoder" );
-    if( type == "Unstructured" )
-    {
-        decoderType = BitBrain::Unstructured;
-    }
-    else if( type == "FixedInput" )
-    {
-        decoderType = BitBrain::FixedInput;
-    }
-    else if( type == "FixedLogic" )
-    {
-        decoderType = BitBrain::FixedLogic;
-    }
-    else if( type == "Hypercube" )
-    {
-        decoderType = BitBrain::Hypercube;
-    }
-    else
-    {
-        ASSERT( false, "Invalid decoder type given in P3 config file." );
-    }
+    trainingGround = config.get<evaluation::pointer>( "world" )();
+    decoder = config.get<decoder::pointer>( "decoder" )();
+    numInputNodes = trainingGround->requiredInputs();
+    numOutputNodes = trainingGround->requiredOutputs();
+    numHiddenNodes = config.get<int>( "gates" ) - numOutputNodes;
+    ASSERT( numHiddenNodes >= 0,
+        "Not enough gates, world requires at least " << numOutputNodes << " gates." );
+    gateComplexity = config.get<int>( "gate_complexity" );
 }
 
 /*
@@ -57,14 +42,8 @@ MarkovWorld::MarkovWorld( Configuration& config, int run_number )
 */
 float MarkovWorld::evaluate(const vector<bool>& solution)
 {
-    auto org = make_shared<Organism>();
-    if( decoderType != BitBrain::Unstructured )
-    {
-      org->brain = make_shared<BitBrain>(solution, 11, 2, decoderType);
-    }
-    else
-    {
-      org->brain = make_shared<BitBrain>(solution, 11, 10, 3, 2);
-    }
-    return (float)trainingGround->testIndividual(org, false);
+    gladiator->dataMap.ClearMap();
+    auto gates = decoder->decode( solution, numInputNodes, numOutputNodes, numHiddenNodes, gateComplexity );
+    gladiator->brain = make_shared<MarkovBrain>( gates, numInputNodes, numOutputNodes, numHiddenNodes );
+    return (float)trainingGround->testIndividual(gladiator, false);
 }

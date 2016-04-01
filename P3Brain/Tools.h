@@ -14,28 +14,6 @@
 #include <vector>
 #include <cassert>
 
-#include "Genome.h"
-
-
-/**
- * Singleton genome used as a stand-in genome object for the BitBrain
- */
-class SingletonGenome
-{
-public:
-    static Genome& getInstance()
-    {
-        static Genome instance = Genome();
-        instance.sites.clear();
-        return instance;
-    }
-
-private:
-    SingletonGenome() {}
-    SingletonGenome( const SingletonGenome& ) = delete;
-    SingletonGenome& operator=( const SingletonGenome& ) = delete;
-};
-
 
 // Define a custom assert function that prints out a message if the assert fails
 #ifndef NDEBUG

@@ -66,7 +66,7 @@ int main( int argc, char * argv[] )
 
     // Set up the random number seed either using the configuration value
     // or the computers built in seed generator.
-    generator& rand=Random::getCommonGenerator();
+    generator& rand = Random::getCommonGenerator();
     int seed = config.get<int>( "seed" );
     if ( seed == -1 )
     {

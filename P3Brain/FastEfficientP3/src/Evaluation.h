@@ -17,9 +17,10 @@
 #include "Configuration.h"
 #include "Util.h"
 
-// Include the Markov World header to use for the MarkovWorld Evaluator
+// Include objects from the MarkovBrain project
 #include "World.h"
-#include "BitBrain.h"
+#include "Organism.h"
+#include "Decoder.h"
 
 #define PI 3.14159265
 
@@ -55,7 +56,12 @@ public:
 
 private:
     shared_ptr<World> trainingGround = nullptr;
-    BitBrain::Decoder decoderType;
+    shared_ptr<Organism> gladiator = make_shared<Organism>();
+    shared_ptr<Decoder> decoder = nullptr;
+    int numInputNodes;
+    int numOutputNodes;
+    int numHiddenNodes;
+    int gateComplexity;
 };
 
 
