@@ -32,6 +32,10 @@ class FeedbackGate : public Gate {
 	virtual void applyNodeMap(vector<int> nodeMap, int maxNodes);
 	virtual void resetGate(void) override;
 	virtual vector<int> getIns() override;
+	virtual string gateType() override{
+		return "Feedback";
+	}
+
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Feedback_Gate__) */

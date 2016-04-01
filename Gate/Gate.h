@@ -24,7 +24,7 @@
 using namespace std;
 
 class Gate {
- public:
+public:
 	int ID;
 
 	static const int START_CODE = 0;
@@ -33,8 +33,6 @@ class Gate {
 	static const int OUT_COUNT_CODE = 20;
 	static const int OUT_ADDRESS_CODE = 21;
 	static const int DATA_CODE = 30;
-
-	//static void setupGates();
 
 	Gate() {
 		ID = 0;
@@ -48,75 +46,71 @@ class Gate {
 	virtual void resetGate(void);  // this is empty here. Some gates so not need to reset, they can use this method.
 	virtual vector<int> getIns();  // returns a vector of int with the adress for this gates input brain state value addresses
 	virtual vector<int> getOuts();  // returns a vector of int with the adress for this gates onput brain state value addresses
-
-	// functions which must be provided with each gate
 	virtual void update(vector<double> & states, vector<double> & nextStates) = 0;  // the function is empty, and must be provided in any derived gates
-	virtual string description() = 0;  // returns a description of the gate. This method can be used in derived gates description method to return ins and outs and coding regions
+	// returns a description of the gate. This method can be used in derived gates description method to return ins and outs and coding regions
+	virtual string descriptionIO();  // returns a description of the gate. This method can be used in derived gates description method to return ins and outs and coding regions
+	virtual string description();  // returns a description of the gate. This method can be used in derived gates description method to return ins and outs and coding regions
+	virtual string gateType() {
+		return "undefined";
+	}
 
 };
 
-class ProbabilisticGate : public Gate {  //conventional probabilistic gate
- public:
-
+class ProbabilisticGate: public Gate {  //conventional probabilistic gate
+public:
 	vector<vector<double>> table;
-
 	ProbabilisticGate() = delete;
-	//ProbabilisticGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
-	ProbabilisticGate(pair<vector<int>,vector<int>> addresses, vector<vector<int>> _rawTable, int _ID);
-
-
+	ProbabilisticGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _rawTable, int _ID);
 	virtual ~ProbabilisticGate() = default;
-
 	virtual void update(vector<double> & states, vector<double> & nextStates) override;
+	virtual string gateType() override{
+		return "Probabilistic";
+	}
 
-	virtual string description() override;
 
 };
 
-class DeterministicGate : public Gate {
- public:
+class DeterministicGate: public Gate {
+public:
 	vector<vector<int>> table;
-
 	DeterministicGate() = delete;
-	//DeterministicGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
-	DeterministicGate(pair<vector<int>,vector<int>> addresses, vector<vector<int>> _table, int _ID);
-
+	DeterministicGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID);
 	virtual ~DeterministicGate() = default;
 	virtual void update(vector<double> & states, vector<double> & nextStates) override;
-
-	void setupForBits(int* Ins, int nrOfIns, int Out, int logic);
-
-	virtual string description() override;
-
-	//double voidOutput;
+	//void setupForBits(int* Ins, int nrOfIns, int Out, int logic);
+	virtual string gateType() override{
+		return "Deterministic";
+	}
 };
 
-class FixedEpsilonGate : public DeterministicGate {
- private:
- public:
+class FixedEpsilonGate: public DeterministicGate {
+public:
 	static const double& FixedEpsilonGate_Probability;
-
 	vector<int> defaultOutput;
 	double epsilon;
 	FixedEpsilonGate() = delete;
-	FixedEpsilonGate(pair<vector<int>,vector<int>> addresses, vector<vector<int>> _table, int _ID);
+	FixedEpsilonGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID);
 	virtual ~FixedEpsilonGate() = default;
 	virtual void update(vector<double> & states, vector<double> & nextStates) override;
-	virtual string description() override;
+	virtual string gateType() override{
+		return "FixedEpsilon";
+	}
+
 };
 
-class VoidGate : public DeterministicGate {
+class VoidGate: public DeterministicGate {
 	static const double& voidGate_Probability;
-
- private:
- public:
+public:
 	vector<int> defaultOutput;
 	double epsilon;
 	VoidGate() = delete;
-	VoidGate(pair<vector<int>,vector<int>> addresses, vector<vector<int>> _table, int _ID);
+	VoidGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID);
 	virtual ~VoidGate() = default;
 	virtual void update(vector<double> & states, vector<double> & nextStates) override;
-	virtual string description() override;
+	virtual string gateType() override{
+			return "VoidGate";
+		}
+
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Gate__) */

@@ -149,6 +149,10 @@ public:
 		return s;
 	}
 
+	virtual string gateType() override{
+		return "Neuron";
+	}
+
 	void applyNodeMap(vector<int> nodeMap, int maxNodes) override {
 		Gate::applyNodeMap(nodeMap, maxNodes);
 		if (thresholdFromNode != -1) {
@@ -162,6 +166,7 @@ public:
 	void resetGate() override {
 		currentCharge = 0;
 	}
+
 
 };
 

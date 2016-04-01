@@ -41,9 +41,8 @@ vector<int> Gate::getOuts() {
 	return outputs;
 }
 
-string Gate::description() {
-	string S = "Gate\n";
-	S = S + "IN:";
+string Gate::descriptionIO() {
+	string S = "IN:";
 	for (size_t i = 0; i < inputs.size(); i++)
 		S = S + " " + to_string(inputs[i]);
 	S = S + "\n";
@@ -53,6 +52,10 @@ string Gate::description() {
 	S = S + "\n";
 	//S = S + getCodingRegions();
 	return S;
+}
+
+string Gate::description() {
+	return "Gate " + to_string(ID) + " is a " + gateType() + "Gate\n" + descriptionIO();
 }
 
 /* *** ProbilisticGate implementation *** */
@@ -101,10 +104,6 @@ void ProbabilisticGate::update(vector<double> & nodes, vector<double> & nextNode
 																						   // but always put the last bit in the first input (to maintain consistancy)
 }
 
-string ProbabilisticGate::description() {
-	return "Gate " + to_string(ID) + " is a Probabilistic " + Gate::description();
-}
-
 /* *** Determistic Gate Implementation *** */
 
 DeterministicGate::DeterministicGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID) {
@@ -114,28 +113,24 @@ DeterministicGate::DeterministicGate(pair<vector<int>, vector<int>> addresses, v
 	table = _table;
 }
 
-void DeterministicGate::setupForBits(int* Ins, int nrOfIns, int Out, int logic) {
-	inputs.resize(nrOfIns);
-	for (int i = 0; i < nrOfIns; i++)
-		inputs[i] = Ins[i];
-	outputs.resize(1);
-	outputs[0] = Out;
-	table.resize(1 << nrOfIns);
-	for (int i = 0; i < (1 << nrOfIns); i++) {
-		table[i].resize(1);
-		table[i][0] = (logic >> i) & 1;
-	}
-}
+//void DeterministicGate::setupForBits(int* Ins, int nrOfIns, int Out, int logic) {
+//	inputs.resize(nrOfIns);
+//	for (int i = 0; i < nrOfIns; i++)
+//		inputs[i] = Ins[i];
+//	outputs.resize(1);
+//	outputs[0] = Out;
+//	table.resize(1 << nrOfIns);
+//	for (int i = 0; i < (1 << nrOfIns); i++) {
+//		table[i].resize(1);
+//		table[i][0] = (logic >> i) & 1;
+//	}
+//}
 
 void DeterministicGate::update(vector<double> & nodes, vector<double> & nextNodes) {
 	int input = vectorToBitToInt(nodes,inputs,true); // converts the input values into an index (true indicates to reverse order)
 	for (size_t i = 0; i < outputs.size(); i++) {
 		nextNodes[outputs[i]] += table[input][i];
 	}
-}
-
-string DeterministicGate::description() {
-	return "Gate " + to_string(ID) + " is a Deterministic " + Gate::description();
 }
 
 /* *** Fixed Epison Gate *** */
@@ -176,10 +171,6 @@ void FixedEpsilonGate::update(vector<double> & nodes, vector<double> & nextNodes
 	}
 }
 
-string FixedEpsilonGate::description() {
-	return "Gate " + to_string(ID) + " is a Fixed Epsilon " + Gate::description();
-}
-
 /* *** VoidGate *** */
 /* this gate behaves like a deterministic gate with a constant externally set error which may set a single output to 0 */
 
@@ -199,9 +190,5 @@ void VoidGate::update(vector<double> & nodes, vector<double> & nextNodes) {
 	for (size_t i = 0; i < outputs.size(); i++) { // add output row to nextNodes
 		nextNodes[outputs[i]] += outputRow[i];
 	}
-}
-
-string VoidGate::description() {
-	return "Gate " + to_string(ID) + " is a Void Gate " + Gate::description();
 }
 

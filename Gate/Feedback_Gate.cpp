@@ -175,8 +175,8 @@ void FeedbackGate::update(vector<double> & states, vector<double> & nextStates) 
 }
 
 string FeedbackGate::description() {
-	string S = "pos node:" + to_string((int) posFBNode) + "\n neg node:" + to_string((int) negFBNode);
-	return to_string(ID) + ": Feedback Gate\n " + S + "\n" + Gate::description();
+	string S = "pos node:" + to_string((int) posFBNode) + "\n neg node:" + to_string((int) negFBNode) + "\n";
+	return Gate::description() + S;
 }
 
 void FeedbackGate::applyNodeMap(vector<int> nodeMap, int maxNodes) {
