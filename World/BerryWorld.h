@@ -215,7 +215,7 @@ public:
 		return inputNodesCount;
 	}
 	virtual int requiredOutputs() override {
-		return inputNodesCount;
+		return outputNodesCount;
 	}
 
 };

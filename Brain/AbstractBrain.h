@@ -55,7 +55,7 @@ public:
 		nrHiddenNodes = hidden;
 		recordActivity = false;
 
-		nrOfBrainNodes = nrInNodes + nrOutNodes + nrHiddenNodes;
+		nrOfBrainNodes = ins + outs + hidden;
 		nodes.resize(nrOfBrainNodes);
 		nextNodes.resize(nrOfBrainNodes);
 
