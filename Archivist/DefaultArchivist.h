@@ -5,8 +5,8 @@
 //  Created by Cliff Bohm on 5/30/15.
 //
 
-#ifndef __BasicMarkovBrainTemplate__Archivist__
-#define __BasicMarkovBrainTemplate__Archivist__
+#ifndef __BasicMarkovBrainTemplate__DefaultArchivist__
+#define __BasicMarkovBrainTemplate__DefaultArchivist__
 
 #include <algorithm>
 #include <memory>
@@ -14,18 +14,12 @@
 #include <stdlib.h>
 #include <vector>
 
-#include "../Brain/MarkovBrain.h"
-#include "../Genome/Genome.h"
 #include "../Global.h"
 #include "../Organism/Organism.h"
 
-//#include "Utilities/Parameters.h"
-#include "../Utilities/Data.h"
-#include "../Utilities/Utilities.h"
-
 using namespace std;
 
-class Archivist {
+class DefaultArchivist {
  public:
 
 	static const string& Arch_outputMethodStr;  // string parameter for outputMethod;
@@ -48,8 +42,9 @@ class Archivist {
 
 	bool finished;  // if finished, then as far as the archivist is concerned, we can stop the run.
 
-	Archivist(vector<string> aveFileColumns = {});
-	virtual ~Archivist() = default;
+	DefaultArchivist();
+	DefaultArchivist(vector<string> aveFileColumns);
+	virtual ~DefaultArchivist() = default;
 
 	//save dominant and average file data
 	void writeRealTimeFiles(vector<shared_ptr<Organism>> &population);
@@ -60,4 +55,4 @@ class Archivist {
 
 };
 
-#endif /* defined(__BasicMarkovBrainTemplate__Archivist__) */
+#endif /* defined(__BasicMarkovBrainTemplate__DefaultArchivist__) */

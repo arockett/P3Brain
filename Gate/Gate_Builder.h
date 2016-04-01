@@ -5,9 +5,10 @@
 
 #include "Gate.h"
 #include "Feedback_Gate.h"
-#include "GP_Gate.h"
+#include "GPGate.h"
 #include "Threshold_Gate.h"
 #include "TritGate.h"
+#include "NeuronGate.h"
 
 class Gate_Builder {  // manages what kinds of gates can be built
  public:
@@ -31,6 +32,8 @@ class Gate_Builder {  // manages what kinds of gates can be built
 	static const bool& usingTritDeterministicGate;
 	static const int& tritDeterministicGateInitialCount;
 
+	static const bool& usingNeuronGate;
+	static const int& neuronGateInitialCount;
 
 
 

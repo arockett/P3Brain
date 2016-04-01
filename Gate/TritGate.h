@@ -6,6 +6,10 @@
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
 //
 //
+
+#ifndef __BasicMarkovBrainTemplate__TritGate__
+#define __BasicMarkovBrainTemplate__TritGate__
+
 #include <iostream>
 #include <math.h>
 
@@ -31,6 +35,7 @@ class TritDeterministicGate : public Gate {
 	//double voidOutput;
 };
 
+#endif /* defined(__BasicMarkovBrainTemplate__TritGate__) */
 
 
 

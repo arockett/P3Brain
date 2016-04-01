@@ -17,7 +17,7 @@
 
 #include "../Gate/Gate_Builder.h"
 #include "../GateListBuilder/GateListBuilder.h"
-#include "../Genome/Genome.h"
+#include "../Genome/AbstractGenome.h"
 
 #include "../Utilities/Parameters.h"
 
@@ -30,6 +30,9 @@ public:
 
 	vector<string> aveFileColumns;
 
+	bool recordActivity;
+	string recordActivityFileName;
+
 	int nrOfBrainNodes;  // the number of states in THIS brain
 						 // this is temporary! new node/memory/dataCell will fix this.
 	int nrInNodes;
@@ -41,6 +44,7 @@ public:
 
 	AbstractBrain() {
 		nrInNodes = nrOutNodes = nrHiddenNodes = nrOfBrainNodes = 0;
+		recordActivity = false;
 		cout << "ERROR: attempting to construct brain with no arguments. Check brain type for required parameters... most likely at least #in, #out and #hidden are required!\n\nExiting.\n" << endl;
 		exit(1);
 	}
@@ -49,8 +53,9 @@ public:
 		nrInNodes = ins;
 		nrOutNodes = outs;
 		nrHiddenNodes = hidden;
+		recordActivity = false;
 
-		nrOfBrainNodes = nrInNodes + nrOutNodes + nrHiddenNodes;
+		nrOfBrainNodes = ins + outs + hidden;
 		nodes.resize(nrOfBrainNodes);
 		nextNodes.resize(nrOfBrainNodes);
 
@@ -69,6 +74,14 @@ public:
 		for (int i = 0; i < nrOfBrainNodes; i++) {
 			nodes[i] = 0.0;
 		}
+	}
+
+	virtual void inline setRecordActivity(bool _recordActivity){
+		recordActivity = _recordActivity;
+	}
+
+	virtual void inline setRecordFileName(string _recordActivityFileName){
+		recordActivityFileName = _recordActivityFileName;
 	}
 
 	virtual void inline resetOutputs() {

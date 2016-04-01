@@ -9,11 +9,11 @@
 #ifndef __BasicMarkovBrainTemplate__GA_Optimizer__
 #define __BasicMarkovBrainTemplate__GA_Optimizer__
 
-#include "Optimizer.h"
+#include "AbstractOptimizer.h"
 
 using namespace std;
 
-class GA_Optimizer : public BaseOptimizer {
+class GA_Optimizer : public AbstractOptimizer {
  public:
 	virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population) override;
 };

@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
 //
 
-#include "Brain.h"
+#include "AbstractBrain.h"
 
 
 const string& AbstractBrain::brainTypeStr = Parameters::register_parameter("brainType", (string) "Markov", "brain to be used in evolution loop, [Markov, Wire]", "BRAIN");  // string parameter for outputMethod;

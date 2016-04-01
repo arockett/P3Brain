@@ -17,13 +17,12 @@
 #include <sstream>
 #include <utility>
 
-#include "Genome.h"
-
 #include "../Utilities/Utilities.h"
 #include "../Utilities/Data.h"
 #include "../Utilities/Parameters.h"
 #include "../Utilities/ParametersTable.h"
 #include "../Utilities/Random.h"
+#include "AbstractGenome.h"
 
 using namespace std;
 
@@ -170,7 +169,7 @@ public:
 	virtual void recordDataMap() override;
 
 	// load all genomes from a file
-	virtual void loadGenomes(string fileName, vector<shared_ptr<AbstractGenome>> &genomes) override;
+	virtual void loadGenomeFile(string fileName, vector<shared_ptr<AbstractGenome>> &genomes) override;
 // load a genome from CSV file with headers - will return genome from saved organism with key / keyvalue pair
 // the undefined action is to take no action
 //	virtual void loadGenome(string fileName, string key, string keyValue);

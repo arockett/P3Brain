@@ -17,8 +17,6 @@
 #include <sstream>
 #include <utility>
 
-#include "Chromosome.h"
-
 #include "../Utilities/Utilities.h"
 #include "../Utilities/Data.h"
 #include "../Utilities/Parameters.h"
@@ -151,11 +149,25 @@ class AbstractGenome {
 		cout << "Warning! In AbstractGenome::printGenome()...\n";
 	}
 
-	virtual void loadGenome(string fileName, string key, string keyValue) {
+	virtual void loadGenomeFile(string fileName, vector<shared_ptr<AbstractGenome>> &genomes) {
+		cout << "loadGenomeFile() has not been defined for this type of genome!" << endl;
+		exit(1);
 	}
 
-	virtual void loadGenomes(string fileName, vector<shared_ptr<AbstractGenome>> &genomes) {
+	// loadGenome will load file "fileName" and return the first genome whos dataMap matches key,value
+	// if no genome matches, function returns nullptr
+	// if more then one genome matches, function return first match
+	virtual shared_ptr<AbstractGenome> loadGenome(string fileName, string key, string value) {
+		vector<shared_ptr<AbstractGenome>> genomes;
+		loadGenomeFile(fileName, genomes);
+		for (auto g:genomes){
+				if (g->dataMap.Get(key) == value){
+					return g;
+				}
+		}
+		return nullptr;
 	}
+
 
 	virtual bool isEmpty() = 0;
 

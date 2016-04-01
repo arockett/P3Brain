@@ -10,6 +10,9 @@
 #include "../Utilities/Utilities.h"
 #include "WireBrain.h"
 
+
+const bool& WireBrain::allowNegativeCharge = Parameters::register_parameter("allowNegativeCharge", false, "if true, wire brain can interpret negative input, deliver negative output, and charge negatively", "BRAIN - WIRE");
+
 const int& WireBrain::defaultWidth = Parameters::register_parameter("size_width", 10, "width of the wire brain cube", "BRAIN - WIRE");
 const int& WireBrain::defaultHeight = Parameters::register_parameter("size_height", 10, "height of the wire brain cube", "BRAIN - WIRE");
 const int& WireBrain::defaultDepth = Parameters::register_parameter("size_depth", 10, "depth of the wire brain cube", "BRAIN - WIRE");

@@ -8,11 +8,11 @@
 #ifndef __BasicMarkovBrainTemplate__LODwAP_Archivist__
 #define __BasicMarkovBrainTemplate__LODwAP_Archivist__
 
-#include "Archivist.h"
+#include "DefaultArchivist.h"
 
 using namespace std;
 
-class LODwAP_Archivist : public Archivist {  // Line of Decent with Active Pruning
+class LODwAPArchivist : public DefaultArchivist {  // Line of Decent with Active Pruning
  public:
 
 	static const int& LODwAP_Arch_dataInterval;  // how often to write out data
@@ -46,9 +46,9 @@ class LODwAP_Archivist : public Archivist {  // Line of Decent with Active Pruni
 	//unordered_map<int, vector<weak_ptr<Organism>>> checkpoints;  // used by SSwD only - this keeps lists of orgs that may be written (if they have living decendents)
 	//// key is Global::nextGenomeWrite or Global::nextDataWrite
 
-	LODwAP_Archivist(vector<string> aveFileColumns = {});
+	LODwAPArchivist(vector<string> aveFileColumns = {});
 
-	virtual ~LODwAP_Archivist() = default;
+	virtual ~LODwAPArchivist() = default;
 
 	virtual bool archive(vector<shared_ptr<Organism>> population, int flush = 0) override;
 };

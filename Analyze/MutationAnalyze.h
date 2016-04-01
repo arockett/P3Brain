@@ -8,23 +8,22 @@
 #ifndef __BasicMarkovBrainTemplate__MutationAnalyse__
 #define __BasicMarkovBrainTemplate__MutationAnalyse__
 
-#include <algorithm>
-#include <iostream>
-#include <fstream>
-#include <set>
-#include <time.h>
-#include <stdlib.h>
-#include <vector>
-
-#include "../Genome/Genome.h"
-#include "../World/World.h"
-#include "../World/BerryWorld.h"
-
-#include "../Utilities/Data.h"
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include "../Brain/MarkovBrain.h"
+//#include <algorithm>
+//#include <iostream>
+//#include <fstream>
+//#include <set>
+//#include <time.h>
+//#include <stdlib.h>
+//#include <vector>
+//
+//#include "../Genome/Genome.h"
+//#include "../Utilities/Data.h"
+//
+//#include <sys/types.h>
+//#include <sys/stat.h>
+//#include "../Brain/MarkovBrain.h"
+//#include "../World/BerryWorldTest.h"
+//#include "../World/WorldTest.h"
 
 using namespace std;
 //class MutationAnalyse {

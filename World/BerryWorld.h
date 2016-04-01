@@ -14,20 +14,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../Genome/Genome.h"
-#include "../World/World.h"
-#include "../Analyze/Analyze.h"
-#include "../Brain/Brain.h"
-#include "../Utilities/Parameters.h"
-#include "../Utilities/Utilities.h"
-#include "../Utilities/Random.h"
+#include "AbstractWorld.h"
 
 using namespace std;
 
-class MadBotAI;
-
-class BerryWorld : public World {
- public:
+class BerryWorld: public AbstractWorld {
+private:
+	int outputNodesCount, inputNodesCount;
+public:
 	const int numberOfDirections = 8;
 	const int xm[8] = { 0, 1, 1, 1, 0, -1, -1, -1 };  //these are directions
 	const int ym[8] = { -1, -1, 0, 1, 1, 1, 0, -1 };
@@ -38,7 +32,7 @@ class BerryWorld : public World {
 
 	// Parameters
 	static const double& TSK;
-	static const int& worldUpdates;
+	static const int& defaultWorldUpdates;
 	static const int& foodTypes;
 	static const double& rewardForFood1;
 	static const double& rewardForFood2;
@@ -83,6 +77,8 @@ class BerryWorld : public World {
 	static const bool& recordFoodListNoEat;
 	// end parameters
 
+	int worldUpdates;
+
 	int foodRatioTotal;  // sum of ratioFood for foods in use
 	vector<int> foodRatioLookup;
 	vector<double> foodRewards;
@@ -111,7 +107,7 @@ class BerryWorld : public World {
 				cout << "ERROR: In BerryWorld::pickFood() - lastfood > foodTypes (i.e. last food eaten is not in foodTypes!)\nExiting.\n\n";
 				exit(1);
 			}
-			if (foodRatioTotal - foodRatioLookup[lastfood] == 0){
+			if (foodRatioTotal - foodRatioLookup[lastfood] == 0) {
 				cout << "ERROR: In BerryWorld::pickFood() : lastfood is not <= 0, and foodTypes = 1.\nThere is only one foodType! Pick can not be a different foodType\n\nExiting";
 				exit(1);
 			}
@@ -214,6 +210,14 @@ class BerryWorld : public World {
 	}
 
 	void printGrid(vector<int> grid, pair<int, int> loc, int facing);
+
+	virtual int requiredInputs() override{
+		return inputNodesCount;
+	}
+	virtual int requiredOutputs() override {
+		return outputNodesCount;
+	}
+
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__BerryWorld__) */

@@ -16,15 +16,15 @@
 #include <vector>
 
 #include "../Gate/Gate_Builder.h"
-#include "../Genome/Genome.h"
+#include "../Genome/AbstractGenome.h"
 
 #include "../Utilities/Parameters.h"
 
 using namespace std;
-class Base_GateListBuilder {
+class AbstractGateListBuilder {
  public:
-	Base_GateListBuilder() = default;
-	virtual ~Base_GateListBuilder() = default;
+	AbstractGateListBuilder() = default;
+	virtual ~AbstractGateListBuilder() = default;
 //	virtual vector<shared_ptr<Gate>> buildGateList(shared_ptr<AbstractGenome> genome, int nrOfBrainStates,
 //	                                               int maxValue, shared_ptr<vector<int>> genomeHeadValues, int genomeHeadValuesCount,
 //	                                               shared_ptr<vector<vector<int>>> genomePerGateValues, int genomePerGateValuesCount) = 0;
@@ -51,11 +51,11 @@ class Base_GateListBuilder {
 
 };
 
-class Classic_GateListBuilder : public Base_GateListBuilder {
+class ClassicGateListBuilder : public AbstractGateListBuilder {
  public:
 
-	Classic_GateListBuilder() = default;
-	virtual ~Classic_GateListBuilder() = default;
+	ClassicGateListBuilder() = default;
+	virtual ~ClassicGateListBuilder() = default;
 
 	virtual vector<shared_ptr<Gate>> buildGateListAndGetAllValues(shared_ptr<AbstractGenome> genome, int nrOfBrainStates,
 	                                               int maxValue, vector<int> &genomeHeadValues, int genomeHeadValuesCount,

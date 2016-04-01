@@ -23,7 +23,7 @@ MarkovBrain::MarkovBrain(vector<shared_ptr<Gate>> _gates, int _nrInNodes, int _n
 	aveFileColumns.push_back("gates");
 }
 
-MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes) :
+MarkovBrain::MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes) :
 		AbstractBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes) {
 	GLB = _GLB;
 	//make a node map to handle genome value to brain state address look up.
@@ -34,7 +34,7 @@ MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, int _nrInNodes, 
 	aveFileColumns.push_back("gates");
 }
 
-MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes) :
+MarkovBrain::MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes) :
 		MarkovBrain(_GLB, _nrInNodes, _nrOutNodes, _nrHiddenNodes) {  //this is a constructor. it is run whenever a new brain is created.
 	//cout << "in MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrOfBrainStates)\n\tabout to - gates = GLB->buildGateList(genome, nrOfBrainStates);" << endl;
 	gates = GLB->buildGateList(genome, nrOfBrainNodes);

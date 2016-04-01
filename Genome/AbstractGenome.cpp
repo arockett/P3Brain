@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
 //
 
-#include "Genome.h"
+#include "AbstractGenome.h"
 
 const string& AbstractGenome::genomeTypeStr = Parameters::register_parameter("genomeType", (string) "Multi", "genome to be used in evolution loop, [Multi, Circular]", "GENOME");  // string parameter for outputMethod;
 const int& AbstractGenome::alphabetSize = Parameters::register_parameter("genomeAlphabetSize", 256, "alphabet size for genome", "GENOME");  // string parameter for outputMethod;

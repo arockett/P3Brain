@@ -1,14 +1,14 @@
-#include "snapshot_Archivist.h"
+#include "SnapshotArchivist.h"
 
-const int& Snapshot_Archivist::SS_Arch_dataInterval = Parameters::register_parameter("dataInterval_SS", 100, "How often to save a data file", "ARCHIVIST_SNAPSHOT");
-const int& Snapshot_Archivist::SS_Arch_genomeInterval = Parameters::register_parameter("genomeInterval_SS", 1000, "How often to save a genome file", "ARCHIVIST_SNAPSHOT");
-const string& Snapshot_Archivist::SS_Arch_DataFilePrefix = Parameters::register_parameter("dataFilePrefix_SS", (string) "data", "name of genome file (stores genomes)", "ARCHIVIST_SNAPSHOT");
-const string& Snapshot_Archivist::SS_Arch_GenomeFilePrefix = Parameters::register_parameter("genomeFilePrefix_SS", (string) "genome", "name of data file (stores everything but genomes)", "ARCHIVIST_SNAPSHOT");
-const bool& Snapshot_Archivist::SS_Arch_writeDataFiles = Parameters::register_parameter("writeDataFiles_SS", true, "if true, data files will be written", "ARCHIVIST_SNAPSHOT");
-const bool& Snapshot_Archivist::SS_Arch_writeGenomeFiles = Parameters::register_parameter("writeGenomeFiles_SS", true, "if true, genome files will be written", "ARCHIVIST_SNAPSHOT");
+const int& SnapshotArchivist::SS_Arch_dataInterval = Parameters::register_parameter("dataInterval_SS", 100, "How often to save a data file", "ARCHIVIST_SNAPSHOT");
+const int& SnapshotArchivist::SS_Arch_genomeInterval = Parameters::register_parameter("genomeInterval_SS", 1000, "How often to save a genome file", "ARCHIVIST_SNAPSHOT");
+const string& SnapshotArchivist::SS_Arch_DataFilePrefix = Parameters::register_parameter("dataFilePrefix_SS", (string) "data", "name of genome file (stores genomes)", "ARCHIVIST_SNAPSHOT");
+const string& SnapshotArchivist::SS_Arch_GenomeFilePrefix = Parameters::register_parameter("genomeFilePrefix_SS", (string) "genome", "name of data file (stores everything but genomes)", "ARCHIVIST_SNAPSHOT");
+const bool& SnapshotArchivist::SS_Arch_writeDataFiles = Parameters::register_parameter("writeDataFiles_SS", true, "if true, data files will be written", "ARCHIVIST_SNAPSHOT");
+const bool& SnapshotArchivist::SS_Arch_writeGenomeFiles = Parameters::register_parameter("writeGenomeFiles_SS", true, "if true, genome files will be written", "ARCHIVIST_SNAPSHOT");
 
-Snapshot_Archivist::Snapshot_Archivist(vector<string> aveFileColumns) :
-		Archivist(aveFileColumns) {
+SnapshotArchivist::SnapshotArchivist(vector<string> aveFileColumns) :
+		DefaultArchivist(aveFileColumns) {
 	dataInterval = SS_Arch_dataInterval;
 	genomeInterval = SS_Arch_genomeInterval;
 	DataFilePrefix = SS_Arch_DataFilePrefix;
@@ -17,7 +17,7 @@ Snapshot_Archivist::Snapshot_Archivist(vector<string> aveFileColumns) :
 	writeGenomeFiles = SS_Arch_writeGenomeFiles;
 }
 
-void Snapshot_Archivist::saveSnapshotData(vector<shared_ptr<Organism>> population, int update) {
+void SnapshotArchivist::saveSnapshotData(vector<shared_ptr<Organism>> population, int update) {
 	// write out data
 	string dataFileName = DataFilePrefix + "_" + to_string(update) + ".csv";
 
@@ -36,7 +36,7 @@ void Snapshot_Archivist::saveSnapshotData(vector<shared_ptr<Organism>> populatio
 	}
 }
 
-void Snapshot_Archivist::saveSnapshotGenomes(vector<shared_ptr<Organism>> population, int update) {
+void SnapshotArchivist::saveSnapshotGenomes(vector<shared_ptr<Organism>> population, int update) {
 
 	// write out genomes
 	string genomeFileName = GenomeFilePrefix + "_" + to_string(update) + ".csv";
@@ -56,7 +56,7 @@ void Snapshot_Archivist::saveSnapshotGenomes(vector<shared_ptr<Organism>> popula
 	}
 }
 
-bool Snapshot_Archivist::archive(vector<shared_ptr<Organism>> population, int flush) {
+bool SnapshotArchivist::archive(vector<shared_ptr<Organism>> population, int flush) {
 	if (flush != 1) {
 
 		if (Global::update % realtimeFilesInterval == 0) {  // do not write files on flush - these organisms have not been evaluated!

@@ -9,9 +9,9 @@
 #ifndef __BasicMarkovBrainTemplate__Tournament2_Optimizer__
 #define __BasicMarkovBrainTemplate__Tournament2_Optimizer__
 
-#include "Optimizer.h"
+#include "AbstractOptimizer.h"
 
-class Tournament2Optimizer : public BaseOptimizer {
+class Tournament2Optimizer : public AbstractOptimizer {
  public:
 	virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population) override;
 };

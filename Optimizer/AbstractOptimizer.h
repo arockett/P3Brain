@@ -13,14 +13,14 @@
 #include <stdlib.h>
 #include <vector>
 
-#include "../Genome/Genome.h"
+#include "../Genome/AbstractGenome.h"
 #include "../Organism/Organism.h"
 
 #include "../Utilities/Parameters.h"
 
 using namespace std;
 
-class BaseOptimizer {
+class AbstractOptimizer {
  public:
 	const static string& Optimizer_MethodStr;
 
@@ -29,11 +29,11 @@ class BaseOptimizer {
 
  public:
 	double maxFitness;
-	BaseOptimizer() {
+	AbstractOptimizer() {
 		maxFitness = 0;
 	}
-	virtual ~BaseOptimizer() = default;
-	virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population);
+	virtual ~AbstractOptimizer() = default;
+	virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population) = 0;
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Optimizer__) */

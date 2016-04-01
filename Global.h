@@ -24,6 +24,7 @@ class Global {
 	static const int& randomSeed;  // seed for random number generator, if -1 random number generator will be seeded randomly
 	static const int& updates;  // run until there is a MCRA at this time
 	static const int& popSize;  // number of genomes in the population
+	static const string& mode;  // number of genomes in the population
 
 	static const string& outputDirectory;  // where files will be written
 

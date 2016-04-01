@@ -16,14 +16,14 @@
 #include <stdlib.h>
 #include <vector>
 
-#include "../Genome/Genome.h"
+#include "../Genome/AbstractGenome.h"
 #include "../Global.h"
 
 #include "../Utilities/Parameters.h"
 
 using namespace std;
 
-class Gate {  // abstact class. Assumes that a standard genome is being used.
+class Gate {
  public:
 	int ID;
 
@@ -34,9 +34,7 @@ class Gate {  // abstact class. Assumes that a standard genome is being used.
 	static const int OUT_ADDRESS_CODE = 21;
 	static const int DATA_CODE = 30;
 
-	//static void AddGate(int ID, function<shared_ptr<Gate>(shared_ptr<Genome>, int)> theFunction);
-	static void setupGates();
-	//static function<shared_ptr<Gate>(shared_ptr<Genome>, int)> makeGate[256];
+	//static void setupGates();
 
 	Gate() {
 		ID = 0;
@@ -45,44 +43,6 @@ class Gate {  // abstact class. Assumes that a standard genome is being used.
 
 	vector<int> inputs;
 	vector<int> outputs;
-
-
-	// functions used in genome translation
-	//int getIOAddress(shared_ptr<AbstractGenome::Handler> genomeHandler, shared_ptr<AbstractGenome> genome, int gateID);  // extracts one brain state value address from a genome
-//	void getSomeBrainAddresses(const int& howMany, const int& howManyMax, vector<int>& addresses, shared_ptr<AbstractGenome::Handler> genomeHandler, shared_ptr<AbstractGenome> genome, int code, int gateID);  // extracts many brain state value addresses from a genome
-//	void getInputsAndOutputs(const vector<int> insRange, vector<int> outsRange, shared_ptr<AbstractGenome::Handler> genomeHandle, shared_ptr<AbstractGenome> genome, int gateID);  // extracts the input and output brain state value addresses for this gate
-//
-//	int getIndexFromInputs(vector<double> &brainState);  // used during update to convert gate input into table indexes
-
-//  /*
-//   * build a table of size range[0],range[1] which is the upper left subset of a table rangeMax[0],rangeMax[1]
-//   * the table rangeMax[0],rangeMax[0] would be filled with values from the genome (filling each row before going to the next column
-//   * This table is assigned to the gates table field.
-//   * set codingRegions for each used genome site value = DATA_CODE; (may need to add more support for this later!)
-//   */
-//  template<typename Type>
-//  void getTableFromGenome(vector<int> range, vector<int> rangeMax, int& genomeIndex, shared_ptr<Genome> genome, vector<vector<Type>> &table) {
-//    int x, y;
-//    int Y = range[0];
-//    int X = range[1];
-//    int maxY = rangeMax[0];
-//    int maxX = rangeMax[1];
-//
-//    table.resize(Y);  // set the number of rows in the table
-//
-//    for (y = 0; y < (Y); y++) {
-//      table[y].resize(X);  // set the number of columns in this row
-//      for (x = 0; x < X; x++) {
-//        table[y][x] = (Type) (genome->sites[genomeIndex]);
-//        codingRegions[genomeIndex] = Genome::DATA_CODE;
-//        genome->advanceIndex(genomeIndex);
-//      }
-//      for (; x < maxX; x++) {
-//        genome->advanceIndex(genomeIndex);  // advance genomeIndex to account for unused entries in the max sized table for this row
-//      }
-//    }
-//    genome->advanceIndex(genomeIndex, (maxY - Y) * maxX);  // advance genomeIndex to account for extra rows in the max sized table
-//  }
 
 	virtual void applyNodeMap(vector<int> nodeMap, int maxNodes);  // converts genome values into brain state value addresses
 	virtual void resetGate(void);  // this is empty here. Some gates so not need to reset, they can use this method.
