@@ -30,7 +30,9 @@ class TritDeterministicGate : public Gate {
 
 	void setupForBits(int* Ins, int nrOfIns, int Out, int logic);
 
-	virtual string description() override;
+	virtual string gateType() override{
+		return "TritDeterministic";
+	}
 
 	//double voidOutput;
 };

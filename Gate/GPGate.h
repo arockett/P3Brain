@@ -30,6 +30,10 @@ class GPGate : public Gate {
 	virtual ~GPGate() = default;
 	virtual void update(vector<double> & states, vector<double> & nextStates) override;
 	virtual string description() override;
+	virtual string gateType() override{
+		return "GeneticPrograming";
+	}
+
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__GP_Gate__) */

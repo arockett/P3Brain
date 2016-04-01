@@ -39,6 +39,13 @@ MarkovBrain::MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, shared_ptr<Ab
 	//cout << "in MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrOfBrainStates)\n\tabout to - gates = GLB->buildGateList(genome, nrOfBrainStates);" << endl;
 	gates = GLB->buildGateList(genome, nrOfBrainNodes);
 	inOutReMap();  // map ins and outs from genome values to brain states
+//	for (auto g : gates){
+//		cout << g->description();
+//		cout << endl;
+//	}
+//	cout << "------------------------------------------------------------------"<<endl;
+
+
 }
 
 shared_ptr<AbstractBrain> MarkovBrain::makeBrainFromGenome(shared_ptr<AbstractGenome> _genome) {
