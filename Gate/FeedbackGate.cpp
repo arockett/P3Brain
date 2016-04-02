@@ -10,10 +10,9 @@
 
 #include <iostream>
 
-#include "Gate.h"
-
 #include "../Utilities/Random.h"
 #include "../Utilities/Utilities.h"
+#include "AbstractGate.h"
 
 bool FeedbackGate::feedbackON = true;
 
@@ -30,8 +29,8 @@ FeedbackGate::FeedbackGate(shared_ptr<AbstractGenome> genome, shared_ptr<Abstrac
 	int _xDim, _yDim;
 
 	//get the dimensions of the table
-	_xDim = genomeHandler->readInt(1, 4, Gate::IN_COUNT_CODE, gateID);
-	_yDim = genomeHandler->readInt(1, 4, Gate::OUT_COUNT_CODE, gateID);
+	_xDim = genomeHandler->readInt(1, 4, AbstractGate::IN_COUNT_CODE, gateID);
+	_yDim = genomeHandler->readInt(1, 4, AbstractGate::OUT_COUNT_CODE, gateID);
 
 	//get the dimensions of the feedback buffer
 	//was :
@@ -39,10 +38,10 @@ FeedbackGate::FeedbackGate(shared_ptr<AbstractGenome> genome, shared_ptr<Abstrac
 	//negFBNode = genome->sites[(k++) % genome->sites.size()];
 	//nrPos = genome->sites[(k++) % genome->sites.size()] & 3;
 	//nrNeg = genome->sites[(k++) % genome->sites.size()] & 3;
-	posFBNode = genomeHandler->readInt(0, 255, Gate::DATA_CODE, gateID);
-	negFBNode = genomeHandler->readInt(0, 255, Gate::DATA_CODE, gateID);
-	nrPos = genomeHandler->readInt(0, 3, Gate::DATA_CODE, gateID);
-	nrNeg = genomeHandler->readInt(0, 3, Gate::DATA_CODE, gateID);
+	posFBNode = genomeHandler->readInt(0, 255, AbstractGate::DATA_CODE, gateID);
+	negFBNode = genomeHandler->readInt(0, 255, AbstractGate::DATA_CODE, gateID);
+	nrPos = genomeHandler->readInt(0, 3, AbstractGate::DATA_CODE, gateID);
+	nrNeg = genomeHandler->readInt(0, 3, AbstractGate::DATA_CODE, gateID);
 
 	//prepare the containers for the inputsand outputs addresses
 	inputs.resize(_yDim);
@@ -55,13 +54,13 @@ FeedbackGate::FeedbackGate(shared_ptr<AbstractGenome> genome, shared_ptr<Abstrac
 	//get the Ioutputs addresses
 
 	for (i = 0; i < _yDim; i++) {
-		inputs[i] = genomeHandler->readInt( 0, 255, Gate::IN_ADDRESS_CODE, gateID);
+		inputs[i] = genomeHandler->readInt( 0, 255, AbstractGate::IN_ADDRESS_CODE, gateID);
 	}
 	for (; i < 4; i++) {
 		genomeHandler->readInt(0, 255 );
 	}
 	for (i = 0; i < _xDim; i++) {
-		outputs[i] = genomeHandler->readInt(0, 255, Gate::OUT_ADDRESS_CODE, gateID);
+		outputs[i] = genomeHandler->readInt(0, 255, AbstractGate::OUT_ADDRESS_CODE, gateID);
 	}
 	for (; i < 4; i++) {
 		genomeHandler->readInt(0, 255);
@@ -69,13 +68,13 @@ FeedbackGate::FeedbackGate(shared_ptr<AbstractGenome> genome, shared_ptr<Abstrac
 
 	//get the Feedback forces
 	for (i = 0; i < nrPos; i++) {
-		posLevelOfFB[i] = ((double) (1 + genomeHandler->readInt(0, 255, Gate::DATA_CODE, gateID))) / 256.0;
+		posLevelOfFB[i] = ((double) (1 + genomeHandler->readInt(0, 255, AbstractGate::DATA_CODE, gateID))) / 256.0;
 	}
 	for (; i < 4; i++) {
 		genomeHandler->readInt( 0, 255 );
 	}
 	for (i = 0; i < nrNeg; i++) {
-		negLevelOfFB[i] = ((double) (1 + genomeHandler->readInt(0, 255, Gate::DATA_CODE, gateID))) / 256.0;
+		negLevelOfFB[i] = ((double) (1 + genomeHandler->readInt(0, 255, AbstractGate::DATA_CODE, gateID))) / 256.0;
 	}
 	for (; i < 4; i++) {
 		genomeHandler->readInt(0, 255 );
@@ -89,7 +88,7 @@ FeedbackGate::FeedbackGate(shared_ptr<AbstractGenome> genome, shared_ptr<Abstrac
 		originalTable[i].resize(1 << _xDim);
 		double S = 0.0;
 		for (j = 0; j < (1 << _xDim); j++) {
-			table[i][j] = (double) genomeHandler->readInt(0, 255, Gate::DATA_CODE, gateID);
+			table[i][j] = (double) genomeHandler->readInt(0, 255, AbstractGate::DATA_CODE, gateID);
 			S += table[i][j];
 		}
 		//normalize the row
@@ -176,11 +175,11 @@ void FeedbackGate::update(vector<double> & states, vector<double> & nextStates) 
 
 string FeedbackGate::description() {
 	string S = "pos node:" + to_string((int) posFBNode) + "\n neg node:" + to_string((int) negFBNode) + "\n";
-	return Gate::description() + S;
+	return AbstractGate::description() + S;
 }
 
 void FeedbackGate::applyNodeMap(vector<int> nodeMap, int maxNodes) {
-	Gate::applyNodeMap(nodeMap, maxNodes);
+	AbstractGate::applyNodeMap(nodeMap, maxNodes);
 	posFBNode = nodeMap[posFBNode % maxNodes];
 	negFBNode = nodeMap[negFBNode % maxNodes];
 }

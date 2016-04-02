@@ -48,9 +48,9 @@ void Gate_Builder::getSomeBrainAddresses(const int& howMany, const int& howManyM
 // if number of inputs or outputs is less then the max possible inputs or outputs skip the unused sites in the genome
 pair<vector<int>, vector<int>> Gate_Builder::getInputsAndOutputs(const pair<int, int> insRange, const pair<int, int> outsRange, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {  // (max#in, max#out,currentIndexInGenome,genome,codingRegions)
 
-	int numInputs = genomeHandler->readInt(insRange.first, insRange.second, Gate::IN_COUNT_CODE, gateID);
+	int numInputs = genomeHandler->readInt(insRange.first, insRange.second, AbstractGate::IN_COUNT_CODE, gateID);
 	//cout << "num_Inputs: " << numInputs << "\n";
-	int numOutputs = genomeHandler->readInt(outsRange.first, outsRange.second, Gate::OUT_COUNT_CODE, gateID);
+	int numOutputs = genomeHandler->readInt(outsRange.first, outsRange.second, AbstractGate::OUT_COUNT_CODE, gateID);
 	//cout << "num_Outputs: " << numOutputs << "\n";
 	vector<int> inputs;
 	vector<int> outputs;
@@ -59,10 +59,10 @@ pair<vector<int>, vector<int>> Gate_Builder::getInputsAndOutputs(const pair<int,
 	outputs.resize(numOutputs);
 
 	if (insRange.second > 0) {
-		getSomeBrainAddresses(numInputs, insRange.second, inputs, genomeHandler, Gate::IN_ADDRESS_CODE, gateID);
+		getSomeBrainAddresses(numInputs, insRange.second, inputs, genomeHandler, AbstractGate::IN_ADDRESS_CODE, gateID);
 	}
 	if (outsRange.second > 0) {
-		getSomeBrainAddresses(numOutputs, outsRange.second, outputs, genomeHandler, Gate::OUT_ADDRESS_CODE, gateID);
+		getSomeBrainAddresses(numOutputs, outsRange.second, outputs, genomeHandler, AbstractGate::OUT_ADDRESS_CODE, gateID);
 	}
 	return {inputs,outputs};
 }
@@ -71,6 +71,7 @@ pair<vector<int>, vector<int>> Gate_Builder::getInputsAndOutputs(const pair<int,
 //there are 256 possible gates identified each by a pair of codons (n followed by 256-n)
 //after initializing Gate::MakeGate, Gate::AddGate() adds values and the associated constructor function to Gate::MakeGate
 void Gate_Builder::setupGates() {
+	int gateIDCounter = 42;
 	makeGate.resize(1 << Global::bitsPerCodon);
 	for (int i = 0; i < (1 << Global::bitsPerCodon); i++) {
 		AddGate(i, nullptr);
@@ -78,7 +79,7 @@ void Gate_Builder::setupGates() {
 	gateStartCodes.resize(1 << Global::bitsPerCodon);
 	if (usingProbGate) {
 		inUseGateNames.insert("Probabilistic");
-		int codonOne = 42;
+		int codonOne = gateIDCounter++;
 		inUseGateTypes.insert(codonOne);
 		{
 			//gateStartCodes.insert(pair<int, vector<int> >(codonOne, vector<int>()));
@@ -89,7 +90,7 @@ void Gate_Builder::setupGates() {
 		AddGate(codonOne, [](shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
 			pair<vector<int>,vector<int>> addresses = getInputsAndOutputs( {1, 4}, {1, 4}, genomeHandler, gateID);
 
-			vector<vector<int>> rawTable = genomeHandler->readTable( {1 << addresses.first.size(), 1 << addresses.second.size()}, {16, 16}, {0, 255}, Gate::DATA_CODE, gateID);
+			vector<vector<int>> rawTable = genomeHandler->readTable( {1 << addresses.first.size(), 1 << addresses.second.size()}, {16, 16}, {0, 255}, AbstractGate::DATA_CODE, gateID);
 			if (genomeHandler->atEOC()) {
 				shared_ptr<ProbabilisticGate> nullObj = nullptr;
 				return nullObj;
@@ -99,7 +100,7 @@ void Gate_Builder::setupGates() {
 	}
 	if (usingDetGate) {
 		inUseGateNames.insert("Deterministic");
-		int codonOne = 43;
+		int codonOne = gateIDCounter++;
 		inUseGateTypes.insert(codonOne);
 		{
 			//gateStartCodes.insert(pair<int, vector<int> >(codonOne, vector<int>()));
@@ -111,7 +112,7 @@ void Gate_Builder::setupGates() {
 
 		AddGate(codonOne, [](shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
 			pair<vector<int>,vector<int>> addresses = getInputsAndOutputs( {1, 4}, {1, 4}, genomeHandler, gateID);
-			vector<vector<int>> table = genomeHandler->readTable( {1 << addresses.first.size(), addresses.second.size()}, {16, 4}, {0, 1}, Gate::DATA_CODE, gateID);
+			vector<vector<int>> table = genomeHandler->readTable( {1 << addresses.first.size(), addresses.second.size()}, {16, 4}, {0, 1}, AbstractGate::DATA_CODE, gateID);
 
 			//vector<vector<int>> table = genomeHandler->readTable( {16,4}, {16, 4}, {0, 1}, Gate::DATA_CODE, gateID);
 				if (genomeHandler->atEOC()) {
@@ -123,7 +124,7 @@ void Gate_Builder::setupGates() {
 	}
 	if (usingEpsiGate) {
 		inUseGateNames.insert("FixedEpsilon");
-		int codonOne = 47;
+		int codonOne = gateIDCounter++;
 		inUseGateTypes.insert(codonOne);
 		{
 			//gateStartCodes.insert(pair<int, vector<int> >(codonOne, vector<int>()));
@@ -133,7 +134,7 @@ void Gate_Builder::setupGates() {
 		intialGateCounts[codonOne] = epsiGateInitialCount;
 		AddGate(codonOne, [](shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
 			pair<vector<int>,vector<int>> addresses = getInputsAndOutputs( {1, 4}, {1, 4}, genomeHandler, gateID);
-			vector<vector<int>> table = genomeHandler->readTable( {1 << addresses.first.size(), addresses.second.size()}, {16, 4}, {0, 1}, Gate::DATA_CODE, gateID);
+			vector<vector<int>> table = genomeHandler->readTable( {1 << addresses.first.size(), addresses.second.size()}, {16, 4}, {0, 1}, AbstractGate::DATA_CODE, gateID);
 			if (genomeHandler->atEOC()) {
 				shared_ptr<FixedEpsilonGate> nullObj = nullptr;;
 				return nullObj;
@@ -143,7 +144,7 @@ void Gate_Builder::setupGates() {
 	}
 	if (usingVoidGate) {
 		inUseGateNames.insert("Void");
-		int codonOne = 48;
+		int codonOne = gateIDCounter++;
 		inUseGateTypes.insert(codonOne);
 		{
 			//gateStartCodes.insert(pair<int, vector<int> >(codonOne, vector<int>()));
@@ -153,7 +154,7 @@ void Gate_Builder::setupGates() {
 		intialGateCounts[codonOne] = voidGateInitialCount;
 		AddGate(codonOne, [](shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
 			pair<vector<int>,vector<int>> addresses = getInputsAndOutputs( {1, 4}, {1, 4}, genomeHandler, gateID);
-			vector<vector<int>> table = genomeHandler->readTable( {1 << addresses.first.size(), addresses.second.size()}, {16, 4}, {0, 1}, Gate::DATA_CODE, gateID);
+			vector<vector<int>> table = genomeHandler->readTable( {1 << addresses.first.size(), addresses.second.size()}, {16, 4}, {0, 1}, AbstractGate::DATA_CODE, gateID);
 			if (genomeHandler->atEOC()) {
 				shared_ptr<VoidGate> nullObj = nullptr;;
 				return nullObj;
@@ -167,7 +168,7 @@ void Gate_Builder::setupGates() {
 //	}
 	if (usingGPGate) {
 		inUseGateNames.insert("GeneticPrograming");
-		int codonOne = 45;
+		int codonOne = gateIDCounter++;
 		inUseGateTypes.insert(codonOne);
 		{
 			//gateStartCodes.insert(pair<int, vector<int> >(codonOne, vector<int>()));
@@ -177,10 +178,10 @@ void Gate_Builder::setupGates() {
 		intialGateCounts[codonOne] = voidGateInitialCount;
 		AddGate(codonOne, [](shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
 			pair<vector<int>,vector<int>> addresses = getInputsAndOutputs( {1, 4}, {1, 4}, genomeHandler, gateID);
-			int operation = genomeHandler->readInt(0, 8, Gate::DATA_CODE, gateID);
+			int operation = genomeHandler->readInt(0, 8, AbstractGate::DATA_CODE, gateID);
 			vector<double> constValues;
 			for (int i = 0; i < 4; i++) {
-				constValues.push_back(genomeHandler->readDouble(GPGate::constValueMin, GPGate::constValueMax, Gate::DATA_CODE, gateID));
+				constValues.push_back(genomeHandler->readDouble(GPGate::constValueMin, GPGate::constValueMax, AbstractGate::DATA_CODE, gateID));
 			}
 			if (genomeHandler->atEOC()) {
 				shared_ptr<GPGate> nullObj = nullptr;;
@@ -198,7 +199,7 @@ void Gate_Builder::setupGates() {
 //	}
 	if (usingTritDeterministicGate) {
 		inUseGateNames.insert("TritDeterministic");
-		int codonOne = 49;
+		int codonOne = gateIDCounter++;
 		inUseGateTypes.insert(codonOne);
 		{
 			//gateStartCodes.insert(pair<int, vector<int> >(codonOne, vector<int>()));
@@ -208,7 +209,7 @@ void Gate_Builder::setupGates() {
 		intialGateCounts[codonOne] = tritDeterministicGateInitialCount;
 		AddGate(codonOne, [](shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
 			pair<vector<int>,vector<int>> addresses = getInputsAndOutputs( {1, 4}, {1, 4}, genomeHandler, gateID);
-			vector<vector<int>> table = genomeHandler->readTable( {pow(3,addresses.first.size()), addresses.second.size()}, {81, 4}, {-1, 1}, Gate::DATA_CODE, gateID);
+			vector<vector<int>> table = genomeHandler->readTable( {pow(3,addresses.first.size()), addresses.second.size()}, {81, 4}, {-1, 1}, AbstractGate::DATA_CODE, gateID);
 			if (genomeHandler->atEOC()) {
 				shared_ptr<TritDeterministicGate> nullObj = nullptr;;
 				return nullObj;
@@ -218,7 +219,7 @@ void Gate_Builder::setupGates() {
 	}
 	if (usingNeuronGate) {
 		inUseGateNames.insert("Neuron");
-		int codonOne = 50;
+		int codonOne = gateIDCounter++;
 		inUseGateTypes.insert(codonOne);
 		{
 			gateStartCodes[codonOne].push_back(codonOne);
@@ -227,35 +228,35 @@ void Gate_Builder::setupGates() {
 		intialGateCounts[codonOne] = neuronGateInitialCount;
 		AddGate(codonOne, [](shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
 
-			int numInputs = genomeHandler->readInt(NeuronGate::defaultNumInputsMin, NeuronGate::defaultNumInputsMax, Gate::IN_COUNT_CODE, gateID);
+			int numInputs = genomeHandler->readInt(NeuronGate::defaultNumInputsMin, NeuronGate::defaultNumInputsMax, AbstractGate::IN_COUNT_CODE, gateID);
 			vector<int> inputs;
 			inputs.resize(numInputs);
-			getSomeBrainAddresses(numInputs, NeuronGate::defaultNumInputsMax, inputs, genomeHandler, Gate::IN_ADDRESS_CODE, gateID);
+			getSomeBrainAddresses(numInputs, NeuronGate::defaultNumInputsMax, inputs, genomeHandler, AbstractGate::IN_ADDRESS_CODE, gateID);
 
-			int output = genomeHandler->readInt(0, (1 << Global::bitsPerBrainAddress) - 1, Gate::OUT_ADDRESS_CODE, gateID);
+			int output = genomeHandler->readInt(0, (1 << Global::bitsPerBrainAddress) - 1, AbstractGate::OUT_ADDRESS_CODE, gateID);
 
 			int dischargeBehavior = NeuronGate::defaultDischargeBehavior;
 			if (dischargeBehavior == -1) {
-				dischargeBehavior = genomeHandler->readInt(0, 2, Gate::DATA_CODE, gateID);
+				dischargeBehavior = genomeHandler->readInt(0, 2, AbstractGate::DATA_CODE, gateID);
 			}
-			double thresholdValue = genomeHandler->readDouble(NeuronGate::defaultThresholdMin, NeuronGate::defaultThresholdMax, Gate::DATA_CODE, gateID);
+			double thresholdValue = genomeHandler->readDouble(NeuronGate::defaultThresholdMin, NeuronGate::defaultThresholdMax, AbstractGate::DATA_CODE, gateID);
 
 			bool thresholdActivates = 1;
 			if (NeuronGate::defaultAllowRepression == 1) {
-				thresholdActivates = genomeHandler->readInt(0, 1, Gate::DATA_CODE, gateID);
+				thresholdActivates = genomeHandler->readInt(0, 1, AbstractGate::DATA_CODE, gateID);
 			}
 
-			double decayRate = genomeHandler->readDouble(NeuronGate::defaultDecayRateMin, NeuronGate::defaultDecayRateMax, Gate::DATA_CODE, gateID);
-			double deliveryCharge = genomeHandler->readDouble(NeuronGate::defaultDeliveryChargeMin, NeuronGate::defaultDeliveryChargeMax, Gate::DATA_CODE, gateID);
+			double decayRate = genomeHandler->readDouble(NeuronGate::defaultDecayRateMin, NeuronGate::defaultDecayRateMax, AbstractGate::DATA_CODE, gateID);
+			double deliveryCharge = genomeHandler->readDouble(NeuronGate::defaultDeliveryChargeMin, NeuronGate::defaultDeliveryChargeMax, AbstractGate::DATA_CODE, gateID);
 			double deliveryError = NeuronGate::defaultDeliveryError;
 
 			int ThresholdFromNode = -1;
 			int DeliveryChargeFromNode = -1;
 			if (NeuronGate::defaultThresholdFromNode) {
-				ThresholdFromNode = genomeHandler->readInt(0, (1 << Global::bitsPerBrainAddress) - 1, Gate::IN_ADDRESS_CODE, gateID);
+				ThresholdFromNode = genomeHandler->readInt(0, (1 << Global::bitsPerBrainAddress) - 1, AbstractGate::IN_ADDRESS_CODE, gateID);
 			}
 			if (NeuronGate::defaultDeliveryChargeFromNode) {
-				DeliveryChargeFromNode = genomeHandler->readInt(0, (1 << Global::bitsPerBrainAddress) - 1, Gate::IN_ADDRESS_CODE, gateID);
+				DeliveryChargeFromNode = genomeHandler->readInt(0, (1 << Global::bitsPerBrainAddress) - 1, AbstractGate::IN_ADDRESS_CODE, gateID);
 			}
 			if (genomeHandler->atEOC()) {
 				shared_ptr<NeuronGate> nullObj = nullptr;;
@@ -268,9 +269,9 @@ void Gate_Builder::setupGates() {
 
 /* *** some c++ 11 magic to speed up translation from genome to gates *** */
 //function<shared_ptr<Gate>(shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID)> Gate_Builder::makeGate[256];
-vector<function<shared_ptr<Gate>(shared_ptr<AbstractGenome::Handler>, int gateID)>> Gate_Builder::makeGate;
+vector<function<shared_ptr<AbstractGate>(shared_ptr<AbstractGenome::Handler>, int gateID)>> Gate_Builder::makeGate;
 
-void Gate_Builder::AddGate(int gateType, function<shared_ptr<Gate>(shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID)> theFunction) {
+void Gate_Builder::AddGate(int gateType, function<shared_ptr<AbstractGate>(shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID)> theFunction) {
 	makeGate[gateType] = theFunction;
 }
 /* *** end - some c++ 11 magic to speed up translation from genome to gates *** */

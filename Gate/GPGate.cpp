@@ -97,6 +97,6 @@ void GPGate::update(vector<double> & states, vector<double> & nextStates) {
 string GPGate::description() {
 	string gateTypeName[9] = { "fixed constants", "+", "-", "*", "/", "Sin", "Cos", "Log", "Exp" };
 	string constString = " constants: " + to_string(constValues[0]) + " " + to_string(constValues[1]) + " "+ to_string(constValues[2]) + " " + to_string(constValues[3]) + "\n";
-	return "Gate " + to_string(ID) + " is a (" + gateTypeName[operation] + ") " + gateType() + "Gate\n" + Gate::descriptionIO() + constString;
+	return "Gate " + to_string(ID) + " is a (" + gateTypeName[operation] + ") " + gateType() + "Gate\n" + AbstractGate::descriptionIO() + constString;
 }
 

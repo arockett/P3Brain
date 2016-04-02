@@ -8,11 +8,11 @@
 
 #ifndef __BasicMarkovBrainTemplate__Threshold_Gate__
 #define __BasicMarkovBrainTemplate__Threshold_Gate__
-#include "Gate.h"
+#include "AbstractGate.h"
 
 using namespace std;
 
-class Thresholdgate : public Gate {
+class Thresholdgate : public AbstractGate {
  private:
 	int threshold;
  public:
