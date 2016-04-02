@@ -53,6 +53,13 @@ public:
 	virtual string gateType() {
 		return "undefined";
 	}
+	virtual pair<vector<int>,vector<int>> getConnectionsLists(){
+		pair<vector<int>,vector<int>> connectionsLists;
+		connectionsLists.first = inputs;
+		connectionsLists.second = outputs;
+		return connectionsLists;
+	}
+
 
 };
 

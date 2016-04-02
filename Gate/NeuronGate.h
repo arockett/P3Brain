@@ -167,6 +167,19 @@ public:
 		currentCharge = 0;
 	}
 
+	virtual pair<vector<int>,vector<int>> getConnectionsLists() override{
+		pair<vector<int>,vector<int>> connectionsLists;
+		connectionsLists.first = inputs;
+		if (thresholdFromNode != -1) {
+			connectionsLists.first.push_back(thresholdFromNode);
+		}
+		if (deliveryChargeFromNode != -1) {
+			connectionsLists.first.push_back(deliveryChargeFromNode);
+		}
+		connectionsLists.second = outputs;
+		return connectionsLists;
+	}
+
 
 };
 

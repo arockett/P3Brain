@@ -81,20 +81,48 @@ string MarkovBrain::description() {
 
 vector<string> MarkovBrain::getStats() {
 	vector<string> dataPairs;
+	vector<int> nodesConnections, nextNodesConnections;
+	nodesConnections.resize(nrOfBrainNodes);
+	nextNodesConnections.resize(nrOfBrainNodes);
+
 	dataPairs.push_back("gates");
 	dataPairs.push_back(to_string(gates.size()));
 
-	map <string,int> gatecounts;
-	for (auto n : Gate_Builder::inUseGateNames){
+	map<string, int> gatecounts;
+	for (auto n : Gate_Builder::inUseGateNames) {
 		gatecounts[n + "Gates"] = 0;
 	}
 	for (auto g : gates) {
-		gatecounts[g->gateType()+"Gates"]++;
+		auto gateConnections = g->getConnectionsLists();
+		for (auto c : gateConnections.first){
+			nodesConnections[c]++;
+		}
+		for (auto c : gateConnections.second){
+			nextNodesConnections[c]++;
+		}
+		gatecounts[g->gateType() + "Gates"]++;
 	}
 
-	for (auto n : Gate_Builder::inUseGateNames){
-		dataPairs.push_back(n+"Gates");
-		dataPairs.push_back(to_string(gatecounts[n+"Gates"]));
+	string nodesConnectionsString = "\"[";
+	string nextNodesConnectionsString = "\"[";
+
+	for (int i = 0; i < nrOfBrainNodes; i++){
+		nodesConnectionsString+=to_string(nodesConnections[i])+",";
+		nextNodesConnectionsString+=to_string(nextNodesConnections[i])+",";
+	}
+	nodesConnectionsString.pop_back();
+	nodesConnectionsString+="]\"";
+	dataPairs.push_back("nodesConnections");
+	dataPairs.push_back(nodesConnectionsString);
+	nextNodesConnectionsString.pop_back();
+	nextNodesConnectionsString+="]\"";
+	dataPairs.push_back("nextNodesConnections");
+	dataPairs.push_back(nextNodesConnectionsString);
+
+
+	for (auto n : Gate_Builder::inUseGateNames) {
+		dataPairs.push_back(n + "Gates");
+		dataPairs.push_back(to_string(gatecounts[n + "Gates"]));
 	}
 
 	return (dataPairs);
