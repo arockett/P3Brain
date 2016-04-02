@@ -12,12 +12,11 @@
 #include <iostream>
 #include <math.h>
 
-#include "Gate.h"
-
 #include "../Utilities/Random.h"
 #include "../Utilities/Utilities.h"
+#include "AbstractGate.h"
 
-class NeuronGate: public Gate {
+class NeuronGate: public AbstractGate {
 public:
 
 	static const int& defaultNumInputsMin;
@@ -154,7 +153,7 @@ public:
 	}
 
 	void applyNodeMap(vector<int> nodeMap, int maxNodes) override {
-		Gate::applyNodeMap(nodeMap, maxNodes);
+		AbstractGate::applyNodeMap(nodeMap, maxNodes);
 		if (thresholdFromNode != -1) {
 			thresholdFromNode = nodeMap[thresholdFromNode] % maxNodes;
 		}
@@ -165,6 +164,19 @@ public:
 
 	void resetGate() override {
 		currentCharge = 0;
+	}
+
+	virtual pair<vector<int>,vector<int>> getConnectionsLists() override{
+		pair<vector<int>,vector<int>> connectionsLists;
+		connectionsLists.first = inputs;
+		if (thresholdFromNode != -1) {
+			connectionsLists.first.push_back(thresholdFromNode);
+		}
+		if (deliveryChargeFromNode != -1) {
+			connectionsLists.first.push_back(deliveryChargeFromNode);
+		}
+		connectionsLists.second = outputs;
+		return connectionsLists;
 	}
 
 

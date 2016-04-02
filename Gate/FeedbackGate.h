@@ -9,11 +9,11 @@
 #ifndef __BasicMarkovBrainTemplate__Feedback_Gate__
 #define __BasicMarkovBrainTemplate__Feedback_Gate__
 
-#include "Gate.h"
+#include "AbstractGate.h"
 
 using namespace std;
 
-class FeedbackGate : public Gate {
+class FeedbackGate : public AbstractGate {
  private:
 	vector<vector<double>> table;
 	vector<vector<double>> originalTable;
