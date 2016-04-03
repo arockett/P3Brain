@@ -8,7 +8,7 @@
 
 //#include <iostream>
 //
-#include "TritGate.h"
+#include "TritDeterministicGate.h"
 //
 //#include "../Utilities/Random.h"
 //#include "../Utilities/Utilities.h"

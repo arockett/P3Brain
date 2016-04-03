@@ -9,11 +9,11 @@
 #ifndef __BasicMarkovBrainTemplate__GP_Gate__
 #define __BasicMarkovBrainTemplate__GP_Gate__
 
-#include "Gate.h"
+#include "AbstractGate.h"
 
 using namespace std;
 
-class GPGate : public Gate {
+class GPGate : public AbstractGate {
  private:
 
 	int operation; // <link> stores the kind of GP operation (Add, Sub, Mult...)

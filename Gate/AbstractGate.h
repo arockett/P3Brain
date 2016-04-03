@@ -23,7 +23,7 @@
 
 using namespace std;
 
-class Gate {
+class AbstractGate {
 public:
 	int ID;
 
@@ -34,10 +34,10 @@ public:
 	static const int OUT_ADDRESS_CODE = 21;
 	static const int DATA_CODE = 30;
 
-	Gate() {
+	AbstractGate() {
 		ID = 0;
 	}
-	virtual ~Gate() = default;
+	virtual ~AbstractGate() = default;
 
 	vector<int> inputs;
 	vector<int> outputs;
@@ -53,64 +53,12 @@ public:
 	virtual string gateType() {
 		return "undefined";
 	}
-
-};
-
-class ProbabilisticGate: public Gate {  //conventional probabilistic gate
-public:
-	vector<vector<double>> table;
-	ProbabilisticGate() = delete;
-	ProbabilisticGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _rawTable, int _ID);
-	virtual ~ProbabilisticGate() = default;
-	virtual void update(vector<double> & states, vector<double> & nextStates) override;
-	virtual string gateType() override{
-		return "Probabilistic";
+	virtual pair<vector<int>,vector<int>> getConnectionsLists(){
+		pair<vector<int>,vector<int>> connectionsLists;
+		connectionsLists.first = inputs;
+		connectionsLists.second = outputs;
+		return connectionsLists;
 	}
-
-
-};
-
-class DeterministicGate: public Gate {
-public:
-	vector<vector<int>> table;
-	DeterministicGate() = delete;
-	DeterministicGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID);
-	virtual ~DeterministicGate() = default;
-	virtual void update(vector<double> & states, vector<double> & nextStates) override;
-	//void setupForBits(int* Ins, int nrOfIns, int Out, int logic);
-	virtual string gateType() override{
-		return "Deterministic";
-	}
-};
-
-class FixedEpsilonGate: public DeterministicGate {
-public:
-	static const double& FixedEpsilonGate_Probability;
-	vector<int> defaultOutput;
-	double epsilon;
-	FixedEpsilonGate() = delete;
-	FixedEpsilonGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID);
-	virtual ~FixedEpsilonGate() = default;
-	virtual void update(vector<double> & states, vector<double> & nextStates) override;
-	virtual string gateType() override{
-		return "FixedEpsilon";
-	}
-
-};
-
-class VoidGate: public DeterministicGate {
-	static const double& voidGate_Probability;
-public:
-	vector<int> defaultOutput;
-	double epsilon;
-	VoidGate() = delete;
-	VoidGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID);
-	virtual ~VoidGate() = default;
-	virtual void update(vector<double> & states, vector<double> & nextStates) override;
-	virtual string gateType() override{
-			return "VoidGate";
-		}
-
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Gate__) */

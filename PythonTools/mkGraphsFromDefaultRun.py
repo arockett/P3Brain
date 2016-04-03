@@ -79,7 +79,7 @@ def BuildMultiPlotFromDict(MultiDataMap,AveDataMap,NamesList,XCoordinateName='',
 			if len(MultiDataMap) > 0:
 				for map in MultiDataMap:
 					print ("X")
-					plt.plot(MultiDataMap[name][NamesList[count]],label=NamesList[count],alpha = .2)
+					plt.plot(MultiDataMap[name][NamesList[count]],label=NamesList[count],alpha = .2,color = (0,0,0))
 	
                                                               # plot the data for each element in name in it's own plot
 			plt.title(NamesList[count], fontsize=16) 	              # set the title for this plot
@@ -97,7 +97,7 @@ def BuildMultiPlotFromDict(MultiDataMap,AveDataMap,NamesList,XCoordinateName='',
 				plt.plot(AveDataMap[XCoordinateName],AveDataMap[NamesList[count]],label=NamesList[count])
 			if len(MultiDataMap) > 0:
 				for name in MultiDataMap:
-					plt.plot(MultiDataMap[name][XCoordinateName],MultiDataMap[name][NamesList[count]],label=NamesList[count], alpha = .2)
+					plt.plot(MultiDataMap[name][XCoordinateName],MultiDataMap[name][NamesList[count]],label=NamesList[count], alpha = .2,color = (0,0,0))
                                                              # plot the data for each element in name in it's own plot
 			plt.title(NamesList[count], fontsize=16)                # set the title for this plot
 			ax.title.set_position([.5, .97])

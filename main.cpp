@@ -28,8 +28,8 @@
 #include "GateListBuilder/GateListBuilder.h"
 
 #include "Group/Group.h"
+#include "Optimizer/GAOptimizer.h"
 
-#include "Optimizer/GA_Optimizer.h"
 #include "Optimizer/Tournament2Optimizer.h"
 #include "Optimizer/TournamentOptimizer.h"
 
@@ -360,7 +360,7 @@ int main(int argc, const char * argv[]) {
 		shared_ptr<AbstractOptimizer> optimizer;
 
 		if (AbstractOptimizer::Optimizer_MethodStr == "GA") {
-			optimizer = make_shared<GA_Optimizer>();
+			optimizer = make_shared<GAOptimizer>();
 			cout << "Using GA Optimizer" << endl;
 		} else if (AbstractOptimizer::Optimizer_MethodStr == "Tournament") {
 			optimizer = make_shared<TournamentOptimizer>();

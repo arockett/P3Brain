@@ -15,7 +15,7 @@
 #include <set>
 #include <vector>
 
-#include "../Gate/Gate_Builder.h"
+#include "../Gate/GateBuilder.h"
 #include "../GateListBuilder/GateListBuilder.h"
 #include "../Genome/AbstractGenome.h"
 

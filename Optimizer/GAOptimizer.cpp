@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
 //
 
-#include "GA_Optimizer.h"
+#include "GAOptimizer.h"
 
 #include <algorithm>
 #include <math.h>
@@ -24,7 +24,7 @@ using namespace std;
  * to the next generation and mutate the copy. If it is too low, keep drawing genomes till you get one
  * which is good enough.
  */
-void GA_Optimizer::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
+void GAOptimizer::makeNextGeneration(vector<shared_ptr<Organism>> &population) {
 	vector<shared_ptr<Organism>> nextPopulation;
 
 	vector<double> Scores;

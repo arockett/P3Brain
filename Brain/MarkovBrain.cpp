@@ -14,7 +14,7 @@
 //bool& MarkovBrain::cacheResults = Parameters::register_parameter("MarkovBrain_cacheResults", true, "if true, t+1 nodes will be cached. If the same input is seen, the cached node values will be used.", "BRAIN - MARKOV");
 //int& MarkovBrain::cacheResultsCount = Parameters::register_parameter("MarkovBrain_cacheResultsCount", 1, "input combinations will be cached this many times, after this, repeats of a given input array will look up a random value from cached values", "BRAIN - MARKOV");
 
-MarkovBrain::MarkovBrain(vector<shared_ptr<Gate>> _gates, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes) :
+MarkovBrain::MarkovBrain(vector<shared_ptr<AbstractGate>> _gates, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes) :
 		AbstractBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes) {
 	GLB = nullptr;
 	gates = _gates;
@@ -81,20 +81,48 @@ string MarkovBrain::description() {
 
 vector<string> MarkovBrain::getStats() {
 	vector<string> dataPairs;
+	vector<int> nodesConnections, nextNodesConnections;
+	nodesConnections.resize(nrOfBrainNodes);
+	nextNodesConnections.resize(nrOfBrainNodes);
+
 	dataPairs.push_back("gates");
 	dataPairs.push_back(to_string(gates.size()));
 
-	map <string,int> gatecounts;
-	for (auto n : Gate_Builder::inUseGateNames){
+	map<string, int> gatecounts;
+	for (auto n : Gate_Builder::inUseGateNames) {
 		gatecounts[n + "Gates"] = 0;
 	}
 	for (auto g : gates) {
-		gatecounts[g->gateType()+"Gates"]++;
+		auto gateConnections = g->getConnectionsLists();
+		for (auto c : gateConnections.first){
+			nodesConnections[c]++;
+		}
+		for (auto c : gateConnections.second){
+			nextNodesConnections[c]++;
+		}
+		gatecounts[g->gateType() + "Gates"]++;
 	}
 
-	for (auto n : Gate_Builder::inUseGateNames){
-		dataPairs.push_back(n+"Gates");
-		dataPairs.push_back(to_string(gatecounts[n+"Gates"]));
+	string nodesConnectionsString = "\"[";
+	string nextNodesConnectionsString = "\"[";
+
+	for (int i = 0; i < nrOfBrainNodes; i++){
+		nodesConnectionsString+=to_string(nodesConnections[i])+",";
+		nextNodesConnectionsString+=to_string(nextNodesConnections[i])+",";
+	}
+	nodesConnectionsString.pop_back();
+	nodesConnectionsString+="]\"";
+	dataPairs.push_back("nodesConnections");
+	dataPairs.push_back(nodesConnectionsString);
+	nextNodesConnectionsString.pop_back();
+	nextNodesConnectionsString+="]\"";
+	dataPairs.push_back("nextNodesConnections");
+	dataPairs.push_back(nextNodesConnectionsString);
+
+
+	for (auto n : Gate_Builder::inUseGateNames) {
+		dataPairs.push_back(n + "Gates");
+		dataPairs.push_back(to_string(gatecounts[n + "Gates"]));
 	}
 
 	return (dataPairs);

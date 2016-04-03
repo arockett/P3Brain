@@ -13,12 +13,11 @@
 #include <iostream>
 #include <math.h>
 
-#include "Gate.h"
-
 #include "../Utilities/Random.h"
 #include "../Utilities/Utilities.h"
+#include "AbstractGate.h"
 
-class TritDeterministicGate : public Gate {
+class TritDeterministicGate : public AbstractGate {
  public:
 	vector<vector<int>> table;
 

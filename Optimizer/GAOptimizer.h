@@ -13,7 +13,7 @@
 
 using namespace std;
 
-class GA_Optimizer : public AbstractOptimizer {
+class GAOptimizer : public AbstractOptimizer {
  public:
 	virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population) override;
 };

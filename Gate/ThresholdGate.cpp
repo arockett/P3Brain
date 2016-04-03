@@ -6,13 +6,13 @@
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
 //
 
-#include <iostream>
+#include "ThresholdGate.h"
 
-#include "Gate.h"
-#include "Threshold_Gate.h"
+#include <iostream>
 
 #include "../Utilities/Random.h"
 #include "../Utilities/Utilities.h"
+#include "AbstractGate.h"
 
 Thresholdgate::Thresholdgate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
 
@@ -29,19 +29,19 @@ Thresholdgate::Thresholdgate(shared_ptr<AbstractGenome> genome, shared_ptr<Abstr
 	//the others are the current state counter, they are the same as the inputs!
 	//get the dimensions of the table
 	// was : _xDim = 1 + (genome->sites[(k++) % genome->sites.size()] & 7);
-	_xDim = genomeHandler->readInt(1, 8, Gate::DATA_CODE, gateID);
+	_xDim = genomeHandler->readInt(1, 8, AbstractGate::DATA_CODE, gateID);
 	//prepare the containers for the inputs and outputs addresses
 	inputs.resize(_xDim);
 	outputs.resize(_xDim);
 
 	// was : inputs[0] = genome->sites[k % genome->sites.size()];
-	inputs[0] = genomeHandler->readInt(0, 255, Gate::DATA_CODE, gateID);
+	inputs[0] = genomeHandler->readInt(0, 255, AbstractGate::DATA_CODE, gateID);
 
 	for (i = 1; i < _xDim; i++) {
 		// was::
 		//inputs[i] = genome->sites[(k + i) % genome->sites.size()];
 		//outputs[i] = genome->sites[(k + i) % genome->sites.size()];
-		inputs[i] = genomeHandler->readInt(0, 255, Gate::DATA_CODE, gateID);
+		inputs[i] = genomeHandler->readInt(0, 255, AbstractGate::DATA_CODE, gateID);
 		outputs[i] = inputs[i];
 	}
 
@@ -51,7 +51,7 @@ Thresholdgate::Thresholdgate(shared_ptr<AbstractGenome> genome, shared_ptr<Abstr
 
 	//yes the threshold can be higher than the maximal number countable to by this threshold counter
 	// was : threshold = genome->sites[(k + i + 1) % genome->sites.size()];
-	threshold = genomeHandler->readInt(0, 255, Gate::DATA_CODE, gateID);
+	threshold = genomeHandler->readInt(0, 255, AbstractGate::DATA_CODE, gateID);
 }
 
 void Thresholdgate::update(vector<double> & states, vector<double> & nextStates) {
@@ -66,6 +66,6 @@ void Thresholdgate::update(vector<double> & states, vector<double> & nextStates)
 }
 
 string Thresholdgate::description() {
-	return to_string(ID) + ": ThresholdgateGate: " + to_string(threshold) + "\n" + Gate::description();;
+	return to_string(ID) + ": ThresholdgateGate: " + to_string(threshold) + "\n" + AbstractGate::description();;
 }
 
