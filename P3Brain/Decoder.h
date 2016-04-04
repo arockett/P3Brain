@@ -10,40 +10,40 @@
 #define DECODER_H_
 
 #include "Configuration.h"
-#include "Gate.h"
+#include "AbstractGate.h"
 
 class Decoder
 {
 public:
-    virtual vector<shared_ptr<Gate>> decode( const vector<bool>&, int, int, int, int ) = 0;
+    virtual vector<shared_ptr<AbstractGate>> decode( const vector<bool>&, int, int, int, int ) = 0;
 };
 
 
 class UnstructuredDecoder : public Decoder
 {
 public:
-    virtual vector<shared_ptr<Gate>> decode( const vector<bool>&, int, int, int, int ) override;
+    virtual vector<shared_ptr<AbstractGate>> decode( const vector<bool>&, int, int, int, int ) override;
 };
 
 
 class FixedInputDecoder : public Decoder
 {
 public:
-    virtual vector<shared_ptr<Gate>> decode( const vector<bool>&, int, int, int, int ) override;
+    virtual vector<shared_ptr<AbstractGate>> decode( const vector<bool>&, int, int, int, int ) override;
 };
 
 
 class FixedLogicDecoder : public Decoder
 {
 public:
-    virtual vector<shared_ptr<Gate>> decode( const vector<bool>&, int, int, int, int ) override;
+    virtual vector<shared_ptr<AbstractGate>> decode( const vector<bool>&, int, int, int, int ) override;
 };
 
 
 class HypercubeDecoder : public Decoder
 {
 public:
-    virtual vector<shared_ptr<Gate>> decode( const vector<bool>&, int, int, int, int ) override;
+    virtual vector<shared_ptr<AbstractGate>> decode( const vector<bool>&, int, int, int, int ) override;
 };
 
 

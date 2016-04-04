@@ -10,19 +10,13 @@
 #include "Tools.h"
 
 
-LogicalWorld::LogicalWorld( const vector<Logic>& outputLogics )
+LogicalWorld::LogicalWorld()
 {
-    if( outputLogics.size() > 0 )
-    {
-        for( auto l : outputLogics )
-        {
-            logic.push_back( l );
-        }
-    }
-    else
-    {
-        logic.push_back( AND );
-    }
+    logic = {
+        LogicalWorld::Logic::AND,
+        LogicalWorld::Logic::XOR,
+        LogicalWorld::Logic::NXOR
+    };
 
     fitnessIncrement = 1.0 / 4 / logic.size();
 }

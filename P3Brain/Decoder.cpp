@@ -8,6 +8,7 @@
 #include "Decoder.h"
 
 #include "Tools.h"
+#include "DeterministicGate.h"
 
 
 // Template specialization to convert a string to a function pointer
@@ -19,7 +20,7 @@ decoder::pointer Configuration::get( const string key )
 }
 
 
-vector<shared_ptr<Gate>> UnstructuredDecoder::decode( const vector<bool>& genome, int numInputNodes, int numOutputNodes, int numHiddenNodes, int gateIns )
+vector<shared_ptr<AbstractGate>> UnstructuredDecoder::decode( const vector<bool>& genome, int numInputNodes, int numOutputNodes, int numHiddenNodes, int gateIns )
 {
     /********************************************************
     * Calculate encoding sizes to ensure the genome is long enough
@@ -36,7 +37,7 @@ vector<shared_ptr<Gate>> UnstructuredDecoder::decode( const vector<bool>& genome
     /********************************************************
     * Decode the genome bit string
     ********************************************************/
-    vector<shared_ptr<Gate>> gates;
+    vector<shared_ptr<AbstractGate>> gates;
     auto start = genome.begin();
     int nodeId = numInputNodes;
     while( start != genome.end() )
@@ -45,9 +46,9 @@ vector<shared_ptr<Gate>> UnstructuredDecoder::decode( const vector<bool>& genome
 
         // Get inputs
         vector<int> inNodes;
-        for( int k = 0; k < gateIns; k++ )
+        for( int i = 0; i < gateIns; i++ )
         {
-            auto end = start + ( ( k + 1 ) * inputEncodingSize );
+            auto end = start + inputEncodingSize;
             vector<bool> inNumber( start, end );
             inNodes.push_back( boolStringToInt( inNumber ) % numNodes );
             start = end;
@@ -61,7 +62,7 @@ vector<shared_ptr<Gate>> UnstructuredDecoder::decode( const vector<bool>& genome
         vector<vector<int>> logic;
         for( start; start != end; start++ )
         {
-            logic.push_back( vector<int>( 1, *start ) );
+            logic.push_back( vector<int>( 1, (int)*start ) );
         }
 
         // Create and add gate
@@ -69,10 +70,12 @@ vector<shared_ptr<Gate>> UnstructuredDecoder::decode( const vector<bool>& genome
 
         nodeId++;
     }
+
+    return gates;
 }
 
 
-vector<shared_ptr<Gate>> FixedInputDecoder::decode( const vector<bool>& genome, int numInputNodes, int numOutputNodes, int numHiddenNodes, int gateIns )
+vector<shared_ptr<AbstractGate>> FixedInputDecoder::decode( const vector<bool>& genome, int numInputNodes, int numOutputNodes, int numHiddenNodes, int gateIns )
 {
     // TODO Layer the fixed gate inputs so that each Brain Input state can be accessed by a gate
 
@@ -91,7 +94,7 @@ vector<shared_ptr<Gate>> FixedInputDecoder::decode( const vector<bool>& genome, 
     ASSERT( numInputNodes >= gateIns,
         "Invalid gate complexity. The number of gate inputs must be no more than the number of inpute nodes." );
 
-    vector<shared_ptr<Gate>> gates;
+    vector<shared_ptr<AbstractGate>> gates;
     auto start = genome.begin();
     int nodeId = numInputNodes;
     while( start != genome.end() )
@@ -114,7 +117,7 @@ vector<shared_ptr<Gate>> FixedInputDecoder::decode( const vector<bool>& genome, 
         vector<vector<int>> logic;
         for( start; start != end; start++ )
         {
-            logic.push_back( vector<int>( 1, *start ) );
+            logic.push_back( vector<int>( 1, (int)*start ) );
         }
 
         // inStates will hold the index of each input to the gate, possible input indices
@@ -123,16 +126,19 @@ vector<shared_ptr<Gate>> FixedInputDecoder::decode( const vector<bool>& genome, 
 
         nodeId++;
     }
+
+    return gates;
 }
 
 
-vector<shared_ptr<Gate>> FixedLogicDecoder::decode( const vector<bool>& genome, int numInputNodes, int numOutputNodes, int numHiddenNodes, int gateIns )
+vector<shared_ptr<AbstractGate>> FixedLogicDecoder::decode( const vector<bool>& genome, int numInputNodes, int numOutputNodes, int numHiddenNodes, int gateIns )
 {
     // TODO
+    return vector<shared_ptr<AbstractGate>>();
 }
 
 
-vector<shared_ptr<Gate>> HypercubeDecoder::decode( const vector<bool>& genome, int numInputNodes, int numOutputNodes, int numHiddenNodes, int gateIns )
+vector<shared_ptr<AbstractGate>> HypercubeDecoder::decode( const vector<bool>& genome, int numInputNodes, int numOutputNodes, int numHiddenNodes, int gateIns )
 {
     /********************************************************
     * Check the genome size to ensure it's the right length
@@ -175,7 +181,7 @@ vector<shared_ptr<Gate>> HypercubeDecoder::decode( const vector<bool>& genome, i
     * Decode the genome bit string
     ********************************************************/
 
-    vector<shared_ptr<Gate>> gates;
+    vector<shared_ptr<AbstractGate>> gates;
     auto start = genome.begin();
     int nodeId = numInputNodes;
     while( start != genome.end() )
@@ -184,9 +190,9 @@ vector<shared_ptr<Gate>> HypercubeDecoder::decode( const vector<bool>& genome, i
 
         // Get inputs
         vector<int> inNodes;
-        for( int k = 0; k < gateIns; k++ )
+        for( int i = 0; i < gateIns; i++ )
         {
-            auto end = start + ( ( k + 1 )*inputEncodingSize );
+            auto end = start + inputEncodingSize;
             vector<bool> inNumber( start, end );
             inNodes.push_back( flipBit( nodeId, boolStringToInt( inNumber ) % cubeDimension ) );
         }
@@ -199,7 +205,7 @@ vector<shared_ptr<Gate>> HypercubeDecoder::decode( const vector<bool>& genome, i
         vector<vector<int>> logic;
         for( start; start != end; start++ )
         {
-            logic.push_back( vector<int>( 1, *start ) );
+            logic.push_back( vector<int>( 1, (int)*start ) );
         }
 
         // inStates will hold the index of each input to the gate, possible input indices
@@ -208,4 +214,6 @@ vector<shared_ptr<Gate>> HypercubeDecoder::decode( const vector<bool>& genome, i
 
         nodeId++;
     }
+
+    return gates;
 }

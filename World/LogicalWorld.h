@@ -33,7 +33,7 @@ public:
         TRUE    // 1111
     };
 
-    LogicalWorld(const vector<Logic>& outputLogics = vector<Logic>());
+    LogicalWorld();
     virtual ~LogicalWorld();
 
     virtual double testIndividual(shared_ptr<Organism> org, bool analyse, bool show = 0) override;
