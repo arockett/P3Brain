@@ -31,8 +31,15 @@ public:
 	//extra methods added:
 	double GetUtilityForAnsweringQuestion( shared_ptr<Organism> org, double P[2], double Pay[2]);
 
-    virtual int requiredInputs() override;
-    virtual int requiredOutputs() override;
+    virtual int requiredInputs() override
+    {
+        return 5;
+    }
+
+    virtual int requiredOutputs() override
+    {
+        return 4;
+    }
 	
 };
 
