@@ -18,7 +18,7 @@
 #include "Util.h"
 
 // Include objects from the MarkovBrain project
-#include "World.h"
+#include "AbstractWorld.h"
 #include "Organism.h"
 #include "Decoder.h"
 
@@ -55,7 +55,7 @@ public:
     create_evaluator(MarkovWorld);
 
 private:
-    shared_ptr<World> trainingGround = nullptr;
+    shared_ptr<AbstractWorld> trainingGround = nullptr;
     shared_ptr<Organism> gladiator = make_shared<Organism>();
     shared_ptr<Decoder> decoder = nullptr;
     int numInputNodes;
@@ -65,13 +65,17 @@ private:
 };
 
 
+#include "LogicalWorld.h"
 #include "BerryWorld.h"
+#include "UtilityWorld.h"
 // This mapping is used to convert a problem's name into an instance
 // of that Evaluator object
 namespace evaluation {
-using pointer=std::function<shared_ptr<World>()>;
+using pointer=std::function<shared_ptr<AbstractWorld>()>;
 static std::unordered_map<string, pointer> lookup( {
+    { "Logical", make_shared<LogicalWorld> },
     { "Berry", make_shared<BerryWorld> },
+    { "Utility", make_shared<UtilityWorld> },
 });
 }
 

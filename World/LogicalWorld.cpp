@@ -32,79 +32,79 @@ LogicalWorld::~LogicalWorld()
 {
 }
 
-double LogicalWorld::testIndividual(shared_ptr<Organism> organism, bool analyse) {
+double LogicalWorld::testIndividual(shared_ptr<Organism> organism, bool analyse, bool show) {
     auto& agent = organism->brain;
     // If there aren't enough non-input nodes to check then return 0 fitness
     // because the bit string is not long enough
-    if( (int)logic.size() > agent->nrOfBrainStates - 2 )
+    if( (int)logic.size() > agent->nrOfBrainNodes - 2 )
         return 0.0;
 
     double fitness = 0.0;
 
     /*
-     * Test the agent to make them develop an "and" gate
+     * Test the agent with each combination of two bit binary inputs
      */
     // 0 0
     agent->resetBrain();
-    agent->states[0] = 0.0;
-    agent->states[1] = 0.0;
-    for( int i = 0; i < agent->nrOfBrainStates - 2; i++ )
+    agent->nodes[0] = 0.0;
+    agent->nodes[1] = 0.0;
+    for( int i = 0; i < agent->nrOfBrainNodes - 2; i++ )
     {
-        agent->states[0] = 0.0;
-        agent->states[1] = 0.0;
+        agent->nodes[0] = 0.0;
+        agent->nodes[1] = 0.0;
         agent->update();
     }
     for( unsigned i = 0; i < logic.size(); i++ )
     {
-        if( agent->states[agent->nrOfBrainStates - ( logic.size() - i )] == (double)getBit( logic[i], 3 ) )
+        if( agent->nodes[agent->nrOfBrainNodes - ( logic.size() - i )] == (double)getBit( logic[i], 3 ) )
             fitness += fitnessIncrement;
     }
 
     // 0 1
     agent->resetBrain();
-    agent->states[0] = 0.0;
-    agent->states[1] = 1.0;
-    for( int i = 0; i < agent->nrOfBrainStates - 2; i++ )
+    agent->nodes[0] = 0.0;
+    agent->nodes[1] = 1.0;
+    for( int i = 0; i < agent->nrOfBrainNodes - 2; i++ )
     {
-        agent->states[0] = 0.0;
-        agent->states[1] = 1.0;
+        agent->nodes[0] = 0.0;
+        agent->nodes[1] = 1.0;
         agent->update();
     }
     for( unsigned i = 0; i < logic.size(); i++ )
     {
-        if( agent->states[agent->nrOfBrainStates - ( logic.size() - i )] == (double)getBit( logic[i], 2 ) )
+        if( agent->nodes[agent->nrOfBrainNodes - ( logic.size() - i )] == (double)getBit( logic[i], 2 ) )
             fitness += fitnessIncrement;
     }
     
     // 1 0
     agent->resetBrain();
-    agent->states[0] = 1.0;
-    agent->states[1] = 0.0;
-    for( int i = 0; i < agent->nrOfBrainStates - 2; i++ )
+    agent->nodes[0] = 1.0;
+    agent->nodes[1] = 0.0;
+    for( int i = 0; i < agent->nrOfBrainNodes - 2; i++ )
     {
-        agent->states[0] = 1.0;
-        agent->states[1] = 0.0;
+        agent->nodes[0] = 1.0;
+        agent->nodes[1] = 0.0;
         agent->update();
     }
     for( unsigned i = 0; i < logic.size(); i++ )
     {
-        if( agent->states[agent->nrOfBrainStates - ( logic.size() - i )] == (double)getBit( logic[i], 1 ) )
+        if( agent->nodes[agent->nrOfBrainNodes - ( logic.size() - i )] == (double)getBit( logic[i], 1 ) )
             fitness += fitnessIncrement;
     }
 
     // 1 1
     agent->resetBrain();
-    agent->states[0] = 1.0;
-    agent->states[1] = 1.0;
-    for( int i = 0; i < agent->nrOfBrainStates - 2; i++ )
+    agent->nodes[0] = 1.0;
+    agent->nodes[1] = 1.0;
+    for( int i = 0; i < agent->nrOfBrainNodes - 2; i++ )
     {
-        agent->states[0] = 1.0;
-        agent->states[1] = 1.0;
+        agent->nodes[0] = 1.0;
+        agent->nodes[1] = 1.0;
         agent->update();
     }
     for( unsigned i = 0; i < logic.size(); i++ )
     {
-        if( agent->states[agent->nrOfBrainStates - ( logic.size() - i )] == (double)getBit( logic[i], 0 ) )
+        if( agent->nodes[agent->nrOfBrainNodes - ( logic.size() - i )] == (double)getBit( logic[i], 0 ) )
             fitness += fitnessIncrement;
     }
 

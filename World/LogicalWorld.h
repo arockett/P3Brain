@@ -9,9 +9,9 @@
 #ifndef LOGICALWORLD_H_
 #define LOGICALWORLD_H_
 
-#include "World.h"
+#include "AbstractWorld.h"
 
-class LogicalWorld : public World
+class LogicalWorld : public AbstractWorld
 {
 public:
     enum Logic {
@@ -36,7 +36,17 @@ public:
     LogicalWorld(const vector<Logic>& outputLogics = vector<Logic>());
     virtual ~LogicalWorld();
 
-    double testIndividual(shared_ptr<Organism> org, bool analyse) override;
+    virtual double testIndividual(shared_ptr<Organism> org, bool analyse, bool show = 0) override;
+
+    virtual int requiredInputs() override
+    {
+        return 2;
+    }
+
+    virtual int requiredOutputs() override
+    {
+        return logic.size();
+    }
 
 private:
     vector<Logic> logic;
