@@ -31,6 +31,9 @@ MarkovWorld::MarkovWorld( Configuration& config, int run_number )
     ASSERT( numHiddenNodes >= 0,
         "Not enough gates, world requires at least " << numOutputNodes << " gates." );
     gateComplexity = config.get<int>( "gate_complexity" );
+
+    // Validate these parameters for the specific decoder
+    decoder->validateParameters( config.get<int>( "length" ), numInputNodes, numOutputNodes, numHiddenNodes, gateComplexity );
 }
 
 /*

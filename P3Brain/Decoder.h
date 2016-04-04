@@ -15,20 +15,33 @@
 class Decoder
 {
 public:
+    virtual void validateParameters( int, int, int, int, int ) = 0;
     virtual vector<shared_ptr<AbstractGate>> decode( const vector<bool>&, int, int, int, int ) = 0;
+
+    bool isValidated() { return validated; }
+
+protected:
+    bool validated = false;
+    int inputEncodingSize;
+    int logicEncodingSize;
 };
 
 
 class UnstructuredDecoder : public Decoder
 {
 public:
+    virtual void validateParameters( int, int, int, int, int ) override;
     virtual vector<shared_ptr<AbstractGate>> decode( const vector<bool>&, int, int, int, int ) override;
+
+private:
+    int numNodes;
 };
 
 
 class FixedInputDecoder : public Decoder
 {
 public:
+    virtual void validateParameters( int, int, int, int, int ) override;
     virtual vector<shared_ptr<AbstractGate>> decode( const vector<bool>&, int, int, int, int ) override;
 };
 
@@ -36,6 +49,7 @@ public:
 class FixedLogicDecoder : public Decoder
 {
 public:
+    virtual void validateParameters( int, int, int, int, int ) override;
     virtual vector<shared_ptr<AbstractGate>> decode( const vector<bool>&, int, int, int, int ) override;
 };
 
@@ -43,7 +57,11 @@ public:
 class HypercubeDecoder : public Decoder
 {
 public:
+    virtual void validateParameters( int, int, int, int, int ) override;
     virtual vector<shared_ptr<AbstractGate>> decode( const vector<bool>&, int, int, int, int ) override;
+
+private:
+    int cubeDimension;
 };
 
 
