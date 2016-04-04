@@ -17,7 +17,7 @@
 
 namespace optimize {
 // Renaming of the function pointer used to create new optimization methods
-using pointer=shared_ptr<BitStringOptimizer> (*)(generator& rand, shared_ptr<Evaluator> evaluator, Configuration& config);
+using pointer=shared_ptr<BitStringOptimizer> (*)(Generator& rand, shared_ptr<Evaluator> evaluator, Configuration& config);
 
 // Lookup table translates strings to function pointers
 static std::unordered_map<string, pointer> lookup( {

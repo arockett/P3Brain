@@ -19,7 +19,7 @@
 // Inherits and implements the BitStringOptimizer interface
 class LTGA : public BitStringOptimizer {
  public:
-  LTGA(generator& _rand, shared_ptr<Evaluator> _evaluator, Configuration& _config);
+  LTGA(Generator& _rand, shared_ptr<Evaluator> _evaluator, Configuration& _config);
   bool iterate() override;
   string finalize() override;
   create_optimizer(LTGA);
@@ -39,7 +39,7 @@ class LTGA : public BitStringOptimizer {
   // Uses a binary tournament between individuals to determine which
   // solutions are part of the entropy calculations.  All solutions are
   // always added to the next generation.
-  void binary_insert(generator& rand, vector<vector<bool>> & solutions,
+  void binary_insert(Generator& rand, vector<vector<bool>> & solutions,
       Population& next_pop);
   void generation();
   hill_climb::pointer hc;

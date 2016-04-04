@@ -7,7 +7,7 @@
 #include "Experiments.h"
 
 // A single run of optimization
-Record single_run(generator& rand, Configuration& config,
+Record single_run(Generator& rand, Configuration& config,
                   evaluation::pointer world, optimize::pointer solver,
                   int run) {
   size_t limit = config.get<int>("eval_limit");
@@ -30,7 +30,7 @@ Record single_run(generator& rand, Configuration& config,
 }
 
 // Performs multiple runs of optimization
-vector<Record> multirun(generator& rand, Configuration& config,
+vector<Record> multirun(Generator& rand, Configuration& config,
                         evaluation::pointer problem, optimize::pointer solver) {
   int runs = config.get<int>("runs");
   int verbosity = config.get<int>("verbosity");
@@ -51,7 +51,7 @@ vector<Record> multirun(generator& rand, Configuration& config,
 }
 
 // Determine the minimum useful population size
-int bisection(generator& rand, Configuration& config, evaluation::pointer problem,
+int bisection(Generator& rand, Configuration& config, evaluation::pointer problem,
               optimize::pointer solver) {
   int runs = config.get<int>("runs");
   float good_enough = config.get<int>("fitness_limit");
@@ -112,7 +112,7 @@ int bisection(generator& rand, Configuration& config, evaluation::pointer proble
 
 // Performs a bisection method where a single success decreases predicted population size,
 // and a single failure returns to the previously predicted size.
-int fast_bisection(generator& rand, Configuration& config,
+int fast_bisection(Generator& rand, Configuration& config,
                    evaluation::pointer problem, optimize::pointer solver) {
   // initial bounds
   int min = 0;
@@ -132,7 +132,7 @@ int fast_bisection(generator& rand, Configuration& config,
 
 // Recursively drills down from a given size until either it finds the correct
 // population size, or you discover that max isn't big enough
-int recurse(generator& rand, Configuration& config, evaluation::pointer problem,
+int recurse(Generator& rand, Configuration& config, evaluation::pointer problem,
             optimize::pointer solver, int min, int max) {
   int runs = config.get<int>("runs");
   float good_enough = config.get<float>("fitness_limit");

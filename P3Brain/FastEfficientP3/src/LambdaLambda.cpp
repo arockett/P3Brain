@@ -15,7 +15,7 @@
 #include <numeric>
 
 // Constructs some tools used during evolution, performs initial evaluation
-LambdaLambda::LambdaLambda(generator& _rand, shared_ptr<Evaluator> _evaluator,
+LambdaLambda::LambdaLambda(Generator& _rand, shared_ptr<Evaluator> _evaluator,
                            Configuration& _config)
     : BitStringOptimizer(_rand, _evaluator, _config),
       selectors(length),

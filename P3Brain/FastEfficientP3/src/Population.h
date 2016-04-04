@@ -40,10 +40,10 @@ class Population {
   // entropy table and solutions in the population.  "fitness" should
   // start as the fitness of "solution", and both will be set to the
   // improved values after application.
-  void improve(generator& rand, vector<bool> & solution, float & fitness,
+  void improve(Generator& rand, vector<bool> & solution, float & fitness,
                shared_ptr<Evaluator> evaluator);
   // Use the pairwise frequency table to construct a linkage tree
-  void rebuild_tree(generator& rand);
+  void rebuild_tree(Generator& rand);
 
   // Metadata recording about the behavior of crossover
   size_t successes, ties, failures, donation_attempts, donation_failures;
@@ -80,18 +80,18 @@ class Population {
   // them into an order for application with crossover.
 
   // Tool used to allow configuration of cluster ordering
-  using cluster_ordering_method=void (*)(generator& rand,
+  using cluster_ordering_method=void (*)(Generator& rand,
       const vector<vector<int>>& clusters, vector<int>& cluster_ordering);
   cluster_ordering_method ordering;
 
   // Leave the clusters in the order they were created
-  static void no_action(generator& rand, const vector<vector<int>>& clusters, vector<int>& cluster_ordering);
+  static void no_action(Generator& rand, const vector<vector<int>>& clusters, vector<int>& cluster_ordering);
   // Sort clusters by size, smallest first.  Randomize order of equal sized clusters
-  static void smallest_first(generator& rand, const vector<vector<int>>& clusters, vector<int>& cluster_ordering);
+  static void smallest_first(Generator& rand, const vector<vector<int>>& clusters, vector<int>& cluster_ordering);
   // Shuffle the order of clusters
-  static void random(generator& rand, const vector<vector<int>>& clusters, vector<int>& cluster_ordering);
+  static void random(Generator& rand, const vector<vector<int>>& clusters, vector<int>& cluster_ordering);
   // Reverse the order of clusters such that the cluster with the tightest linkage appears last.
-  static void least_linked_first(generator& rand, const vector<vector<int>>& clusters, vector<int>& cluster_ordering);
+  static void least_linked_first(Generator& rand, const vector<vector<int>>& clusters, vector<int>& cluster_ordering);
 
   // Lookup tool used to convert a string name to a ordering function.
   std::unordered_map<string, cluster_ordering_method> ordering_lookup = {

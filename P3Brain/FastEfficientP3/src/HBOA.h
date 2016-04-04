@@ -74,7 +74,7 @@ struct Bayesian_Tree {
   void join();
 
   // Use the decision tree to set "index" in solution
-  void set_bit(generator& rand, vector<bool>& solution);
+  void set_bit(Generator& rand, vector<bool>& solution);
 
   // Calculate the BDe score of this tree
   Factorial_Fraction bde_fraction();
@@ -104,9 +104,9 @@ class Bayesian_Forest {
   // Provide this solution to each tree for modeling purposes
   void add_solution(const vector<bool>* solution);
   // Construct the entire forest based on the added solutions
-  void build_forest(generator & rand);
+  void build_forest(Generator & rand);
   // Generate a new solution based on the build model
-  void generate(generator& rand, vector<bool> & solution);
+  void generate(Generator& rand, vector<bool> & solution);
   // Utility function for displaying the forest
   friend std::ostream& operator<<(std::ostream& out, const Bayesian_Forest&);
  private:
@@ -130,7 +130,7 @@ class Bayesian_Forest {
 // The Hierarchical Bayesian Optimization Algorithm implementation
 class HBOA : public BitStringOptimizer {
  public:
-  HBOA(generator& _rand, shared_ptr<Evaluator> _evaluator, Configuration& _config);
+  HBOA(Generator& _rand, shared_ptr<Evaluator> _evaluator, Configuration& _config);
   // Perform a generation of search, returns false if convergence is reached
   bool iterate() override;
   create_optimizer(HBOA);

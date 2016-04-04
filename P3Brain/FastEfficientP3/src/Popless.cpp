@@ -4,7 +4,7 @@
 #include "Popless.h"
 #include "OptimizationCollection.h"
 
-Popless::Popless(generator& _rand, shared_ptr<Evaluator> _evaluator,
+Popless::Popless(Generator& _rand, shared_ptr<Evaluator> _evaluator,
                  Configuration& _config)
     : BitStringOptimizer(_rand, _evaluator, _config) {
   largest_size = config.get<int>("pop_size");

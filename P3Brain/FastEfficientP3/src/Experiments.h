@@ -17,25 +17,25 @@
 // Performs a single optimization run using the specified solver to optimizing
 // the passed in problem.  Returns a record of how many evaluations were required
 // to reach each new fitness level.
-Record single_run(generator& rand, Configuration& config,
+Record single_run(Generator& rand, Configuration& config,
                   evaluation::pointer problem, optimize::pointer solver,
                   int run);
 
 // Performs multiple runs of optimization, repeatedly calling single_run with
 // different run numbers.  Returns the collection of records produced.
 // Will periodically print to the screen depending on the "verbosity" level
-vector<Record> multirun(generator& rand, Configuration& config,
+vector<Record> multirun(Generator& rand, Configuration& config,
                         evaluation::pointer problem, optimize::pointer solver);
 
 // Tool used to determine the minimum population size capable of performing
 // the desired number of runs and having all runs find the global optimum.
-int bisection(generator& rand, Configuration& config, evaluation::pointer problem,
+int bisection(Generator& rand, Configuration& config, evaluation::pointer problem,
               optimize::pointer solver);
 
-int fast_bisection(generator& rand, Configuration& config,
+int fast_bisection(Generator& rand, Configuration& config,
                    evaluation::pointer problem, optimize::pointer solver);
 
-int recurse(generator& rand, Configuration& config, evaluation::pointer problem,
+int recurse(Generator& rand, Configuration& config, evaluation::pointer problem,
             optimize::pointer solver, int min, int max);
 
 #endif /* EXPERIMENTS_H_ */

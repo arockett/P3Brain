@@ -6,7 +6,7 @@
 #include "Util.h"
 
 // Creates a new vector containing "length" number of random bits
-vector<bool> rand_vector(generator& rand, const size_t length) {
+vector<bool> rand_vector(Generator& rand, const size_t length) {
   std::uniform_int_distribution<int> rbit(0, 1);
   vector<bool> vect(length, 0);
   for (size_t index = 0; index < vect.size(); index++) {

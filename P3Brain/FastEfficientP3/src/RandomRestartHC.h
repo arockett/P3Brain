@@ -14,7 +14,7 @@
 // Implements the optimizer interface
 class RandomRestartHC : public BitStringOptimizer {
  public:
-  RandomRestartHC(generator& _rand, shared_ptr<Evaluator> _evaluator,
+  RandomRestartHC(Generator& _rand, shared_ptr<Evaluator> _evaluator,
                   Configuration& _config)
       : BitStringOptimizer(_rand, _evaluator, _config),
         hill_climber(_config.get<hill_climb::pointer>("hill_climber")) {

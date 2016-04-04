@@ -305,7 +305,7 @@ Factorial_Fraction Bayesian_Tree::splitless_bde(size_t new_index) {
 }
 
 // Use the tree and the current solution to determine the probabilistic value of "index"
-void Bayesian_Tree::set_bit(generator& rand, vector<bool>& solution) {
+void Bayesian_Tree::set_bit(Generator& rand, vector<bool>& solution) {
   if (is_leaf) {
     // If solutions==0, probability is even
     double probability = 0.5;
@@ -346,7 +346,7 @@ void Bayesian_Forest::add_solution(const vector<bool>* solution) {
 }
 
 // Construct a forest from the added solutions
-void Bayesian_Forest::build_forest(generator & rand) {
+void Bayesian_Forest::build_forest(Generator & rand) {
   // Initially all trees have themselves as both prev and post
   prev.resize(trees.size());
   post.resize(trees.size());
@@ -404,7 +404,7 @@ void Bayesian_Forest::build_forest(generator & rand) {
 }
 
 // Use each tree in the forest to set all bits in the solution
-void Bayesian_Forest::generate(generator& rand, vector<bool> & solution) {
+void Bayesian_Forest::generate(Generator& rand, vector<bool> & solution) {
   for (const auto& index : ordering) {
     trees[index].set_bit(rand, solution);
   }
@@ -456,7 +456,7 @@ void Bayesian_Forest::filter(
 }
 
 // Set up initial population
-HBOA::HBOA(generator& _rand, shared_ptr<Evaluator> _evaluator,
+HBOA::HBOA(Generator& _rand, shared_ptr<Evaluator> _evaluator,
            Configuration& _config)
     : BitStringOptimizer(_rand, _evaluator, _config) {
   size_t pop_size = config.get<int>("pop_size");

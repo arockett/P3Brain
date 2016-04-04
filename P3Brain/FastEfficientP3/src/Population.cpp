@@ -85,7 +85,7 @@ float Population::get_distance(int x, int y) const {
 // Developed from the O(N^2) method described in:
 // "Optimal implementations of UPGMA and other common clustering algorithms"
 // by I. Gronau and S. Moran
-void Population::rebuild_tree(generator& rand) {
+void Population::rebuild_tree(Generator& rand) {
   // usable keeps track of which clusters can still be merged
   vector<size_t> usable(length);
   // initialize it to just the clusters of size 1
@@ -266,7 +266,7 @@ bool Population::donate(vector<bool> & solution, float & fitness,
 
 // Performs an entire crossover event, applying all discovered clusters, in an
 // attempt to use the population to improve "solution".
-void Population::improve(generator& rand, vector<bool> & solution, float & fitness,
+void Population::improve(Generator& rand, vector<bool> & solution, float & fitness,
                          shared_ptr<Evaluator> evaluator) {
   // Data structure used to select random population donors
   vector<int> options(solutions.size());
@@ -304,7 +304,7 @@ void Population::improve(generator& rand, vector<bool> & solution, float & fitne
 }
 
 // Order the clusters based on size, smallest first, ties broken randomly
-void Population::smallest_first(generator& rand,
+void Population::smallest_first(Generator& rand,
                                 const vector<vector<int>>& clusters,
                                 vector<int>& cluster_ordering) {
   // Shuffle ordering to break ties randomly
@@ -332,19 +332,19 @@ void Population::smallest_first(generator& rand,
 }
 
 // Order the clusters such that the last to be linked is the first to appear
-void Population::least_linked_first(generator& rand,
+void Population::least_linked_first(Generator& rand,
                                     const vector<vector<int>>& clusters,
                                     vector<int>& cluster_ordering) {
   std::reverse(cluster_ordering.begin(), cluster_ordering.end());
 }
 
 // Leave the clusters as the were created.  AKA most linked first
-void Population::no_action(generator& rand, const vector<vector<int>>& clusters,
+void Population::no_action(Generator& rand, const vector<vector<int>>& clusters,
                            vector<int>& cluster_ordering) {
 }
 
 // Put the clusters in a completely random order
-void Population::random(generator& rand, const vector<vector<int>>& clusters,
+void Population::random(Generator& rand, const vector<vector<int>>& clusters,
                         vector<int>& cluster_ordering) {
   std::shuffle(cluster_ordering.begin(), cluster_ordering.end(), rand);
 }

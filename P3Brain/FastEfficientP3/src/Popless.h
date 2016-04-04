@@ -17,7 +17,7 @@
 // Inherits and implements the optimizer
 class Popless : public BitStringOptimizer {
  public:
-  Popless(generator& _rand, shared_ptr<Evaluator> _evaluator,
+  Popless(Generator& _rand, shared_ptr<Evaluator> _evaluator,
           Configuration& _config);
   bool iterate() override;
   create_optimizer(Popless);

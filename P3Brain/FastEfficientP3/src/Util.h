@@ -16,10 +16,10 @@ using std::vector;
 
 // Defines that the random number genrator in use is the Mersenne Twister
 #include "Random.h"
-using Random::generator;
+using Random::Generator;
 
 // Generate a random bit vector of the requested length
-vector<bool> rand_vector(generator& rand, const size_t length);
+vector<bool> rand_vector( Generator& rand, const size_t length);
 
 // Print out a vector to the stream.
 void print(const vector<bool> & vect, std::ostream & out = std::cout);

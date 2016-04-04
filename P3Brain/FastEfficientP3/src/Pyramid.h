@@ -19,7 +19,7 @@
 // Implements the BitStringOptimizer interface
 class Pyramid : public BitStringOptimizer {
  public:
-  Pyramid(generator& _rand, shared_ptr<Evaluator> _evaluator,
+  Pyramid(Generator& _rand, shared_ptr<Evaluator> _evaluator,
           Configuration& _config)
       : BitStringOptimizer(_rand, _evaluator, _config),
         only_add_improvements(_config.get<int>("only_add_improvements")),
