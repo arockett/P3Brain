@@ -18,9 +18,9 @@ import getopt
 ####
 
 def usage():
-	print()
+	print('')
 	print(sys.argv[0] + ' [-h][-t title][-s pdf|png][-l][-c "source,x-axis,[alpha X,][legend location,][style,][line width X,]data1,data2,..."]')
-	print()
+	print('')
 	print('  -h show this help message')
 	print('  -s do not display graph(s), save image(s) instead ("pdf" or "png" format)')
 	print('  -l also load and graph Line of Decent (data.csv)')
@@ -39,7 +39,7 @@ def usage():
 	print('       line width = optional (default "line width 1")')
 	print('             [1 .. ]')
 	print('       data* = columns to graph')
-	print()
+	print('')
 
 ####
 #
@@ -375,7 +375,8 @@ def main(argv=None):
 		
 ######## SAVE TO FILE
 	
-	customTitle = customTitle + ' '
+	if customTitle != '':
+		customTitle = customTitle + ' '
 
 ######## SAVE TO A PNG FILE
 
