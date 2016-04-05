@@ -38,7 +38,7 @@ public:
 	int nrInNodes;
 	int nrOutNodes;
 	int nrHiddenNodes;
-
+	vector<int> inputNodesList, outputNodesList;//maps inputs to nodes and outputs to nodes
 	vector<double> nodes;
 	vector<double> nextNodes;
 
@@ -55,6 +55,13 @@ public:
 		nrHiddenNodes = hidden;
 		recordActivity = false;
 
+		// setup default input and output nodes lists
+		for (int i = 0;i<nrInNodes;i++){
+			inputNodesList.push_back(i);
+		}
+		for (int i = nrInNodes; i<nrInNodes+nrOutNodes;i++){
+			outputNodesList.push_back(i);
+		}
 		nrOfBrainNodes = ins + outs + hidden;
 		nodes.resize(nrOfBrainNodes);
 		nextNodes.resize(nrOfBrainNodes);
@@ -85,14 +92,18 @@ public:
 	}
 
 	virtual void inline resetOutputs() {
-		for (int i = nrInNodes; i < (nrInNodes + nrOutNodes); i++) {
+//		for (int i = nrInNodes; i < (nrInNodes + nrOutNodes); i++) {
+//			nodes[i] = 0.0;
+//		}
+		for (auto i:outputNodesList){
 			nodes[i] = 0.0;
 		}
 	}
 
 	inline void setInput(const int& nodeAddress, const double& value) {
 		if (nodeAddress < nrInNodes) {
-			nodes[nodeAddress] = value;
+			//nodes[nodeAddress] = value;
+			nodes[inputNodesList[nodeAddress]] = value;
 		} else {
 			cout << "in Brain::setInput() : Writing to invalid input node (" << nodeAddress << ") - this brain needs more input nodes!\nExiting" << endl;
 			exit(1);
@@ -110,7 +121,8 @@ public:
 
 	inline double readInput(const int& nodeAddress) {
 		if (nodeAddress < nrInNodes) {
-			return nodes[nodeAddress];
+			//return nodes[nodeAddress];
+			return nodes[inputNodesList[nodeAddress]];
 		} else {
 			cout << "in Brain::readInput() : Reading from invalid input node (" << nodeAddress << ") - this brain needs more input nodes!\nExiting" << endl;
 			exit(1);
@@ -119,7 +131,8 @@ public:
 
 	inline double readOutput(const int& nodeAddress) {
 		if (nodeAddress < nrOutNodes) {
-			return nodes[nodeAddress + nrInNodes];
+			//return nodes[nodeAddress + nrInNodes];
+			return nodes[outputNodesList[nodeAddress]];
 		} else {
 			cout << "in Brain::readOutput() : Reading from invalid output node (" << nodeAddress << ") - this brain needs more output nodes!\nExiting" << endl;
 			exit(1);
@@ -127,7 +140,7 @@ public:
 	}
 
 	inline double ReadNode(const int& nodeAddress) {
-		if (nodeAddress < nrInNodes + nrOutNodes + nrHiddenNodes) {
+		if (nodeAddress < nrOfBrainNodes) {
 			return nodes[nodeAddress];
 		} else {
 			cout << "in Brain::ReadNode() :Writing to invalid input node (" << nodeAddress << ") - this brain needs more nodes!\nExiting" << endl;
@@ -147,6 +160,32 @@ public:
 			result = (result) + Bit(nodes[i]);
 		return result;
 
+	}
+
+	void setOutputNodesList(vector<int> nodesList){
+		if ((int)nodesList.size() == nrOutNodes){
+			outputNodesList = nodesList;
+		} else {
+			cout << "ERROR: In setOutputNodesList(). size of nodesList does not match nrOutNodes.\n\nExiting.\n"<<endl;
+			exit(1);
+		}
+	}
+
+	void setInputNodesList(vector<int> nodesList){
+		if ((int)nodesList.size() == nrInNodes){
+			inputNodesList = nodesList;
+		} else {
+			cout << "ERROR: In setInputNodesList(). size of nodesList does not match nrInNodes.\n\nExiting.\n"<<endl;
+			exit(1);
+		}
+	}
+
+	vector<int> getOutputNodesList(){
+		return outputNodesList;
+	}
+
+	vector<int> getInputNodesList(){
+		return inputNodesList;
 	}
 
 };
