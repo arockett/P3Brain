@@ -31,6 +31,7 @@ MarkovWorld::MarkovWorld( Configuration& config, int run_number )
     ASSERT( numHiddenNodes >= 0,
         "Not enough gates, world requires at least " << numOutputNodes << " gates." );
     gateComplexity = config.get<int>( "gate_complexity" );
+    trials = config.get<int>( "trials" );
 
     // Validate these parameters for the specific decoder
     decoder->validateParameters( config.get<int>( "length" ), numInputNodes, numOutputNodes, numHiddenNodes, gateComplexity );
@@ -48,5 +49,11 @@ float MarkovWorld::evaluate(const vector<bool>& solution)
     gladiator->dataMap.ClearMap();
     auto gates = decoder->decode( solution, numInputNodes, numOutputNodes, numHiddenNodes, gateComplexity );
     gladiator->brain = make_shared<MarkovBrain>( gates, numInputNodes, numOutputNodes, numHiddenNodes );
-    return (float)trainingGround->testIndividual(gladiator, false);
+
+    float sum = 0.0;
+    for( int i = 0; i < trials; i++ )
+    {
+        sum += (float)trainingGround->testIndividual( gladiator, false );
+    }
+    return sum / trials;
 }

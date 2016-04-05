@@ -31,7 +31,7 @@ void UnstructuredDecoder::validateParameters( int genomeLength, int numInputNode
     int numGates = numOutputNodes + numHiddenNodes;
 
     logicEncodingSize = 1 << gateIns;
-    inputEncodingSize = ceil( log2( numNodes ) );
+    inputEncodingSize = (int)ceil( log2( numNodes ) );
     int gateEncodingSize = gateIns * inputEncodingSize + logicEncodingSize;
     ASSERT( genomeLength / gateEncodingSize == numGates,
         "Invalid genome length, should be " << numGates * gateEncodingSize << "." );
@@ -67,7 +67,7 @@ vector<shared_ptr<AbstractGate>> UnstructuredDecoder::decode( const vector<bool>
         // Get logic
         auto end = start + logicEncodingSize;
         vector<vector<int>> logic;
-        for( start; start != end; start++ )
+        for( ; start != end; start++ )
         {
             logic.push_back( vector<int>( 1, (int)*start ) );
         }
@@ -128,7 +128,7 @@ vector<shared_ptr<AbstractGate>> FixedInputDecoder::decode( const vector<bool>& 
         // Get the gate logic
         auto end = start + logicEncodingSize;
         vector<vector<int>> logic;
-        for( start; start != end; start++ )
+        for( ; start != end; start++ )
         {
             logic.push_back( vector<int>( 1, (int)*start ) );
         }
@@ -241,7 +241,7 @@ vector<shared_ptr<AbstractGate>> HypercubeDecoder::decode( const vector<bool>& g
         // Get the gate logic
         auto end = start + logicEncodingSize;
         vector<vector<int>> logic;
-        for( start; start != end; start++ )
+        for( ; start != end; start++ )
         {
             logic.push_back( vector<int>( 1, (int)*start ) );
         }

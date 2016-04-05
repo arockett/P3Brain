@@ -62,6 +62,7 @@ private:
     int numOutputNodes;
     int numHiddenNodes;
     int gateComplexity;
+    int trials;
 };
 
 
