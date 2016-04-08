@@ -63,6 +63,8 @@ private:
     int numHiddenNodes;
     int gateComplexity;
     int trials;
+    vector<int> inputMapping;
+    vector<int> outputMapping;
 };
 
 

@@ -20,9 +20,28 @@ decoder::pointer Configuration::get( const string key )
 }
 
 
+void Decoder::mapToBeginning( vector<int>& map, int length, int start )
+{
+    map.resize( length );
+    for( int i = 0; i < length; i++ )
+    {
+        map[i] = i + start;
+    }
+}
+
+void Decoder::mapToEnd( vector<int>& map, int length, int end = 0 )
+{
+    map.resize( length );
+    for( int i = 0; i < length; i++ )
+    {
+        map[i] = end - length + i;
+    }
+}
+
+
 /***************************************************************************************/
 
-void UnstructuredDecoder::validateParameters( int genomeLength, int numInputNodes, int numOutputNodes, int numHiddenNodes, int gateIns )
+void UnstructuredDecoder::validateParameters( int genomeLength, int numInputNodes, int numOutputNodes, int numHiddenNodes, int gateIns, vector<int>& iMap, vector<int>& oMap )
 {
     /********************************************************
     * Calculate encoding sizes to ensure the genome is long enough
@@ -35,6 +54,12 @@ void UnstructuredDecoder::validateParameters( int genomeLength, int numInputNode
     int gateEncodingSize = gateIns * inputEncodingSize + logicEncodingSize;
     ASSERT( genomeLength / gateEncodingSize == numGates,
         "Invalid genome length, should be " << numGates * gateEncodingSize << "." );
+
+    /*
+     * Set the input and output mappings
+     */
+    mapToBeginning( iMap, numInputNodes );
+    mapToBeginning( oMap, numOutputNodes, numInputNodes );
 
     validated = true;
 }
@@ -83,7 +108,7 @@ vector<shared_ptr<AbstractGate>> UnstructuredDecoder::decode( const vector<bool>
 
 
 /***************************************************************************************/
-void FixedInputDecoder::validateParameters( int genomeLength, int numInputNodes, int numOutputNodes, int numHiddenNodes, int gateIns )
+void FixedInputDecoder::validateParameters( int genomeLength, int numInputNodes, int numOutputNodes, int numHiddenNodes, int gateIns, vector<int>& iMap, vector<int>& oMap )
 {
     // Calculate the number of bits needed to represent a gate with the given # of ins
     logicEncodingSize = 1 << gateIns;
@@ -99,6 +124,12 @@ void FixedInputDecoder::validateParameters( int genomeLength, int numInputNodes,
     // Assert that there are enough input nodes for the given # of gate ins
     ASSERT( numInputNodes >= gateIns,
         "Invalid gate complexity. The number of gate inputs must be no more than the number of inpute nodes." );
+
+    /*
+    * Set the input and output mappings
+    */
+    mapToBeginning( iMap, numInputNodes );
+    mapToEnd( oMap, numOutputNodes, numInputNodes + numGates );
 
     validated = true;
 }
@@ -146,7 +177,7 @@ vector<shared_ptr<AbstractGate>> FixedInputDecoder::decode( const vector<bool>& 
 
 /***************************************************************************************/
 
-void FixedLogicDecoder::validateParameters( int genomeLength, int numInputNodes, int numOutputNodes, int numHiddenNodes, int gateIns )
+void FixedLogicDecoder::validateParameters( int genomeLength, int numInputNodes, int numOutputNodes, int numHiddenNodes, int gateIns, vector<int>& iMap, vector<int>& oMap )
 {
 
 }
@@ -160,7 +191,7 @@ vector<shared_ptr<AbstractGate>> FixedLogicDecoder::decode( const vector<bool>& 
 
 /***************************************************************************************/
 
-void HypercubeDecoder::validateParameters( int genomeLength, int numInputNodes, int numOutputNodes, int numHiddenNodes, int gateIns )
+void HypercubeDecoder::validateParameters( int genomeLength, int numInputNodes, int numOutputNodes, int numHiddenNodes, int gateIns, vector<int>& iMap, vector<int>& oMap )
 {
     /********************************************************
     * Check the genome size to ensure it's the right length
@@ -208,6 +239,12 @@ void HypercubeDecoder::validateParameters( int genomeLength, int numInputNodes, 
     ASSERT( encodedGates == (float)numGates,
         "Invalid P3 bit string length. Based on the number of input nodes and gate complexity, length should be "
         << numGates * gateEncodingSize << "." );
+
+    /*
+    * Set the input and output mappings
+    */
+    mapToBeginning( iMap, numInputNodes );
+    mapToEnd( oMap, numOutputNodes, numInputNodes + numGates );
 
     validated = true;
 }

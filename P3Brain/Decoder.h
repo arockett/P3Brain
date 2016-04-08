@@ -15,12 +15,15 @@
 class Decoder
 {
 public:
-    virtual void validateParameters( int, int, int, int, int ) = 0;
+    virtual void validateParameters( int, int, int, int, int, vector<int>&, vector<int>& ) = 0;
     virtual vector<shared_ptr<AbstractGate>> decode( const vector<bool>&, int, int, int, int ) = 0;
 
     bool isValidated() { return validated; }
 
 protected:
+    void mapToBeginning( vector<int>& map, int length, int start = 0 );
+    void mapToEnd( vector<int>& map, int length, int end );
+
     bool validated = false;
     int inputEncodingSize;
     int logicEncodingSize;
@@ -30,7 +33,7 @@ protected:
 class UnstructuredDecoder : public Decoder
 {
 public:
-    virtual void validateParameters( int, int, int, int, int ) override;
+    virtual void validateParameters( int, int, int, int, int, vector<int>&, vector<int>& ) override;
     virtual vector<shared_ptr<AbstractGate>> decode( const vector<bool>&, int, int, int, int ) override;
 
 private:
@@ -41,7 +44,7 @@ private:
 class FixedInputDecoder : public Decoder
 {
 public:
-    virtual void validateParameters( int, int, int, int, int ) override;
+    virtual void validateParameters( int, int, int, int, int, vector<int>&, vector<int>& ) override;
     virtual vector<shared_ptr<AbstractGate>> decode( const vector<bool>&, int, int, int, int ) override;
 };
 
@@ -49,7 +52,7 @@ public:
 class FixedLogicDecoder : public Decoder
 {
 public:
-    virtual void validateParameters( int, int, int, int, int ) override;
+    virtual void validateParameters( int, int, int, int, int, vector<int>&, vector<int>& ) override;
     virtual vector<shared_ptr<AbstractGate>> decode( const vector<bool>&, int, int, int, int ) override;
 };
 
@@ -57,7 +60,7 @@ public:
 class HypercubeDecoder : public Decoder
 {
 public:
-    virtual void validateParameters( int, int, int, int, int ) override;
+    virtual void validateParameters( int, int, int, int, int, vector<int>&, vector<int>& ) override;
     virtual vector<shared_ptr<AbstractGate>> decode( const vector<bool>&, int, int, int, int ) override;
 
 private:

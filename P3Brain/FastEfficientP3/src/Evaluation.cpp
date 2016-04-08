@@ -34,7 +34,7 @@ MarkovWorld::MarkovWorld( Configuration& config, int run_number )
     trials = config.get<int>( "trials" );
 
     // Validate these parameters for the specific decoder
-    decoder->validateParameters( config.get<int>( "length" ), numInputNodes, numOutputNodes, numHiddenNodes, gateComplexity );
+    decoder->validateParameters( config.get<int>( "length" ), numInputNodes, numOutputNodes, numHiddenNodes, gateComplexity, inputMapping, outputMapping );
 }
 
 /*
@@ -49,6 +49,8 @@ float MarkovWorld::evaluate(const vector<bool>& solution)
     gladiator->dataMap.ClearMap();
     auto gates = decoder->decode( solution, numInputNodes, numOutputNodes, numHiddenNodes, gateComplexity );
     gladiator->brain = make_shared<MarkovBrain>( gates, numInputNodes, numOutputNodes, numHiddenNodes );
+    gladiator->brain->setInputNodesList( inputMapping );
+    gladiator->brain->setOutputNodesList( outputMapping );
 
     float sum = 0.0;
     for( int i = 0; i < trials; i++ )
