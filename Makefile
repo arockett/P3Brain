@@ -53,9 +53,9 @@ DEBUG_TARGET=p3brain-debug
 #
 # Targets
 #
-release: $(RELEASE_DIR) $(RELEASE_TARGET)
+release: release_dir $(RELEASE_TARGET)
 
-debug: $(DEBUG_DIR) $(DEBUG_TARGET)
+debug: debug_dir $(DEBUG_TARGET)
 
 # pull in dependency info for *existing* .o files
 -include $(addprefix $(RELEASE)/, $(OBJS:.o=.d))
@@ -67,19 +67,19 @@ $(RELEASE_TARGET): $(RELEASE_OBJ)
 $(DEBUG_TARGET): $(DEBUG_OBJ)
 	$(CXX) $(CXX_DEBUG_FLAGS) $^ -o $@
 
-$(RELEASE_OBJ): $(RELEASE)/%.o: %.cpp $(DEPS)
+$(RELEASE_OBJ): $(RELEASE)/%.o: %.cpp
 	$(CXX) $(CXX_RELEASE_FLAGS) -c $(filter %.cpp, $<) -o $@ -MMD -MF"$(@:%.o=%.d)" -MT"$@"
 
-$(DEBUG_OBJ): $(DEBUG)/%.o: %.cpp $(DEPS)
+$(DEBUG_OBJ): $(DEBUG)/%.o: %.cpp
 	$(CXX) $(CXX_DEBUG_FLAGS) -c $(filter %.cpp, $<) -o $@ -MMD -MF"$(@:%.o=%.d)" -MT"$@"
 
 
-.PHONY: $(RELEASE_DIR) $(DEBUG_DIR) clean extra_clean junkless
+.PHONY: release_dir debug_dir clean extra_clean junkless
 
-$(RELEASE_DIR):
+release_dir:
 	mkdir -p $(RELEASE)
 
-$(DEBUG_DIR):
+debug_dir:
 	mkdir -p $(DEBUG)
 
 clean: junkless
