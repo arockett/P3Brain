@@ -1,0 +1,69 @@
+//
+//  BerryWorld.h
+//  BasicMarkovBrainTemplate
+//
+//  Created by Arend Hintze on 6/15/15.
+//  Copyright (c) 2015 Arend Hintze. All rights reserved.
+//
+
+#ifndef __BasicMarkovBrainTemplate__NumeralClassifierWorld__
+#define __BasicMarkovBrainTemplate__NumeralClassifierWorld__
+
+#include <iostream>
+#include <fstream>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "../AbstractWorld.h"
+
+using namespace std;
+
+class NumeralClassifierWorld : public AbstractWorld {
+private:
+	int outputNodesCount, inputNodesCount;
+public:
+	const int numberOfDirections = 4;
+
+	const int BLACK = 0;
+	const int WHITE = 1;
+
+	// Parameters
+	static const int& defaulttestsPreWorldEval;
+	static const int& defaultWorldUpdates;
+	static const int& defaultRetinaType;
+	static const string& numeralDataFileName;
+
+	// end parameters
+
+	int worldUpdates;
+	int testsPreWorldEval;
+	vector<pair<int, int>> retinalOffsets = { { 0, 0 }, { -1, 0 }, { 1, 0 }, { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { -2, -2 }, { -1, -2 }, { 0, -2 }, { 1, -2 }, { 2, -2 }, { -2, 2 }, { -1, 2 }, { 0, 2 }, { 1, 2 }, { 2, 2 }, { -2, -1 }, { 2, -1 }, { -2, 0 }, { 2, 0 }, { -2, 1 }, { 2, 1 }, { -3, -3 }, { -2, -3 }, { -1, -3 }, { 0, -3 }, { 1, -3 }, { 2, -3 }, { 3, -3 }, { -3, 3 }, { -2, 3 }, { -1, 3 }, { 0, 3 }, { 1, 3 }, { 2, 3 }, { 3, 3 }, { -3, -2 }, { 3, -2 }, { -3, -1 }, { 3, -1 }, { -3, 0 }, { 3, 0 }, { -3, 1 }, { 3, 1 }, { -3, 2 }, { 3, 2 } };
+	// retina is a list of offsets defining input sensor array to brain
+	// 25 26 27 28 29 30 31
+	// 39  9 10 11 12 13 40
+	// 41 19  3  4  5 20 42
+	// 43 21  1  0  2 22 44
+	// 45 32  6  7  8 24 46
+	// 47 14 15 16 17 18 48
+	// 32 33 34 35 36 37 38
+	int retinaType, retinaSensors, stepSize;
+
+	vector<vector<bool>>numeralData;
+
+
+	NumeralClassifierWorld();
+
+//  double testIndividual(shared_ptr<Organism> org, bool analyse);
+
+	double testIndividual(shared_ptr<Organism> org, bool analyse, bool show = 0) override;
+
+	virtual int requiredInputs() override {
+		return inputNodesCount;
+	}
+	virtual int requiredOutputs() override {
+		return outputNodesCount;
+	}
+
+};
+
+#endif /* defined(__BasicMarkovBrainTemplate__NumeralClassifierWorld__) */
