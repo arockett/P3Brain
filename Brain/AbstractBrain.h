@@ -148,7 +148,7 @@ public:
 		}
 	}
 
-	inline vector<double> ReadAllNodes(const int& nodeAddress) {
+	inline vector<double> ReadAllNodes() {
 		return nodes;
 	}
 

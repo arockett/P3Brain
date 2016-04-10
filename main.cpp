@@ -18,6 +18,7 @@
 #include "Archivist/SSwDArchivist.h"
 #include "Global.h"
 
+#include "Brain/HumanBrain.h"
 #include "Brain/MarkovBrain.h"
 #include "Brain/WireBrain.h"
 
@@ -42,6 +43,7 @@
 
 #include "World/BerryWorld.h"
 #include "World/TestWorld.h"
+#include "World/NumeralClassifierWorld/NumeralClassifierWorld.h"
 
 using namespace std;
 
@@ -67,8 +69,11 @@ int main(int argc, const char * argv[]) {
 		cout << "Using Random Seed: " << Global::randomSeed << endl;
 	}
 
-	auto world = make_shared<BerryWorld>();  //new World();
-	//auto world = make_shared<TestWorld>();  //new World();
+	//auto world = make_shared<BerryWorld>();
+
+	auto world = make_shared<NumeralClassifierWorld>();
+
+	//auto world = make_shared<TestWorld>();
 
 // test chromosome crossover speed
 //	auto C1 = make_shared<Chromosome<bool>>(10000, 2);
@@ -316,10 +321,14 @@ int main(int argc, const char * argv[]) {
 			templateBrain = make_shared<MarkovBrain>(make_shared<ClassicGateListBuilder>(), world->requiredInputs(), world->requiredOutputs(), AbstractBrain::hiddenNodes);
 		} else if (AbstractBrain::brainTypeStr == "Wire") {
 			templateBrain = make_shared<WireBrain>(world->requiredInputs(), world->requiredOutputs(), AbstractBrain::hiddenNodes);
+		} else if (AbstractBrain::brainTypeStr == "Human") {
+			templateBrain = make_shared<HumanBrain>(world->requiredInputs(), world->requiredOutputs(), AbstractBrain::hiddenNodes);
 		} else {
 			cout << "\n\nERROR: Unrecognized brain type in configuration!\n  \"" << AbstractBrain::brainTypeStr << "\" is not defined.\n\nExiting.\n" << endl;
 			exit(1);
 		}
+
+
 
 		shared_ptr<Organism> progenitor = make_shared<Organism>(templateGenome, templateBrain);  // make a organism with a genome and brain - progenitor serves as an ancestor to all and a template organism
 
@@ -410,7 +419,7 @@ int main(int argc, const char * argv[]) {
 		bool finished = false;  // when the archivist says we are done, we can stop!
 
 		while (!finished) {
-			world->evaluateFitness(group->population, false);  // evaluate each organism in the population using a World
+			world->evaluateFitness(group->population, false, AbstractWorld::showOnUpdate);  // evaluate each organism in the population using a World
 			//cout << "  evaluation done\n";
 			finished = group->archive();  // save data, update memory and delete any unneeded data;
 			//cout << "  archive done\n";

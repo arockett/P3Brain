@@ -292,13 +292,12 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 			cout << "\ngeneration update: " << Global::update << "  world update: " << t << "\n";
 			cout << "currentLocation: " << currentLocation.first << "," << currentLocation.second << "  :  " << facing << "\n";
 			cout << "inNodes: ";
-			cout << "inNodes: ";
 			for (int i = 0; i < inputNodesCount; i++) {
-				cout << org->brain->readInput(i);
+				cout << org->brain->readInput(i) << " ";
 			}
 			cout << "\nlast outNodes: ";
 			for (int i = 0; i < outputNodesCount; i++) {
-				cout << org->brain->readOutput(i);
+				cout << org->brain->readOutput(i) << " ";
 			}
 			cout << "\n\n  -- brain update --\n\n";
 		}
@@ -381,7 +380,7 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 		}
 
 		if (show) {
-			cout << "outNodes: " << Bit(org->brain->readOutput(0)) << Bit(org->brain->readOutput(1)) << Bit(org->brain->readOutput(2)) << "\n";
+			cout << "outNodes: " << Bit(org->brain->readOutput(0)) << " " << Bit(org->brain->readOutput(1)) << " " << Bit(org->brain->readOutput(2)) << "\n";
 			cout << "output1: " << output1 << "  output2: " << output2 << "\n";
 			cout << "\n  -- world update --\n\n";
 			printGrid(grid, currentLocation, facing);
