@@ -69,9 +69,9 @@ int main(int argc, const char * argv[]) {
 		cout << "Using Random Seed: " << Global::randomSeed << endl;
 	}
 
-	//auto world = make_shared<BerryWorld>();
+	auto world = make_shared<BerryWorld>();
 
-	auto world = make_shared<NumeralClassifierWorld>();
+	//auto world = make_shared<NumeralClassifierWorld>();
 
 	//auto world = make_shared<TestWorld>();
 

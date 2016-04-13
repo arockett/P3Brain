@@ -54,10 +54,20 @@ void HumanBrain::resetBrain() {
 }
 
 void HumanBrain::update() {
+	cout << "Inputs: ";
+	for (int i = 0; i < nrOutNodes; i++) {
+		cout << nodes[inputNodesList[i]] << " ";
+	}
+	cout << "\nLast Outputs: ";
+	for (int i = 0; i < nrOutNodes; i++) {
+		cout << nodes[outputNodesList[i]] << " ";
+	}
+	cout << endl;
+
 	nextNodes.assign(nrOfBrainNodes, 0.0);
 	char key;
 	if (useActionMap) {
-		cout << "please enter action: ";
+		cout << "please enter action (* for options): ";
 		cin >> key;
 		while (actionMap.find(key) == actionMap.end()) {
 			if (key == '*') {
@@ -70,7 +80,7 @@ void HumanBrain::update() {
 					cout << ")"<<endl;
 				}
 			} else {
-				cout << "action not found (enter '*' for options)." << endl;
+				cout << "action not found." << endl;
 			}
 			cout << "please enter action: ";
 			cin >> key;
