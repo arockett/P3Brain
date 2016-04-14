@@ -17,10 +17,8 @@ struct Entry {
 	string documentation;  // A string descrbing the purpose of the parameter
 	string classification;  // A string that broadly indicates what this Entry is involved in
 	Entry() = default;
-	Entry(T default_value, string doc, string cl = "none")
-			: variable(default_value),
-			  documentation(doc),
-			  classification(cl) {
+	Entry(T default_value, string doc, string cl = "none") :
+			variable(default_value), documentation(doc), classification(cl) {
 	}
 };
 
@@ -32,7 +30,7 @@ unordered_map<string, Entry<T>>& registry() {
 }
 
 class Parameters {
- public:
+public:
 
 	static unordered_map<string, string> readCommandLine(int argc, const char** argv) {
 		unordered_map<string, string> comand_line_list;
@@ -58,9 +56,9 @@ class Parameters {
 	static unordered_map<string, string> readConfigFile(string configFileName) {
 		unordered_map<string, string> config_file_list;
 		set<char> nameFirstLegalChars = {  // characters that can be used as the first "letter" of a name
-		        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_' };
+				'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_' };
 		set<char> nameLegalChars = {  // characters that can be used in the body of a name
-		        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '_', ':' };
+				'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '_', ':' };
 		set<char> whiteSpaceChars = { ' ', '\t' };
 
 		string line;
@@ -74,12 +72,35 @@ class Parameters {
 		ifstream configFile(configFileName);  // open file named by configFileName
 		if (configFile.is_open())  // if the file named by configFileName can be opened
 		{
+			string categoryName = "";
 			while (getline(configFile, line))  // keep loading one line from the file at a time into "line" until we get to the end of the file
 			{
 				line_number++;
 				index = 0;
-				parameterName = "";
-				parameterValue = "";
+
+				if (line[index] == '%') {  //if a line starts with % parse a catagory name
+					index++;
+					index++;
+					categoryName = "";  //reset category name
+					// get name (must start with letter or "_")
+					if (index < line.length() && nameFirstLegalChars.find(line[index]) != nameFirstLegalChars.end()) {
+						categoryName += line[index];
+						index++;
+					} else if (index < line.length()) {  // if the first character on the line is not white space, # or a name start character
+						categoryName = "ERROR_IN_CATEGORY_NAME";  // set the categoryName to something easy to detect. something bad happened
+						index = line.length();  // move to end of line (this will create a error since there is a name, but no value)
+					}
+					// get rest of name
+					while (index < line.length() && nameLegalChars.find(line[index]) != nameLegalChars.end()) {
+						categoryName += line[index];
+						index++;
+					}
+					index = line.length();  // move to end of line
+
+				}
+
+				(configFileName == "settings.cfg") ? parameterName = "" : parameterName = configFileName.substr(0, configFileName.length() - 4) + "_";
+
 				// move past any leading white space
 				while (index < line.length() && whiteSpaceChars.find(line[index]) != whiteSpaceChars.end()) {
 					index++;
@@ -101,6 +122,17 @@ class Parameters {
 					parameterName += line[index];
 					index++;
 				}
+
+				if (parameterName != "") {
+					if (categoryName != "") {
+						parameterName = categoryName + "_" + parameterName;
+					}
+
+					if (configFileName != "settings.cfg"){
+						parameterName = configFileName.substr(0, configFileName.length() - 4) + "_" + parameterName;
+					}
+
+				}
 				// move past white space between name and "="
 				while (index < line.length() && whiteSpaceChars.find(line[index]) != whiteSpaceChars.end()) {
 					index++;
@@ -113,6 +145,7 @@ class Parameters {
 						index++;
 					}
 					// get value : values can be made up of any characters
+					parameterValue = "";
 					while (index < line.length() && whiteSpaceChars.find(line[index]) == whiteSpaceChars.end() && line[index] != '#') {
 						parameterValue += line[index];
 						index++;
@@ -156,6 +189,9 @@ class Parameters {
 // Use static calls to set up the parameter before main calls "set parameters"
 	template<class T>
 	static const T& register_parameter(string name, const T& default_value, const string& documentation, const string& classification = "none") {
+		if (classification!="none" && classification!=""){
+			name = classification + "_" + name;
+		}
 		if (registry<T>().find(name) != registry<T>().end()) {
 			cout << "  - registering parameters :: \"" << name << "\" is being registered more then once... you should look into this!\n";
 		}
@@ -220,28 +256,28 @@ class Parameters {
 		if (!valueSet) {
 			int intValue;
 			valueSet = lookup_parameter_of_type(key, intValue);
-			if (valueSet){
+			if (valueSet) {
 				value = intValue;
 			}
 		}
 		if (!valueSet) {
 			bool boolValue;
 			valueSet = lookup_parameter_of_type(key, boolValue);
-			if (valueSet){
+			if (valueSet) {
 				value = boolValue;
 			}
 		}
 		if (!valueSet) {
 			string stringValue;
 			valueSet = lookup_parameter_of_type(key, stringValue);
-			if (valueSet){
-				bool success = load_value(stringValue,value);
+			if (valueSet) {
+				bool success = load_value(stringValue, value);
 				if (!success) {
 					throw std::invalid_argument("In Parameters::lookupDouble, for key \"" + key + "\" a string was found which can not be converted to double.\n");
 				}
 			}
 		}
-		if (!valueSet){
+		if (!valueSet) {
 			cout << "ERROR! lookupDouble could not find key \"" << key << "\"\nExiting\n";
 			exit(1);
 		}
@@ -311,11 +347,14 @@ class Parameters {
 		ostringstream build_string;
 
 		for (const auto & parameter : registry<T>()) {
-
-			build_string << parameter.first << " = " << parameter.second.variable;
+			registry<T>()[parameter.first].classification;
+			string nameLessCategory = parameter.first.substr(parameter.second.classification.length()+1, parameter.first.length());
+			////////////////////////////////////////////////////////////////////////////////////////////////////////
+			//build_string << parameter.first << " = " << parameter.second.variable;
+			build_string << nameLessCategory << " = " << parameter.second.variable;
 
 			int size = build_string.str().size();
-			while (size < 35) {
+			while (size < 40) {
 				build_string << " ";
 				size++;
 			}
@@ -338,7 +377,7 @@ class Parameters {
 		dump_parameters_of_type<string>(sorted_parameters);
 
 		if (sorted_parameters.find("GLOBAL") != sorted_parameters.end()) {
-			out << "# GLOBAL:" << "\n";
+			out << "% GLOBAL" << "\n";
 			for (auto parameter : sorted_parameters["GLOBAL"]) {
 				out << "  " << parameter.second << "\n";
 			}
@@ -350,7 +389,7 @@ class Parameters {
 		out << "\n";
 
 		for (auto group : sorted_parameters) {
-			out << "# " << group.first << ":\n";
+			out << "% " << group.first << "\n";
 			for (auto parameter : group.second) {
 				out << "  " << parameter.second << "\n";
 			}

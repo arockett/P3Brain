@@ -14,21 +14,21 @@
 
 // Initialize Parameters
 
-const int& MultiGenome::initialPloidy = Parameters::register_parameter("ploidy", 1, "number of copies of each chromosome", "GENOME - MULTI");
-const int& MultiGenome::initialChromosomes = Parameters::register_parameter("chromosomes", 1, "number of chromosome pairs (i.e. if chromosomes = 2 and ploidy = 2 there will be 4 chromosomes in the genome)", "GENOME - MULTI");
+const int& MultiGenome::initialPloidy = Parameters::register_parameter("ploidy", 1, "number of copies of each chromosome", "GENOME_MULTI");
+const int& MultiGenome::initialChromosomes = Parameters::register_parameter("chromosomes", 1, "number of chromosome pairs (i.e. if chromosomes = 2 and ploidy = 2 there will be 4 chromosomes in the genome)", "GENOME_MULTI");
 
-const int& MultiGenome::initialChromosomeSize = Parameters::register_parameter("chromosomeSizeInitial", 10000, "starting size for all chromosomes in genome (genome size will be chromosomeSizeInitial * number of chromosomes * ploidy)", "GENOME - MULTI");
-const double& MultiGenome::pointMutationRate = Parameters::register_parameter("pointMutationRate", 0.005, "per site point mutation rate", "GENOME - MULTI");
-const double& MultiGenome::insertionRate = Parameters::register_parameter("mutationCopyRate", 0.00002, "per site insertion rate", "GENOME - MULTI");
-const int& MultiGenome::insertionMinSize = Parameters::register_parameter("mutationCopyMinSize", 10, "minimum size of insertion mutation", "GENOME - MULTI");
-const int& MultiGenome::insertionMaxSize = Parameters::register_parameter("mutationCopyMaxSize", 200, "maximum size of insertion mutation", "GENOME - MULTI");
-const double& MultiGenome::deletionRate = Parameters::register_parameter("mutationDeletionRate", 0.00002, "per site deletion rate", "GENOME - MULTI");
-const int& MultiGenome::deletionMinSize = Parameters::register_parameter("mutationDeletionMinSize", 10, "minimum size of insertion mutation", "GENOME - MULTI");
-const int& MultiGenome::deletionMaxSize = Parameters::register_parameter("mutationDeletionMaxSize", 200, "maximum size of insertion mutation", "GENOME - MULTI");
-const int& MultiGenome::maxChromosomeSize = Parameters::register_parameter("chromosomeSizeMin", MultiGenome::deletionMaxSize * 2, "if a chromosome is smaller then this, mutations will only increase chromosome size", "GENOME - MULTI");
-const int& MultiGenome::minChromosomeSize = Parameters::register_parameter("chromosomeSizeMax", 20000, "if a chromosome is larger then this, mutations will only decrease chromosome size", "GENOME - MULTI");
+const int& MultiGenome::initialChromosomeSize = Parameters::register_parameter("chromosomeSizeInitial", 10000, "starting size for all chromosomes in genome (genome size will be chromosomeSizeInitial * number of chromosomes * ploidy)", "GENOME_MULTI");
+const double& MultiGenome::pointMutationRate = Parameters::register_parameter("mutationPointRate", 0.005, "per site point mutation rate", "GENOME_MULTI");
+const double& MultiGenome::insertionRate = Parameters::register_parameter("mutationCopyRate", 0.00002, "per site insertion rate", "GENOME_MULTI");
+const int& MultiGenome::insertionMinSize = Parameters::register_parameter("mutationCopyMinSize", 10, "minimum size of insertion mutation", "GENOME_MULTI");
+const int& MultiGenome::insertionMaxSize = Parameters::register_parameter("mutationCopyMaxSize", 200, "maximum size of insertion mutation", "GENOME_MULTI");
+const double& MultiGenome::deletionRate = Parameters::register_parameter("mutationDeletionRate", 0.00002, "per site deletion rate", "GENOME_MULTI");
+const int& MultiGenome::deletionMinSize = Parameters::register_parameter("mutationDeletionMinSize", 10, "minimum size of insertion mutation", "GENOME_MULTI");
+const int& MultiGenome::deletionMaxSize = Parameters::register_parameter("mutationDeletionMaxSize", 200, "maximum size of insertion mutation", "GENOME_MULTI");
+const int& MultiGenome::maxChromosomeSize = Parameters::register_parameter("chromosomeSizeMin", MultiGenome::deletionMaxSize * 2, "if a chromosome is smaller then this, mutations will only increase chromosome size", "GENOME_MULTI");
+const int& MultiGenome::minChromosomeSize = Parameters::register_parameter("chromosomeSizeMax", 20000, "if a chromosome is larger then this, mutations will only decrease chromosome size", "GENOME_MULTI");
 
-const int& MultiGenome::crossCount = Parameters::register_parameter("genomecrossCount", 3, "number of crosses when performing crossover", "GENOME - MULTI");
+const int& MultiGenome::crossCount = Parameters::register_parameter("genomecrossCount", 3, "number of crosses when performing crossover", "GENOME_MULTI");
 
 // constructor
 MultiGenome::Handler::Handler(shared_ptr<AbstractGenome> _genome, bool _readDirection) {
@@ -370,24 +370,24 @@ bool MultiGenome::isEmpty() {
 void MultiGenome::mutate() {
 	for (auto chromosome : chromosomes) {
 		int nucleotides = chromosome->size();
-		int howManyPoint = Random::getBinomial(nucleotides, PT.lookup("pointMutationRate"));
-		int howManyCopy = Random::getBinomial(nucleotides, PT.lookup("mutationCopyRate"));
-		int howManyDelete = Random::getBinomial(nucleotides, PT.lookup("mutationDeletionRate"));
+		int howManyPoint = Random::getBinomial(nucleotides, PT.lookup("GENOME_MULTI_mutationPointRate"));
+		int howManyCopy = Random::getBinomial(nucleotides, PT.lookup("GENOME_MULTI_mutationCopyRate"));
+		int howManyDelete = Random::getBinomial(nucleotides, PT.lookup("GENOME_MULTI_mutationDeletionRate"));
 		// do some point mutations
 		for (int i = 0; i < howManyPoint; i++) {
 			chromosome->mutatePoint();
 		}
 		// do some copy mutations
-		if (nucleotides < PT.lookup("chromosomeSizeMax")) {
-			for (int i = 0; i < howManyCopy && (nucleotides < PT.lookup("chromosomeSizeMax")); i++) {
-				chromosome->mutateCopy(PT.lookup("mutationCopyMinSize"), PT.lookup("mutationCopyMaxSize"), PT.lookup("chromosomeSizeMax"));
+		if (nucleotides < PT.lookup("GENOME_MULTI_chromosomeSizeMax")) {
+			for (int i = 0; i < howManyCopy && (nucleotides < PT.lookup("GENOME_MULTI_chromosomeSizeMax")); i++) {
+				chromosome->mutateCopy(PT.lookup("GENOME_MULTI_mutationCopyMinSize"), PT.lookup("GENOME_MULTI_mutationCopyMaxSize"), PT.lookup("GENOME_MULTI_chromosomeSizeMax"));
 				nucleotides = chromosome->size();
 			}
 		}
 		// do some deletion mutations
-		if (nucleotides > PT.lookup("chromosomeSizeMin")) {
-			for (int i = 0; i < howManyDelete && (nucleotides > PT.lookup("chromosomeSizeMin")); i++) {
-				chromosome->mutateDelete(PT.lookup("mutationDeletionMinSize"), PT.lookup("mutationDeletionMaxSize"), PT.lookup("chromosomeSizeMin"));
+		if (nucleotides > PT.lookup("GENOME_MULTI_chromosomeSizeMin")) {
+			for (int i = 0; i < howManyDelete && (nucleotides > PT.lookup("GENOME_MULTI_chromosomeSizeMin")); i++) {
+				chromosome->mutateDelete(PT.lookup("GENOME_MULTI_mutationDeletionMinSize"), PT.lookup("GENOME_MULTI_mutationDeletionMaxSize"), PT.lookup("GENOME_MULTI_chromosomeSizeMin"));
 				nucleotides = chromosome->size();
 			}
 		}
@@ -441,7 +441,7 @@ shared_ptr<AbstractGenome> MultiGenome::makeMutatedGenomeFromMany(vector<shared_
 				auto parent = dynamic_pointer_cast<MultiGenome>(rawParent);
 				parentChromosomes.push_back(parent->chromosomes[i]);  // make a vector that contains the nth chromosome from each parent
 			}
-			newGenome->chromosomes[newGenome->chromosomes.size() - 1]->crossover(parentChromosomes, newGenome->PT.lookup("genomecrossCount"));  // create a crossover chromosome
+			newGenome->chromosomes[newGenome->chromosomes.size() - 1]->crossover(parentChromosomes, newGenome->PT.lookup("GENOME_MULTI_genomecrossCount"));  // create a crossover chromosome
 		}
 	} else if (ploidy == (int) parents.size()) {  // if multi ploid than cross chromosomes from all parents
 		int setCount = castParent0->chromosomes.size() / ploidy;  // number of sets of chromosomes
@@ -454,7 +454,7 @@ shared_ptr<AbstractGenome> MultiGenome::makeMutatedGenomeFromMany(vector<shared_
 				for (int pCount = 0; pCount < ploidy; pCount++) {  // make a vector containing all the chromosomes in this chromosome set from this parent
 					parentChromosomes.push_back(dynamic_pointer_cast<MultiGenome>(parent)->chromosomes[(currSet * ploidy) + pCount]);
 				}
-				newGenome->chromosomes[newGenome->chromosomes.size() - 1]->crossover(parentChromosomes, newGenome->PT.lookup("genomecrossCount"));
+				newGenome->chromosomes[newGenome->chromosomes.size() - 1]->crossover(parentChromosomes, newGenome->PT.lookup("GENOME_MULTI_genomecrossCount"));
 				parentCount++;
 			}
 		}

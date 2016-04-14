@@ -11,9 +11,6 @@
 #include "../Utilities/Random.h"
 #include "../Utilities/Utilities.h"
 
-//bool& MarkovBrain::cacheResults = Parameters::register_parameter("MarkovBrain_cacheResults", true, "if true, t+1 nodes will be cached. If the same input is seen, the cached node values will be used.", "BRAIN - MARKOV");
-//int& MarkovBrain::cacheResultsCount = Parameters::register_parameter("MarkovBrain_cacheResultsCount", 1, "input combinations will be cached this many times, after this, repeats of a given input array will look up a random value from cached values", "BRAIN - MARKOV");
-
 MarkovBrain::MarkovBrain(vector<shared_ptr<AbstractGate>> _gates, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes) :
 		AbstractBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes) {
 	GLB = nullptr;

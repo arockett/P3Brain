@@ -10,32 +10,32 @@
 #include "../Utilities/Utilities.h"
 #include "WireBrain.h"
 
-const bool& WireBrain::allowNegativeCharge = Parameters::register_parameter("allowNegativeCharge", false, "if true, wire brain can interpret negative input, deliver negative output, and charge negatively", "BRAIN - WIRE");
+const bool& WireBrain::allowNegativeCharge = Parameters::register_parameter("allowNegativeCharge", false, "if true, wire brain can interpret negative input, deliver negative output, and charge negatively", "BRAIN_WIRE");
 
-const int& WireBrain::defaultWidth = Parameters::register_parameter("size_width", 10, "width of the wire brain cube", "BRAIN - WIRE");
-const int& WireBrain::defaultHeight = Parameters::register_parameter("size_height", 10, "height of the wire brain cube", "BRAIN - WIRE");
-const int& WireBrain::defaultDepth = Parameters::register_parameter("size_depth", 10, "depth of the wire brain cube", "BRAIN - WIRE");
-const int& WireBrain::worldConnectionsSeparation = Parameters::register_parameter("worldConnectionsSeparation", 7, "distance between nodes input and output connections (I/O)", "BRAIN - WIRE");
-const int& WireBrain::overchargeThreshold = Parameters::register_parameter("overchargeThreshold", 3, "If a cell receives this much charge or more, it will not charge", "BRAIN - WIRE");
-const int& WireBrain::decayDuration = Parameters::register_parameter("decayDuration", 1, "length of time a cell will decay (while in decay a cell can not become charged)", "BRAIN - WIRE");
-const int& WireBrain::chargeUpdatesPerUpdate = Parameters::register_parameter("chargeUpdatesPerUpdate", 30, "Number of charge updates per brain update", "BRAIN - WIRE");
-const bool& WireBrain::constantInputs = Parameters::register_parameter("constantInputs", true, "if true, input values are reset every charge update, if not, input values are set on first charge update only.", "BRAIN - WIRE");
+const int& WireBrain::defaultWidth = Parameters::register_parameter("size_width", 10, "width of the wire brain cube", "BRAIN_WIRE");
+const int& WireBrain::defaultHeight = Parameters::register_parameter("size_height", 10, "height of the wire brain cube", "BRAIN_WIRE");
+const int& WireBrain::defaultDepth = Parameters::register_parameter("size_depth", 10, "depth of the wire brain cube", "BRAIN_WIRE");
+const int& WireBrain::worldConnectionsSeparation = Parameters::register_parameter("worldConnectionsSeparation", 7, "distance between nodes input and output connections (I/O)", "BRAIN_WIRE");
+const int& WireBrain::overchargeThreshold = Parameters::register_parameter("overchargeThreshold", 3, "If a cell receives this much charge or more, it will not charge", "BRAIN_WIRE");
+const int& WireBrain::decayDuration = Parameters::register_parameter("decayDuration", 1, "length of time a cell will decay (while in decay a cell can not become charged)", "BRAIN_WIRE");
+const int& WireBrain::chargeUpdatesPerUpdate = Parameters::register_parameter("chargeUpdatesPerUpdate", 30, "Number of charge updates per brain update", "BRAIN_WIRE");
+const bool& WireBrain::constantInputs = Parameters::register_parameter("constantInputs", true, "if true, input values are reset every charge update, if not, input values are set on first charge update only.", "BRAIN_WIRE");
 
-const bool& WireBrain::cacheResults = Parameters::register_parameter("WireBrain_cacheResults", true, "if true, t+1 nodes will be cached. If the same input is seen, the cached node values will be used.", "BRAIN - WIRE");
-const int& WireBrain::cacheResultsCount = Parameters::register_parameter("WireBrain_cacheResultsCount", 1, "input combinations will be cached this many times, after this, repeats of a given input array will look up a random value from cached values", "BRAIN - WIRE");
+const bool& WireBrain::cacheResults = Parameters::register_parameter("cacheResults", true, "if true, t+1 nodes will be cached. If the same input is seen, the cached node values will be used.", "BRAIN_WIRE");
+const int& WireBrain::cacheResultsCount = Parameters::register_parameter("cacheResultsCount", 1, "input combinations will be cached this many times, after this, repeats of a given input array will look up a random value from cached values", "BRAIN_WIRE");
 
-const string& WireBrain::genomeDecodingMethod = Parameters::register_parameter("genomeDecodingMethod", (string) "bitmap", "bitmap = convert genome directly, wiregenes = genes defined by start codeons, location, direction and location", "BRAIN - WIRE");
-const bool& WireBrain::wiregenesAllowSimpleWires = Parameters::register_parameter("wiregenes_AllowSimpeWires", true, "allow SimpleWire features (lengths of straight wire)", "BRAIN - WIRE - WIREGENE");
-const string& WireBrain::wiregenesSimpleWireDirections = Parameters::register_parameter("wiregenes_SimpleWireDirections", (string) "cardinalOnly", "cardinalOnly (wires project in 6 square directions) vs diagonalsAlso (wires project on diagonals also)", "BRAIN - WIRE - WIREGENE");
-const int& WireBrain::wiregenesSimpleWireMaxLength = Parameters::register_parameter("wiregenes_SimpleWireMaxLength", 1, "maximum length of a SimpleWire (if 1, direction is effectively ignored). Wires that would project outside of brain are clipped", "BRAIN - WIRE - WIREGENE");
-const bool& WireBrain::wiregenesAllowWormholes = Parameters::register_parameter("wiregenes_AllowWormholes", false, "allow Wormhole features (one directional links between distant wires)", "BRAIN - WIRE - WIREGENE");
-const int& WireBrain::wiregenesWormholesBidirectional = Parameters::register_parameter("wiregenes_WormholesBidirectional", 0, "allow Wormhole features to be bidirectional(0 = no, 1 = random, 2 = always)", "BRAIN - WIRE - WIREGENE");
-const bool& WireBrain::wiregenesAllowSquiggleWires = Parameters::register_parameter("wiregenes_AllowSquiggleWires", false, "allow squiggleWire features (wires generated by converting genome into list of directions)", "BRAIN - WIRE - WIREGENE");
-const int& WireBrain::wiregenesSquiggleWireMinLength = Parameters::register_parameter("wiregenes_SquiggleWireMinLength", 4, "minimum length of a SquiggleWire (if 1, it will look just like a SimpleWire). Wires that would project outside of brain are clipped", "BRAIN - WIRE - WIREGENE");
-const int& WireBrain::wiregenesSquiggleWireMaxLength = Parameters::register_parameter("wiregenes_SquiggleWireMaxLength", 10, "maximum length of a SquiggleWire (if 1, it will look just like a SimpleWire). Wires that would project outside of brain are clipped", "BRAIN - WIRE - WIREGENE");
-const string& WireBrain::wiregenesSquiggleWireDirections = Parameters::register_parameter("wiregenes_SquiggleWireDirections", (string) "cardinalOnly", "cardinalOnly (wires project in 6 square directions) vs diagonalsAlso (wires project on diagonals also)", "BRAIN - WIRE - WIREGENE");
-const int& WireBrain::wiregenesInitialGeneCount = Parameters::register_parameter("wiregenes_InitialGeneCount", 50, "number of start codons to be inserted into inital genome", "BRAIN - WIRE - WIREGENE");
-const double& WireBrain::bitmapInitialFillRatio = Parameters::register_parameter("bitmap_InitialFillRatio", .2, "if bitmap genomeDecodingMethod: amount of the brain that will initially be wire vs. empty", "BRAIN - WIRE");
+const string& WireBrain::genomeDecodingMethod = Parameters::register_parameter("genomeDecodingMethod", (string) "bitmap", "bitmap = convert genome directly, wiregenes = genes defined by start codeons, location, direction and location", "BRAIN_WIRE");
+const bool& WireBrain::wiregenesAllowSimpleWires = Parameters::register_parameter("allowSimpeWires", true, "allow SimpleWire features (lengths of straight wire)", "BRAIN_WIRE_WIREGENE");
+const string& WireBrain::wiregenesSimpleWireDirections = Parameters::register_parameter("simpleWireDirections", (string) "cardinalOnly", "cardinalOnly (wires project in 6 square directions) vs diagonalsAlso (wires project on diagonals also)", "BRAIN_WIRE_WIREGENE");
+const int& WireBrain::wiregenesSimpleWireMaxLength = Parameters::register_parameter("simpleWireMaxLength", 1, "maximum length of a SimpleWire (if 1, direction is effectively ignored). Wires that would project outside of brain are clipped", "BRAIN_WIRE_WIREGENE");
+const bool& WireBrain::wiregenesAllowWormholes = Parameters::register_parameter("allowWormholes", false, "allow Wormhole features (one directional links between distant wires)", "BRAIN_WIRE_WIREGENE");
+const int& WireBrain::wiregenesWormholesBidirectional = Parameters::register_parameter("wormholesBidirectional", 0, "allow Wormhole features to be bidirectional(0 = no, 1 = random, 2 = always)", "BRAIN_WIRE_WIREGENE");
+const bool& WireBrain::wiregenesAllowSquiggleWires = Parameters::register_parameter("allowSquiggleWires", false, "allow squiggleWire features (wires generated by converting genome into list of directions)", "BRAIN_WIRE_WIREGENE");
+const int& WireBrain::wiregenesSquiggleWireMinLength = Parameters::register_parameter("squiggleWireMinLength", 4, "minimum length of a SquiggleWire (if 1, it will look just like a SimpleWire). Wires that would project outside of brain are clipped", "BRAIN_WIRE_WIREGENE");
+const int& WireBrain::wiregenesSquiggleWireMaxLength = Parameters::register_parameter("squiggleWireMaxLength", 10, "maximum length of a SquiggleWire (if 1, it will look just like a SimpleWire). Wires that would project outside of brain are clipped", "BRAIN_WIRE_WIREGENE");
+const string& WireBrain::wiregenesSquiggleWireDirections = Parameters::register_parameter("squiggleWireDirections", (string) "cardinalOnly", "cardinalOnly (wires project in 6 square directions) vs diagonalsAlso (wires project on diagonals also)", "BRAIN_WIRE_WIREGENE");
+const int& WireBrain::wiregenesInitialGeneCount = Parameters::register_parameter("initialGeneCount", 50, "number of start codons to be inserted into initial genome (add even number of all - even if not allowed)", "BRAIN_WIRE_WIREGENE");
+const double& WireBrain::bitmapInitialFillRatio = Parameters::register_parameter("bitmap_InitialFillRatio", .2, "if bitmap genomeDecodingMethod: amount of the brain that will initially be wire vs. empty", "BRAIN_WIRE");
 
 WireBrain::WireBrain(int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes) :
 		AbstractBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes) {

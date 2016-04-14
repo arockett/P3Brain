@@ -1,7 +1,7 @@
 #include "DefaultArchivist.h"
 using namespace std;
 
-const string& DefaultArchivist::Arch_outputMethodStr = Parameters::register_parameter("outputMethod", (string) "default", "output method, [default, LODwAP (Line of Decent with Aggressive Pruning), snapshot, SSwD (SnapShot with Delay)]", "ARCHIVIST - OUTPUT METHOD");  // string parameter for outputMethod;
+const string& DefaultArchivist::Arch_outputMethodStr = Parameters::register_parameter("outputMethod", (string) "default", "output method, [default, LODwAP (Line of Decent with Aggressive Pruning), snapshot, SSwD (SnapShot with Delay)]", "ARCHIVIST_OUTPUT_METHOD");  // string parameter for outputMethod;
 
 const int& DefaultArchivist::Arch_realtimeFilesInterval = Parameters::register_parameter("realtimeFilesInterval", 10, "How often to write to realtime data files", "ARCHIVIST");
 const bool& DefaultArchivist::Arch_writeAveFile = Parameters::register_parameter("writeAveFile", true, "Save data to average file?", "ARCHIVIST");

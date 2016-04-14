@@ -15,7 +15,7 @@
 
 /* this gate behaves like a deterministic gate with a constant externally set error which may the gate to deliver the wrong set of output values */
 
-const double& FixedEpsilonGate::FixedEpsilonGate_Probability = Parameters::register_parameter("fixedEpsilonGate_Probability", 0.05, "chance that an output from a FixedEpsilonGate gate will be randomized", "GATES - FIXED EPSILON");
+const double& FixedEpsilonGate::FixedEpsilonGate_Probability = Parameters::register_parameter("fixedEpsilonGate_Probability", 0.05, "chance that an output from a FixedEpsilonGate gate will be randomized", "GATES_FIXED_EPSILON");
 
 
 FixedEpsilonGate::FixedEpsilonGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID) :

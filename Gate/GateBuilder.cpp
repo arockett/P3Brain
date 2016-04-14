@@ -1,26 +1,26 @@
 #include "GateBuilder.h"
 
-const bool& Gate_Builder::usingProbGate = Parameters::register_parameter("probabilisticGate", false, "set to true to enable probabilistic gates", "GATE TYPES");
-const int& Gate_Builder::probGateInitialCount = Parameters::register_parameter("probabilisticGate_InitialCount", 3, "seed genome with this many start codons", "GATE TYPES");
-const bool& Gate_Builder::usingDetGate = Parameters::register_parameter("deterministicGate", true, "set to true to enable deterministic gates?", "GATE TYPES");
-const int& Gate_Builder::detGateInitialCount = Parameters::register_parameter("deterministicGate_InitialCount", 6, "seed genome with this many start codons", "GATE TYPES");
-const bool& Gate_Builder::usingEpsiGate = Parameters::register_parameter("fixedEpsilonGate", false, "set to true to enable epsilon gates", "GATE TYPES");
-const int& Gate_Builder::epsiGateInitialCount = Parameters::register_parameter("fixedEpsilonGate_InitialCount", 3, "seed genome with this many start codons", "GATE TYPES");
-const bool& Gate_Builder::usingVoidGate = Parameters::register_parameter("voidGate", false, "set to true to enable void gates", "GATE TYPES");
-const int& Gate_Builder::voidGateInitialCount = Parameters::register_parameter("voidGate_InitialCount", 3, "seed genome with this many start codons", "GATE TYPES");
+const bool& Gate_Builder::usingProbGate = Parameters::register_parameter("probabilisticGate", false, "set to true to enable probabilistic gates", "GATES");
+const int& Gate_Builder::probGateInitialCount = Parameters::register_parameter("probabilisticGate_InitialCount", 3, "seed genome with this many start codons", "GATES");
+const bool& Gate_Builder::usingDetGate = Parameters::register_parameter("deterministicGate", true, "set to true to enable deterministic gates?", "GATES");
+const int& Gate_Builder::detGateInitialCount = Parameters::register_parameter("deterministicGate_InitialCount", 6, "seed genome with this many start codons", "GATES");
+const bool& Gate_Builder::usingEpsiGate = Parameters::register_parameter("fixedEpsilonGate", false, "set to true to enable epsilon gates", "GATES");
+const int& Gate_Builder::epsiGateInitialCount = Parameters::register_parameter("fixedEpsilonGate_InitialCount", 3, "seed genome with this many start codons", "GATES");
+const bool& Gate_Builder::usingVoidGate = Parameters::register_parameter("voidGate", false, "set to true to enable void gates", "GATES");
+const int& Gate_Builder::voidGateInitialCount = Parameters::register_parameter("voidGate_InitialCount", 3, "seed genome with this many start codons", "GATES");
 
-const bool& Gate_Builder::usingFBGate = Parameters::register_parameter("feedBackGate", false, "set to true to enable feedback gates", "GATE TYPES");
-const int& Gate_Builder::fBGateInitialCount = Parameters::register_parameter("feedBackGate_InitialCount", 3, "seed genome with this many start codons", "GATE TYPES");
-const bool& Gate_Builder::usingGPGate = Parameters::register_parameter("geneticProgramingGate", false, "set to true to enable GP (what?) gates", "GATE TYPES");
-const int& Gate_Builder::gPGateInitialCount = Parameters::register_parameter("geneticProgramingGate_InitialCount", 3, "seed genome with this many start codons", "GATE TYPES");
-const bool& Gate_Builder::usingThGate = Parameters::register_parameter("thresholdGate", false, "set to true to enable threshold gates", "GATE TYPES");
-const int& Gate_Builder::thGateInitialCount = Parameters::register_parameter("thresholdGate_InitialCount", 3, "seed genome with this many start codons", "GATE TYPES");
+const bool& Gate_Builder::usingFBGate = Parameters::register_parameter("feedBackGate", false, "set to true to enable feedback gates", "GATES");
+const int& Gate_Builder::fBGateInitialCount = Parameters::register_parameter("feedBackGate_InitialCount", 3, "seed genome with this many start codons", "GATES");
+const bool& Gate_Builder::usingGPGate = Parameters::register_parameter("geneticProgramingGate", false, "set to true to enable GP (what?) gates", "GATES");
+const int& Gate_Builder::gPGateInitialCount = Parameters::register_parameter("geneticProgramingGate_InitialCount", 3, "seed genome with this many start codons", "GATES");
+const bool& Gate_Builder::usingThGate = Parameters::register_parameter("thresholdGate", false, "set to true to enable threshold gates", "GATES");
+const int& Gate_Builder::thGateInitialCount = Parameters::register_parameter("thresholdGate_InitialCount", 3, "seed genome with this many start codons", "GATES");
 
-const bool& Gate_Builder::usingTritDeterministicGate = Parameters::register_parameter("tritDeterministicGate", false, "set to true to enable tritDeterministic gates", "GATE TYPES");
-const int& Gate_Builder::tritDeterministicGateInitialCount = Parameters::register_parameter("tritDeterministicGateGate_InitialCount", 3, "seed genome with this many start codons", "GATE TYPES");
+const bool& Gate_Builder::usingTritDeterministicGate = Parameters::register_parameter("tritGate", false, "set to true to enable tritDeterministic gates", "GATES");
+const int& Gate_Builder::tritDeterministicGateInitialCount = Parameters::register_parameter("tritGate_InitialCount", 3, "seed genome with this many start codons", "GATES");
 
-const bool& Gate_Builder::usingNeuronGate = Parameters::register_parameter("neuronGate", false, "set to true to enable Neuron gates", "GATE TYPES");
-const int& Gate_Builder::neuronGateInitialCount = Parameters::register_parameter("neuronGateGate_InitialCount", 3, "seed genome with this many start codons", "GATE TYPES");
+const bool& Gate_Builder::usingNeuronGate = Parameters::register_parameter("neuronGate", false, "set to true to enable Neuron gates", "GATES");
+const int& Gate_Builder::neuronGateInitialCount = Parameters::register_parameter("neuronGate_InitialCount", 3, "seed genome with this many start codons", "GATES");
 
 set<int> Gate_Builder::inUseGateTypes;
 vector<vector<int>> Gate_Builder::gateStartCodes;

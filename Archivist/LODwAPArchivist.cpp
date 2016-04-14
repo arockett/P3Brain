@@ -1,13 +1,13 @@
 #include "LODwAPArchivist.h"
 
-const int& LODwAPArchivist::LODwAP_Arch_dataInterval = Parameters::register_parameter("dataInterval_LODwAP", 100, "How often to write to data file", "ARCHIVIST_LODWAP");
-const int& LODwAPArchivist::LODwAP_Arch_genomeInterval = Parameters::register_parameter("genomeInterval_LODwAP", 1000, "How often to write genome file", "ARCHIVIST_LODWAP");
-const int& LODwAPArchivist::LODwAP_Arch_pruneInterval = Parameters::register_parameter("pruneInterval_LODwAP", 100, "How often to attempt to prune LOD and actually write out to files", "ARCHIVIST_LODWAP");
-const int& LODwAPArchivist::LODwAP_Arch_terminateAfter = Parameters::register_parameter("terminateAfter_LODwAP", 100, "how long to run after updates (to get better coalescence)", "ARCHIVIST_LODWAP");
-const string& LODwAPArchivist::LODwAP_Arch_DataFileName = Parameters::register_parameter("dataFileName_LODwAP", (string) "data.csv", "name of genome file (stores genomes for line of decent)", "ARCHIVIST_LODWAP");
-const string& LODwAPArchivist::LODwAP_Arch_GenomeFileName = Parameters::register_parameter("genomeFileName_LODwAP", (string) "genome.csv", "name of data file (stores everything but genomes)", "ARCHIVIST_LODWAP");
-const bool& LODwAPArchivist::LODwAP_Arch_writeDataFile = Parameters::register_parameter("writeDataFile_LODwAP", true, "if true, a data file will be written", "ARCHIVIST_LODWAP");
-const bool& LODwAPArchivist::LODwAP_Arch_writeGenomeFile = Parameters::register_parameter("writeGenomeFile_LODwAP", true, "if true, a genome file will be written", "ARCHIVIST_LODWAP");
+const int& LODwAPArchivist::LODwAP_Arch_dataInterval = Parameters::register_parameter("dataInterval", 100, "How often to write to data file", "ARCHIVIST_LODWAP");
+const int& LODwAPArchivist::LODwAP_Arch_genomeInterval = Parameters::register_parameter("genomeInterval", 1000, "How often to write genome file", "ARCHIVIST_LODWAP");
+const int& LODwAPArchivist::LODwAP_Arch_pruneInterval = Parameters::register_parameter("pruneInterval", 100, "How often to attempt to prune LOD and actually write out to files", "ARCHIVIST_LODWAP");
+const int& LODwAPArchivist::LODwAP_Arch_terminateAfter = Parameters::register_parameter("terminateAfter", 100, "how long to run after updates (to get better coalescence)", "ARCHIVIST_LODWAP");
+const string& LODwAPArchivist::LODwAP_Arch_DataFileName = Parameters::register_parameter("dataFileName", (string) "data.csv", "name of genome file (stores genomes for line of decent)", "ARCHIVIST_LODWAP");
+const string& LODwAPArchivist::LODwAP_Arch_GenomeFileName = Parameters::register_parameter("genomeFileName", (string) "genome.csv", "name of data file (stores everything but genomes)", "ARCHIVIST_LODWAP");
+const bool& LODwAPArchivist::LODwAP_Arch_writeDataFile = Parameters::register_parameter("writeDataFile", true, "if true, a data file will be written", "ARCHIVIST_LODWAP");
+const bool& LODwAPArchivist::LODwAP_Arch_writeGenomeFile = Parameters::register_parameter("writeGenomeFile", true, "if true, a genome file will be written", "ARCHIVIST_LODWAP");
 const bool& LODwAPArchivist::LODwAP_Arch_DataFileShowAllLists = Parameters::register_parameter("dataFileShowAllLists", true, "if true, lists named 'all'* in data map will be saved", "ARCHIVIST_LODWAP");
 const bool& LODwAPArchivist::LODwAP_Arch_DataFileConvertAllLists = Parameters::register_parameter("dataFileConvertAllLists", true, "if true, lists named 'all'* in data map will be averaged and added to file", "ARCHIVIST_LODWAP");
 LODwAPArchivist::LODwAPArchivist(vector<string> aveFileColumns) :

@@ -9,10 +9,10 @@
 #include "../../Utilities/Utilities.h"
 #include "NumeralClassifierWorld.h"
 
-const int& NumeralClassifierWorld::defaulttestsPreWorldEval = Parameters::register_parameter("NumeralClassifier_testsPreWorldEval", 5, "number of values each brain attempts to evaluate in a world evaluation", "WORLD - NUMERALCLASSIFIER");
-const int& NumeralClassifierWorld::defaultWorldUpdates = Parameters::register_parameter("NumeralClassifier_WorldUpdates", 100, "amount of time an brain is tested", "WORLD - NUMERALCLASSIFIER");
-const int& NumeralClassifierWorld::defaultRetinaType = Parameters::register_parameter("retinaType", 3, "//1 = center only, 2 = 3 across, 3 = 3x3, 4 = 5x5, 5 = 7x7", "WORLD - NUMERALCLASSIFIER");
-const string& NumeralClassifierWorld::numeralDataFileName = Parameters::register_parameter("numeralDataFileName", (string) "World/NumeralClassifierWorld/mnist.train.discrete.28x28-only100", "name of file with numeral data", "WORLD - NUMERALCLASSIFIER");
+const int& NumeralClassifierWorld::defaulttestsPreWorldEval = Parameters::register_parameter("testsPreWorldEval", 5, "number of values each brain attempts to evaluate in a world evaluation", "WORLD_NUMERALCLASSIFIER");
+const int& NumeralClassifierWorld::defaultWorldUpdates = Parameters::register_parameter("WorldUpdates", 100, "amount of time an brain is tested", "WORLD_NUMERALCLASSIFIER");
+const int& NumeralClassifierWorld::defaultRetinaType = Parameters::register_parameter("retinaType", 3, "//1 = center only, 2 = 3 across, 3 = 3x3, 4 = 5x5, 5 = 7x7", "WORLD_NUMERALCLASSIFIER");
+const string& NumeralClassifierWorld::numeralDataFileName = Parameters::register_parameter("dataFileName", (string) "World/NumeralClassifierWorld/mnist.train.discrete.28x28-only100", "name of file with numeral data", "WORLD_NUMERALCLASSIFIER");
 
 NumeralClassifierWorld::NumeralClassifierWorld() {
 	worldUpdates = defaultWorldUpdates;

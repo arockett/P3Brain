@@ -11,8 +11,9 @@
 #include "../Utilities/Random.h"
 #include "../Utilities/Utilities.h"
 
-const bool& HumanBrain::useActionMap = Parameters::register_parameter("humanBrain_useActionMap", false, "if true, an action map will be used to translate user input", "BRAIN - HUMAN");
-const string& HumanBrain::actionMapFileName = Parameters::register_parameter("humanBrain_actionMapFileName", (string) "actionMap.txt", "if useActionMap = true, use this file", "BRAIN - HUMAN");
+const bool& HumanBrain::useActionMap = Parameters::register_parameter("useActionMap", false, "if true, an action map will be used to translate user input", "BRAIN_HUMAN");
+const string& HumanBrain::actionMapFileName = Parameters::register_parameter("actionMapFileName", (string) "actionMap.txt", "if useActionMap = true, use this file", "BRAIN_HUMAN");
+
 HumanBrain::HumanBrain(int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes) :
 		AbstractBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes) {
 	if (useActionMap) {  // if using an action map, load map with lines of format char output1 output2 output3... file must match brain # of outputs

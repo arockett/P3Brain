@@ -14,8 +14,8 @@
 #include "../Utilities/Utilities.h"
 
 
-const double& GPGate::constValueMin = Parameters::register_parameter("gpGate_constValueMin", -1, "for the const values, min value the genome can generate", "GATES - GP");
-const double& GPGate::constValueMax = Parameters::register_parameter("gpGate_constValueMax", 1, "for the const values, max value the genome can generate", "GATES - GP");
+const double& GPGate::constValueMin = Parameters::register_parameter("constValueMin", -1, "for the const values, min value the genome can generate", "GATES_GP");
+const double& GPGate::constValueMax = Parameters::register_parameter("constValueMax", 1, "for the const values, max value the genome can generate", "GATES_GP");
 
 /* *** GP Gate implementation *** */
 

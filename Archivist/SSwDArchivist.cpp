@@ -1,14 +1,14 @@
 #include "SSwDArchivist.h"
 
-const int& SSwDArchivist::SSwD_Arch_dataInterval = Parameters::register_parameter("dataInterval_SSwD", 100, "How often to save a data file", "ARCHIVIST_SSWD");
-const int& SSwDArchivist::SSwD_Arch_genomeInterval = Parameters::register_parameter("genomeInterval_SSwD", 1000, "How often to save a genome file", "ARCHIVIST_SSWD");
-const int& SSwDArchivist::SSwD_Arch_dataIntervalDelay = Parameters::register_parameter("dataIntervalDelay_SSwD", 10, "when using Snap Shot with Delay output Method, how long is the delay before saving data", "ARCHIVIST_SSWD");
-const int& SSwDArchivist::SSwD_Arch_genomeIntervalDelay = Parameters::register_parameter("genomeIntervalDelay_SSwD", 10, "when using Snap Shot with Delay output Method, how long is the delay before saving genomes ", "ARCHIVIST_SSWD");
-const int& SSwDArchivist::SSwD_Arch_cleanupInterval = Parameters::register_parameter("cleanupInterval_SSwD", 100, "How often to cleanup old checkpoints", "ARCHIVIST_SSWD");
-const string& SSwDArchivist::SSwD_Arch_DataFilePrefix = Parameters::register_parameter("dataFilePrefix_SSwD", (string) "data", "name of genome file (stores genomes)", "ARCHIVIST_SSWD");
-const string& SSwDArchivist::SSwD_Arch_GenomeFilePrefix = Parameters::register_parameter("genomeFilePrefix_SSwD", (string) "genome", "name of data file (stores everything but genomes)", "ARCHIVIST_SSWD");
-const bool& SSwDArchivist::SSwD_Arch_writeDataFiles = Parameters::register_parameter("writeDataFiles_SSwD", true, "if true, data files will be written", "ARCHIVIST_SSWD");
-const bool& SSwDArchivist::SSwD_Arch_writeGenomeFiles = Parameters::register_parameter("writeGenomeFiles_SSwD", true, "if true, genome files will be written", "ARCHIVIST_SSWD");
+const int& SSwDArchivist::SSwD_Arch_dataInterval = Parameters::register_parameter("dataInterval", 100, "How often to save a data file", "ARCHIVIST_SSWD");
+const int& SSwDArchivist::SSwD_Arch_genomeInterval = Parameters::register_parameter("genomeInterval", 1000, "How often to save a genome file", "ARCHIVIST_SSWD");
+const int& SSwDArchivist::SSwD_Arch_dataIntervalDelay = Parameters::register_parameter("dataIntervalDelay", 10, "when using Snap Shot with Delay output Method, how long is the delay before saving data", "ARCHIVIST_SSWD");
+const int& SSwDArchivist::SSwD_Arch_genomeIntervalDelay = Parameters::register_parameter("genomeIntervalDelay", 10, "when using Snap Shot with Delay output Method, how long is the delay before saving genomes ", "ARCHIVIST_SSWD");
+const int& SSwDArchivist::SSwD_Arch_cleanupInterval = Parameters::register_parameter("cleanupInterval", 100, "How often to cleanup old checkpoints", "ARCHIVIST_SSWD");
+const string& SSwDArchivist::SSwD_Arch_DataFilePrefix = Parameters::register_parameter("dataFilePrefix", (string) "data", "name of genome file (stores genomes)", "ARCHIVIST_SSWD");
+const string& SSwDArchivist::SSwD_Arch_GenomeFilePrefix = Parameters::register_parameter("genomeFilePrefix", (string) "genome", "name of data file (stores everything but genomes)", "ARCHIVIST_SSWD");
+const bool& SSwDArchivist::SSwD_Arch_writeDataFiles = Parameters::register_parameter("writeDataFiles", true, "if true, data files will be written", "ARCHIVIST_SSWD");
+const bool& SSwDArchivist::SSwD_Arch_writeGenomeFiles = Parameters::register_parameter("writeGenomeFiles", true, "if true, genome files will be written", "ARCHIVIST_SSWD");
 
 SSwDArchivist::SSwDArchivist(vector<string> aveFileColumns) :
 		DefaultArchivist(aveFileColumns) {
