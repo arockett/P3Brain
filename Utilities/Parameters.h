@@ -807,6 +807,11 @@ public:
 	}
 
 	static void readCommandLine(int argc, const char** argv, unordered_map<string, string>& comand_line_list, vector<string>& fileList) {
+		bool temp = false;
+		readCommandLine(argc, argv, comand_line_list, fileList, temp);
+	}
+
+	static void readCommandLine(int argc, const char** argv, unordered_map<string, string>& comand_line_list, vector<string>& fileList, bool& saveFiles) {
 		int argCount = 1;
 		while (argCount < argc) {
 			if (argv[argCount][0] == '-' && argv[argCount][1] == 'f') {  // denotes that file names will follow
@@ -840,6 +845,9 @@ public:
 						}
 					}
 				}
+			} else if (argv[argCount][0] == '-' && argv[argCount][1] == 's') {
+				saveFiles = true;
+				argCount++;
 			}
 		}
 	}
@@ -1057,7 +1065,8 @@ public:
 		unordered_map<string, string> command_line_list;
 		vector<string> fileList;
 
-		Parameters::readCommandLine(argc, argv, command_line_list, fileList);
+		bool saveFiles = false;
+		Parameters::readCommandLine(argc, argv, command_line_list, fileList, saveFiles);
 
 		string workingNameSpace, workingCategory, workingParameterName;
 
@@ -1114,6 +1123,12 @@ public:
 				exit(1);
 			}
 		}
+		if (saveFiles) {
+
+			Parameters::saveSettingsFiles( {""}, { { "organism.cfg", { "GATE*","GENOME*", "BRAIN*"} }, { "world.cfg", { "WORLD*" } }, { "settings.cfg", { "" } } });
+			cout << "Saving config Files and Exiting." << endl;
+			exit(0);
+		}
 	}
 
 	static void saveSettingsFile(const string& nameSpace, stringstream& FILE, vector<string> categoryList, bool alsoChildren = false, int nameSpaceLevel = 0) {
@@ -1159,11 +1174,11 @@ public:
 				bool saveThis = false;
 				if (categoryList.size() > 0 && categoryList[0] != "-") {
 					for (auto cat : categoryList) {
-						if (group.first.size() >= cat.size()) {
+						if ((int)group.first.size() >= ((int)cat.size())-1) {
 							if (group.first == cat) {
 								saveThis = true;
 							} else {
-								if (cat.size() > 0 && cat[cat.size() - 1] == '*') {
+								if ((int)cat.size() > 0 && cat[((int)cat.size()) - 1] == '*') {
 									if (group.first.substr(0, cat.size() - 1) == cat.substr(0, cat.size() - 1)) {
 										saveThis = true;
 									}
@@ -1175,11 +1190,11 @@ public:
 				} else {
 					saveThis = true;
 					for (auto cat : categoryList) {
-						if (group.first.size() >= cat.size()) {
+						if ((int)group.first.size() >= ((int)cat.size())-1) {
 							if (group.first == cat) {
 								saveThis = false;
 							} else {
-								if (cat.size() > 0 && cat[cat.size() - 1] == '*') {
+								if ((int)cat.size() > 0 && cat[((int)cat.size()) - 1] == '*') {
 									if (group.first.substr(0, cat.size() - 1) == cat.substr(0, cat.size() - 1)) {
 										saveThis = false;
 									}
@@ -1268,7 +1283,7 @@ public:
 					}
 				}
 				if (!fileEmpty) {
-					ofstream FILE("settings/"+fileName+cList.first);
+					ofstream FILE(fileName+cList.first);
 					FILE << ss.str();
 					FILE.close();
 				}
