@@ -37,35 +37,35 @@ using namespace std;
 
 class WireBrain: public AbstractBrain {
 
-	static const bool& allowNegativeCharge;
-	static const int& defaultWidth;
-	static const int& defaultHeight;
-	static const int& defaultDepth;
-	static const int& worldConnectionsSeparation;
-	static const int& overchargeThreshold;
-	static const int& decayDuration;
-	static const int& chargeUpdatesPerUpdate;
-	static const bool& constantInputs;
-	static const bool& cacheResults;
-	static const int& cacheResultsCount;
+	static shared_ptr<bool> allowNegativeCharge;
+	static shared_ptr<int> defaultWidth;
+	static shared_ptr<int> defaultHeight;
+	static shared_ptr<int> defaultDepth;
+	static shared_ptr<int> worldConnectionsSeparation;
+	static shared_ptr<int> overchargeThreshold;
+	static shared_ptr<int> decayDuration;
+	static shared_ptr<int> chargeUpdatesPerUpdate;
+	static shared_ptr<bool> constantInputs;
+	static shared_ptr<bool> cacheResults;
+	static shared_ptr<int> cacheResultsCount;
 
-	static const string& genomeDecodingMethod;  // "bitmap" = convert genome directly, "wiregenes" = genes defined by start codeons, location, direction and location
-	static const int& wiregenesInitialGeneCount;
-	static const double& bitmapInitialFillRatio;
+	static shared_ptr<string> genomeDecodingMethod;  // "bitmap" = convert genome directly, "wiregenes" = genes defined by start codeons, location, direction and location
+	static shared_ptr<int> wiregenesInitialGeneCount;
+	static shared_ptr<double> bitmapInitialFillRatio;
 
-	static const bool& wiregenesAllowSimpleWires;
-	static const int& wiregenesSimpleWireMaxLength;
-	static const string& wiregenesSimpleWireDirections;
+	static shared_ptr<bool> wiregenesAllowSimpleWires;
+	static shared_ptr<int> wiregenesSimpleWireMaxLength;
+	static shared_ptr<string> wiregenesSimpleWireDirections;
 
-	static const bool& wiregenesAllowWormholes;
-	static const int& wiregenesWormholesBidirectional;
+	static shared_ptr<bool> wiregenesAllowWormholes;
+	static shared_ptr<int> wiregenesWormholesBidirectional;
 
-	static const bool& wiregenesAllowSquiggleWires;
-	static const int& wiregenesSquiggleWireMinLength;
-	static const int& wiregenesSquiggleWireMaxLength;
-	static const string& wiregenesSquiggleWireDirections;
+	static shared_ptr<bool> wiregenesAllowSquiggleWires;
+	static shared_ptr<int> wiregenesSquiggleWireMinLength;
+	static shared_ptr<int> wiregenesSquiggleWireMaxLength;
+	static shared_ptr<string> wiregenesSquiggleWireDirections;
 
-	const int CHARGE = 2 + decayDuration;
+	const int CHARGE = 2 + *decayDuration;
 	const int NEGCHARGE = CHARGE * -1;
 
 public:
@@ -99,7 +99,6 @@ public:
 	virtual string description() override;
 	virtual vector<string> getStats() override;
 	virtual void initalizeGenome(shared_ptr<AbstractGenome> _genome) override;
-}
-;
+};
 
 #endif /* defined(__BasicMarkovBrainTemplate__WireBrain__) */

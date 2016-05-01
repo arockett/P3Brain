@@ -19,22 +19,22 @@
 using namespace std;
 
 class Global {
- public:
+public:
 	// parameters
-	static const int& randomSeed;  // seed for random number generator, if -1 random number generator will be seeded randomly
-	static const int& updates;  // run until there is a MCRA at this time
-	static const int& popSize;  // number of genomes in the population
-	static const string& mode;  // number of genomes in the population
+	static shared_ptr<int> randomSeed;  // seed for random number generator, if -1 random number generator will be seeded randomly
+	static shared_ptr<int> updates;  // run until there is a MCRA at this time
+	static shared_ptr<int> popSize;  // number of genomes in the population
+	static shared_ptr<string> mode;  // number of genomes in the population
 
-	static const string& outputDirectory;  // where files will be written
+	static shared_ptr<string> outputDirectory;  // where files will be written
 
-	static const int& bitsPerBrainAddress;  // how many bits are evaluated to determine the brain addresses.
-	                                  // i.e. ceil(bitsPerBrainAddress/8) = number of genome sites used
-	static const int& bitsPerCodon;
+	static shared_ptr<int> bitsPerBrainAddress;  // how many bits are evaluated to determine the brain addresses.
+	// i.e. ceil(bitsPerBrainAddress/8) = number of genome sites used
+	static shared_ptr<int> bitsPerCodon;
 
-	                                  //////////
-	                                  // Below are non configurable values (not set directly by Parameters.h methods)
-	                                  //////////
+	//////////
+	// Below are non configurable values (not set directly by Parameters.h methods)
+	//////////
 	static int update;  // the current "time"
 
 };

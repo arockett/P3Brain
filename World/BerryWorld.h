@@ -31,50 +31,50 @@ public:
 	const int WALL = 9;
 
 	// Parameters
-	static const double& TSK;
-	static const int& defaultWorldUpdates;
-	static const int& foodTypes;
-	static const double& rewardForFood1;
-	static const double& rewardForFood2;
-	static const double& rewardForFood3;
-	static const double& rewardForFood4;
-	static const double& rewardForFood5;
-	static const double& rewardForFood6;
-	static const double& rewardForFood7;
-	static const double& rewardForFood8;
+	static shared_ptr<double> TSK;
+	static shared_ptr<int> defaultWorldUpdates;
+	static shared_ptr<int> foodTypes;
+	static shared_ptr<double> rewardForFood1;
+	static shared_ptr<double> rewardForFood2;
+	static shared_ptr<double> rewardForFood3;
+	static shared_ptr<double> rewardForFood4;
+	static shared_ptr<double> rewardForFood5;
+	static shared_ptr<double> rewardForFood6;
+	static shared_ptr<double> rewardForFood7;
+	static shared_ptr<double> rewardForFood8;
 
-	static const double& rewardForTurn;
-	static const double& rewardForMove;
+	static shared_ptr<double> rewardForTurn;
+	static shared_ptr<double> rewardForMove;
 
-	static const int& ratioFood0;
-	static const int& ratioFood1;
-	static const int& ratioFood2;
-	static const int& ratioFood3;
-	static const int& ratioFood4;
-	static const int& ratioFood5;
-	static const int& ratioFood6;
-	static const int& ratioFood7;
-	static const int& ratioFood8;
+	static shared_ptr<int> ratioFood0;
+	static shared_ptr<int> ratioFood1;
+	static shared_ptr<int> ratioFood2;
+	static shared_ptr<int> ratioFood3;
+	static shared_ptr<int> ratioFood4;
+	static shared_ptr<int> ratioFood5;
+	static shared_ptr<int> ratioFood6;
+	static shared_ptr<int> ratioFood7;
+	static shared_ptr<int> ratioFood8;
 
-	static const int& WorldY;
-	static const int& WorldX;
-	static const bool& borderWalls;
-	static const int& randomWalls;
+	static shared_ptr<int> WorldY;
+	static shared_ptr<int> WorldX;
+	static shared_ptr<bool> borderWalls;
+	static shared_ptr<int> randomWalls;
 
-	static const bool& allowMoveAndEat;
+	static shared_ptr<bool> allowMoveAndEat;
 
-	static const bool& senseDown;
-	static const bool& senseFront;
-	static const bool& senseFrontSides;
-	static const bool& senseWalls;
-	static const bool& clearOutputs;
+	static shared_ptr<bool> senseDown;
+	static shared_ptr<bool> senseFront;
+	static shared_ptr<bool> senseFrontSides;
+	static shared_ptr<bool> senseWalls;
+	static shared_ptr<bool> clearOutputs;
 
-	static const int& replacement;
+	static shared_ptr<int> replacement;
 
-	static const bool& recordConsumptionRatio;
-	static const bool& recordFoodList;
-	static const bool& recordFoodListEatEmpty;
-	static const bool& recordFoodListNoEat;
+	static shared_ptr<bool> recordConsumptionRatio;
+	static shared_ptr<bool> recordFoodList;
+	static shared_ptr<bool> recordFoodListEatEmpty;
+	static shared_ptr<bool> recordFoodListNoEat;
 	// end parameters
 
 	int worldUpdates;
@@ -103,7 +103,7 @@ public:
 				counter += foodRatioLookup[pick];  // add this new picks ratio to counter
 			}
 		} else {  // if given a last food, pick a food that is not that.
-			if (lastfood > foodTypes) {
+			if (lastfood > *foodTypes) {
 				cout << "ERROR: In BerryWorld::pickFood() - lastfood > foodTypes (i.e. last food eaten is not in foodTypes!)\nExiting.\n\n";
 				exit(1);
 			}
@@ -134,7 +134,7 @@ public:
 
 	// convert x,y into a grid index
 	int getGridIndexFromXY(pair<int, int> loc) {
-		return loc.first + (loc.second * BerryWorld::WorldX);
+		return loc.first + (loc.second * *WorldX);
 	}
 
 	// return value on grid at index
@@ -149,7 +149,7 @@ public:
 
 	// takes x,y and updates them by moving one step in facing
 	pair<int, int> moveOnGrid(pair<int, int> loc, int facing) {
-		return {loopMod((loc.first + xm[facing]), BerryWorld::WorldX), loopMod((loc.second + ym[facing]), BerryWorld::WorldY)};
+		return {loopMod((loc.first + xm[facing]), *WorldX), loopMod((loc.second + ym[facing]), *WorldY)};
 	}
 
 	// update value at index in grid
@@ -171,11 +171,11 @@ public:
 
 	// return a vector of size x*y (grid) with walls with borderWalls (if borderWalls = true) and randomWalls (that many) randomly placed walls
 	vector<int> makeTestGrid() {
-		vector<int> grid = makeGrid(WorldX, WorldY);
+		vector<int> grid = makeGrid(*WorldX, *WorldY);
 
-		for (int y = 0; y < WorldY; y++) {  // fill grid with food (and outer wall if needed)
-			for (int x = 0; x < WorldX; x++) {
-				if (borderWalls && (x == 0 || x == WorldX - 1 || y == 0 || y == WorldY - 1)) {
+		for (int y = 0; y < *WorldY; y++) {  // fill grid with food (and outer wall if needed)
+			for (int x = 0; x < *WorldX; x++) {
+				if (*borderWalls && (x == 0 || x == *WorldX - 1 || y == 0 || y == *WorldY - 1)) {
 					setGridValue(grid, { x, y }, WALL);  // place walls on edge
 				} else {
 					setGridValue(grid, { x, y }, pickFood(-1));  // place random food where there is not a wall
@@ -183,20 +183,20 @@ public:
 			}
 		}
 
-		if ((randomWalls >= WorldX * WorldY) && !borderWalls) {
+		if ((*randomWalls >= *WorldX * *WorldY) && !*borderWalls) {
 			cout << "In BerryWorld::makeTestGrid() To many random walls... exiting!" << endl;
 			exit(1);
 		}
-		if ((randomWalls >= (WorldX - 2) * (WorldY - 2)) && borderWalls) {
+		if ((*randomWalls >= (*WorldX - 2) * (*WorldY - 2)) && *borderWalls) {
 			cout << "In BerryWorld::makeTestGrid() To many random walls... exiting!" << endl;
 			exit(1);
 		}
 
-		for (int i = 0; i < randomWalls; i++) {  // add random walls
-			if (borderWalls) {
-				setGridValue(grid, { Random::getInt(1, WorldX - 2), Random::getInt(1, WorldY - 2) }, WALL);  // if borderWalls than don't place random walls on the outer edge
+		for (int i = 0; i < *randomWalls; i++) {  // add random walls
+			if (*borderWalls) {
+				setGridValue(grid, { Random::getInt(1, *WorldX - 2), Random::getInt(1, *WorldY - 2) }, WALL);  // if borderWalls than don't place random walls on the outer edge
 			} else {
-				setGridValue(grid, { Random::getIndex(WorldX), Random::getIndex(WorldY) }, WALL);  // place walls anywhere
+				setGridValue(grid, { Random::getIndex(*WorldX), Random::getIndex(*WorldY) }, WALL);  // place walls anywhere
 			}
 		}
 		return grid;

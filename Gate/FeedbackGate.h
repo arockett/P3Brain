@@ -24,6 +24,7 @@ class FeedbackGate : public AbstractGate {
  public:
 
 	static bool feedbackON;
+
 	FeedbackGate() = delete;
 	FeedbackGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
 	virtual ~FeedbackGate() = default;

@@ -11,13 +11,13 @@
 #include "../Utilities/Random.h"
 #include "../Utilities/Utilities.h"
 
-const bool& HumanBrain::useActionMap = Parameters::register_parameter("useActionMap", false, "if true, an action map will be used to translate user input", "BRAIN_HUMAN");
-const string& HumanBrain::actionMapFileName = Parameters::register_parameter("actionMapFileName", (string) "actionMap.txt", "if useActionMap = true, use this file", "BRAIN_HUMAN");
+shared_ptr<bool> HumanBrain::useActionMap = Parameters::root->register_parameter("BRAIN_HUMAN-useActionMap", false, "if true, an action map will be used to translate user input");
+shared_ptr<string> HumanBrain::actionMapFileName = Parameters::root->register_parameter("BRAIN_HUMAN-actionMapFileName", (string) "actionMap.txt", "if useActionMap = true, use this file");
 
 HumanBrain::HumanBrain(int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes) :
 		AbstractBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes) {
-	if (useActionMap) {  // if using an action map, load map with lines of format char output1 output2 output3... file must match brain # of outputs
-		string fileName = actionMapFileName;
+	if (*useActionMap) {  // if using an action map, load map with lines of format char output1 output2 output3... file must match brain # of outputs
+		string fileName = *actionMapFileName;
 		ifstream FILE(fileName);
 		string rawLine;
 		double readDouble;
@@ -67,7 +67,7 @@ void HumanBrain::update() {
 
 	nextNodes.assign(nrOfBrainNodes, 0.0);
 	char key;
-	if (useActionMap) {
+	if (*useActionMap) {
 		cout << "please enter action (* for options): ";
 		cin >> key;
 		while (actionMap.find(key) == actionMap.end()) {
@@ -78,7 +78,7 @@ void HumanBrain::update() {
 					for (size_t index = 0; index < iter->second.size(); index++) {
 						cout << iter->second[index] << " ";
 					}
-					cout << ")"<<endl;
+					cout << ")" << endl;
 				}
 			} else {
 				cout << "action not found." << endl;

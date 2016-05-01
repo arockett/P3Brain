@@ -3,6 +3,7 @@
 
 #include <math.h>
 
+#include "../Utilities/Parameters.h"
 #include "DeterministicGate.h"
 #include "FeedbackGate.h"
 #include "FixedEpsilonGate.h"
@@ -16,27 +17,27 @@
 class Gate_Builder {  // manages what kinds of gates can be built
  public:
 
-	static const bool& usingProbGate;
-	static const int& probGateInitialCount;
-	static const bool& usingDetGate;
-	static const int& detGateInitialCount;
-	static const bool& usingEpsiGate;
-	static const int& epsiGateInitialCount;
-	static const bool& usingVoidGate;
-	static const int& voidGateInitialCount;
+	static shared_ptr< bool> usingProbGate;
+	static shared_ptr<int> probGateInitialCount;
+	static shared_ptr<bool> usingDetGate;
+	static shared_ptr<int> detGateInitialCount;
+	static shared_ptr<bool> usingEpsiGate;
+	static shared_ptr<int> epsiGateInitialCount;
+	static shared_ptr<bool> usingVoidGate;
+	static shared_ptr<int> voidGateInitialCount;
 
-	static const bool& usingFBGate;
-	static const int& fBGateInitialCount;
-	static const bool& usingGPGate;
-	static const int& gPGateInitialCount;
-	static const bool& usingThGate;
-	static const int& thGateInitialCount;
+	static shared_ptr<bool> usingFBGate;
+	static shared_ptr<int> fBGateInitialCount;
+	static shared_ptr<bool> usingGPGate;
+	static shared_ptr<int> gPGateInitialCount;
+	static shared_ptr<bool> usingThGate;
+	static shared_ptr<int> thGateInitialCount;
 
-	static const bool& usingTritDeterministicGate;
-	static const int& tritDeterministicGateInitialCount;
+	static shared_ptr<bool> usingTritDeterministicGate;
+	static shared_ptr<int> tritDeterministicGateInitialCount;
 
-	static const bool& usingNeuronGate;
-	static const int& neuronGateInitialCount;
+	static shared_ptr<bool> usingNeuronGate;
+	static shared_ptr<int> neuronGateInitialCount;
 
 
 

@@ -1,20 +1,20 @@
 #include "SnapshotArchivist.h"
 
-const int& SnapshotArchivist::SS_Arch_dataInterval = Parameters::register_parameter("dataInterval", 100, "How often to save a data file", "ARCHIVIST_SNAPSHOT");
-const int& SnapshotArchivist::SS_Arch_genomeInterval = Parameters::register_parameter("genomeInterval", 1000, "How often to save a genome file", "ARCHIVIST_SNAPSHOT");
-const string& SnapshotArchivist::SS_Arch_DataFilePrefix = Parameters::register_parameter("dataFilePrefix", (string) "data", "name of genome file (stores genomes)", "ARCHIVIST_SNAPSHOT");
-const string& SnapshotArchivist::SS_Arch_GenomeFilePrefix = Parameters::register_parameter("genomeFilePrefix", (string) "genome", "name of data file (stores everything but genomes)", "ARCHIVIST_SNAPSHOT");
-const bool& SnapshotArchivist::SS_Arch_writeDataFiles = Parameters::register_parameter("writeDataFiles", true, "if true, data files will be written", "ARCHIVIST_SNAPSHOT");
-const bool& SnapshotArchivist::SS_Arch_writeGenomeFiles = Parameters::register_parameter("writeGenomeFiles", true, "if true, genome files will be written", "ARCHIVIST_SNAPSHOT");
+shared_ptr<int> SnapshotArchivist::SS_Arch_dataInterval = Parameters::root->register_parameter("ARCHIVIST_SNAPSHOT-dataInterval", 100, "How often to save a data file");
+shared_ptr<int> SnapshotArchivist::SS_Arch_genomeInterval = Parameters::root->register_parameter("ARCHIVIST_SNAPSHOT-genomeInterval", 1000, "How often to save a genome file");
+shared_ptr<string> SnapshotArchivist::SS_Arch_DataFilePrefix = Parameters::root->register_parameter("ARCHIVIST_SNAPSHOT-dataFilePrefix", (string) "data", "name of genome file (stores genomes)");
+shared_ptr<string> SnapshotArchivist::SS_Arch_GenomeFilePrefix = Parameters::root->register_parameter("ARCHIVIST_SNAPSHOT-genomeFilePrefix", (string) "genome", "name of data file (stores everything but genomes)");
+shared_ptr<bool> SnapshotArchivist::SS_Arch_writeDataFiles = Parameters::root->register_parameter("ARCHIVIST_SNAPSHOT-writeDataFiles", true, "if true, data files will be written");
+shared_ptr<bool> SnapshotArchivist::SS_Arch_writeGenomeFiles = Parameters::root->register_parameter("ARCHIVIST_SNAPSHOT-writeGenomeFiles", true, "if true, genome files will be written");
 
 SnapshotArchivist::SnapshotArchivist(vector<string> aveFileColumns) :
 		DefaultArchivist(aveFileColumns) {
-	dataInterval = SS_Arch_dataInterval;
-	genomeInterval = SS_Arch_genomeInterval;
-	DataFilePrefix = SS_Arch_DataFilePrefix;
-	GenomeFilePrefix = SS_Arch_GenomeFilePrefix;
-	writeDataFiles = SS_Arch_writeDataFiles;
-	writeGenomeFiles = SS_Arch_writeGenomeFiles;
+	dataInterval = *SS_Arch_dataInterval;
+	genomeInterval = *SS_Arch_genomeInterval;
+	DataFilePrefix = *SS_Arch_DataFilePrefix;
+	GenomeFilePrefix = *SS_Arch_GenomeFilePrefix;
+	writeDataFiles = *SS_Arch_writeDataFiles;
+	writeGenomeFiles = *SS_Arch_writeGenomeFiles;
 }
 
 void SnapshotArchivist::saveSnapshotData(vector<shared_ptr<Organism>> population, int update) {
@@ -62,10 +62,10 @@ bool SnapshotArchivist::archive(vector<shared_ptr<Organism>> population, int flu
 		if (Global::update % realtimeFilesInterval == 0) {  // do not write files on flush - these organisms have not been evaluated!
 			writeRealTimeFiles(population);  // write to dominant and average files
 		}
-		if ((Global::update % SS_Arch_dataInterval == 0) && (flush == 0) && writeDataFiles) {  // do not write files on flush - these organisms have not been evaluated!
+		if ((Global::update % dataInterval == 0) && (flush == 0) && writeDataFiles) {  // do not write files on flush - these organisms have not been evaluated!
 			saveSnapshotData(population, Global::update);
 		}
-		if ((Global::update % SS_Arch_genomeInterval == 0) && (flush == 0) && writeGenomeFiles) {  // do not write files on flush - these organisms have not been evaluated!
+		if ((Global::update % genomeInterval == 0) && (flush == 0) && writeGenomeFiles) {  // do not write files on flush - these organisms have not been evaluated!
 			saveSnapshotGenomes(population, Global::update);
 		}
 		for (auto org : population) {  // we don't need to worry about tracking parents or lineage, so we clear out this data every generation.
@@ -73,5 +73,5 @@ bool SnapshotArchivist::archive(vector<shared_ptr<Organism>> population, int flu
 		}
 	}
 	// if we are at the end of the run
-	return (Global::update >= Global::updates);
+	return (Global::update >= *Global::updates);
 }

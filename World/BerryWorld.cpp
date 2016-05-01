@@ -8,57 +8,59 @@
 
 #include "BerryWorld.h"
 
-const double& BerryWorld::TSK = Parameters::register_parameter("taskSwitchingCost", 1.4, "cost to change food sources", "WORLD_BERRY");
-const int& BerryWorld::defaultWorldUpdates = Parameters::register_parameter("worldUpdates", 400, "amount of time an brain is tested", "WORLD_BERRY");
+shared_ptr<double> BerryWorld::TSK = Parameters::root->register_parameter("WORLD_BERRY-taskSwitchingCost", 1.4, "cost to change food sources");
+shared_ptr<int> BerryWorld::defaultWorldUpdates = Parameters::root->register_parameter("WORLD_BERRY-worldUpdates", 400, "amount of time an brain is tested");
 
-const int& BerryWorld::foodTypes = Parameters::register_parameter("foodTypes", 2, "number of types of food", "WORLD_BERRY");
-const double& BerryWorld::rewardForFood1 = Parameters::register_parameter("rewardForFood1", 1.0, "reward for eating a Food1", "WORLD_BERRY");
-const double& BerryWorld::rewardForFood2 = Parameters::register_parameter("rewardForFood2", 1.0, "reward for eating a Food2", "WORLD_BERRY");
-const double& BerryWorld::rewardForFood3 = Parameters::register_parameter("rewardForFood3", 1.0, "reward for eating a Food3", "WORLD_BERRY");
-const double& BerryWorld::rewardForFood4 = Parameters::register_parameter("rewardForFood4", 1.0, "reward for eating a Food4", "WORLD_BERRY");
-const double& BerryWorld::rewardForFood5 = Parameters::register_parameter("rewardForFood5", 1.0, "reward for eating a Food5", "WORLD_BERRY");
-const double& BerryWorld::rewardForFood6 = Parameters::register_parameter("rewardForFood6", 1.0, "reward for eating a Food6", "WORLD_BERRY");
-const double& BerryWorld::rewardForFood7 = Parameters::register_parameter("rewardForFood7", 1.0, "reward for eating a Food7", "WORLD_BERRY");
-const double& BerryWorld::rewardForFood8 = Parameters::register_parameter("rewardForFood8", 1.0, "reward for eating a Food8", "WORLD_BERRY");
+shared_ptr<int> BerryWorld::foodTypes = Parameters::root->register_parameter("WORLD_BERRY-foodTypes", 2, "number of types of food");
+shared_ptr<double> BerryWorld::rewardForFood1 = Parameters::root->register_parameter("WORLD_BERRY-rewardForFood1", 1.0, "reward for eating a Food1");
+shared_ptr<double> BerryWorld::rewardForFood2 = Parameters::root->register_parameter("WORLD_BERRY-rewardForFood2", 1.0, "reward for eating a Food2");
+shared_ptr<double> BerryWorld::rewardForFood3 = Parameters::root->register_parameter("WORLD_BERRY-rewardForFood3", 1.0, "reward for eating a Food3");
+shared_ptr<double> BerryWorld::rewardForFood4 = Parameters::root->register_parameter("WORLD_BERRY-rewardForFood4", 1.0, "reward for eating a Food4");
+shared_ptr<double> BerryWorld::rewardForFood5 = Parameters::root->register_parameter("WORLD_BERRY-rewardForFood5", 1.0, "reward for eating a Food5");
+shared_ptr<double> BerryWorld::rewardForFood6 = Parameters::root->register_parameter("WORLD_BERRY-rewardForFood6", 1.0, "reward for eating a Food6");
+shared_ptr<double> BerryWorld::rewardForFood7 = Parameters::root->register_parameter("WORLD_BERRY-rewardForFood7", 1.0, "reward for eating a Food7");
+shared_ptr<double> BerryWorld::rewardForFood8 = Parameters::root->register_parameter("WORLD_BERRY-rewardForFood8", 1.0, "reward for eating a Food8");
 
-const double& BerryWorld::rewardForTurn = Parameters::register_parameter("rewardForTurn", 0.0, "reward for turning", "WORLD_BERRY_ADVANCED");
-const double& BerryWorld::rewardForMove = Parameters::register_parameter("rewardForMove", 0.0, "reward for moving", "WORLD_BERRY_ADVANCED");
+shared_ptr<double> BerryWorld::rewardForTurn = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-rewardForTurn", 0.0, "reward for turning");
+shared_ptr<double> BerryWorld::rewardForMove = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-rewardForMove", 0.0, "reward for moving");
 
-const int& BerryWorld::ratioFood0 = Parameters::register_parameter("replacementRatioFood0", 0, "Relative likelihood to leave empty space empty", "WORLD_BERRY_ADVANCED");
-const int& BerryWorld::ratioFood1 = Parameters::register_parameter("replacementRatioFood1", 1, "Relative likelihood to place Food1", "WORLD_BERRY_ADVANCED");
-const int& BerryWorld::ratioFood2 = Parameters::register_parameter("replacementRatioFood2", 1, "Relative likelihood to place Food2", "WORLD_BERRY_ADVANCED");
-const int& BerryWorld::ratioFood3 = Parameters::register_parameter("replacementRatioFood3", 1, "Relative likelihood to place Food3", "WORLD_BERRY_ADVANCED");
-const int& BerryWorld::ratioFood4 = Parameters::register_parameter("replacementRatioFood4", 1, "Relative likelihood to place Food4", "WORLD_BERRY_ADVANCED");
-const int& BerryWorld::ratioFood5 = Parameters::register_parameter("replacementRatioFood5", 1, "Relative likelihood to place Food5", "WORLD_BERRY_ADVANCED");
-const int& BerryWorld::ratioFood6 = Parameters::register_parameter("replacementRatioFood6", 1, "Relative likelihood to place Food6", "WORLD_BERRY_ADVANCED");
-const int& BerryWorld::ratioFood7 = Parameters::register_parameter("replacementRatioFood7", 1, "Relative likelihood to place Food7", "WORLD_BERRY_ADVANCED");
-const int& BerryWorld::ratioFood8 = Parameters::register_parameter("replacementRatioFood8", 1, "Relative likelihood to place Food8", "WORLD_BERRY_ADVANCED");
+shared_ptr<int> BerryWorld::ratioFood0 = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood0", 0, "Relative likelihood to leave empty space empty");
+shared_ptr<int> BerryWorld::ratioFood1 = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood1", 1, "Relative likelihood to place Food1");
+shared_ptr<int> BerryWorld::ratioFood2 = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood2", 1, "Relative likelihood to place Food2");
+shared_ptr<int> BerryWorld::ratioFood3 = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood3", 1, "Relative likelihood to place Food3");
+shared_ptr<int> BerryWorld::ratioFood4 = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood4", 1, "Relative likelihood to place Food4");
+shared_ptr<int> BerryWorld::ratioFood5 = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood5", 1, "Relative likelihood to place Food5");
+shared_ptr<int> BerryWorld::ratioFood6 = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood6", 1, "Relative likelihood to place Food6");
+shared_ptr<int> BerryWorld::ratioFood7 = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood7", 1, "Relative likelihood to place Food7");
+shared_ptr<int> BerryWorld::ratioFood8 = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood8", 1, "Relative likelihood to place Food8");
 
-const int& BerryWorld::WorldX = Parameters::register_parameter("worldX", 8, "world X size", "WORLD_BERRY");
-const int& BerryWorld::WorldY = Parameters::register_parameter("worldY", 8, "world Y size", "WORLD_BERRY");
-const bool& BerryWorld::borderWalls = Parameters::register_parameter("makeBorderWalls", true, "if true world will have a bounding wall", "WORLD_BERRY");
-const int& BerryWorld::randomWalls = Parameters::register_parameter("makeRandomWalls", 0, "add this many walls to the world", "WORLD_BERRY_ADVANCED");
+shared_ptr<int> BerryWorld::WorldX = Parameters::root->register_parameter("WORLD_BERRY-worldX", 8, "world X size");
+shared_ptr<int> BerryWorld::WorldY = Parameters::root->register_parameter("WORLD_BERRY-worldY", 8, "world Y size");
+shared_ptr<bool> BerryWorld::borderWalls = Parameters::root->register_parameter("WORLD_BERRY-makeBorderWalls", true, "if true world will have a bounding wall");
+shared_ptr<int> BerryWorld::randomWalls = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-makeRandomWalls", 0, "add this many walls to the world");
 
-const bool& BerryWorld::clearOutputs = Parameters::register_parameter("clearOutputs", false, "if true outputs will be cleared on each world update", "WORLD_BERRY");
+shared_ptr<bool> BerryWorld::clearOutputs = Parameters::root->register_parameter("WORLD_BERRY-clearOutputs", false, "if true outputs will be cleared on each world update");
 
-const bool& BerryWorld::allowMoveAndEat = Parameters::register_parameter("allowMoveAndEat", false, "if true, the brain can move and eat in the same world update", "WORLD_BERRY_ADVANCED");
-const bool& BerryWorld::senseDown = Parameters::register_parameter("senseDown", true, "if true, Agent can sense what it's standing on", "WORLD_BERRY");
-const bool& BerryWorld::senseFront = Parameters::register_parameter("senseFront", true, "if true, Agent can sense what's in front of it", "WORLD_BERRY");
-const bool& BerryWorld::senseFrontSides = Parameters::register_parameter("senseFrontSides", false, "if true, Agent can sense what's in front to the left and right of it", "WORLD_BERRY");
-const bool& BerryWorld::senseWalls = Parameters::register_parameter("senseWalls", false, "if true, Agent can sense Walls", "WORLD_BERRY");
-const int& BerryWorld::replacement = Parameters::register_parameter("replacement", -1, "-1 = random, 0 = no replacement, 1 = replace other (note: Food0, can be replace by Food0)", "WORLD_BERRY_ADVANCED");
+shared_ptr<bool> BerryWorld::allowMoveAndEat = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-allowMoveAndEat", false, "if true, the brain can move and eat in the same world update");
+shared_ptr<bool> BerryWorld::senseDown = Parameters::root->register_parameter("WORLD_BERRY-senseDown", true, "if true, Agent can sense what it's standing on");
+shared_ptr<bool> BerryWorld::senseFront = Parameters::root->register_parameter("WORLD_BERRY-senseFront", true, "if true, Agent can sense what's in front of it");
+shared_ptr<bool> BerryWorld::senseFrontSides = Parameters::root->register_parameter("WORLD_BERRY-senseFrontSides", false, "if true, Agent can sense what's in front to the left and right of it");
+shared_ptr<bool> BerryWorld::senseWalls = Parameters::root->register_parameter("WORLD_BERRY-senseWalls", false, "if true, Agent can sense Walls");
 
-const bool& BerryWorld::recordConsumptionRatio = Parameters::register_parameter("recordConsumptionRatio", false, "if true, record greater of red/blue+1 or blue/red+1", "WORLD_BERRY_ADVANCED");
-const bool& BerryWorld::recordFoodList = Parameters::register_parameter("recordFoodList", true, "if true, record list of food eaten", "WORLD_BERRY_ADVANCED");
-const bool& BerryWorld::recordFoodListEatEmpty = Parameters::register_parameter("recordFoodListEatEmpty", false, "if true, foodList will include attempts to eat 0", "WORLD_BERRY_ADVANCED");
-const bool& BerryWorld::recordFoodListNoEat = Parameters::register_parameter("recordFoodListNoEat", false, "if true, if true foodList will include no eat (-1)", "WORLD_BERRY_ADVANCED");
+
+shared_ptr<int> BerryWorld::replacement = Parameters::root->register_parameter("WORLD_BERRY-replacement", -1, "-1 = random, 0 = no replacement, 1 = replace other (note: Food0, can be replace by Food0)");
+
+shared_ptr<bool> BerryWorld::recordConsumptionRatio = Parameters::root->register_parameter("WORLD_BERRY-recordConsumptionRatio", false, "if true, record greater of red/blue+1 or blue/red+1");
+shared_ptr<bool> BerryWorld::recordFoodList = Parameters::root->register_parameter("WORLD_BERRY-recordFoodList", true, "if true, record list of food eaten");
+shared_ptr<bool> BerryWorld::recordFoodListEatEmpty = Parameters::root->register_parameter("WORLD_BERRY-recordFoodListEatEmpty", false, "if true, foodList will include attempts to eat 0");
+shared_ptr<bool> BerryWorld::recordFoodListNoEat = Parameters::root->register_parameter("WORLD_BERRY-recordFoodListNoEat", false, "if true, if true foodList will include no eat (-1)");
 
 
 BerryWorld::BerryWorld() {
 
-	worldUpdates = defaultWorldUpdates;
+	worldUpdates = *defaultWorldUpdates;
 
-	if (foodTypes < 1 || foodTypes > 8) {
+	if (*foodTypes < 1 || *foodTypes > 8) {
 		cout << "In BerryWorld you either have too few or too many foodTypes (must be >0 and <=8)\n\nExiting\n\n";
 		exit(1);
 	}
@@ -67,11 +69,11 @@ BerryWorld::BerryWorld() {
 	outputNodesCount = 3;  // number of brain nodes used for output, 2 for move, 1 for eat
 
 	if (senseWalls) {
-		inputNodesCount = (senseDown * foodTypes) + ((senseFront * foodTypes) + senseWalls) + (2 * ((senseFrontSides * foodTypes) + senseWalls));
+		inputNodesCount = (*senseDown * *foodTypes) + ((*senseFront * *foodTypes) + *senseWalls) + (2 * ((*senseFrontSides * *foodTypes) + *senseWalls));
 		// sense down does not include walls (can't stand on a wall (yet!) * types of food
 		// senseFront * types of food + wall, same for senseFrontSides, but there are 2
 	} else {  // no border walls
-		inputNodesCount = (senseDown * foodTypes) + (senseFront * foodTypes) + (2 * (senseFrontSides * foodTypes));
+		inputNodesCount = (*senseDown * *foodTypes) + (*senseFront * *foodTypes) + (2 * (*senseFrontSides * *foodTypes));
 		// sense down * types of food, same for senseFront, same for senseFrontSides, but there are 2
 	}
 
@@ -85,51 +87,51 @@ BerryWorld::BerryWorld() {
 
 	}
 	foodRatioLookup.resize(9);  // stores reward of each type of food NOTE: food is indexed from 1 so 0th entry is chance to leave empty
-	foodRatioLookup[0] = ratioFood0;
-	foodRatioLookup[1] = ratioFood1;
-	foodRatioLookup[2] = ratioFood2;
-	foodRatioLookup[3] = ratioFood3;
-	foodRatioLookup[4] = ratioFood4;
-	foodRatioLookup[5] = ratioFood5;
-	foodRatioLookup[6] = ratioFood6;
-	foodRatioLookup[7] = ratioFood7;
-	foodRatioLookup[8] = ratioFood8;
+	foodRatioLookup[0] = *ratioFood0;
+	foodRatioLookup[1] = *ratioFood1;
+	foodRatioLookup[2] = *ratioFood2;
+	foodRatioLookup[3] = *ratioFood3;
+	foodRatioLookup[4] = *ratioFood4;
+	foodRatioLookup[5] = *ratioFood5;
+	foodRatioLookup[6] = *ratioFood6;
+	foodRatioLookup[7] = *ratioFood7;
+	foodRatioLookup[8] = *ratioFood8;
 
 	foodRatioTotal = 0;
-	for (int i = 0; i <= foodTypes; i++) {
+	for (int i = 0; i <= *foodTypes; i++) {
 		foodRatioTotal += foodRatioLookup[i];
 	}
 
 	foodRewards.resize(9);  // stores reward of each type of food
 	foodRewards[0] = 0;
-	foodRewards[1] = rewardForFood1;
-	foodRewards[2] = rewardForFood2;
-	foodRewards[3] = rewardForFood3;
-	foodRewards[4] = rewardForFood4;
-	foodRewards[5] = rewardForFood5;
-	foodRewards[6] = rewardForFood6;
-	foodRewards[7] = rewardForFood7;
-	foodRewards[8] = rewardForFood8;
+	foodRewards[1] = *rewardForFood1;
+	foodRewards[2] = *rewardForFood2;
+	foodRewards[3] = *rewardForFood3;
+	foodRewards[4] = *rewardForFood4;
+	foodRewards[5] = *rewardForFood5;
+	foodRewards[6] = *rewardForFood6;
+	foodRewards[7] = *rewardForFood7;
+	foodRewards[8] = *rewardForFood8;
 
 	// columns to be added to ave file
 	aveFileColumns.clear();
 	aveFileColumns.push_back("score");
 	aveFileColumns.push_back("total");
-	if (foodTypes > 1) {
+	if (*foodTypes > 1) {
 		aveFileColumns.push_back("switches");
 	}
-	for (int i = 0; i <= foodTypes; i++) {
+	for (int i = 0; i <= *foodTypes; i++) {
 		string temp_name = "food" + to_string(i);  // make food names i.e. food1, food2, etc.
 		aveFileColumns.push_back(temp_name);
 	}
-	if (recordConsumptionRatio) {  // consumption ratio displays high value of org favors one food over the other and low values if both are being consumed. works on food[0] and food[1] only
+	if (*recordConsumptionRatio) {  // consumption ratio displays high value of org favors one food over the other and low values if both are being consumed. works on food[0] and food[1] only
 		aveFileColumns.push_back("consumptionRatio");
 	}
 }
 
 void BerryWorld::printGrid(vector<int> grid, pair<int, int> loc, int facing) {
-	for (int y = 0; y < BerryWorld::WorldY; y++) {
-		for (int x = 0; x < BerryWorld::WorldX; x++) {
+	for (int y = 0; y < *WorldY; y++) {
+		for (int x = 0; x < *WorldX; x++) {
 			if ((x == loc.first) && (y == loc.second)) {
 				cout << facingDisplay[facing] << " ";
 			} else {
@@ -152,10 +154,10 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 	vector<int> grid = makeTestGrid();
 
 	// organism starts in the center of the world, facing in a random direction.
-	pair<int, int> currentLocation = { Random::getIndex(WorldX), Random::getIndex(WorldY) };  // location of the organism
+	pair<int, int> currentLocation = { Random::getIndex(*WorldX), Random::getIndex(*WorldY) };  // location of the organism
 	//currentLocation = { WorldX/2, WorldY/2 };  // location of the organism
 	while (getGridValue(grid, currentLocation) == WALL) {
-		currentLocation = {Random::getIndex(WorldX), Random::getIndex(WorldY)};  //
+		currentLocation = {Random::getIndex(*WorldX), Random::getIndex(*WorldY)};  //
 	}
 	int facing = Random::getIndex(8);  // direction the agent is facing
 
@@ -221,9 +223,9 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 	int lastFood = -1;  //nothing has been eaten yet!
 	int foodHereOnArrival = getGridValue(grid, currentLocation); //value of the food when we got here - needed for replacement method.
 	vector<int> eaten;  // stores number of each type of food was eaten in total for this test. [0] stores number of times org attempted to eat on empty location
-	eaten.resize(foodTypes + 1);
+	eaten.resize(*foodTypes + 1);
 
-	if (recordFoodList) {
+	if (*recordFoodList) {
 		org->dataMap.Append("foodList", -2);  // -2 = a world initialization, -1 = did not eat this step
 	}
 
@@ -248,20 +250,20 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 		rightFront = getGridValue(grid, moveOnGrid(currentLocation, turnRight(facing)));
 
 		nodesAssignmentCounter = 0;  // get ready to start assigning inputs
-		if (senseWalls) {
-			if (senseDown) {
-				for (int i = 0; i < foodTypes; i++) {  // fill first nodes with food values at here location
+		if (*senseWalls) {
+			if (*senseDown) {
+				for (int i = 0; i < *foodTypes; i++) {  // fill first nodes with food values at here location
 					org->brain->setInput(nodesAssignmentCounter++, (here == i + 1));
 				}
 			}
-			if (senseFront) {
-				for (int i = 0; i < foodTypes; i++) {  // fill first nodes with food values at front location
+			if (*senseFront) {
+				for (int i = 0; i < *foodTypes; i++) {  // fill first nodes with food values at front location
 					org->brain->setInput(nodesAssignmentCounter++, (front == i + 1));
 				}
 				org->brain->setInput(nodesAssignmentCounter++, (front == WALL));
 			}
-			if (senseFrontSides) {
-				for (int i = 0; i < foodTypes; i++) {  // fill first nodes with food values at front location
+			if (*senseFrontSides) {
+				for (int i = 0; i < *foodTypes; i++) {  // fill first nodes with food values at front location
 					org->brain->setInput(nodesAssignmentCounter++, (leftFront == i + 1));
 					org->brain->setInput(nodesAssignmentCounter++, (rightFront == i + 1));
 				}
@@ -269,18 +271,18 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 				org->brain->setInput(nodesAssignmentCounter++, (rightFront == WALL));
 			}
 		} else {  // don't sense walls
-			if (senseDown) {
-				for (int i = 0; i < foodTypes; i++) {  // fill first nodes with food values at here location
+			if (*senseDown) {
+				for (int i = 0; i < *foodTypes; i++) {  // fill first nodes with food values at here location
 					org->brain->setInput(nodesAssignmentCounter++, (here == i + 1));
 				}
 			}
-			if (senseFront) {
-				for (int i = 0; i < foodTypes; i++) {  // fill first nodes with food values at front location
+			if (*senseFront) {
+				for (int i = 0; i < *foodTypes; i++) {  // fill first nodes with food values at front location
 					org->brain->setInput(nodesAssignmentCounter++, (front == i + 1));
 				}
 			}
-			if (senseFrontSides) {
-				for (int i = 0; i < foodTypes; i++) {  // fill first nodes with food values at front location
+			if (*senseFrontSides) {
+				for (int i = 0; i < *foodTypes; i++) {  // fill first nodes with food values at front location
 					org->brain->setInput(nodesAssignmentCounter++, (leftFront == i + 1));
 					org->brain->setInput(nodesAssignmentCounter++, (rightFront == i + 1));
 				}
@@ -303,7 +305,7 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 		}
 
 		// inputNodesCount is now set to the first output Brain State Address. we will not move it until the next world update!
-		if (clearOutputs) {
+		if (*clearOutputs) {
 			org->brain->resetOutputs();
 		}
 
@@ -327,14 +329,14 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 
 		if (output2 == 1) {  // if org tried to eat
 			int foodHere = getGridValue(grid, currentLocation);
-			if ((recordFoodList && foodHere != 0) || (recordFoodList && recordFoodListEatEmpty)) {
+			if ((*recordFoodList && foodHere != 0) || (*recordFoodList && *recordFoodListEatEmpty)) {
 				org->dataMap.Append("foodList", foodHere);  // record that org ate food (or tried to at any rate)
 			}
 			eaten[foodHere]++;  // track the number of each berry eaten, including 0s
 			if (foodHere != EMPTY) {  // eat food here (if there is food here)
 				if (lastFood != -1) {  // if some food has already been eaten
 					if (lastFood != foodHere) {  // if this food is different then the last food eaten
-						score -= BerryWorld::TSK;  // pay the task switch cost
+						score -= *TSK;  // pay the task switch cost
 						switches++;
 					}
 				}
@@ -343,30 +345,30 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 				setGridValue(grid, currentLocation, 0);  // clear this location
 			}
 		} else {
-			if (recordFoodList && recordFoodListNoEat) {
+			if (*recordFoodList && *recordFoodListNoEat) {
 				org->dataMap.Append("foodList", -1);  // record that org did not try to eat this time
 			}
 		}
 
-		if ((output2 == 0) || (allowMoveAndEat == 1)) {  // if we did not eat or we allow moving and eating in the same world update
+		if ((output2 == 0) || (*allowMoveAndEat == 1)) {  // if we did not eat or we allow moving and eating in the same world update
 			switch (output1) {
 			case 0:  //nothing
 				break;
 			case 1:  //turn left
 				facing = turnLeft(facing);
-				score += rewardForTurn;
+				score += *rewardForTurn;
 				break;
 			case 2:  //turn right
 				facing = turnRight(facing);
-				score += rewardForTurn;
+				score += *rewardForTurn;
 				break;
 			case 3:  //move forward
 				if (getGridValue(grid, moveOnGrid(currentLocation, facing)) != WALL) {  // if the proposed move is not a wall
-					score += rewardForMove;
+					score += *rewardForMove;
 					if (getGridValue(grid, currentLocation) == EMPTY) {  // if the current location is empty...
-						if (replacement == -1 || foodHereOnArrival == EMPTY) { // if replacement = random (-1) or the this location was already empty when org got here...
+						if (*replacement == -1 || foodHereOnArrival == EMPTY) { // if replacement = random (-1) or the this location was already empty when org got here...
 							setGridValue(grid, currentLocation, pickFood(-1));  // plant a random food
-						} else if (replacement == 1 && foodHereOnArrival > EMPTY) { // if replacement = other (1) and there was some food here when org got here...
+						} else if (*replacement == 1 && foodHereOnArrival > EMPTY) { // if replacement = other (1) and there was some food here when org got here...
 							setGridValue(grid, currentLocation, pickFood(foodHereOnArrival));  // plant a different food when what was here
 						}
 						// if replacement = no replacement (0), no replacement/do nothing
@@ -395,14 +397,14 @@ double BerryWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool s
 	}
 
 	int total_eaten = 0;
-	for (int i = 0; i <= foodTypes; i++) {
+	for (int i = 0; i <= *foodTypes; i++) {
 		if (i != 0) {  // don't count the attempts to eat empty!
 			total_eaten += eaten[i];
 		}
 		string temp_name = "allfood" + to_string(i);  // make food names i.e. food1, food2, etc.
 		org->dataMap.Append(temp_name, eaten[i]);
 	}
-	if (recordConsumptionRatio) {  // consumption ratio displays high value of org favors one food over the other and low values if both are being consumed. works on food[0] and food[1] only
+	if (*recordConsumptionRatio) {  // consumption ratio displays high value of org favors one food over the other and low values if both are being consumed. works on food[0] and food[1] only
 		(eaten[1] > eaten[2]) ? org->dataMap.Append("allconsumptionRatio", (double) eaten[1] / (double) (eaten[2] + 1)) : org->dataMap.Append("allconsumptionRatio", (double) eaten[2] / (double) (eaten[1] + 1));
 	}
 	org->dataMap.Append("alltotal", total_eaten);  // total food eaten (regardless of type)

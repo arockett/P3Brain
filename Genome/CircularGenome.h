@@ -20,25 +20,25 @@
 #include "../Utilities/Utilities.h"
 #include "../Utilities/Data.h"
 #include "../Utilities/Parameters.h"
-#include "../Utilities/ParametersTable.h"
 #include "../Utilities/Random.h"
 #include "AbstractGenome.h"
 
 using namespace std;
 
+// needed to move static values to own class because of templating.
 class CircularGenomeParameters {
 public:
-	static const int& initialGenomeSize;
-	static const double& pointMutationRate;
-	static const double& insertionRate;
-	static const int& insertionMinSize;
-	static const int& insertionMaxSize;
-	static const double& deletionRate;
-	static const int& deletionMinSize;
-	static const int& deletionMaxSize;
-	static const int& maxGenomeSize;
-	static const int& minGenomeSize;
-	static const int& crossCount;  // number of crosses to make when performing crossover
+	static shared_ptr<int> initialGenomeSize;
+	static shared_ptr<double> pointMutationRate;
+	static shared_ptr<double> insertionRate;
+	static shared_ptr<int> insertionMinSize;
+	static shared_ptr<int> insertionMaxSize;
+	static shared_ptr<double> deletionRate;
+	static shared_ptr<int> deletionMinSize;
+	static shared_ptr<int> deletionMaxSize;
+	static shared_ptr<int> maxGenomeSize;
+	static shared_ptr<int> minGenomeSize;
+	static shared_ptr<int> crossCount;  // number of crosses to make when performing crossover
 };
 
 template<class T>
@@ -95,7 +95,6 @@ public:
 
 	};
 
-	ParametersTable PT;
 	vector<T> sites;
 	double alphabetSize;
 

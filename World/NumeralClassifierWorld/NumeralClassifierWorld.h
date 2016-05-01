@@ -28,10 +28,10 @@ public:
 	const int WHITE = 1;
 
 	// Parameters
-	static const int& defaulttestsPreWorldEval;
-	static const int& defaultWorldUpdates;
-	static const int& defaultRetinaType;
-	static const string& numeralDataFileName;
+	static shared_ptr<int> defaulttestsPreWorldEval;
+	static shared_ptr<int> defaultWorldUpdates;
+	static shared_ptr<int> defaultRetinaType;
+	static shared_ptr<string> numeralDataFileName;
 
 	// end parameters
 

@@ -22,15 +22,15 @@ using namespace std;
 class DefaultArchivist {
  public:
 
-	static const string& Arch_outputMethodStr;  // string parameter for outputMethod;
+	static shared_ptr<string> Arch_outputMethodStr;  // string parameter for outputMethod;
 
-	static const int& Arch_realtimeFilesInterval;  // how often to write out data
-	static const bool& Arch_writeAveFile;  // if true, ave file will be created
-	static const bool& Arch_writeDominantFile;  // if true, dominant file will be created
-	static const string& Arch_AveFileName;  // name of the Averages file (ave for all brains when file is written to)
-	static const string& Arch_DominantFileName;  // name of the Dominant file (all stats for best brain when file is writtne to)
-	static const string& Arch_DefaultAveFileColumnNames;  // data to be saved into average file (must be values that can generate an average)
-	static const bool& Arch_DominantFileShowAllLists;
+	static shared_ptr<int> Arch_realtimeFilesInterval;  // how often to write out data
+	static shared_ptr<bool> Arch_writeAveFile;  // if true, ave file will be created
+	static shared_ptr<bool> Arch_writeDominantFile;  // if true, dominant file will be created
+	static shared_ptr<string> Arch_AveFileName;  // name of the Averages file (ave for all brains when file is written to)
+	static shared_ptr<string> Arch_DominantFileName;  // name of the Dominant file (all stats for best brain when file is writtne to)
+	static shared_ptr<string> Arch_DefaultAveFileColumnNames;  // data to be saved into average file (must be values that can generate an average)
+	static shared_ptr<bool> Arch_DominantFileShowAllLists;
 
 	int realtimeFilesInterval;  // how often to write out data
 	bool writeAveFile;  // if true, ave file will be created
@@ -39,6 +39,7 @@ class DefaultArchivist {
 	string DominantFileName;  // name of the Dominant file (all stats for best brain when file is writtne to)
 	map<string, vector<string>> files;  // list of files (NAME,LIST OF COLUMNS)
 	vector<string> DefaultAveFileColumns;  // what columns will be written into the AveFile
+	bool DominantFileShowAllLists;
 
 	bool finished;  // if finished, then as far as the archivist is concerned, we can stop the run.
 

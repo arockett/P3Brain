@@ -20,8 +20,8 @@ class GPGate : public AbstractGate {
 	vector<double> constValues; // list of constant values
  public:
 
-	static const double& constValueMin;
-	static const double& constValueMax;
+	static shared_ptr<double> constValueMin;
+	static shared_ptr<double> constValueMax;
 
 	GPGate() = delete;
 	//GPGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);

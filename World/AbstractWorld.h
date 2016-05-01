@@ -19,8 +19,8 @@ using namespace std;
 
 class AbstractWorld {
 public:
-	const static int& repeats;
-	const static bool& showOnUpdate;
+	 static shared_ptr<int> repeats;
+	 static shared_ptr<bool> showOnUpdate;
 
 	vector<string> aveFileColumns;
 

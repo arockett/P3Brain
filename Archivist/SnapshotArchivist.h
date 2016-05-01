@@ -14,12 +14,12 @@ using namespace std;
 
 class SnapshotArchivist : public DefaultArchivist {  // SnapShot
  public:
-	static const int& SS_Arch_dataInterval;  // how often to save data
-	static const int& SS_Arch_genomeInterval;  // how often to save genomes
-	static const string& SS_Arch_DataFilePrefix;  // name of the Data file
-	static const string& SS_Arch_GenomeFilePrefix;  // name of the Genome file (genomes on LOD)
-	static const bool& SS_Arch_writeDataFiles;  // if true, write data file
-	static const bool& SS_Arch_writeGenomeFiles;  // if true, write genome file
+	static shared_ptr< int> SS_Arch_dataInterval;  // how often to save data
+	static shared_ptr< int> SS_Arch_genomeInterval;  // how often to save genomes
+	static shared_ptr< string> SS_Arch_DataFilePrefix;  // name of the Data file
+	static shared_ptr< string> SS_Arch_GenomeFilePrefix;  // name of the Genome file (genomes on LOD)
+	static shared_ptr< bool> SS_Arch_writeDataFiles;  // if true, write data file
+	static shared_ptr< bool> SS_Arch_writeGenomeFiles;  // if true, write genome file
 
 	int dataInterval;
 	int genomeInterval;

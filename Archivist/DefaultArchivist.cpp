@@ -1,34 +1,35 @@
 #include "DefaultArchivist.h"
 using namespace std;
 
-const string& DefaultArchivist::Arch_outputMethodStr = Parameters::register_parameter("outputMethod", (string) "default", "output method, [default, LODwAP (Line of Decent with Aggressive Pruning), snapshot, SSwD (SnapShot with Delay)]", "ARCHIVIST_OUTPUT_METHOD");  // string parameter for outputMethod;
+shared_ptr<string> DefaultArchivist::Arch_outputMethodStr = Parameters::root->register_parameter("ARCHIVIST_OUTPUT_METHOD-outputMethod", (string) "default", "output method, [default, LODwAP (Line of Decent with Aggressive Pruning), snapshot, SSwD (SnapShot with Delay)]");  // string parameter for outputMethod;
 
-const int& DefaultArchivist::Arch_realtimeFilesInterval = Parameters::register_parameter("realtimeFilesInterval", 10, "How often to write to realtime data files", "ARCHIVIST");
-const bool& DefaultArchivist::Arch_writeAveFile = Parameters::register_parameter("writeAveFile", true, "Save data to average file?", "ARCHIVIST");
-const bool& DefaultArchivist::Arch_writeDominantFile = Parameters::register_parameter("writeDominantFile", true, "Save data to dominant file?", "ARCHIVIST");
-const string& DefaultArchivist::Arch_AveFileName = Parameters::register_parameter("aveFileName", (string) "ave.csv", "name of average file (saves population averages)", "ARCHIVIST");
-const string& DefaultArchivist::Arch_DominantFileName = Parameters::register_parameter("dominantFileName", (string) "dominant.csv", "name of dominant file (saves data on dominant organism)", "ARCHIVIST");
-const string& DefaultArchivist::Arch_DefaultAveFileColumnNames = Parameters::register_parameter("aveFileColumns", (string) "[]", "data to be saved into average file (must be values that can generate an average). If empty, MABE will try to figure it out", "ARCHIVIST");
-const bool& DefaultArchivist::Arch_DominantFileShowAllLists = Parameters::register_parameter("dominantFileShowAllLists", true, "lists named 'all'* in data map will be averaged and added to file. if true, raw 'all'* lists will also be added to the file", "ARCHIVIST");
+shared_ptr<int> DefaultArchivist::Arch_realtimeFilesInterval = Parameters::root->register_parameter("ARCHIVIST-realtimeFilesInterval", 10, "How often to write to realtime data files");
+shared_ptr<bool> DefaultArchivist::Arch_writeAveFile = Parameters::root->register_parameter("ARCHIVIST-writeAveFile", true, "Save data to average file?");
+shared_ptr<bool> DefaultArchivist::Arch_writeDominantFile = Parameters::root->register_parameter("ARCHIVIST-writeDominantFile", true, "Save data to dominant file?");
+shared_ptr<string> DefaultArchivist::Arch_AveFileName = Parameters::root->register_parameter("ARCHIVIST-aveFileName", (string) "ave.csv", "name of average file (saves population averages)");
+shared_ptr<string> DefaultArchivist::Arch_DominantFileName = Parameters::root->register_parameter("ARCHIVIST-dominantFileName", (string) "dominant.csv", "name of dominant file (saves data on dominant organism)");
+shared_ptr<string> DefaultArchivist::Arch_DefaultAveFileColumnNames = Parameters::root->register_parameter("ARCHIVIST-aveFileColumns", (string) "[]", "data to be saved into average file (must be values that can generate an average). If empty, MABE will try to figure it out");
+shared_ptr<bool> DefaultArchivist::Arch_DominantFileShowAllLists = Parameters::root->register_parameter("ARCHIVIST-dominantFileShowAllLists", true, "lists named 'all'* in data map will be averaged and added to file. if true, raw 'all'* lists will also be added to the file");
 
-
-DefaultArchivist::DefaultArchivist(){
-	realtimeFilesInterval = Arch_realtimeFilesInterval;
-	writeAveFile = Arch_writeAveFile;
-	writeDominantFile = Arch_writeDominantFile;
-	AveFileName = Arch_AveFileName;
-	DominantFileName = Arch_DominantFileName;
+DefaultArchivist::DefaultArchivist() {
+	realtimeFilesInterval = *Arch_realtimeFilesInterval;
+	writeAveFile = *Arch_writeAveFile;
+	writeDominantFile = *Arch_writeDominantFile;
+	AveFileName = *Arch_AveFileName;
+	DominantFileName = *Arch_DominantFileName;
+	DominantFileShowAllLists = *Arch_DominantFileShowAllLists;
 	finished = false;
 }
 
-DefaultArchivist::DefaultArchivist(vector<string> aveFileColumns){
-	realtimeFilesInterval = Arch_realtimeFilesInterval;
-	writeAveFile = Arch_writeAveFile;
-	writeDominantFile = Arch_writeDominantFile;
-	AveFileName = Arch_AveFileName;
-	DominantFileName = Arch_DominantFileName;
+DefaultArchivist::DefaultArchivist(vector<string> aveFileColumns) {
+	realtimeFilesInterval = *Arch_realtimeFilesInterval;
+	writeAveFile = *Arch_writeAveFile;
+	writeDominantFile = *Arch_writeDominantFile;
+	AveFileName = *Arch_AveFileName;
+	DominantFileName = *Arch_DominantFileName;
+	DominantFileShowAllLists = *Arch_DominantFileShowAllLists;
 	finished = false;
-	convertCSVListToVector(Arch_DefaultAveFileColumnNames, DefaultAveFileColumns);
+	convertCSVListToVector(*Arch_DefaultAveFileColumnNames, DefaultAveFileColumns);
 	if (DefaultAveFileColumns.size() <= 0) {
 		DefaultAveFileColumns = aveFileColumns;
 	}
@@ -94,7 +95,7 @@ void DefaultArchivist::writeRealTimeFiles(vector<shared_ptr<Organism>> &populati
 				temp /= (double) values.size();
 				DomMap.Set(key.substr(3, key.size() - 1), temp);
 			}
-			if (Arch_DominantFileShowAllLists) {
+			if (DominantFileShowAllLists) {
 				DomMap.Set(key, population[best]->dataMap.Get(key));
 			}
 		}
@@ -114,5 +115,5 @@ bool DefaultArchivist::archive(vector<shared_ptr<Organism>> population, int flus
 		}
 	}
 	// if we are at the end of the run
-	return (Global::update >= Global::updates);
+	return (Global::update >= *Global::updates);
 }

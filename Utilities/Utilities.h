@@ -13,8 +13,62 @@
 #include <iostream>
 #include <map>
 #include <sstream>
+#include <vector>
 
 using namespace std;
+
+
+template<typename T1, typename T2>
+bool HaveSameType(T1, T2) {
+	return is_same<T1, T2>();
+}
+
+inline string get_var_typename(const bool&) {
+	return "bool";
+}
+inline string get_var_typename(const string&) {
+	return "string";
+}
+inline string get_var_typename(const int&) {
+	return "int";
+}
+inline string get_var_typename(const double&) {
+	return "double";
+}
+
+inline vector<string> nameSpaceToNameParts(const string& nameSpace) {
+	string localNameSpace = nameSpace;
+	vector<string> nameParts;
+	bool done = (nameSpace.size() == 0);
+	bool nameSpaceValid = true;
+	while (!done) {
+		if (localNameSpace.size() > 2) {  // name space name must end with :: so must have more then 2 characters
+			int i = 0;
+			while ((localNameSpace[i] != ':' || localNameSpace[i + 1] != ':') && (i < (int) localNameSpace.size() - 2)) {
+				i++;
+			}
+			if (!(localNameSpace[i] == ':' && localNameSpace[i + 1] == ':')) {  // if there is not "::" at the end of the name space part
+				nameSpaceValid = false;
+				done = true;
+			} else {  // found "::"
+				nameParts.push_back(localNameSpace.substr(0, i + 2));
+				localNameSpace = localNameSpace.substr(i + 2, localNameSpace.size());
+				if (localNameSpace.size() == 0) {  // if after cutting of part there is nothing left
+					done = true;
+				}
+			}
+		} else {  // if the name space name part is less then 3 characters... ie, must be at least "*::"
+			nameSpaceValid = false;
+			done = true;
+		}
+	}
+	if (!nameSpaceValid) {
+		cout << "  Error::in ParametersTable::pointToNestedTable(string nameSpace). name space is invalid.\n  Can't parse \"" << localNameSpace << "\"\n   Parameter name space must end in ::\nExiting." << endl;
+		exit(1);
+	}
+	return nameParts;
+}
+
 
 /*
  * return x % y were (-1 % y) = (y - 1)
@@ -151,6 +205,21 @@ inline string CSVLookUp(map<string, vector<string>> CSV_Table, const string& loo
 template<class T>
 static bool load_value(const string& value, T& target) {
 	std::stringstream ss(value);
+	ss >> target;
+	if (ss.fail()) {
+		return false;
+	} else {
+		string remaining;
+		ss >> remaining;
+		// stream failure means nothing left in stream, which is what we want
+		return ss.fail();
+	}
+}
+
+// Put an arbitrary value to the target variable, return false on conversion failure (COPIES FUNCTION OF load_value()!)
+template<class T>
+static bool stringToValue(const string& source, T& target) {
+	std::stringstream ss(source);
 	ss >> target;
 	if (ss.fail()) {
 		return false;

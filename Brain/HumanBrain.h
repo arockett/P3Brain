@@ -24,13 +24,14 @@
 
 using namespace std;
 
-class HumanBrain : public AbstractBrain {
- public:
+class HumanBrain: public AbstractBrain {
+public:
 
-	static const bool& useActionMap;
-	static const string& actionMapFileName;
-	map <char,vector<double>> actionMap;
-	map <char,string> actionNames;
+	static shared_ptr<bool> useActionMap;
+	static shared_ptr<string> actionMapFileName;
+
+	map<char, vector<double>> actionMap;
+	map<char, string> actionNames;
 
 	HumanBrain() = delete;
 

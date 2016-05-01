@@ -20,7 +20,6 @@
 #include "../Utilities/Utilities.h"
 #include "../Utilities/Data.h"
 #include "../Utilities/Parameters.h"
-#include "../Utilities/ParametersTable.h"
 #include "../Utilities/Random.h"
 #include "AbstractChromosome.h"
 #include "AbstractGenome.h"
@@ -30,19 +29,21 @@ using namespace std;
 class MultiGenome : public AbstractGenome {
  public:
 
-	static const int& initialPloidy;
-	static const int& initialChromosomes;
-	static const int& initialChromosomeSize;
-	static const double& pointMutationRate;
-	static const double& insertionRate;
-	static const int& insertionMinSize;
-	static const int& insertionMaxSize;
-	static const double& deletionRate;
-	static const int& deletionMinSize;
-	static const int& deletionMaxSize;
-	static const int& maxChromosomeSize;
-	static const int& minChromosomeSize;
-	static const int& crossCount;  // number of crosses to make when performing crossover
+	//static shared_ptr<string> test;
+
+	static shared_ptr<int> initialPloidy;
+	static shared_ptr<int> initialChromosomes;
+	static shared_ptr<int> initialChromosomeSize;
+	static shared_ptr<double> pointMutationRate;
+	static shared_ptr<double> insertionRate;
+	static shared_ptr<int> insertionMinSize;
+	static shared_ptr<int> insertionMaxSize;
+	static shared_ptr<double> deletionRate;
+	static shared_ptr<int> deletionMinSize;
+	static shared_ptr<int> deletionMaxSize;
+	static shared_ptr<int> maxChromosomeSize;
+	static shared_ptr<int> minChromosomeSize;
+	static shared_ptr<int> crossCount;  // number of crosses to make when performing crossover
 
 	class Handler : public AbstractGenome::Handler {
  	public:
@@ -95,7 +96,6 @@ class MultiGenome : public AbstractGenome {
 
 	};
  public:
-	ParametersTable PT;
 	int ploidy;
 	vector<shared_ptr<AbstractChromosome>> chromosomes;
 

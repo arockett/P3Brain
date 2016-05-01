@@ -19,20 +19,20 @@
 class NeuronGate: public AbstractGate {
 public:
 
-	static const int& defaultNumInputsMin;
-	static const int& defaultNumInputsMax;
-	static const int& defaultDischargeBehavior;
-	static const double& defaultThresholdMin;
-	static const double& defaultThresholdMax;
-	static const bool& defaultThresholdFromNode;
+	static shared_ptr<int> defaultNumInputsMin;
+	static shared_ptr<int> defaultNumInputsMax;
+	static shared_ptr<int> defaultDischargeBehavior;
+	static shared_ptr<double> defaultThresholdMin;
+	static shared_ptr<double> defaultThresholdMax;
+	static shared_ptr<bool> defaultThresholdFromNode;
 
-	static const bool& defaultAllowRepression;
-	static const double& defaultDecayRateMin;
-	static const double& defaultDecayRateMax;
-	static const double& defaultDeliveryChargeMin;
-	static const double& defaultDeliveryChargeMax;
-	static const bool& defaultDeliveryChargeFromNode;
-	static const double& defaultDeliveryError;
+	static shared_ptr<bool> defaultAllowRepression;
+	static shared_ptr<double> defaultDecayRateMin;
+	static shared_ptr<double> defaultDecayRateMax;
+	static shared_ptr<double> defaultDeliveryChargeMin;
+	static shared_ptr<double> defaultDeliveryChargeMax;
+	static shared_ptr<bool> defaultDeliveryChargeFromNode;
+	static shared_ptr<double> defaultDeliveryError;
 
 	int dischargeBehavior;  // what to do when the gate delivers a charge
 	double thresholdValue;  // threshold when this gate will fire (if negative, then fire when currentCharge < threshold)

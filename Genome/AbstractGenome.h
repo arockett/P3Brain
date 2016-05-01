@@ -20,7 +20,6 @@
 #include "../Utilities/Utilities.h"
 #include "../Utilities/Data.h"
 #include "../Utilities/Parameters.h"
-#include "../Utilities/ParametersTable.h"
 #include "../Utilities/Random.h"
 
 using namespace std;
@@ -29,9 +28,12 @@ class AbstractGenome {
 
  public:
 
-	static const string& genomeTypeStr;
-	static const int& alphabetSize;
-	static const string& genomeSitesType;
+	static shared_ptr<string> genomeTypeStr;
+	static shared_ptr<int> alphabetSize;
+	static shared_ptr<string> genomeSitesType;
+
+	string nameSpace = "";
+	shared_ptr<ParametersTable> PT = nullptr;
 
 	// Handlers are how you access Genomes for reading and writting.
 	// to get a handle for a genome call that that genomes newHandler() method
