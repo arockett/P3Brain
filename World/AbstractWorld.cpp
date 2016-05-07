@@ -12,8 +12,8 @@
 
 #include "../Utilities/Data.h"
 
-shared_ptr<int> AbstractWorld::repeats = Parameters::root->register_parameter("WORLD-repeats", 3, "Number of times to test each Genome per generation");
-shared_ptr<bool> AbstractWorld::showOnUpdate = Parameters::root->register_parameter("WORLD-showOnUpdate", false, "display world while running world updates (if world allows)");
+shared_ptr<int> AbstractWorld::repeats = Parameters::register_parameter("WORLD-repeats", 3, "Number of times to test each Genome per generation");
+shared_ptr<bool> AbstractWorld::showOnUpdate = Parameters::register_parameter("WORLD-showOnUpdate", false, "display world while running world updates (if world allows)");
 
 void AbstractWorld::evaluateFitness(vector<shared_ptr<Organism>> population, bool analyse, bool show) {
 	for (size_t i = 0; i < population.size(); i++) {

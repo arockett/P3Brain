@@ -16,10 +16,10 @@
 
 using namespace std;
 
-shared_ptr<string> AbstractOptimizer::Optimizer_MethodStr = Parameters::root->register_parameter("OPTIMIZER-optimizer", (string) "GA", "optimizer to be used in evolution loop, [GA, Tournament, Tournament2]");  // string parameter for outputMethod;
+shared_ptr<string> AbstractOptimizer::Optimizer_MethodStr = Parameters::register_parameter("OPTIMIZER-optimizer", (string) "GA", "optimizer to be used in evolution loop, [GA, Tournament, Tournament2]");  // string parameter for outputMethod;
 
-shared_ptr<int> AbstractOptimizer::elitism = Parameters::root->register_parameter("OPTIMIZER-elitism", 0, "if the chosen optimizer allows for elitism, The highest scoring brain will be included in the next generation this many times (0 = no elitism)?");
-shared_ptr<int> AbstractOptimizer::tournamentSize = Parameters::root->register_parameter("OPTIMIZER-tournamentSize", 5, "how many genomes to consider when doing Tournament selection? 1 will result in random selection.");
+shared_ptr<int> AbstractOptimizer::elitism = Parameters::register_parameter("OPTIMIZER-elitism", 0, "if the chosen optimizer allows for elitism, The highest scoring brain will be included in the next generation this many times (0 = no elitism)?");
+shared_ptr<int> AbstractOptimizer::tournamentSize = Parameters::register_parameter("OPTIMIZER-tournamentSize", 5, "how many genomes to consider when doing Tournament selection? 1 will result in random selection.");
 
 /*
  * Optimizer::makeNextGeneration(vector<Genome*> population, vector<double> W)

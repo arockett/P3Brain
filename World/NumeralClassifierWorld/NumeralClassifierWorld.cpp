@@ -9,10 +9,10 @@
 #include "../../Utilities/Utilities.h"
 #include "NumeralClassifierWorld.h"
 
-shared_ptr<int> NumeralClassifierWorld::defaulttestsPreWorldEval = Parameters::root->register_parameter("WORLD_NUMERALCLASSIFIER-testsPreWorldEval", 5, "number of values each brain attempts to evaluate in a world evaluation");
-shared_ptr<int> NumeralClassifierWorld::defaultWorldUpdates = Parameters::root->register_parameter("WORLD_NUMERALCLASSIFIER-WorldUpdates", 100, "number of world updates brain has to evaluate each value");
-shared_ptr<int> NumeralClassifierWorld::defaultRetinaType = Parameters::root->register_parameter("WORLD_NUMERALCLASSIFIER-retinaType", 3, "//1 = center only, 2 = 3 across, 3 = 3x3, 4 = 5x5, 5 = 7x7");
-shared_ptr<string> NumeralClassifierWorld::numeralDataFileName = Parameters::root->register_parameter("WORLD_NUMERALCLASSIFIER-dataFileName", (string) "World/NumeralClassifierWorld/mnist.train.discrete.28x28-only100", "name of file with numeral data");
+shared_ptr<int> NumeralClassifierWorld::defaulttestsPreWorldEval = Parameters::register_parameter("WORLD_NUMERALCLASSIFIER-testsPreWorldEval", 5, "number of values each brain attempts to evaluate in a world evaluation");
+shared_ptr<int> NumeralClassifierWorld::defaultWorldUpdates = Parameters::register_parameter("WORLD_NUMERALCLASSIFIER-WorldUpdates", 100, "number of world updates brain has to evaluate each value");
+shared_ptr<int> NumeralClassifierWorld::defaultRetinaType = Parameters::register_parameter("WORLD_NUMERALCLASSIFIER-retinaType", 3, "//1 = center only, 2 = 3 across, 3 = 3x3, 4 = 5x5, 5 = 7x7");
+shared_ptr<string> NumeralClassifierWorld::numeralDataFileName = Parameters::register_parameter("WORLD_NUMERALCLASSIFIER-dataFileName", (string) "World/NumeralClassifierWorld/mnist.train.discrete.28x28-only100", "name of file with numeral data");
 
 NumeralClassifierWorld::NumeralClassifierWorld() {
 	worldUpdates = *defaultWorldUpdates;

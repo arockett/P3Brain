@@ -15,11 +15,11 @@
 #include <set>
 #include <vector>
 
-#include "../Gate/GateBuilder.h"
-#include "../GateListBuilder/GateListBuilder.h"
+//#include "Gate/GateBuilder.h"
+//#include "GateListBuilder/GateListBuilder.h"
 #include "../Genome/AbstractGenome.h"
-
 #include "../Utilities/Parameters.h"
+#include "../Global.h"
 
 using namespace std;
 class AbstractBrain {

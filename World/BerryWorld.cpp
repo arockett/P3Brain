@@ -8,52 +8,52 @@
 
 #include "BerryWorld.h"
 
-shared_ptr<double> BerryWorld::TSK = Parameters::root->register_parameter("WORLD_BERRY-taskSwitchingCost", 1.4, "cost to change food sources");
-shared_ptr<int> BerryWorld::defaultWorldUpdates = Parameters::root->register_parameter("WORLD_BERRY-worldUpdates", 400, "amount of time an brain is tested");
+shared_ptr<double> BerryWorld::TSK = Parameters::register_parameter("WORLD_BERRY-taskSwitchingCost", 1.4, "cost to change food sources");
+shared_ptr<int> BerryWorld::defaultWorldUpdates = Parameters::register_parameter("WORLD_BERRY-worldUpdates", 400, "amount of time an brain is tested");
 
-shared_ptr<int> BerryWorld::foodTypes = Parameters::root->register_parameter("WORLD_BERRY-foodTypes", 2, "number of types of food");
-shared_ptr<double> BerryWorld::rewardForFood1 = Parameters::root->register_parameter("WORLD_BERRY-rewardForFood1", 1.0, "reward for eating a Food1");
-shared_ptr<double> BerryWorld::rewardForFood2 = Parameters::root->register_parameter("WORLD_BERRY-rewardForFood2", 1.0, "reward for eating a Food2");
-shared_ptr<double> BerryWorld::rewardForFood3 = Parameters::root->register_parameter("WORLD_BERRY-rewardForFood3", 1.0, "reward for eating a Food3");
-shared_ptr<double> BerryWorld::rewardForFood4 = Parameters::root->register_parameter("WORLD_BERRY-rewardForFood4", 1.0, "reward for eating a Food4");
-shared_ptr<double> BerryWorld::rewardForFood5 = Parameters::root->register_parameter("WORLD_BERRY-rewardForFood5", 1.0, "reward for eating a Food5");
-shared_ptr<double> BerryWorld::rewardForFood6 = Parameters::root->register_parameter("WORLD_BERRY-rewardForFood6", 1.0, "reward for eating a Food6");
-shared_ptr<double> BerryWorld::rewardForFood7 = Parameters::root->register_parameter("WORLD_BERRY-rewardForFood7", 1.0, "reward for eating a Food7");
-shared_ptr<double> BerryWorld::rewardForFood8 = Parameters::root->register_parameter("WORLD_BERRY-rewardForFood8", 1.0, "reward for eating a Food8");
+shared_ptr<int> BerryWorld::foodTypes = Parameters::register_parameter("WORLD_BERRY-foodTypes", 2, "number of types of food");
+shared_ptr<double> BerryWorld::rewardForFood1 = Parameters::register_parameter("WORLD_BERRY-rewardForFood1", 1.0, "reward for eating a Food1");
+shared_ptr<double> BerryWorld::rewardForFood2 = Parameters::register_parameter("WORLD_BERRY-rewardForFood2", 1.0, "reward for eating a Food2");
+shared_ptr<double> BerryWorld::rewardForFood3 = Parameters::register_parameter("WORLD_BERRY-rewardForFood3", 1.0, "reward for eating a Food3");
+shared_ptr<double> BerryWorld::rewardForFood4 = Parameters::register_parameter("WORLD_BERRY-rewardForFood4", 1.0, "reward for eating a Food4");
+shared_ptr<double> BerryWorld::rewardForFood5 = Parameters::register_parameter("WORLD_BERRY-rewardForFood5", 1.0, "reward for eating a Food5");
+shared_ptr<double> BerryWorld::rewardForFood6 = Parameters::register_parameter("WORLD_BERRY-rewardForFood6", 1.0, "reward for eating a Food6");
+shared_ptr<double> BerryWorld::rewardForFood7 = Parameters::register_parameter("WORLD_BERRY-rewardForFood7", 1.0, "reward for eating a Food7");
+shared_ptr<double> BerryWorld::rewardForFood8 = Parameters::register_parameter("WORLD_BERRY-rewardForFood8", 1.0, "reward for eating a Food8");
 
-shared_ptr<double> BerryWorld::rewardForTurn = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-rewardForTurn", 0.0, "reward for turning");
-shared_ptr<double> BerryWorld::rewardForMove = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-rewardForMove", 0.0, "reward for moving");
+shared_ptr<double> BerryWorld::rewardForTurn = Parameters::register_parameter("WORLD_BERRY_ADVANCED-rewardForTurn", 0.0, "reward for turning");
+shared_ptr<double> BerryWorld::rewardForMove = Parameters::register_parameter("WORLD_BERRY_ADVANCED-rewardForMove", 0.0, "reward for moving");
 
-shared_ptr<int> BerryWorld::ratioFood0 = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood0", 0, "Relative likelihood to leave empty space empty");
-shared_ptr<int> BerryWorld::ratioFood1 = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood1", 1, "Relative likelihood to place Food1");
-shared_ptr<int> BerryWorld::ratioFood2 = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood2", 1, "Relative likelihood to place Food2");
-shared_ptr<int> BerryWorld::ratioFood3 = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood3", 1, "Relative likelihood to place Food3");
-shared_ptr<int> BerryWorld::ratioFood4 = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood4", 1, "Relative likelihood to place Food4");
-shared_ptr<int> BerryWorld::ratioFood5 = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood5", 1, "Relative likelihood to place Food5");
-shared_ptr<int> BerryWorld::ratioFood6 = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood6", 1, "Relative likelihood to place Food6");
-shared_ptr<int> BerryWorld::ratioFood7 = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood7", 1, "Relative likelihood to place Food7");
-shared_ptr<int> BerryWorld::ratioFood8 = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood8", 1, "Relative likelihood to place Food8");
+shared_ptr<int> BerryWorld::ratioFood0 = Parameters::register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood0", 0, "Relative likelihood to leave empty space empty");
+shared_ptr<int> BerryWorld::ratioFood1 = Parameters::register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood1", 1, "Relative likelihood to place Food1");
+shared_ptr<int> BerryWorld::ratioFood2 = Parameters::register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood2", 1, "Relative likelihood to place Food2");
+shared_ptr<int> BerryWorld::ratioFood3 = Parameters::register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood3", 1, "Relative likelihood to place Food3");
+shared_ptr<int> BerryWorld::ratioFood4 = Parameters::register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood4", 1, "Relative likelihood to place Food4");
+shared_ptr<int> BerryWorld::ratioFood5 = Parameters::register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood5", 1, "Relative likelihood to place Food5");
+shared_ptr<int> BerryWorld::ratioFood6 = Parameters::register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood6", 1, "Relative likelihood to place Food6");
+shared_ptr<int> BerryWorld::ratioFood7 = Parameters::register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood7", 1, "Relative likelihood to place Food7");
+shared_ptr<int> BerryWorld::ratioFood8 = Parameters::register_parameter("WORLD_BERRY_ADVANCED-replacementRatioFood8", 1, "Relative likelihood to place Food8");
 
-shared_ptr<int> BerryWorld::WorldX = Parameters::root->register_parameter("WORLD_BERRY-worldX", 8, "world X size");
-shared_ptr<int> BerryWorld::WorldY = Parameters::root->register_parameter("WORLD_BERRY-worldY", 8, "world Y size");
-shared_ptr<bool> BerryWorld::borderWalls = Parameters::root->register_parameter("WORLD_BERRY-makeBorderWalls", true, "if true world will have a bounding wall");
-shared_ptr<int> BerryWorld::randomWalls = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-makeRandomWalls", 0, "add this many walls to the world");
+shared_ptr<int> BerryWorld::WorldX = Parameters::register_parameter("WORLD_BERRY-worldX", 8, "world X size");
+shared_ptr<int> BerryWorld::WorldY = Parameters::register_parameter("WORLD_BERRY-worldY", 8, "world Y size");
+shared_ptr<bool> BerryWorld::borderWalls = Parameters::register_parameter("WORLD_BERRY-makeBorderWalls", true, "if true world will have a bounding wall");
+shared_ptr<int> BerryWorld::randomWalls = Parameters::register_parameter("WORLD_BERRY_ADVANCED-makeRandomWalls", 0, "add this many walls to the world");
 
-shared_ptr<bool> BerryWorld::clearOutputs = Parameters::root->register_parameter("WORLD_BERRY-clearOutputs", false, "if true outputs will be cleared on each world update");
+shared_ptr<bool> BerryWorld::clearOutputs = Parameters::register_parameter("WORLD_BERRY-clearOutputs", false, "if true outputs will be cleared on each world update");
 
-shared_ptr<bool> BerryWorld::allowMoveAndEat = Parameters::root->register_parameter("WORLD_BERRY_ADVANCED-allowMoveAndEat", false, "if true, the brain can move and eat in the same world update");
-shared_ptr<bool> BerryWorld::senseDown = Parameters::root->register_parameter("WORLD_BERRY-senseDown", true, "if true, Agent can sense what it's standing on");
-shared_ptr<bool> BerryWorld::senseFront = Parameters::root->register_parameter("WORLD_BERRY-senseFront", true, "if true, Agent can sense what's in front of it");
-shared_ptr<bool> BerryWorld::senseFrontSides = Parameters::root->register_parameter("WORLD_BERRY-senseFrontSides", false, "if true, Agent can sense what's in front to the left and right of it");
-shared_ptr<bool> BerryWorld::senseWalls = Parameters::root->register_parameter("WORLD_BERRY-senseWalls", false, "if true, Agent can sense Walls");
+shared_ptr<bool> BerryWorld::allowMoveAndEat = Parameters::register_parameter("WORLD_BERRY_ADVANCED-allowMoveAndEat", false, "if true, the brain can move and eat in the same world update");
+shared_ptr<bool> BerryWorld::senseDown = Parameters::register_parameter("WORLD_BERRY-senseDown", true, "if true, Agent can sense what it's standing on");
+shared_ptr<bool> BerryWorld::senseFront = Parameters::register_parameter("WORLD_BERRY-senseFront", true, "if true, Agent can sense what's in front of it");
+shared_ptr<bool> BerryWorld::senseFrontSides = Parameters::register_parameter("WORLD_BERRY-senseFrontSides", false, "if true, Agent can sense what's in front to the left and right of it");
+shared_ptr<bool> BerryWorld::senseWalls = Parameters::register_parameter("WORLD_BERRY-senseWalls", false, "if true, Agent can sense Walls");
 
 
-shared_ptr<int> BerryWorld::replacement = Parameters::root->register_parameter("WORLD_BERRY-replacement", -1, "-1 = random, 0 = no replacement, 1 = replace other (note: Food0, can be replace by Food0)");
+shared_ptr<int> BerryWorld::replacement = Parameters::register_parameter("WORLD_BERRY-replacement", -1, "-1 = random, 0 = no replacement, 1 = replace other (note: Food0, can be replace by Food0)");
 
-shared_ptr<bool> BerryWorld::recordConsumptionRatio = Parameters::root->register_parameter("WORLD_BERRY-recordConsumptionRatio", false, "if true, record greater of red/blue+1 or blue/red+1");
-shared_ptr<bool> BerryWorld::recordFoodList = Parameters::root->register_parameter("WORLD_BERRY-recordFoodList", true, "if true, record list of food eaten");
-shared_ptr<bool> BerryWorld::recordFoodListEatEmpty = Parameters::root->register_parameter("WORLD_BERRY-recordFoodListEatEmpty", false, "if true, foodList will include attempts to eat 0");
-shared_ptr<bool> BerryWorld::recordFoodListNoEat = Parameters::root->register_parameter("WORLD_BERRY-recordFoodListNoEat", false, "if true, if true foodList will include no eat (-1)");
+shared_ptr<bool> BerryWorld::recordConsumptionRatio = Parameters::register_parameter("WORLD_BERRY-recordConsumptionRatio", false, "if true, record greater of red/blue+1 or blue/red+1");
+shared_ptr<bool> BerryWorld::recordFoodList = Parameters::register_parameter("WORLD_BERRY-recordFoodList", true, "if true, record list of food eaten");
+shared_ptr<bool> BerryWorld::recordFoodListEatEmpty = Parameters::register_parameter("WORLD_BERRY-recordFoodListEatEmpty", false, "if true, foodList will include attempts to eat 0");
+shared_ptr<bool> BerryWorld::recordFoodListNoEat = Parameters::register_parameter("WORLD_BERRY-recordFoodListNoEat", false, "if true, if true foodList will include no eat (-1)");
 
 
 BerryWorld::BerryWorld() {

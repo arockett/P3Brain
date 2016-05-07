@@ -1,15 +1,15 @@
 #include "LODwAPArchivist.h"
 
-shared_ptr<int> LODwAPArchivist::LODwAP_Arch_dataInterval = Parameters::root->register_parameter("ARCHIVIST_LODWAP-dataInterval", 100, "How often to write to data file");
-shared_ptr<int> LODwAPArchivist::LODwAP_Arch_genomeInterval = Parameters::root->register_parameter("ARCHIVIST_LODWAP-genomeInterval", 1000, "How often to write genome file");
-shared_ptr<int> LODwAPArchivist::LODwAP_Arch_pruneInterval = Parameters::root->register_parameter("ARCHIVIST_LODWAP-pruneInterval", 100, "How often to attempt to prune LOD and actually write out to files");
-shared_ptr<int> LODwAPArchivist::LODwAP_Arch_terminateAfter = Parameters::root->register_parameter("ARCHIVIST_LODWAP-terminateAfter", 100, "how long to run after updates (to get better coalescence)");
-shared_ptr<string> LODwAPArchivist::LODwAP_Arch_DataFileName = Parameters::root->register_parameter("ARCHIVIST_LODWAP-dataFileName", (string) "data.csv", "name of genome file (stores genomes for line of decent)");
-shared_ptr<string> LODwAPArchivist::LODwAP_Arch_GenomeFileName = Parameters::root->register_parameter("ARCHIVIST_LODWAP-genomeFileName", (string) "genome.csv", "name of data file (stores everything but genomes)");
-shared_ptr<bool> LODwAPArchivist::LODwAP_Arch_writeDataFile = Parameters::root->register_parameter("ARCHIVIST_LODWAP-writeDataFile", true, "if true, a data file will be written");
-shared_ptr<bool> LODwAPArchivist::LODwAP_Arch_writeGenomeFile = Parameters::root->register_parameter("ARCHIVIST_LODWAP-writeGenomeFile", true, "if true, a genome file will be written");
-shared_ptr<bool> LODwAPArchivist::LODwAP_Arch_dataFileShowAllLists = Parameters::root->register_parameter("ARCHIVIST_LODWAP-dataFileShowAllLists", true, "if true, lists named 'all'* in data map will be saved");
-shared_ptr<bool> LODwAPArchivist::LODwAP_Arch_dataFileConvertAllLists = Parameters::root->register_parameter("ARCHIVIST_LODWAP-dataFileConvertAllLists", true, "if true, lists named 'all'* in data map will be averaged and added to file");
+shared_ptr<int> LODwAPArchivist::LODwAP_Arch_dataInterval = Parameters::register_parameter("ARCHIVIST_LODWAP-dataInterval", 100, "How often to write to data file");
+shared_ptr<int> LODwAPArchivist::LODwAP_Arch_genomeInterval = Parameters::register_parameter("ARCHIVIST_LODWAP-genomeInterval", 1000, "How often to write genome file");
+shared_ptr<int> LODwAPArchivist::LODwAP_Arch_pruneInterval = Parameters::register_parameter("ARCHIVIST_LODWAP-pruneInterval", 100, "How often to attempt to prune LOD and actually write out to files");
+shared_ptr<int> LODwAPArchivist::LODwAP_Arch_terminateAfter = Parameters::register_parameter("ARCHIVIST_LODWAP-terminateAfter", 100, "how long to run after updates (to get better coalescence)");
+shared_ptr<string> LODwAPArchivist::LODwAP_Arch_DataFileName = Parameters::register_parameter("ARCHIVIST_LODWAP-dataFileName", (string) "data.csv", "name of genome file (stores genomes for line of decent)");
+shared_ptr<string> LODwAPArchivist::LODwAP_Arch_GenomeFileName = Parameters::register_parameter("ARCHIVIST_LODWAP-genomeFileName", (string) "genome.csv", "name of data file (stores everything but genomes)");
+shared_ptr<bool> LODwAPArchivist::LODwAP_Arch_writeDataFile = Parameters::register_parameter("ARCHIVIST_LODWAP-writeDataFile", true, "if true, a data file will be written");
+shared_ptr<bool> LODwAPArchivist::LODwAP_Arch_writeGenomeFile = Parameters::register_parameter("ARCHIVIST_LODWAP-writeGenomeFile", true, "if true, a genome file will be written");
+shared_ptr<bool> LODwAPArchivist::LODwAP_Arch_dataFileShowAllLists = Parameters::register_parameter("ARCHIVIST_LODWAP-dataFileShowAllLists", true, "if true, lists named 'all'* in data map will be saved");
+shared_ptr<bool> LODwAPArchivist::LODwAP_Arch_dataFileConvertAllLists = Parameters::register_parameter("ARCHIVIST_LODWAP-dataFileConvertAllLists", true, "if true, lists named 'all'* in data map will be averaged and added to file");
 
 LODwAPArchivist::LODwAPArchivist(vector<string> aveFileColumns) :
 		DefaultArchivist(aveFileColumns) {

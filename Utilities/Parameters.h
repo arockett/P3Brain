@@ -331,7 +331,6 @@ private:
 	shared_ptr<map<string, shared_ptr<ParametersTable>>> parametersTablesRegistry;
 	shared_ptr<map<string, string>> parameterDocumentation;  // for each parameter name, contains documentation
 
-	static const string emptyNameSpace;
 	string workString;
 
 	void setID() {
@@ -533,8 +532,8 @@ public:
 	// set value in named table (creates if needed) - will also set this value in rootTable if the value does not exist
 	// add or overwrite to this table and add to root if not there.
 	template<typename T>
-	shared_ptr<T> setParameter(const string& name, const T& value, const string& _tableNameSpace = emptyNameSpace, bool _saveOnFileWrite = false) {
-		string localTableNameSpace = (_tableNameSpace == emptyNameSpace)?tableNameSpace:_tableNameSpace;
+	shared_ptr<T> setParameter(const string& name, const T& value, const string& _tableNameSpace = "'", bool _saveOnFileWrite = false) {
+		string localTableNameSpace = (_tableNameSpace == "'")?tableNameSpace:_tableNameSpace;
 		if (localTableNameSpace != tableNameSpace) {  // if this table is not the table we are writing to...nameSpaceToNameParts
 			if ((*parametersTablesRegistry).find(localTableNameSpace) != (*parametersTablesRegistry).end()) {  // if the table we are writing to exists...
 				return (*parametersTablesRegistry)[localTableNameSpace]->setParameter(name, value, localTableNameSpace, _saveOnFileWrite);// go to the table and set the value
@@ -585,7 +584,7 @@ public:
 // attempt to delete a value from this table also, remove any non-local children who are relying on this value.
 // if removing from root, delete all paramaters with this name in table.
 	void deleteParameter(const string& name) {
-		ASSERT((table.find(name) != table.end()), "  ERROR! :: attempt to remove non-existent \"" << tableNameSpace<<name << "\". Exiting");
+		ASSERT((table.find(name) != table.end()), "  ERROR! :: attempt to remove non-existent \"" << tableNameSpace << name << "\". Exiting");
 		if (tableNameSpace == "") {  // if we are in the root table
 			(*parameterDocumentation).erase(name);
 			// remove parameter from all children
@@ -766,6 +765,26 @@ public:
 class Parameters {
 public:
 	static shared_ptr<ParametersTable> root;
+
+	static shared_ptr<bool> register_parameter(const string& name, const bool& default_value, const string& documentation);
+	static shared_ptr<string> register_parameter(const string& name, const string& default_value, const string& documentation);
+	static shared_ptr<int> register_parameter(const string& name, const int& default_value, const string& documentation);
+	static shared_ptr<double> register_parameter(const string& name, const double& default_value, const string& documentation);
+
+//	template<typename T>
+//	static shared_ptr<T> register_parameter(const string& name, const T& default_value, const string& documentation) {
+//		if (root == nullptr) {
+//			shared_ptr<ParametersTable> root = ParametersTable::makeTable();
+//		}
+//		return root->register_parameter(name, default_value, documentation);
+//	}
+
+//	static shared_ptr<bool> register_parameter(const string& name, const bool& default_value, const string& documentation) {
+//		if (root == nullptr){
+//			shared_ptr<ParametersTable> root = ParametersTable::makeTable();
+//		}
+//		return root->register_parameter(name, default_value, documentation);
+//	}
 
 	static void parseFullParameterName(const string& fullName, string& nameSpace, string& category, string& parameterName) {
 		int i = fullName.size() - 1;
@@ -1062,6 +1081,11 @@ public:
 	}
 
 	static void initializeParameters(int argc, const char * argv[]) {
+
+		if (root == nullptr){
+			root = ParametersTable::makeTable();
+		}
+
 		unordered_map<string, string> command_line_list;
 		vector<string> fileList;
 
@@ -1125,7 +1149,7 @@ public:
 		}
 		if (saveFiles) {
 
-			Parameters::saveSettingsFiles( {""}, { { "organism.cfg", { "GATE*","GENOME*", "BRAIN*"} }, { "world.cfg", { "WORLD*" } }, { "settings.cfg", { "" } } });
+			Parameters::saveSettingsFiles( { "*" }, { { "settings_organism.cfg", { "GATE*", "GENOME*", "BRAIN*" } }, { "settings_world.cfg", { "WORLD*" } }, { "settings.cfg", { "" } } });
 			cout << "Saving config Files and Exiting." << endl;
 			exit(0);
 		}
@@ -1174,11 +1198,11 @@ public:
 				bool saveThis = false;
 				if (categoryList.size() > 0 && categoryList[0] != "-") {
 					for (auto cat : categoryList) {
-						if ((int)group.first.size() >= ((int)cat.size())-1) {
+						if ((int) group.first.size() >= ((int) cat.size()) - 1) {
 							if (group.first == cat) {
 								saveThis = true;
 							} else {
-								if ((int)cat.size() > 0 && cat[((int)cat.size()) - 1] == '*') {
+								if ((int) cat.size() > 0 && cat[((int) cat.size()) - 1] == '*') {
 									if (group.first.substr(0, cat.size() - 1) == cat.substr(0, cat.size() - 1)) {
 										saveThis = true;
 									}
@@ -1190,11 +1214,11 @@ public:
 				} else {
 					saveThis = true;
 					for (auto cat : categoryList) {
-						if ((int)group.first.size() >= ((int)cat.size())-1) {
+						if ((int) group.first.size() >= ((int) cat.size()) - 1) {
 							if (group.first == cat) {
 								saveThis = false;
 							} else {
-								if ((int)cat.size() > 0 && cat[((int)cat.size()) - 1] == '*') {
+								if ((int) cat.size() > 0 && cat[((int) cat.size()) - 1] == '*') {
 									if (group.first.substr(0, cat.size() - 1) == cat.substr(0, cat.size() - 1)) {
 										saveThis = false;
 									}

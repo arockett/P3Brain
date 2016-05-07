@@ -18,15 +18,13 @@
 #include "Archivist/SSwDArchivist.h"
 #include "Global.h"
 
-#include "Brain/HumanBrain.h"
-#include "Brain/MarkovBrain.h"
-#include "Brain/WireBrain.h"
+#include "Brain/HumanBrain/HumanBrain.h"
+#include "Brain/MarkovBrain/MarkovBrain.h"
+#include "Brain/WireBrain/WireBrain.h"
 
 #include "Genome/CircularGenome.h"
 #include "Genome/MultiGenome.h"
 #include "Genome/TemplatedChromosome.h"
-
-#include "GateListBuilder/GateListBuilder.h"
 
 #include "Group/Group.h"
 #include "Optimizer/GAOptimizer.h"
@@ -52,7 +50,8 @@ int main(int argc, const char * argv[]) {
 	cout << "\n\n" << "\tMM   MM      A       BBBBBB    EEEEEE\n" << "\tMMM MMM     AAA      BB   BB   EE\n" << "\tMMMMMMM    AA AA     BBBBBB    EEEEEE\n" << "\tMM M MM   AAAAAAA    BB   BB   EE\n" << "\tMM   MM  AA     AA   BBBBBB    EEEEEE\n" << "\n" << "\tModular    Agent      Based    Evolver\n\n\n\thttp://hintzelab.msu.edu/MABE\n\n" << endl;
 
 	Parameters::initializeParameters(argc, argv);  // loads command line and configFile values into registered parameters
-													// also writes out a config file if requested
+												   // also writes out a config file if requested
+
 
 //	shared_ptr<ParametersTable> pt = make_shared<ParametersTable>();
 //
@@ -76,7 +75,7 @@ int main(int argc, const char * argv[]) {
 //	cout << "done";
 //	exit(1);
 
-	Gate_Builder::setupGates();  // determines which gate types will be in use.
+	//Gate_Builder::setupGates();  // determines which gate types will be in use.
 
 	// outputDirectory must exist. If outputDirectory does not exist, no error will occur, but no data will be writen.
 	FileManager::outputDirectory = *Global::outputDirectory;

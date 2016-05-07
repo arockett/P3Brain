@@ -1,11 +1,11 @@
 #include "SnapshotArchivist.h"
 
-shared_ptr<int> SnapshotArchivist::SS_Arch_dataInterval = Parameters::root->register_parameter("ARCHIVIST_SNAPSHOT-dataInterval", 100, "How often to save a data file");
-shared_ptr<int> SnapshotArchivist::SS_Arch_genomeInterval = Parameters::root->register_parameter("ARCHIVIST_SNAPSHOT-genomeInterval", 1000, "How often to save a genome file");
-shared_ptr<string> SnapshotArchivist::SS_Arch_DataFilePrefix = Parameters::root->register_parameter("ARCHIVIST_SNAPSHOT-dataFilePrefix", (string) "data", "name of genome file (stores genomes)");
-shared_ptr<string> SnapshotArchivist::SS_Arch_GenomeFilePrefix = Parameters::root->register_parameter("ARCHIVIST_SNAPSHOT-genomeFilePrefix", (string) "genome", "name of data file (stores everything but genomes)");
-shared_ptr<bool> SnapshotArchivist::SS_Arch_writeDataFiles = Parameters::root->register_parameter("ARCHIVIST_SNAPSHOT-writeDataFiles", true, "if true, data files will be written");
-shared_ptr<bool> SnapshotArchivist::SS_Arch_writeGenomeFiles = Parameters::root->register_parameter("ARCHIVIST_SNAPSHOT-writeGenomeFiles", true, "if true, genome files will be written");
+shared_ptr<int> SnapshotArchivist::SS_Arch_dataInterval = Parameters::register_parameter("ARCHIVIST_SNAPSHOT-dataInterval", 100, "How often to save a data file");
+shared_ptr<int> SnapshotArchivist::SS_Arch_genomeInterval = Parameters::register_parameter("ARCHIVIST_SNAPSHOT-genomeInterval", 1000, "How often to save a genome file");
+shared_ptr<string> SnapshotArchivist::SS_Arch_DataFilePrefix = Parameters::register_parameter("ARCHIVIST_SNAPSHOT-dataFilePrefix", (string) "data", "name of genome file (stores genomes)");
+shared_ptr<string> SnapshotArchivist::SS_Arch_GenomeFilePrefix = Parameters::register_parameter("ARCHIVIST_SNAPSHOT-genomeFilePrefix", (string) "genome", "name of data file (stores everything but genomes)");
+shared_ptr<bool> SnapshotArchivist::SS_Arch_writeDataFiles = Parameters::register_parameter("ARCHIVIST_SNAPSHOT-writeDataFiles", true, "if true, data files will be written");
+shared_ptr<bool> SnapshotArchivist::SS_Arch_writeGenomeFiles = Parameters::register_parameter("ARCHIVIST_SNAPSHOT-writeGenomeFiles", true, "if true, genome files will be written");
 
 SnapshotArchivist::SnapshotArchivist(vector<string> aveFileColumns) :
 		DefaultArchivist(aveFileColumns) {

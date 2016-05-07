@@ -14,21 +14,21 @@
 
 // Initialize Parameters
 
-shared_ptr<int> MultiGenome::initialPloidy = Parameters::root->register_parameter("GENOME_MULTI-ploidy", 1, "number of copies of each chromosome");
-shared_ptr<int> MultiGenome::initialChromosomes = Parameters::root->register_parameter("GENOME_MULTI-chromosomes", 1, "number of chromosome pairs (i.e. if chromosomes = 2 and ploidy = 2 there will be 4 chromosomes in the genome)");
+shared_ptr<int> MultiGenome::initialPloidy = Parameters::register_parameter("GENOME_MULTI-ploidy", 1, "number of copies of each chromosome");
+shared_ptr<int> MultiGenome::initialChromosomes = Parameters::register_parameter("GENOME_MULTI-chromosomes", 1, "number of chromosome pairs (i.e. if chromosomes = 2 and ploidy = 2 there will be 4 chromosomes in the genome)");
 
-shared_ptr<int> MultiGenome::initialChromosomeSize = Parameters::root->register_parameter("GENOME_MULTI-chromosomeSizeInitial", 10000, "starting size for all chromosomes in genome (genome size will be chromosomeSizeInitial * number of chromosomes * ploidy)");
-shared_ptr<double> MultiGenome::pointMutationRate = Parameters::root->register_parameter("GENOME_MULTI-mutationPointRate", 0.005, "per site point mutation rate");
-shared_ptr<double> MultiGenome::insertionRate = Parameters::root->register_parameter("GENOME_MULTI-mutationCopyRate", 0.00002, "per site insertion rate");
-shared_ptr<int> MultiGenome::insertionMinSize = Parameters::root->register_parameter("GENOME_MULTI-mutationCopyMinSize", 10, "minimum size of insertion mutation");
-shared_ptr<int> MultiGenome::insertionMaxSize = Parameters::root->register_parameter("GENOME_MULTI-mutationCopyMaxSize", 200, "maximum size of insertion mutation");
-shared_ptr<double> MultiGenome::deletionRate = Parameters::root->register_parameter("GENOME_MULTI-mutationDeletionRate", 0.00002, "per site deletion rate");
-shared_ptr<int> MultiGenome::deletionMinSize = Parameters::root->register_parameter("GENOME_MULTI-mutationDeletionMinSize", 10, "minimum size of insertion mutation");
-shared_ptr<int> MultiGenome::deletionMaxSize = Parameters::root->register_parameter("GENOME_MULTI-mutationDeletionMaxSize", 200, "maximum size of insertion mutation");
-shared_ptr<int> MultiGenome::maxChromosomeSize = Parameters::root->register_parameter("GENOME_MULTI-chromosomeSizeMin", *MultiGenome::deletionMaxSize * 2, "if a chromosome is smaller then this, mutations will only increase chromosome size");
-shared_ptr<int> MultiGenome::minChromosomeSize = Parameters::root->register_parameter("GENOME_MULTI-chromosomeSizeMax", 20000, "if a chromosome is larger then this, mutations will only decrease chromosome size");
+shared_ptr<int> MultiGenome::initialChromosomeSize = Parameters::register_parameter("GENOME_MULTI-chromosomeSizeInitial", 10000, "starting size for all chromosomes in genome (genome size will be chromosomeSizeInitial * number of chromosomes * ploidy)");
+shared_ptr<double> MultiGenome::pointMutationRate = Parameters::register_parameter("GENOME_MULTI-mutationPointRate", 0.005, "per site point mutation rate");
+shared_ptr<double> MultiGenome::insertionRate = Parameters::register_parameter("GENOME_MULTI-mutationCopyRate", 0.00002, "per site insertion rate");
+shared_ptr<int> MultiGenome::insertionMinSize = Parameters::register_parameter("GENOME_MULTI-mutationCopyMinSize", 10, "minimum size of insertion mutation");
+shared_ptr<int> MultiGenome::insertionMaxSize = Parameters::register_parameter("GENOME_MULTI-mutationCopyMaxSize", 200, "maximum size of insertion mutation");
+shared_ptr<double> MultiGenome::deletionRate = Parameters::register_parameter("GENOME_MULTI-mutationDeletionRate", 0.00002, "per site deletion rate");
+shared_ptr<int> MultiGenome::deletionMinSize = Parameters::register_parameter("GENOME_MULTI-mutationDeletionMinSize", 10, "minimum size of insertion mutation");
+shared_ptr<int> MultiGenome::deletionMaxSize = Parameters::register_parameter("GENOME_MULTI-mutationDeletionMaxSize", 200, "maximum size of insertion mutation");
+shared_ptr<int> MultiGenome::maxChromosomeSize = Parameters::register_parameter("GENOME_MULTI-chromosomeSizeMin", *MultiGenome::deletionMaxSize * 2, "if a chromosome is smaller then this, mutations will only increase chromosome size");
+shared_ptr<int> MultiGenome::minChromosomeSize = Parameters::register_parameter("GENOME_MULTI-chromosomeSizeMax", 20000, "if a chromosome is larger then this, mutations will only decrease chromosome size");
 
-shared_ptr<int> MultiGenome::crossCount = Parameters::root->register_parameter("GENOME_MULTI-genomecrossCount", 3, "number of crosses when performing crossover");
+shared_ptr<int> MultiGenome::crossCount = Parameters::register_parameter("GENOME_MULTI-genomecrossCount", 3, "number of crosses when performing crossover");
 
 // constructor
 MultiGenome::Handler::Handler(shared_ptr<AbstractGenome> _genome, bool _readDirection) {
