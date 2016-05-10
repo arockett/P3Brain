@@ -20,8 +20,8 @@ using namespace std;
 
 class AbstractWorld {
 public:
-	 static shared_ptr<int> repeats;
-	 static shared_ptr<bool> showOnUpdate;
+	 static shared_ptr<ParameterLink<int>> repeatsPL;
+	 static shared_ptr<ParameterLink<bool>> showOnUpdatePL;
 
 	vector<string> aveFileColumns;
 

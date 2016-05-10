@@ -8,13 +8,13 @@
 
 #include "HumanBrain.h"
 
-shared_ptr<bool> HumanBrain::useActionMap = Parameters::register_parameter("BRAIN_HUMAN-useActionMap", false, "if true, an action map will be used to translate user input");
-shared_ptr<string> HumanBrain::actionMapFileName = Parameters::register_parameter("BRAIN_HUMAN-actionMapFileName", (string) "actionMap.txt", "if useActionMap = true, use this file");
+shared_ptr<ParameterLink<bool>> HumanBrain::useActionMapPL = Parameters::register_parameter("BRAIN_HUMAN-useActionMap", false, "if true, an action map will be used to translate user input");
+shared_ptr<ParameterLink<string>> HumanBrain::actionMapFileNamePL = Parameters::register_parameter("BRAIN_HUMAN-actionMapFileName", (string) "actionMap.txt", "if useActionMap = true, use this file");
 
 HumanBrain::HumanBrain(int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes) :
 		AbstractBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes) {
-	if (*useActionMap) {  // if using an action map, load map with lines of format char output1 output2 output3... file must match brain # of outputs
-		string fileName = *actionMapFileName;
+	if (useActionMapPL->lookup()) {  // if using an action map, load map with lines of format char output1 output2 output3... file must match brain # of outputs
+		string fileName = actionMapFileNamePL->lookup();
 		ifstream FILE(fileName);
 		string rawLine;
 		double readDouble;
@@ -64,7 +64,7 @@ void HumanBrain::update() {
 
 	nextNodes.assign(nrOfBrainNodes, 0.0);
 	char key;
-	if (*useActionMap) {
+	if (useActionMapPL->lookup()) {
 		cout << "please enter action (* for options): ";
 		cin >> key;
 		while (actionMap.find(key) == actionMap.end()) {

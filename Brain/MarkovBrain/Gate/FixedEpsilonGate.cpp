@@ -10,12 +10,12 @@
 
 /* this gate behaves like a deterministic gate with a constant externally set error which may the gate to deliver the wrong set of output values */
 
-shared_ptr<double> FixedEpsilonGate::FixedEpsilonGate_Probability = Parameters::register_parameter("GATES_FIXED_EPSILON-failProbability", 0.05, "chance that an output from a FixedEpsilonGate gate will be randomized");
+shared_ptr<ParameterLink<double>> FixedEpsilonGate::FixedEpsilonGate_ProbabilityPL = Parameters::register_parameter("GATES_FIXED_EPSILON-failProbability", 0.05, "chance that an output from a FixedEpsilonGate gate will be randomized");
 
 
 FixedEpsilonGate::FixedEpsilonGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID) :
 		DeterministicGate(addresses, _table, _ID) {  // use DeterministicGate constructor to build set up everything (including a table of 0s and 1s)
-	epsilon = *FixedEpsilonGate_Probability;  // in case you want to have different epsilon for different gates (who am I to judge?)
+	epsilon = FixedEpsilonGate_ProbabilityPL->lookup();  // in case you want to have different epsilon for different gates (who am I to judge?)
 
 	// now to the specifics of this gate - we convert the table to a list of numbers (i.e. bitstrings) so we can do fast comparisons in the update
 	defaultOutput.clear();  // clear the defaultOutput vector... the list of bitstrings

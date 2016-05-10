@@ -15,7 +15,7 @@ using namespace std;
 
 class FixedEpsilonGate: public DeterministicGate {
 public:
-	static shared_ptr<double> FixedEpsilonGate_Probability;
+	static shared_ptr<ParameterLink<double>> FixedEpsilonGate_ProbabilityPL;
 
 	vector<int> defaultOutput;
 	double epsilon;

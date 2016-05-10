@@ -8,41 +8,74 @@
 
 #include "WireBrain.h"
 
-shared_ptr<bool> WireBrain::allowNegativeCharge = Parameters::register_parameter("BRAIN_WIRE-allowNegativeCharge", false, "if true, wire brain can interpret negative input, deliver negative output, and charge negatively");
+shared_ptr<ParameterLink<bool>> WireBrain::allowNegativeChargePL = Parameters::register_parameter("BRAIN_WIRE-allowNegativeCharge", false, "if true, wire brain can interpret negative input, deliver negative output, and charge negatively");
 
-shared_ptr<int> WireBrain::defaultWidth = Parameters::register_parameter("BRAIN_WIRE-size_width", 10, "width of the wire brain cube");
-shared_ptr<int> WireBrain::defaultHeight = Parameters::register_parameter("BRAIN_WIRE-size_height", 10, "height of the wire brain cube");
-shared_ptr<int> WireBrain::defaultDepth = Parameters::register_parameter("BRAIN_WIRE-size_depth", 10, "depth of the wire brain cube");
-shared_ptr<int> WireBrain::worldConnectionsSeparation = Parameters::register_parameter("BRAIN_WIRE-worldConnectionsSeparation", 7, "distance between nodes input and output connections (I/O)");
-shared_ptr<int> WireBrain::overchargeThreshold = Parameters::register_parameter("BRAIN_WIRE-overchargeThreshold", 3, "If a cell receives this much charge or more, it will not charge");
-shared_ptr<int> WireBrain::decayDuration = Parameters::register_parameter("BRAIN_WIRE-decayDuration", 1, "length of time a cell will decay (while in decay a cell can not become charged)");
-shared_ptr<int> WireBrain::chargeUpdatesPerUpdate = Parameters::register_parameter("BRAIN_WIRE-chargeUpdatesPerUpdate", 30, "Number of charge updates per brain update");
-shared_ptr<bool> WireBrain::constantInputs = Parameters::register_parameter("BRAIN_WIRE-constantInputs", true, "if true, input values are reset every charge update, if not, input values are set on first charge update only.");
+shared_ptr<ParameterLink<int>> WireBrain::defaultWidthPL = Parameters::register_parameter("BRAIN_WIRE-size_width", 10, "width of the wire brain cube");
+shared_ptr<ParameterLink<int>> WireBrain::defaultHeightPL = Parameters::register_parameter("BRAIN_WIRE-size_height", 10, "height of the wire brain cube");
+shared_ptr<ParameterLink<int>> WireBrain::defaultDepthPL = Parameters::register_parameter("BRAIN_WIRE-size_depth", 10, "depth of the wire brain cube");
+shared_ptr<ParameterLink<int>> WireBrain::worldConnectionsSeparationPL = Parameters::register_parameter("BRAIN_WIRE-worldConnectionsSeparation", 7, "distance between nodes input and output connections (I/O)");
+shared_ptr<ParameterLink<int>> WireBrain::overchargeThresholdPL = Parameters::register_parameter("BRAIN_WIRE-overchargeThreshold", 3, "If a cell receives this much charge or more, it will not charge");
+shared_ptr<ParameterLink<int>> WireBrain::decayDurationPL = Parameters::register_parameter("BRAIN_WIRE-decayDuration", 1, "length of time a cell will decay (while in decay a cell can not become charged)");
+shared_ptr<ParameterLink<int>> WireBrain::chargeUpdatesPerUpdatePL = Parameters::register_parameter("BRAIN_WIRE-chargeUpdatesPerUpdate", 30, "Number of charge updates per brain update");
+shared_ptr<ParameterLink<bool>> WireBrain::constantInputsPL = Parameters::register_parameter("BRAIN_WIRE-constantInputs", true, "if true, input values are reset every charge update, if not, input values are set on first charge update only.");
 
-shared_ptr<bool> WireBrain::cacheResults = Parameters::register_parameter("BRAIN_WIRE-cacheResults", true, "if true, t+1 nodes will be cached. If the same input is seen, the cached node values will be used.");
-shared_ptr<int> WireBrain::cacheResultsCount = Parameters::register_parameter("BRAIN_WIRE-cacheResultsCount", 1, "input combinations will be cached this many times, after this, repeats of a given input array will look up a random value from cached values");
+shared_ptr<ParameterLink<bool>> WireBrain::cacheResultsPL = Parameters::register_parameter("BRAIN_WIRE-cacheResults", true, "if true, t+1 nodes will be cached. If the same input is seen, the cached node values will be used.");
+shared_ptr<ParameterLink<int>> WireBrain::cacheResultsCountPL = Parameters::register_parameter("BRAIN_WIRE-cacheResultsCount", 1, "input combinations will be cached this many times, after this, repeats of a given input array will look up a random value from cached values");
 
-shared_ptr<string> WireBrain::genomeDecodingMethod = Parameters::register_parameter("BRAIN_WIRE-genomeDecodingMethod", (string) "bitmap", "bitmap = convert genome directly, wiregenes = genes defined by start codeons, location, direction and location");
-shared_ptr<double> WireBrain::bitmapInitialFillRatio = Parameters::register_parameter("BRAIN_WIRE-bitmap_InitialFillRatio", .2, "if bitmap genomeDecodingMethod: amount of the brain that will initially be wire vs. empty");
+shared_ptr<ParameterLink<string>> WireBrain::genomeDecodingMethodPL = Parameters::register_parameter("BRAIN_WIRE-genomeDecodingMethod", (string) "bitmap", "bitmap = convert genome directly, wiregenes = genes defined by start codeons, location, direction and location");
+shared_ptr<ParameterLink<double>> WireBrain::bitmapInitialFillRatioPL = Parameters::register_parameter("BRAIN_WIRE-bitmap_InitialFillRatio", .2, "if bitmap genomeDecodingMethod: amount of the brain that will initially be wire vs. empty");
 
-shared_ptr<bool> WireBrain::wiregenesAllowSimpleWires = Parameters::register_parameter("BRAIN_WIRE_WIREGENE-allowSimpeWires", true, "allow SimpleWire features (lengths of straight wire)");
-shared_ptr<string> WireBrain::wiregenesSimpleWireDirections = Parameters::register_parameter("BRAIN_WIRE_WIREGENE-simpleWireDirections", (string) "cardinalOnly", "cardinalOnly (wires project in 6 square directions) vs diagonalsAlso (wires project on diagonals also)");
-shared_ptr<int> WireBrain::wiregenesSimpleWireMaxLength = Parameters::register_parameter("BRAIN_WIRE_WIREGENE-simpleWireMaxLength", 1, "maximum length of a SimpleWire (if 1, direction is effectively ignored). Wires that would project outside of brain are clipped");
-shared_ptr<bool> WireBrain::wiregenesAllowWormholes = Parameters::register_parameter("BRAIN_WIRE_WIREGENE-allowWormholes", false, "allow Wormhole features (one directional links between distant wires)");
-shared_ptr<int> WireBrain::wiregenesWormholesBidirectional = Parameters::register_parameter("BRAIN_WIRE_WIREGENE-wormholesBidirectional", 0, "allow Wormhole features to be bidirectional(0 = no, 1 = random, 2 = always)");
-shared_ptr<bool> WireBrain::wiregenesAllowSquiggleWires = Parameters::register_parameter("BRAIN_WIRE_WIREGENE-allowSquiggleWires", false, "allow squiggleWire features (wires generated by converting genome into list of directions)");
-shared_ptr<int> WireBrain::wiregenesSquiggleWireMinLength = Parameters::register_parameter("BRAIN_WIRE_WIREGENE-squiggleWireMinLength", 4, "minimum length of a SquiggleWire (if 1, it will look just like a SimpleWire). Wires that would project outside of brain are clipped");
-shared_ptr<int> WireBrain::wiregenesSquiggleWireMaxLength = Parameters::register_parameter("BRAIN_WIRE_WIREGENE-squiggleWireMaxLength", 10, "maximum length of a SquiggleWire (if 1, it will look just like a SimpleWire). Wires that would project outside of brain are clipped");
-shared_ptr<string> WireBrain::wiregenesSquiggleWireDirections = Parameters::register_parameter("BRAIN_WIRE_WIREGENE-squiggleWireDirections", (string) "cardinalOnly", "cardinalOnly (wires project in 6 square directions) vs diagonalsAlso (wires project on diagonals also)");
-shared_ptr<int> WireBrain::wiregenesInitialGeneCount = Parameters::register_parameter("BRAIN_WIRE_WIREGENE-initialGeneCount", 50, "number of start codons to be inserted into initial genome (add even number of all - even if not allowed)");
+shared_ptr<ParameterLink<bool>> WireBrain::wiregenesAllowSimpleWiresPL = Parameters::register_parameter("BRAIN_WIRE_WIREGENE-allowSimpeWires", true, "allow SimpleWire features (lengths of straight wire)");
+shared_ptr<ParameterLink<string>> WireBrain::wiregenesSimpleWireDirectionsPL = Parameters::register_parameter("BRAIN_WIRE_WIREGENE-simpleWireDirections", (string) "cardinalOnly", "cardinalOnly (wires project in 6 square directions) vs diagonalsAlso (wires project on diagonals also)");
+shared_ptr<ParameterLink<int>> WireBrain::wiregenesSimpleWireMaxLengthPL = Parameters::register_parameter("BRAIN_WIRE_WIREGENE-simpleWireMaxLength", 1, "maximum length of a SimpleWire (if 1, direction is effectively ignored). Wires that would project outside of brain are clipped");
+shared_ptr<ParameterLink<bool>> WireBrain::wiregenesAllowWormholesPL = Parameters::register_parameter("BRAIN_WIRE_WIREGENE-allowWormholes", false, "allow Wormhole features (one directional links between distant wires)");
+shared_ptr<ParameterLink<int>> WireBrain::wiregenesWormholesBidirectionalPL = Parameters::register_parameter("BRAIN_WIRE_WIREGENE-wormholesBidirectional", 0, "allow Wormhole features to be bidirectional(0 = no, 1 = random, 2 = always)");
+shared_ptr<ParameterLink<bool>> WireBrain::wiregenesAllowSquiggleWiresPL = Parameters::register_parameter("BRAIN_WIRE_WIREGENE-allowSquiggleWires", false, "allow squiggleWire features (wires generated by converting genome into list of directions)");
+shared_ptr<ParameterLink<int>> WireBrain::wiregenesSquiggleWireMinLengthPL = Parameters::register_parameter("BRAIN_WIRE_WIREGENE-squiggleWireMinLength", 4, "minimum length of a SquiggleWire (if 1, it will look just like a SimpleWire). Wires that would project outside of brain are clipped");
+shared_ptr<ParameterLink<int>> WireBrain::wiregenesSquiggleWireMaxLengthPL = Parameters::register_parameter("BRAIN_WIRE_WIREGENE-squiggleWireMaxLength", 10, "maximum length of a SquiggleWire (if 1, it will look just like a SimpleWire). Wires that would project outside of brain are clipped");
+shared_ptr<ParameterLink<string>> WireBrain::wiregenesSquiggleWireDirectionsPL = Parameters::register_parameter("BRAIN_WIRE_WIREGENE-squiggleWireDirections", (string) "cardinalOnly", "cardinalOnly (wires project in 6 square directions) vs diagonalsAlso (wires project on diagonals also)");
+shared_ptr<ParameterLink<int>> WireBrain::wiregenesInitialGeneCountPL = Parameters::register_parameter("BRAIN_WIRE_WIREGENE-initialGeneCount", 50, "number of start codons to be inserted into initial genome (add even number of all - even if not allowed)");
 
 WireBrain::WireBrain(int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes) :
 		AbstractBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes) {
-	width = *defaultWidth;
-	height = *defaultHeight;
-	depth = *defaultDepth;
+
+	allowNegativeChargeLPL = allowNegativeChargePL;
+	defaultWidthLPL = defaultWidthPL;
+	defaultHeightLPL = defaultHeightPL;
+	defaultDepthLPL = defaultDepthPL;
+	worldConnectionsSeparationLPL = worldConnectionsSeparationPL;
+	overchargeThresholdLPL = overchargeThresholdPL;
+	decayDurationLPL = decayDurationPL;
+	chargeUpdatesPerUpdateLPL = chargeUpdatesPerUpdatePL;
+	constantInputsLPL = constantInputsPL;
+	cacheResultsLPL = cacheResultsPL;
+	cacheResultsCountLPL = cacheResultsCountPL;
+
+	genomeDecodingMethodLPL = genomeDecodingMethodPL;
+	wiregenesInitialGeneCountLPL = wiregenesInitialGeneCountPL;
+	bitmapInitialFillRatioLPL = bitmapInitialFillRatioPL;
+
+	wiregenesAllowSimpleWiresLPL = wiregenesAllowSimpleWiresPL;
+	wiregenesSimpleWireMaxLengthLPL = wiregenesSimpleWireMaxLengthPL;
+	wiregenesSimpleWireDirectionsLPL = wiregenesSimpleWireDirectionsPL;
+
+	wiregenesAllowWormholesLPL = wiregenesAllowWormholesPL;
+	wiregenesWormholesBidirectionalLPL = wiregenesWormholesBidirectionalPL;
+
+	wiregenesAllowSquiggleWiresLPL = wiregenesAllowSquiggleWiresPL;
+	wiregenesSquiggleWireMinLengthLPL = wiregenesSquiggleWireMinLengthPL;
+	wiregenesSquiggleWireMaxLengthLPL = wiregenesSquiggleWireMaxLengthPL;
+	wiregenesSquiggleWireDirectionsLPL = wiregenesSquiggleWireDirectionsPL;
+
+	width = defaultWidthLPL->lookup();
+	height = defaultHeightLPL->lookup();
+	depth = defaultDepthLPL->lookup();
 
 	connectionsCount = 0;
+
+	CHARGE = 2 + decayDurationLPL->lookup();
+	NEGCHARGE = CHARGE * -1;
+
 }
 
 void WireBrain::initalize() {
@@ -53,7 +86,7 @@ void WireBrain::initalize() {
 	nodesAddresses.resize(nrOfBrainNodes);
 	nodesNextAddresses.resize(nrOfBrainNodes);
 
-	if (*cacheResults) {
+	if (cacheResultsLPL->lookup()) {
 		inputLookUpTable.resize(pow(2, nrOfBrainNodes));  // set lookup tables to be large enough to handle all possible input combinations
 		inputCount.clear();  // insure that the input counts are all 0.
 		inputCount.resize(pow(2, nrOfBrainNodes));
@@ -61,19 +94,19 @@ void WireBrain::initalize() {
 			inputCount[i] = 0;
 		}
 
-		if (*cacheResultsCount < 1) {
+		if (cacheResultsCountLPL->lookup() < 1) {
 			cout << "\n\nERROR! in WireBrain(shared_ptr<AbstractGenome> genome, int _nrOfNodes) cacheResultsCount must be > 0!\n\nExiting.\n" << endl;
 			exit(1);
 		}
 	}
 	// establish I/O
-	if ((width * depth * height) < (nrOfBrainNodes * *worldConnectionsSeparation)) {
+	if ((width * depth * height) < (nrOfBrainNodes * worldConnectionsSeparationLPL->lookup())) {
 		cout << "ERROR: WireBrain requires a bigger brain width * depth * height must be >= (nrOfNodes * worldConnectionsSeparation)!\nExiting\n" << endl;
 		exit(1);
 	}
 	for (int i = 0; i < nrOfBrainNodes; i++) {
-		nodesAddresses[i] = *worldConnectionsSeparation * i;
-		nodesNextAddresses[i] = ((width * depth * height) - 1) - (*worldConnectionsSeparation * i);
+		nodesAddresses[i] = worldConnectionsSeparationLPL->lookup() * i;
+		nodesNextAddresses[i] = ((width * depth * height) - 1) - (worldConnectionsSeparationLPL->lookup() * i);
 	}
 }
 
@@ -314,7 +347,7 @@ WireBrain::WireBrain(shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrO
 	vector<pair<int, int>> wormholeList;
 
 	if (!genome->isEmpty()) {
-		if (*genomeDecodingMethod == "bitmap") {
+		if (genomeDecodingMethodLPL->lookup() == "bitmap") {
 			// load genome into allCells
 			auto genomeHandler = genome->newHandler(genome, true);
 			for (int l = 0; l < width * depth * height; l++) {
@@ -323,7 +356,7 @@ WireBrain::WireBrain(shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrO
 					wireAddresses.push_back(l);
 				}
 			}
-		} else if (*genomeDecodingMethod == "wiregenes") {
+		} else if (genomeDecodingMethodLPL->lookup() == "wiregenes") {
 
 			// features are:
 			// simpleWire: 42,255-42,X,Y,Z,Length, Direction (if cardinalOnly 0->5 if diagonalsAlso 0->25)
@@ -351,15 +384,15 @@ WireBrain::WireBrain(shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrO
 					if (genomeHandler->atEOG()) {  // if genomeIndex > testIndex, testIndex has wrapped and we are done translating
 						translation_Complete = true;
 					} else if (testSite1Value + testSite2Value == 255) {  // if we found a possible start codon...
-						if (testSite1Value == 42 && *wiregenesAllowSimpleWires) {  // record a wire feature
+						if (testSite1Value == 42 && wiregenesAllowSimpleWiresLPL->lookup()) {  // record a wire feature
 
 							int possibleDirections;  // if cardinalOnly, only 6 possible directions, if diagonalsAlso then 26 possible directions
-							if (*wiregenesSimpleWireDirections == "cardinalOnly") {
+							if (wiregenesSimpleWireDirectionsLPL->lookup() == "cardinalOnly") {
 								possibleDirections = 5;
-							} else if (*wiregenesSimpleWireDirections == "diagonalsAlso") {
+							} else if (wiregenesSimpleWireDirectionsLPL->lookup() == "diagonalsAlso") {
 								possibleDirections = 25;
 							} else {
-								cout << "\nERROR: in WireBrain(shared_ptr<AbstractGenome> genome, int _nrOfNodes) recived illegal value for wiregenesSimpleWireDirections \"" << wiregenesSimpleWireDirections << "\".\n\nExiting!\n\n" << endl;
+								cout << "\nERROR: in WireBrain(shared_ptr<AbstractGenome> genome, int _nrOfNodes) recived illegal value for wiregenesSimpleWireDirections \"" << wiregenesSimpleWireDirectionsLPL->lookup() << "\".\n\nExiting!\n\n" << endl;
 								exit(1);
 							}
 
@@ -374,13 +407,13 @@ WireBrain::WireBrain(shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrO
 							simpleWireFeatures.push_back( { featureGenomeHandler->readInt(0, width - 1, LOCATION_CODE),  // X
 							featureGenomeHandler->readInt(0, height - 1, LOCATION_CODE),  // Y
 							featureGenomeHandler->readInt(0, depth - 1, LOCATION_CODE),  // Z
-							featureGenomeHandler->readInt(1, *wiregenesSimpleWireMaxLength, LENGTH_CODE),  // length of wire
+							featureGenomeHandler->readInt(1, wiregenesSimpleWireMaxLengthLPL->lookup(), LENGTH_CODE),  // length of wire
 							featureGenomeHandler->readInt(0, possibleDirections, DIRECTION_CODE),  // Direction the wire will be built in
 									});
 
 							featureCount++;
 
-						} else if (testSite1Value == 43 && *wiregenesAllowWormholes) {  // record a wormhole
+						} else if (testSite1Value == 43 && wiregenesAllowWormholesLPL->lookup()) {  // record a wormhole
 							genomeHandler->copyTo(featureGenomeHandler);  // make a copy of the genome handler so we can remeber where we are
 							featureGenomeHandler->toggleReadDirection();
 							featureGenomeHandler->readInt(0, 255);  // move back 2 start codon values
@@ -399,15 +432,15 @@ WireBrain::WireBrain(shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrO
 									});
 
 							featureCount++;
-						} else if (testSite1Value == 44 && *wiregenesAllowSquiggleWires) {  // record a squggleWire
+						} else if (testSite1Value == 44 && wiregenesAllowSquiggleWiresLPL->lookup()) {  // record a squggleWire
 
 							int possibleDirections;  // if cardinalOnly, only 6 possible directions, if diagonalsAlso then 26 possible directions
-							if (*wiregenesSquiggleWireDirections == "cardinalOnly") {
+							if (wiregenesSquiggleWireDirectionsLPL->lookup() == "cardinalOnly") {
 								possibleDirections = 5;
-							} else if (*wiregenesSquiggleWireDirections == "diagonalsAlso") {
+							} else if (wiregenesSquiggleWireDirectionsLPL->lookup() == "diagonalsAlso") {
 								possibleDirections = 25;
 							} else {
-								cout << "\nERROR: in WireBrain(shared_ptr<AbstractGenome> genome, int _nrOfNodes) recived illegal value for wiregenesSquiggleWireDirections \"" << wiregenesSquiggleWireDirections << "\".\n\nExiting!\n\n" << endl;
+								cout << "\nERROR: in WireBrain(shared_ptr<AbstractGenome> genome, int _nrOfNodes) recived illegal value for wiregenesSquiggleWireDirections \"" << wiregenesSquiggleWireDirectionsLPL->lookup() << "\".\n\nExiting!\n\n" << endl;
 								exit(1);
 							}
 
@@ -422,7 +455,7 @@ WireBrain::WireBrain(shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrO
 							squiggleWireFeatures.push_back( { featureGenomeHandler->readInt(0, width - 1, LOCATION_CODE),  // X
 							featureGenomeHandler->readInt(0, height - 1, LOCATION_CODE),  // Y
 							featureGenomeHandler->readInt(0, depth - 1, LOCATION_CODE),  // Z
-							featureGenomeHandler->readInt(*wiregenesSquiggleWireMinLength, *wiregenesSquiggleWireMaxLength, LENGTH_CODE) });
+							featureGenomeHandler->readInt(wiregenesSquiggleWireMinLengthLPL->lookup(), wiregenesSquiggleWireMaxLengthLPL->lookup(), LENGTH_CODE) });
 
 							int index = squiggleWireFeatures.size() - 1;
 							int length = squiggleWireFeatures[squiggleWireFeatures.size() - 1][3];
@@ -468,7 +501,7 @@ WireBrain::WireBrain(shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrO
 
 					} else {
 						//cout << "stopped" <<  endl;
-						i = *wiregenesSimpleWireMaxLength;  // if we are outside of the brain, stop this wire
+						i = wiregenesSimpleWireMaxLengthLPL->lookup();  // if we are outside of the brain, stop this wire
 					}
 				}
 			}
@@ -500,7 +533,7 @@ WireBrain::WireBrain(shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrO
 
 					} else {
 						//cout << "stopped" <<  endl;
-						i = *wiregenesSquiggleWireMaxLength;  // if we are outside of the brain, stop this wire
+						i = wiregenesSquiggleWireMaxLengthLPL->lookup();  // if we are outside of the brain, stop this wire
 					}
 				}
 			}
@@ -524,17 +557,17 @@ WireBrain::WireBrain(shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrO
 				sourceIndex = sourceX + (sourceY * width) + (sourceZ * (width * height));
 				destinationIndex = destinationX + (destinationY * width) + (destinationZ * (width * height));
 				if (allCells[sourceIndex] == WIRE && allCells[destinationIndex] == WIRE) {
-					if (*wiregenesWormholesBidirectional == 0) {
+					if (wiregenesWormholesBidirectionalLPL->lookup() == 0) {
 						//neighbors[destinationIndex].push_back(sourceIndex);
 						wormholeList.push_back( { sourceIndex, destinationIndex });
 						//connectionsCount++;
 					}
-					if (*wiregenesWormholesBidirectional == 1) {
+					if (wiregenesWormholesBidirectionalLPL->lookup() == 1) {
 						//(feature[6]) ? neighbors[destinationIndex].push_back(sourceIndex) : neighbors[sourceIndex].push_back(destinationIndex);
 						(feature[6]) ? wormholeList.push_back( { sourceIndex, destinationIndex }) : wormholeList.push_back( { destinationIndex, sourceIndex });
 						//connectionsCount++;
 					}
-					if (*wiregenesWormholesBidirectional == 2) {
+					if (wiregenesWormholesBidirectionalLPL->lookup() == 2) {
 						wormholeList.push_back( { sourceIndex, destinationIndex });
 						wormholeList.push_back( { destinationIndex, sourceIndex });
 						//connectionsCount++;
@@ -544,7 +577,7 @@ WireBrain::WireBrain(shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrO
 			}
 
 		} else {
-			cout << "\nERROR: in WireBrain(shared_ptr<AbstractGenome> genome, int _nrOfNodes) received illegal value for genomeDecodingMethod \"" << *genomeDecodingMethod << "\".\n\nExiting!\n\n" << endl;
+			cout << "\nERROR: in WireBrain(shared_ptr<AbstractGenome> genome, int _nrOfNodes) received illegal value for genomeDecodingMethod \"" << genomeDecodingMethodLPL->lookup() << "\".\n\nExiting!\n\n" << endl;
 			exit(1);
 		}
 	}
@@ -706,14 +739,14 @@ void WireBrain::chargeUpdate() {
 		if (allCells[cellAddress] == WIRE) {
 			chargeCount = 0;
 			int nc = (int) neighbors[cellAddress].size() - 1;  // get the number of neighbors which are wire
-			while (nc >= 0 && chargeCount < *overchargeThreshold) {  // for each neighbor
+			while (nc >= 0 && chargeCount < overchargeThresholdLPL->lookup()) {  // for each neighbor
 				if (allCells[neighbors[cellAddress][nc]] == CHARGE) {  // if that neighbor is charged
 					chargeCount++;
 					nextAllCells[cellAddress] = CHARGE;  // set this WIRE to CHARGE
 				}
 				nc--;
 			}
-			if (chargeCount >= *overchargeThreshold) {
+			if (chargeCount >= overchargeThresholdLPL->lookup()) {
 				nextAllCells[cellAddress] = WIRE;  // if overcharged, change back to WIRE
 				//evalToCharge++;
 			}
@@ -725,7 +758,7 @@ void WireBrain::chargeUpdate() {
 	allCells = nextAllCells;
 
 	// if constantInputs, rechage the inputs
-	if (*constantInputs) {
+	if (constantInputsLPL->lookup()) {
 		for (int i = 0; i < nrOfBrainNodes; i++) {  // for each input cell
 			//evalCount++;
 			if (nodes[i] != 0) {  // if this node is on
@@ -785,10 +818,10 @@ void WireBrain::chargeUpdateTrit() {
 					//nextAllCells[cellAddress] = CHARGE;  // set this WIRE to CHARGE
 				}
 			}
-			if (chargeCount > 0 && chargeCount < *overchargeThreshold) {
+			if (chargeCount > 0 && chargeCount < overchargeThresholdLPL->lookup()) {
 				nextAllCells[cellAddress] = CHARGE;  // if overcharged, change back to WIRE
 				//evalToCharge++;
-			} else if (chargeCount < 0 && chargeCount > (*overchargeThreshold * -1)) {
+			} else if (chargeCount < 0 && chargeCount > (overchargeThresholdLPL->lookup() * -1)) {
 				nextAllCells[cellAddress] = NEGCHARGE;
 			}
 			//cout << "  " << cellAddress << " " << nextAllCells[cellAddress] << endl;
@@ -801,7 +834,7 @@ void WireBrain::chargeUpdateTrit() {
 	allCells = nextAllCells;
 
 	// if constantInputs, rechage the inputs
-	if (*constantInputs) {
+	if (constantInputsLPL->lookup()) {
 		for (int i = 0; i < nrOfBrainNodes; i++) {  // for each input cell
 			//evalCount++;
 			if (nodes[i] != 0) {  // if this node is on
@@ -833,7 +866,7 @@ void WireBrain::update() {
 //			}
 //		}
 
-	if (*cacheResults) {
+	if (cacheResultsLPL->lookup()) {
 		long inputLookUpValue = 0;
 		//cout << "\nInput nodes: ";
 
@@ -842,8 +875,8 @@ void WireBrain::update() {
 			//cout << nodes[i];
 		}
 		//cout << " = " << inputLookUpValue << endl << "  count: " << inputCount[inputLookUpValue] << endl;
-		if (inputCount[inputLookUpValue] >= *cacheResultsCount) {  // if we have seen this value at least cacheResultsCount
-			long outputValue = inputLookUpTable[inputLookUpValue][Random::getIndex(*cacheResultsCount)];  // pull a stored value randomly
+		if (inputCount[inputLookUpValue] >= cacheResultsCountLPL->lookup()) {  // if we have seen this value at least cacheResultsCount
+			long outputValue = inputLookUpTable[inputLookUpValue][Random::getIndex(cacheResultsCountLPL->lookup())];  // pull a stored value randomly
 			//cout << "                                                                     outputValue: " << outputValue << " = ";
 			for (int i = nrOfBrainNodes - 1; i > -1; i--) {  // load outputValue into nodesNext
 				nextNodes[i] = outputValue & 1;  // get right most bit
@@ -857,7 +890,7 @@ void WireBrain::update() {
 			}
 			for (int i = 0; i < nrOfBrainNodes; i++) {  // set up inputs and outputs
 				nextNodes[i] = 0;  // reset all nodesNext
-				if (!*allowNegativeCharge) {
+				if (!allowNegativeChargeLPL->lookup()) {
 					if (Bit(nodes[i]) == 1 && allCells[nodesAddresses[i]] == WIRE) {  // for each node if it is on and connects to wire
 						allCells[nodesAddresses[i]] = CHARGE;  // charge the wire
 					}
@@ -873,8 +906,8 @@ void WireBrain::update() {
 			if (recordActivity) {
 				SaveBrainState("wireBrain.run");
 			}
-			for (int count = 0; count < *chargeUpdatesPerUpdate; count++) {
-				if (!*allowNegativeCharge) {
+			for (int count = 0; count < chargeUpdatesPerUpdateLPL->lookup(); count++) {
+				if (!allowNegativeChargeLPL->lookup()) {
 					chargeUpdate();
 				} else {
 					chargeUpdateTrit();
@@ -906,7 +939,7 @@ void WireBrain::update() {
 			}
 		}
 
-		for (int count = 0; count < *chargeUpdatesPerUpdate; count++) {
+		for (int count = 0; count < chargeUpdatesPerUpdateLPL->lookup(); count++) {
 			chargeUpdate();
 		}
 	}
@@ -1037,21 +1070,21 @@ vector<string> WireBrain::getStats() {
 }
 
 void WireBrain::initalizeGenome(shared_ptr<AbstractGenome> _genome) {
-	int codonMax = (1 << *Global::bitsPerCodon) - 1;
+	int codonMax = (1 << Global::bitsPerCodonPL->lookup()) - 1;
 
-	if (*genomeDecodingMethod == "bitmap") {
+	if (genomeDecodingMethodLPL->lookup() == "bitmap") {
 		auto genomeHandler = _genome->newHandler(_genome);
 
 		for (int i = 0; i < width * depth * height; i++) {  // fill the genome with 0s and 1s randomly with a biased ratio
-			genomeHandler->writeInt(Random::P(*bitmapInitialFillRatio), 0, 1);
+			genomeHandler->writeInt(Random::P(bitmapInitialFillRatioLPL->lookup()), 0, 1);
 		}
 	}
-	if (*genomeDecodingMethod == "wiregenes") {
+	if (genomeDecodingMethodLPL->lookup() == "wiregenes") {
 		_genome->fillRandom();
 
 		auto genomeHandler = _genome->newHandler(_genome);
 
-		for (int i = 0; i < *wiregenesInitialGeneCount; i++) {
+		for (int i = 0; i < wiregenesInitialGeneCountLPL->lookup(); i++) {
 			genomeHandler->randomize();
 			int pick = Random::getInt(42, 44);
 			genomeHandler->writeInt(pick, 0, codonMax);

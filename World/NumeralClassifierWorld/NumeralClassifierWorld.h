@@ -28,15 +28,18 @@ public:
 	const int WHITE = 1;
 
 	// Parameters
-	static shared_ptr<int> defaulttestsPreWorldEval;
-	static shared_ptr<int> defaultWorldUpdates;
-	static shared_ptr<int> defaultRetinaType;
-	static shared_ptr<string> numeralDataFileName;
+	static shared_ptr<ParameterLink<int>> defaulttestsPreWorldEvalPL;
+	static shared_ptr<ParameterLink<int>> defaultWorldUpdatesPL;
+	static shared_ptr<ParameterLink<int>> defaultRetinaTypePL;
+	static shared_ptr<ParameterLink<string>> numeralDataFileNamePL;
 
 	// end parameters
 
-	int worldUpdates;
-	int testsPreWorldEval;
+	shared_ptr<ParameterLink<int>> worldUpdatesLPL;
+	shared_ptr<ParameterLink<int>> testsPreWorldEvalLPL;
+	shared_ptr<ParameterLink<int>> retinaTypeLPL;
+	shared_ptr<ParameterLink<string>> numeralDataFileNameLPL;
+
 	vector<pair<int, int>> retinalOffsets = { { 0, 0 }, { -1, 0 }, { 1, 0 }, { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { -2, -2 }, { -1, -2 }, { 0, -2 }, { 1, -2 }, { 2, -2 }, { -2, 2 }, { -1, 2 }, { 0, 2 }, { 1, 2 }, { 2, 2 }, { -2, -1 }, { 2, -1 }, { -2, 0 }, { 2, 0 }, { -2, 1 }, { 2, 1 }, { -3, -3 }, { -2, -3 }, { -1, -3 }, { 0, -3 }, { 1, -3 }, { 2, -3 }, { 3, -3 }, { -3, 3 }, { -2, 3 }, { -1, 3 }, { 0, 3 }, { 1, 3 }, { 2, 3 }, { 3, 3 }, { -3, -2 }, { 3, -2 }, { -3, -1 }, { 3, -1 }, { -3, 0 }, { 3, 0 }, { -3, 1 }, { 3, 1 }, { -3, 2 }, { 3, 2 } };
 	// retina is a list of offsets defining input sensor array to brain
 	// 25 26 27 28 29 30 31
@@ -46,7 +49,7 @@ public:
 	// 45 32  6  7  8 24 46
 	// 47 14 15 16 17 18 48
 	// 32 33 34 35 36 37 38
-	int retinaType, retinaSensors, stepSize;
+	int retinaSensors, stepSize;
 
 	vector<vector<bool>>numeralData;
 

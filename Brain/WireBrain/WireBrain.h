@@ -23,50 +23,77 @@
 #include "../AbstractBrain.h"
 
 // define the wire states
-
-#define WIRE 1
-#define HOLLOW 0
-
-#define START_CODE 0
-#define LOCATION_CODE 1
-#define DIRECTION_CODE 2
-#define LENGTH_CODE 3
-#define DESTINATION_CODE 4
-
 using namespace std;
 
 class WireBrain: public AbstractBrain {
 
-	static shared_ptr<bool> allowNegativeCharge;
-	static shared_ptr<int> defaultWidth;
-	static shared_ptr<int> defaultHeight;
-	static shared_ptr<int> defaultDepth;
-	static shared_ptr<int> worldConnectionsSeparation;
-	static shared_ptr<int> overchargeThreshold;
-	static shared_ptr<int> decayDuration;
-	static shared_ptr<int> chargeUpdatesPerUpdate;
-	static shared_ptr<bool> constantInputs;
-	static shared_ptr<bool> cacheResults;
-	static shared_ptr<int> cacheResultsCount;
+	static shared_ptr<ParameterLink<bool>> allowNegativeChargePL;
+	static shared_ptr<ParameterLink<int>> defaultWidthPL;
+	static shared_ptr<ParameterLink<int>> defaultHeightPL;
+	static shared_ptr<ParameterLink<int>> defaultDepthPL;
+	static shared_ptr<ParameterLink<int>> worldConnectionsSeparationPL;
+	static shared_ptr<ParameterLink<int>> overchargeThresholdPL;
+	static shared_ptr<ParameterLink<int>> decayDurationPL;
+	static shared_ptr<ParameterLink<int>> chargeUpdatesPerUpdatePL;
+	static shared_ptr<ParameterLink<bool>> constantInputsPL;
+	static shared_ptr<ParameterLink<bool>> cacheResultsPL;
+	static shared_ptr<ParameterLink<int>> cacheResultsCountPL;
 
-	static shared_ptr<string> genomeDecodingMethod;  // "bitmap" = convert genome directly, "wiregenes" = genes defined by start codeons, location, direction and location
-	static shared_ptr<int> wiregenesInitialGeneCount;
-	static shared_ptr<double> bitmapInitialFillRatio;
+	static shared_ptr<ParameterLink<string>> genomeDecodingMethodPL;  // "bitmap" = convert genome directly, "wiregenes" = genes defined by start codeons, location, direction and location
+	static shared_ptr<ParameterLink<int>> wiregenesInitialGeneCountPL;
+	static shared_ptr<ParameterLink<double>> bitmapInitialFillRatioPL;
 
-	static shared_ptr<bool> wiregenesAllowSimpleWires;
-	static shared_ptr<int> wiregenesSimpleWireMaxLength;
-	static shared_ptr<string> wiregenesSimpleWireDirections;
+	static shared_ptr<ParameterLink<bool>> wiregenesAllowSimpleWiresPL;
+	static shared_ptr<ParameterLink<int>> wiregenesSimpleWireMaxLengthPL;
+	static shared_ptr<ParameterLink<string>> wiregenesSimpleWireDirectionsPL;
 
-	static shared_ptr<bool> wiregenesAllowWormholes;
-	static shared_ptr<int> wiregenesWormholesBidirectional;
+	static shared_ptr<ParameterLink<bool>> wiregenesAllowWormholesPL;
+	static shared_ptr<ParameterLink<int>> wiregenesWormholesBidirectionalPL;
 
-	static shared_ptr<bool> wiregenesAllowSquiggleWires;
-	static shared_ptr<int> wiregenesSquiggleWireMinLength;
-	static shared_ptr<int> wiregenesSquiggleWireMaxLength;
-	static shared_ptr<string> wiregenesSquiggleWireDirections;
+	static shared_ptr<ParameterLink<bool>> wiregenesAllowSquiggleWiresPL;
+	static shared_ptr<ParameterLink<int>> wiregenesSquiggleWireMinLengthPL;
+	static shared_ptr<ParameterLink<int>> wiregenesSquiggleWireMaxLengthPL;
+	static shared_ptr<ParameterLink<string>> wiregenesSquiggleWireDirectionsPL;
 
-	const int CHARGE = 2 + *decayDuration;
-	const int NEGCHARGE = CHARGE * -1;
+	shared_ptr<ParameterLink<bool>> allowNegativeChargeLPL;
+	shared_ptr<ParameterLink<int>> defaultWidthLPL;
+	shared_ptr<ParameterLink<int>> defaultHeightLPL;
+	shared_ptr<ParameterLink<int>> defaultDepthLPL;
+	shared_ptr<ParameterLink<int>> worldConnectionsSeparationLPL;
+	shared_ptr<ParameterLink<int>> overchargeThresholdLPL;
+	shared_ptr<ParameterLink<int>> decayDurationLPL;
+	shared_ptr<ParameterLink<int>> chargeUpdatesPerUpdateLPL;
+	shared_ptr<ParameterLink<bool>> constantInputsLPL;
+	shared_ptr<ParameterLink<bool>> cacheResultsLPL;
+	shared_ptr<ParameterLink<int>> cacheResultsCountLPL;
+
+	shared_ptr<ParameterLink<string>> genomeDecodingMethodLPL;  // "bitmap" = convert genome directly, "wiregenes" = genes defined by start codeons, location, direction and location
+	shared_ptr<ParameterLink<int>> wiregenesInitialGeneCountLPL;
+	shared_ptr<ParameterLink<double>> bitmapInitialFillRatioLPL;
+
+	shared_ptr<ParameterLink<bool>> wiregenesAllowSimpleWiresLPL;
+	shared_ptr<ParameterLink<int>> wiregenesSimpleWireMaxLengthLPL;
+	shared_ptr<ParameterLink<string>> wiregenesSimpleWireDirectionsLPL;
+
+	shared_ptr<ParameterLink<bool>> wiregenesAllowWormholesLPL;
+	shared_ptr<ParameterLink<int>> wiregenesWormholesBidirectionalLPL;
+
+	shared_ptr<ParameterLink<bool>> wiregenesAllowSquiggleWiresLPL;
+	shared_ptr<ParameterLink<int>> wiregenesSquiggleWireMinLengthLPL;
+	shared_ptr<ParameterLink<int>> wiregenesSquiggleWireMaxLengthLPL;
+	shared_ptr<ParameterLink<string>> wiregenesSquiggleWireDirectionsLPL;
+
+	int CHARGE;  // = 2 + *decayDuration;
+	int NEGCHARGE;  // = CHARGE * -1;
+
+	const int WIRE = 1;
+	const int HOLLOW = 0;
+
+	const int START_CODE = 0;
+	const int LOCATION_CODE = 1;
+	const int DIRECTION_CODE = 2;
+	const int LENGTH_CODE = 3;
+	const int DESTINATION_CODE = 4;
 
 public:
 

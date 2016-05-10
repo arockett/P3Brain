@@ -14,20 +14,20 @@
 class NeuronGate: public AbstractGate {
 public:
 
-	static shared_ptr<int> defaultNumInputsMin;
-	static shared_ptr<int> defaultNumInputsMax;
-	static shared_ptr<int> defaultDischargeBehavior;
-	static shared_ptr<double> defaultThresholdMin;
-	static shared_ptr<double> defaultThresholdMax;
-	static shared_ptr<bool> defaultThresholdFromNode;
+	static shared_ptr<ParameterLink<int>> defaultNumInputsMinPL;
+	static shared_ptr<ParameterLink<int>> defaultNumInputsMaxPL;
+	static shared_ptr<ParameterLink<int>> defaultDischargeBehaviorPL;
+	static shared_ptr<ParameterLink<double>> defaultThresholdMinPL;
+	static shared_ptr<ParameterLink<double>> defaultThresholdMaxPL;
+	static shared_ptr<ParameterLink<bool>> defaultThresholdFromNodePL;
 
-	static shared_ptr<bool> defaultAllowRepression;
-	static shared_ptr<double> defaultDecayRateMin;
-	static shared_ptr<double> defaultDecayRateMax;
-	static shared_ptr<double> defaultDeliveryChargeMin;
-	static shared_ptr<double> defaultDeliveryChargeMax;
-	static shared_ptr<bool> defaultDeliveryChargeFromNode;
-	static shared_ptr<double> defaultDeliveryError;
+	static shared_ptr<ParameterLink<bool>> defaultAllowRepressionPL;
+	static shared_ptr<ParameterLink<double>> defaultDecayRateMinPL;
+	static shared_ptr<ParameterLink<double>> defaultDecayRateMaxPL;
+	static shared_ptr<ParameterLink<double>> defaultDeliveryChargeMinPL;
+	static shared_ptr<ParameterLink<double>> defaultDeliveryChargeMaxPL;
+	static shared_ptr<ParameterLink<bool>> defaultDeliveryChargeFromNodePL;
+	static shared_ptr<ParameterLink<double>> defaultDeliveryErrorPL;
 
 	int dischargeBehavior;  // what to do when the gate delivers a charge
 	double thresholdValue;  // threshold when this gate will fire (if negative, then fire when currentCharge < threshold)

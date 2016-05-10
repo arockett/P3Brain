@@ -16,21 +16,23 @@
 #include <string>
 #include <vector>
 
+#include "Utilities/Parameters.h"
+
 using namespace std;
 
 class Global {
 public:
 	// parameters
-	static shared_ptr<int> randomSeed;  // seed for random number generator, if -1 random number generator will be seeded randomly
-	static shared_ptr<int> updates;  // run until there is a MCRA at this time
-	static shared_ptr<int> popSize;  // number of genomes in the population
-	static shared_ptr<string> mode;  // number of genomes in the population
+	static shared_ptr<ParameterLink<int>> randomSeedPL;  // seed for random number generator, if -1 random number generator will be seeded randomly
+	static shared_ptr<ParameterLink<int>> updatesPL;  // run until there is a MCRA at this time
+	static shared_ptr<ParameterLink<int>> popSizePL;  // number of genomes in the population
+	static shared_ptr<ParameterLink<string>> modePL;  // number of genomes in the population
 
-	static shared_ptr<string> outputDirectory;  // where files will be written
+	static shared_ptr<ParameterLink<string>> outputDirectoryPL;  // where files will be written
 
-	static shared_ptr<int> bitsPerBrainAddress;  // how many bits are evaluated to determine the brain addresses.
+	static shared_ptr<ParameterLink<int>> bitsPerBrainAddressPL;  // how many bits are evaluated to determine the brain addresses.
 	// i.e. ceil(bitsPerBrainAddress/8) = number of genome sites used
-	static shared_ptr<int> bitsPerCodon;
+	static shared_ptr<ParameterLink<int>> bitsPerCodonPL;
 
 	//////////
 	// Below are non configurable values (not set directly by Parameters.h methods)

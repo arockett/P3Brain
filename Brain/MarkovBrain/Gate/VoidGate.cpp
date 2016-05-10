@@ -10,11 +10,11 @@
 
 /* this gate behaves like a deterministic gate with a constant externally set error which may set a single output to 0 */
 
-shared_ptr<double> VoidGate::voidGate_Probability = Parameters::register_parameter("GATES_VOID-voidGate_Probability", 0.05, "chance that an output from a void gate will be set to 0");
+shared_ptr<ParameterLink<double>> VoidGate::voidGate_ProbabilityPL = Parameters::register_parameter("GATES_VOID-voidGate_Probability", 0.05, "chance that an output from a void gate will be set to 0");
 
 VoidGate::VoidGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID) :
 		DeterministicGate(addresses, _table, _ID) {  // use DeterministicGate constructor to build set up everything (including a table of 0s and 1s)
-	epsilon = *voidGate_Probability;  // in case you want to have different epsilon for different gates (who am I to judge?)
+	epsilon = voidGate_ProbabilityPL->lookup();  // in case you want to have different epsilon for different gates (who am I to judge?)
 }
 
 void VoidGate::update(vector<double> & nodes, vector<double> & nextNodes) {

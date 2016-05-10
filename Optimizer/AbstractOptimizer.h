@@ -22,10 +22,10 @@ using namespace std;
 
 class AbstractOptimizer {
  public:
-	static shared_ptr<string> Optimizer_MethodStr;
+	static shared_ptr<ParameterLink<string>> Optimizer_MethodStrPL;
 
-	static shared_ptr<int> elitism;
-	static shared_ptr<int> tournamentSize;
+	static shared_ptr<ParameterLink<int>> elitismPL;
+	static shared_ptr<ParameterLink<int>> tournamentSizePL;
 
  public:
 	double maxFitness;

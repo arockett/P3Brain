@@ -27,8 +27,8 @@ using namespace std;
 class HumanBrain: public AbstractBrain {
 public:
 
-	static shared_ptr<bool> useActionMap;
-	static shared_ptr<string> actionMapFileName;
+	static shared_ptr<ParameterLink<bool>> useActionMapPL;
+	static shared_ptr<ParameterLink<string>> actionMapFileNamePL;
 
 	map<char, vector<double>> actionMap;
 	map<char, string> actionNames;

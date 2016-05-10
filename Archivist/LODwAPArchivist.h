@@ -15,16 +15,16 @@ using namespace std;
 class LODwAPArchivist: public DefaultArchivist {  // Line of Decent with Active Pruning
 public:
 
-	static shared_ptr<int> LODwAP_Arch_dataInterval;  // how often to write out data
-	static shared_ptr<int> LODwAP_Arch_genomeInterval;  // how often to write out genomes
-	static shared_ptr<int> LODwAP_Arch_pruneInterval;  // how often to attempt to prune the LOD
-	static shared_ptr<int> LODwAP_Arch_terminateAfter;  // how long to run after updates (to get better coalescence)
-	static shared_ptr<string> LODwAP_Arch_DataFileName;  // name of the Data file
-	static shared_ptr<string> LODwAP_Arch_GenomeFileName;  // name of the Genome file (genomes on LOD)
-	static shared_ptr<bool> LODwAP_Arch_writeDataFile;  // if true, write data file
-	static shared_ptr<bool> LODwAP_Arch_writeGenomeFile;  // if true, write genome file
-	static shared_ptr<bool> LODwAP_Arch_dataFileShowAllLists;
-	static shared_ptr<bool> LODwAP_Arch_dataFileConvertAllLists;
+	static shared_ptr<ParameterLink<int>> LODwAP_Arch_dataIntervalPL;  // how often to write out data
+	static shared_ptr<ParameterLink<int>> LODwAP_Arch_genomeIntervalPL;  // how often to write out genomes
+	static shared_ptr<ParameterLink<int>> LODwAP_Arch_pruneIntervalPL;  // how often to attempt to prune the LOD
+	static shared_ptr<ParameterLink<int>> LODwAP_Arch_terminateAfterPL;  // how long to run after updates (to get better coalescence)
+	static shared_ptr<ParameterLink<string>> LODwAP_Arch_DataFileNamePL;  // name of the Data file
+	static shared_ptr<ParameterLink<string>> LODwAP_Arch_GenomeFileNamePL;  // name of the Genome file (genomes on LOD)
+	static shared_ptr<ParameterLink<bool>> LODwAP_Arch_writeDataFilePL;  // if true, write data file
+	static shared_ptr<ParameterLink<bool>> LODwAP_Arch_writeGenomeFilePL;  // if true, write genome file
+	static shared_ptr<ParameterLink<bool>> LODwAP_Arch_dataFileShowAllListsPL;
+	static shared_ptr<ParameterLink<bool>> LODwAP_Arch_dataFileConvertAllListsPL;
 
 	int dataInterval;  // how often to write out data
 	int genomeInterval;  // how often to write out genomes

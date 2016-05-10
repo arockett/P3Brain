@@ -9,18 +9,19 @@
 #include "../../Utilities/Utilities.h"
 #include "NumeralClassifierWorld.h"
 
-shared_ptr<int> NumeralClassifierWorld::defaulttestsPreWorldEval = Parameters::register_parameter("WORLD_NUMERALCLASSIFIER-testsPreWorldEval", 5, "number of values each brain attempts to evaluate in a world evaluation");
-shared_ptr<int> NumeralClassifierWorld::defaultWorldUpdates = Parameters::register_parameter("WORLD_NUMERALCLASSIFIER-WorldUpdates", 100, "number of world updates brain has to evaluate each value");
-shared_ptr<int> NumeralClassifierWorld::defaultRetinaType = Parameters::register_parameter("WORLD_NUMERALCLASSIFIER-retinaType", 3, "//1 = center only, 2 = 3 across, 3 = 3x3, 4 = 5x5, 5 = 7x7");
-shared_ptr<string> NumeralClassifierWorld::numeralDataFileName = Parameters::register_parameter("WORLD_NUMERALCLASSIFIER-dataFileName", (string) "World/NumeralClassifierWorld/mnist.train.discrete.28x28-only100", "name of file with numeral data");
+shared_ptr<ParameterLink<int>> NumeralClassifierWorld::defaulttestsPreWorldEvalPL = Parameters::register_parameter("WORLD_NUMERALCLASSIFIER-testsPreWorldEval", 5, "number of values each brain attempts to evaluate in a world evaluation");
+shared_ptr<ParameterLink<int>> NumeralClassifierWorld::defaultWorldUpdatesPL = Parameters::register_parameter("WORLD_NUMERALCLASSIFIER-WorldUpdates", 100, "number of world updates brain has to evaluate each value");
+shared_ptr<ParameterLink<int>> NumeralClassifierWorld::defaultRetinaTypePL = Parameters::register_parameter("WORLD_NUMERALCLASSIFIER-retinaType", 3, "//1 = center only, 2 = 3 across, 3 = 3x3, 4 = 5x5, 5 = 7x7");
+shared_ptr<ParameterLink<string>> NumeralClassifierWorld::numeralDataFileNamePL = Parameters::register_parameter("WORLD_NUMERALCLASSIFIER-dataFileName", (string) "World/NumeralClassifierWorld/mnist.train.discrete.28x28-only100", "name of file with numeral data");
 
 NumeralClassifierWorld::NumeralClassifierWorld() {
-	worldUpdates = *defaultWorldUpdates;
-	testsPreWorldEval = *defaulttestsPreWorldEval;
+	worldUpdatesLPL = defaultWorldUpdatesPL;
+	testsPreWorldEvalLPL = defaulttestsPreWorldEvalPL;
+	retinaTypeLPL = defaultRetinaTypePL;  //1 = center only, 2 = 3 across, 3 = 3x3, 4 = 5x5, 5 = 7x7
+	numeralDataFileNameLPL = numeralDataFileNamePL;
 
 	outputNodesCount = 13;  // moveX(1), moveY(1), 0->9(10), done(1)
-	retinaType = *defaultRetinaType;  //1 = center only, 2 = 3 across, 3 = 3x3, 4 = 5x5, 5 = 7x7
-	switch (retinaType) {
+	switch (retinaTypeLPL->lookup()) {
 	case 1:
 		retinaSensors = 1;
 		stepSize = 1;
@@ -42,7 +43,7 @@ NumeralClassifierWorld::NumeralClassifierWorld() {
 		stepSize = 7;
 		break;
 	default:
-		cout << "\n\nIn NumeralClassifierWorld constructor, undefined retinaType \"" << retinaType << "\".\n\nExiting!\n" << endl;
+		cout << "\n\nIn NumeralClassifierWorld constructor, undefined retinaType \"" << retinaTypeLPL->lookup() << "\".\n\nExiting!\n" << endl;
 		exit(1);
 	}
 	inputNodesCount = retinaSensors + 4;  // 3 x 3 retina + up + down + left + right
@@ -60,7 +61,7 @@ NumeralClassifierWorld::NumeralClassifierWorld() {
 
 	numeralData.resize(10);
 
-	string fileName = *numeralDataFileName;
+	string fileName = numeralDataFileNameLPL->lookup();
 	ifstream FILE(fileName);
 	string rawLine;
 	int readInt;
@@ -134,14 +135,14 @@ double NumeralClassifierWorld::testIndividual(shared_ptr<Organism> org, bool ana
 	// make sure the brain does not have values from last run
 	org->brain->resetBrain();
 
-	for (int test = 0; test < testsPreWorldEval; test++) {  //run agent for "worldUpdates" brain updates
+	for (int test = 0; test < testsPreWorldEvalLPL->lookup(); test++) {  //run agent for "worldUpdates" brain updates
 		numeralPick = Random::getIndex(10);  // pick a number
 		counts[numeralPick]++;
 		whichNumeral = Random::getIndex(numeralData[numeralPick].size() / (28 * 28));
 		currentX = Random::getIndex(28);  // place organism somewhere in the world
 		currentY = Random::getIndex(28);  // place organism somewhere in the world
 
-		for (int worldUpdate = 0; worldUpdate < worldUpdates; worldUpdate++) {
+		for (int worldUpdate = 0; worldUpdate < worldUpdatesLPL->lookup(); worldUpdate++) {
 
 			nodesAssignmentCounter = 0;  // get ready to start assigning inputs
 			//set retina nodes
@@ -329,7 +330,7 @@ double NumeralClassifierWorld::testIndividual(shared_ptr<Organism> org, bool ana
 		(counts[i] > 0) ? val = (double) correct[i] / (double) counts[i] : val = 0;
 		org->dataMap.Append(temp_name, val);
 		temp_name = "allincorrect" + to_string(i);  // make food names i.e. food1, food2, etc.
-		(counts[i] < testsPreWorldEval) ? val = (double) incorrect[i] / ((double) testsPreWorldEval - counts[i]) : val = 0;
+		(counts[i] < testsPreWorldEvalLPL->lookup()) ? val = (double) incorrect[i] / ((double) testsPreWorldEvalLPL->lookup() - counts[i]) : val = 0;
 		org->dataMap.Append(temp_name, val);
 	}
 

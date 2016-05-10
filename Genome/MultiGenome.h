@@ -26,27 +26,41 @@
 
 using namespace std;
 
-class MultiGenome : public AbstractGenome {
- public:
+class MultiGenome: public AbstractGenome {
+public:
 
 	//static shared_ptr<string> test;
 
-	static shared_ptr<int> initialPloidy;
-	static shared_ptr<int> initialChromosomes;
-	static shared_ptr<int> initialChromosomeSize;
-	static shared_ptr<double> pointMutationRate;
-	static shared_ptr<double> insertionRate;
-	static shared_ptr<int> insertionMinSize;
-	static shared_ptr<int> insertionMaxSize;
-	static shared_ptr<double> deletionRate;
-	static shared_ptr<int> deletionMinSize;
-	static shared_ptr<int> deletionMaxSize;
-	static shared_ptr<int> maxChromosomeSize;
-	static shared_ptr<int> minChromosomeSize;
-	static shared_ptr<int> crossCount;  // number of crosses to make when performing crossover
+	static shared_ptr<ParameterLink<int>> initialPloidyPL;
+	static shared_ptr<ParameterLink<int>> initialChromosomesPL;
+	static shared_ptr<ParameterLink<int>> initialChromosomeSizePL;
+	static shared_ptr<ParameterLink<double>> pointMutationRatePL;
+	static shared_ptr<ParameterLink<double>> insertionRatePL;
+	static shared_ptr<ParameterLink<int>> insertionMinSizePL;
+	static shared_ptr<ParameterLink<int>> insertionMaxSizePL;
+	static shared_ptr<ParameterLink<double>> deletionRatePL;
+	static shared_ptr<ParameterLink<int>> deletionMinSizePL;
+	static shared_ptr<ParameterLink<int>> deletionMaxSizePL;
+	static shared_ptr<ParameterLink<int>> maxChromosomeSizePL;
+	static shared_ptr<ParameterLink<int>> minChromosomeSizePL;
+	static shared_ptr<ParameterLink<int>> crossCountPL;  // number of crosses to make when performing crossover
 
-	class Handler : public AbstractGenome::Handler {
- 	public:
+	//shared_ptr<ParameterLink<int>> initialPloidyLPL;
+	//shared_ptr<ParameterLink<int>> initialChromosomesLPL;
+	//shared_ptr<ParameterLink<int>> initialChromosomeSizeLPL;
+	shared_ptr<ParameterLink<double>> pointMutationRateLPL;
+	shared_ptr<ParameterLink<double>> insertionRateLPL;
+	shared_ptr<ParameterLink<int>> insertionMinSizeLPL;
+	shared_ptr<ParameterLink<int>> insertionMaxSizeLPL;
+	shared_ptr<ParameterLink<double>> deletionRateLPL;
+	shared_ptr<ParameterLink<int>> deletionMinSizeLPL;
+	shared_ptr<ParameterLink<int>> deletionMaxSizeLPL;
+	shared_ptr<ParameterLink<int>> maxChromosomeSizeLPL;
+	shared_ptr<ParameterLink<int>> minChromosomeSizeLPL;
+	shared_ptr<ParameterLink<int>> crossCountLPL;  // number of crosses to make when performing crossover
+
+	class Handler: public AbstractGenome::Handler {
+	public:
 		shared_ptr<MultiGenome> genome;
 		int siteIndex;
 		int chromosomeIndex;
@@ -92,10 +106,10 @@ class MultiGenome : public AbstractGenome {
 		virtual bool inTelomere(int length) override;
 		// move this handler to a random location in genome
 		virtual void randomize() override;
-		virtual vector<vector<int>> readTable(pair<int,int> tableSize, pair<int,int> tableMaxSize, pair<int,int> valueRange, int code = -1, int CodingRegionIndex = 0) override;
+		virtual vector<vector<int>> readTable(pair<int, int> tableSize, pair<int, int> tableMaxSize, pair<int, int> valueRange, int code = -1, int CodingRegionIndex = 0) override;
 
 	};
- public:
+public:
 	int ploidy;
 	vector<shared_ptr<AbstractChromosome>> chromosomes;
 
@@ -105,7 +119,7 @@ class MultiGenome : public AbstractGenome {
 	virtual ~MultiGenome() = default;
 
 	virtual shared_ptr<AbstractGenome> makeLike() override {
-		return make_shared < MultiGenome > (chromosomes[0],(int)chromosomes.size()/ploidy,ploidy);
+		return make_shared<MultiGenome>(chromosomes[0], (int) chromosomes.size() / ploidy, ploidy);
 	}
 
 	virtual shared_ptr<AbstractGenome::Handler> newHandler(shared_ptr<AbstractGenome> _genome, bool _readDirection = true) override;
@@ -173,7 +187,6 @@ class MultiGenome : public AbstractGenome {
 	virtual string genomeToStr() override;
 
 	virtual void printGenome() override;
-
 
 }
 ;

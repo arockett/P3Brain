@@ -13,17 +13,17 @@
 #include "../Utilities/Utilities.h"
 
 // Initialize Parameters
-shared_ptr<int> CircularGenomeParameters::initialGenomeSize = Parameters::register_parameter("GENOME_CIRCULAR-sizeInitial", 2000, "starting size for genome");
-shared_ptr<double> CircularGenomeParameters::pointMutationRate = Parameters::register_parameter("GENOME_CIRCULAR-mutationPointRate", 0.005, "per site point mutation rate");
-shared_ptr<double> CircularGenomeParameters::insertionRate = Parameters::register_parameter("GENOME_CIRCULAR-mutationCopyRate", 0.00002, "per site insertion rate");
-shared_ptr<int> CircularGenomeParameters::insertionMinSize = Parameters::register_parameter("GENOME_CIRCULAR-mutationCopyMinSize", 10, "minimum size of insertion mutation");
-shared_ptr<int> CircularGenomeParameters::insertionMaxSize = Parameters::register_parameter("GENOME_CIRCULAR-mutationCopyMaxSize", 200, "maximum size of insertion mutation");
-shared_ptr<double> CircularGenomeParameters::deletionRate = Parameters::register_parameter("GENOME_CIRCULAR-mutationDeletionRate", 0.00002, "per site deletion rate");
-shared_ptr<int> CircularGenomeParameters::deletionMinSize = Parameters::register_parameter("GENOME_CIRCULAR-mutationDeletionMinSize", 10, "minimum size of insertion mutation");
-shared_ptr<int> CircularGenomeParameters::deletionMaxSize = Parameters::register_parameter("GENOME_CIRCULAR-mutationDeletionMaxSize", 200, "maximum size of insertion mutation");
-shared_ptr<int> CircularGenomeParameters::maxGenomeSize = Parameters::register_parameter("GENOME_CIRCULAR-sizeMin", 400, "if genome is smaller then this, mutations will only increase chromosome size");
-shared_ptr<int> CircularGenomeParameters::minGenomeSize = Parameters::register_parameter("GENOME_CIRCULAR-sizeMax", 5000, "if genome is larger then this, mutations will only decrease chromosome size");
-shared_ptr<int> CircularGenomeParameters::crossCount = Parameters::register_parameter("GENOME_CIRCULAR-crossCount", 3, "number of crosses when performing crossover");
+shared_ptr<ParameterLink<int>> CircularGenomeParameters::initialGenomeSizePL = Parameters::register_parameter("GENOME_CIRCULAR-sizeInitial", 2000, "starting size for genome");
+shared_ptr<ParameterLink<double>> CircularGenomeParameters::pointMutationRatePL = Parameters::register_parameter("GENOME_CIRCULAR-mutationPointRate", 0.005, "per site point mutation rate");
+shared_ptr<ParameterLink<double>> CircularGenomeParameters::insertionRatePL = Parameters::register_parameter("GENOME_CIRCULAR-mutationCopyRate", 0.00002, "per site insertion rate");
+shared_ptr<ParameterLink<int>> CircularGenomeParameters::insertionMinSizePL = Parameters::register_parameter("GENOME_CIRCULAR-mutationCopyMinSize", 10, "minimum size of insertion mutation");
+shared_ptr<ParameterLink<int>> CircularGenomeParameters::insertionMaxSizePL = Parameters::register_parameter("GENOME_CIRCULAR-mutationCopyMaxSize", 200, "maximum size of insertion mutation");
+shared_ptr<ParameterLink<double>> CircularGenomeParameters::deletionRatePL = Parameters::register_parameter("GENOME_CIRCULAR-mutationDeletionRate", 0.00002, "per site deletion rate");
+shared_ptr<ParameterLink<int>> CircularGenomeParameters::deletionMinSizePL = Parameters::register_parameter("GENOME_CIRCULAR-mutationDeletionMinSize", 10, "minimum size of insertion mutation");
+shared_ptr<ParameterLink<int>> CircularGenomeParameters::deletionMaxSizePL = Parameters::register_parameter("GENOME_CIRCULAR-mutationDeletionMaxSize", 200, "maximum size of insertion mutation");
+shared_ptr<ParameterLink<int>> CircularGenomeParameters::minGenomeSizePL = Parameters::register_parameter("GENOME_CIRCULAR-sizeMin", 400, "if genome is smaller then this, mutations will only increase chromosome size");
+shared_ptr<ParameterLink<int>> CircularGenomeParameters::maxGenomeSizePL = Parameters::register_parameter("GENOME_CIRCULAR-sizeMax", 5000, "if genome is larger then this, mutations will only decrease chromosome size");
+shared_ptr<ParameterLink<int>> CircularGenomeParameters::crossCountPL = Parameters::register_parameter("GENOME_CIRCULAR-crossCount", 3, "number of crosses when performing crossover");
 
 // constructor
 template<class T>
@@ -237,6 +237,19 @@ vector<vector<int>> CircularGenome<T>::Handler::readTable(pair<int, int> tableSi
 
 template<class T>
 void CircularGenome<T>::setupCircularGenome(int _size, double _alphabetSize) {
+
+	initialGenomeSizeLPL = (PT == nullptr) ? CircularGenomeParameters::initialGenomeSizePL : Parameters::getIntLink("GENOME_CIRCULAR-sizeInitial", PT);
+	pointMutationRateLPL = (PT == nullptr) ? CircularGenomeParameters::pointMutationRatePL : Parameters::getDoubleLink("GENOME_CIRCULAR-mutationPointRate", PT);
+	insertionRateLPL = (PT == nullptr) ? CircularGenomeParameters::insertionRatePL : Parameters::getDoubleLink("GENOME_CIRCULAR-mutationCopyRate", PT);
+	insertionMinSizeLPL = (PT == nullptr) ? CircularGenomeParameters::insertionMinSizePL : Parameters::getIntLink("GENOME_CIRCULAR-mutationCopyMinSize", PT);
+	insertionMaxSizeLPL = (PT == nullptr) ? CircularGenomeParameters::insertionMaxSizePL : Parameters::getIntLink("GENOME_CIRCULAR-mutationCopyMaxSize", PT);
+	deletionRateLPL = (PT == nullptr) ? CircularGenomeParameters::deletionRatePL : Parameters::getDoubleLink("GENOME_CIRCULAR-mutationDeletionRate", PT);
+	deletionMinSizeLPL = (PT == nullptr) ? CircularGenomeParameters::deletionMinSizePL : Parameters::getIntLink("GENOME_CIRCULAR-mutationDeletionMinSize", PT);
+	deletionMaxSizeLPL = (PT == nullptr) ? CircularGenomeParameters::deletionMaxSizePL : Parameters::getIntLink("GENOME_CIRCULAR-mutationDeletionMaxSize", PT);
+	minGenomeSizeLPL = (PT == nullptr) ? CircularGenomeParameters::minGenomeSizePL : Parameters::getIntLink("GENOME_CIRCULAR-sizeMin", PT);
+	maxGenomeSizeLPL = (PT == nullptr) ? CircularGenomeParameters::maxGenomeSizePL : Parameters::getIntLink("GENOME_CIRCULAR-sizeMax", PT);
+	crossCountLPL = (PT == nullptr) ? CircularGenomeParameters::crossCountPL : Parameters::getIntLink("GENOME_CIRCULAR-crossCount", PT);
+
 	sites.resize(_size);
 	alphabetSize = _alphabetSize;
 	// define columns to be written to genome files
@@ -373,17 +386,17 @@ void CircularGenome<double>::pointMutate() {
 // apply mutations to this genome
 template<class T>
 void CircularGenome<T>::mutate() {
-	int howManyPoint = Random::getBinomial(sites.size(), (PT == nullptr) ? *CircularGenomeParameters::pointMutationRate : PT->lookupDouble("GENOME_CIRCULAR-mutationPointRate"));
-	int howManyCopy = Random::getBinomial(sites.size(), (PT == nullptr) ? *CircularGenomeParameters::insertionRate : PT->lookupDouble("GENOME_CIRCULAR-mutationCopyRate"));
-	int howManyDelete = Random::getBinomial(sites.size(), (PT == nullptr) ? *CircularGenomeParameters::deletionRate : PT->lookupDouble("GENOME_CIRCULAR-mutationDeletionRate"));
+	int howManyPoint = Random::getBinomial(sites.size(), pointMutationRateLPL->lookup());
+	int howManyCopy = Random::getBinomial(sites.size(), insertionRateLPL->lookup());
+	int howManyDelete = Random::getBinomial(sites.size(), deletionRateLPL->lookup());
 	// do some point mutations
 	for (int i = 0; i < howManyPoint; i++) {
 		pointMutate();
 	}
 	// do some copy mutations
-	int MaxGenomeSize = (PT == nullptr) ? *CircularGenomeParameters::maxGenomeSize : PT->lookupInt("GENOME_CIRCULAR-SizeMax");
-	int IMax = (PT == nullptr) ? *CircularGenomeParameters::insertionMaxSize : PT->lookupInt("GENOME_CIRCULAR-mutationCopyMaxSize");
-	int IMin = (PT == nullptr) ? *CircularGenomeParameters::insertionMinSize : PT->lookupInt("GENOME_CIRCULAR-mutationCopyMinSize");
+	int MaxGenomeSize = maxGenomeSizeLPL->lookup();
+	int IMax = insertionMaxSizeLPL->lookup();
+	int IMin = insertionMinSizeLPL->lookup();
 	for (int i = 0; i < howManyCopy && (sites.size() < MaxGenomeSize); i++) {
 		//chromosome->mutateCopy(PT.lookup("mutationCopyMinSize"), PT.lookup("mutationCopyMaxSize"), PT.lookup("chromosomeSizeMax"));
 
@@ -410,9 +423,9 @@ void CircularGenome<T>::mutate() {
 		//cout << sites.size() << endl;
 	}
 	// do some deletion mutations
-	int MinGenomeSize = (PT == nullptr) ? *CircularGenomeParameters::minGenomeSize : PT->lookupInt("GENOME_CIRCULAR-SizeMin");
-	int DMax = (PT == nullptr) ? *CircularGenomeParameters::deletionMaxSize : PT->lookupInt("GENOME_CIRCULAR-mutationDeletionMaxSize");
-	int DMin = (PT == nullptr) ? *CircularGenomeParameters::deletionMinSize : PT->lookupInt("GENOME_CIRCULAR-mutationDeletionMinSize");
+	int MinGenomeSize = minGenomeSizeLPL->lookup();
+	int DMax = deletionMaxSizeLPL->lookup();
+	int DMin = deletionMinSizeLPL->lookup();
 	for (int i = 0; i < howManyDelete && (sites.size() > MinGenomeSize); i++) {
 		//chromosome->mutateDelete(PT.lookup("mutationDeletionMinSize"), PT.lookup("mutationDeletionMaxSize"), PT.lookup("chromosomeSizeMin"));
 
@@ -480,7 +493,7 @@ shared_ptr<AbstractGenome> CircularGenome<T>::makeMutatedGenomeFromMany(vector<s
 
 		// randomly determine crossCount number crossLocations
 		vector<double> crossLocations;
-		int crossCount = (PT == nullptr) ? *CircularGenomeParameters::crossCount : PT->lookupInt("GENOME_CIRCULAR_crossCount");
+		int crossCount = crossCountLPL->lookup();
 		for (int i = 0; i < crossCount; i++) {  // get some cross locations (% of length of chromosome)
 			crossLocations.push_back(Random::getDouble(1.0));
 		}

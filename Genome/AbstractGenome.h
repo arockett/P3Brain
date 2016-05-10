@@ -28,9 +28,9 @@ class AbstractGenome {
 
  public:
 
-	static shared_ptr<string> genomeTypeStr;
-	static shared_ptr<int> alphabetSize;
-	static shared_ptr<string> genomeSitesType;
+	static shared_ptr<ParameterLink<string>> genomeTypeStrPL;
+	static shared_ptr<ParameterLink<int>> alphabetSizePL;
+	static shared_ptr<ParameterLink<string>> genomeSitesTypePL;
 
 	string nameSpace = "";
 	shared_ptr<ParametersTable> PT = nullptr;

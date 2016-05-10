@@ -14,7 +14,8 @@
 using namespace std;
 
 class VoidGate: public DeterministicGate {
-	static shared_ptr<double> voidGate_Probability;
+	static shared_ptr<ParameterLink<double>> voidGate_ProbabilityPL;
+
 public:
 	vector<int> defaultOutput;
 	double epsilon;

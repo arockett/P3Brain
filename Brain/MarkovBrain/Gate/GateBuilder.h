@@ -15,27 +15,27 @@
 class Gate_Builder {  // manages what kinds of gates can be built
 public:
 
-	static shared_ptr<bool> usingProbGate;
-	static shared_ptr<int> probGateInitialCount;
-	static shared_ptr<bool> usingDetGate;
-	static shared_ptr<int> detGateInitialCount;
-	static shared_ptr<bool> usingEpsiGate;
-	static shared_ptr<int> epsiGateInitialCount;
-	static shared_ptr<bool> usingVoidGate;
-	static shared_ptr<int> voidGateInitialCount;
+	static shared_ptr<ParameterLink<bool>> usingProbGatePL;
+	static shared_ptr<ParameterLink<int>> probGateInitialCountPL;
+	static shared_ptr<ParameterLink<bool>> usingDetGatePL;
+	static shared_ptr<ParameterLink<int>> detGateInitialCountPL;
+	static shared_ptr<ParameterLink<bool>> usingEpsiGatePL;
+	static shared_ptr<ParameterLink<int>> epsiGateInitialCountPL;
+	static shared_ptr<ParameterLink<bool>> usingVoidGatePL;
+	static shared_ptr<ParameterLink<int>> voidGateInitialCountPL;
 
-	static shared_ptr<bool> usingFBGate;
-	static shared_ptr<int> fBGateInitialCount;
-	static shared_ptr<bool> usingGPGate;
-	static shared_ptr<int> gPGateInitialCount;
-	static shared_ptr<bool> usingThGate;
-	static shared_ptr<int> thGateInitialCount;
+	static shared_ptr<ParameterLink<bool>> usingFBGatePL;
+	static shared_ptr<ParameterLink<int>> fBGateInitialCountPL;
+	static shared_ptr<ParameterLink<bool>> usingGPGatePL;
+	static shared_ptr<ParameterLink<int>> gPGateInitialCountPL;
+	static shared_ptr<ParameterLink<bool>> usingThGatePL;
+	static shared_ptr<ParameterLink<int>> thGateInitialCountPL;
 
-	static shared_ptr<bool> usingTritDeterministicGate;
-	static shared_ptr<int> tritDeterministicGateInitialCount;
+	static shared_ptr<ParameterLink<bool>> usingTritDeterministicGatePL;
+	static shared_ptr<ParameterLink<int>> tritDeterministicGateInitialCountPL;
 
-	static shared_ptr<bool> usingNeuronGate;
-	static shared_ptr<int> neuronGateInitialCount;
+	static shared_ptr<ParameterLink<bool>> usingNeuronGatePL;
+	static shared_ptr<ParameterLink<int>> neuronGateInitialCountPL;
 
 	set<int> inUseGateTypes;
 	set<string> inUseGateNames;

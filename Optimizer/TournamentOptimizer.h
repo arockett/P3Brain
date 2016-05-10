@@ -15,6 +15,15 @@ using namespace std;
 
 class TournamentOptimizer : public AbstractOptimizer {
  public:
+
+	shared_ptr<ParameterLink<int>> elitismPL;
+	shared_ptr<ParameterLink<int>> tournamentSizePL;
+
+	TournamentOptimizer() {
+		elitismPL = AbstractOptimizer::elitismPL;
+		tournamentSizePL = AbstractOptimizer::tournamentSizePL;
+	}
+
 	virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population) override;
 };
 

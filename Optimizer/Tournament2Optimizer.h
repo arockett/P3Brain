@@ -13,6 +13,15 @@
 
 class Tournament2Optimizer : public AbstractOptimizer {
  public:
+
+	shared_ptr<ParameterLink<int>> elitismPL;
+	shared_ptr<ParameterLink<int>> tournamentSizePL;
+
+	Tournament2Optimizer() {
+		elitismPL = AbstractOptimizer::elitismPL;
+		tournamentSizePL = AbstractOptimizer::tournamentSizePL;
+	}
+
 	virtual void makeNextGeneration(vector<shared_ptr<Organism>> &population) override;
 };
 

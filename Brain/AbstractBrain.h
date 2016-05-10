@@ -24,9 +24,9 @@
 using namespace std;
 class AbstractBrain {
 public:
-	static shared_ptr<string> brainTypeStr;
-	static shared_ptr<int> hiddenNodes;
-	static shared_ptr<bool> serialProcessing;
+	static shared_ptr<ParameterLink<string>> brainTypeStrPL;
+	static shared_ptr<ParameterLink<int>> hiddenNodesPL;
+	static shared_ptr<ParameterLink<bool>> serialProcessingPL;
 
 	vector<string> aveFileColumns;
 

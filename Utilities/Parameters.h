@@ -461,6 +461,35 @@ public:
 		// searchTable either points to a valid table which contains a local value for the named parameter or is a nullptr if not found
 	}
 
+	//return a shared_ptr to Entry in this table with name. If not found, search for it higher.
+	shared_ptr<ParametersEntry<bool>> lookupBoolEntry(const string& name) {
+		if (table.find(name) == table.end()) {
+			lookupBool(name);
+		}
+		return dynamic_pointer_cast<ParametersEntry<bool>>(table[name]);
+	}
+
+	shared_ptr<ParametersEntry<string>> lookupStringEntry(const string& name) {
+		if (table.find(name) == table.end()) {
+			lookupBool(name);
+		}
+		return dynamic_pointer_cast<ParametersEntry<string>>(table[name]);
+	}
+
+	shared_ptr<ParametersEntry<int>> lookupIntEntry(const string& name) {
+		if (table.find(name) == table.end()) {
+			lookupBool(name);
+		}
+		return dynamic_pointer_cast<ParametersEntry<int>>(table[name]);
+	}
+
+	shared_ptr<ParametersEntry<double>> lookupDoubleEntry(const string& name) {
+		if (table.find(name) == table.end()) {
+			lookupBool(name);
+		}
+		return dynamic_pointer_cast<ParametersEntry<double>>(table[name]);
+	}
+
 	template<typename T>
 	void lookup(const string& name, T& value) {
 		// check for the name in this table
@@ -532,7 +561,8 @@ public:
 	// set value in named table (creates if needed) - will also set this value in rootTable if the value does not exist
 	// add or overwrite to this table and add to root if not there.
 	template<typename T>
-	shared_ptr<T> setParameter(const string& name, const T& value, const string& _tableNameSpace = "'", bool _saveOnFileWrite = false) {
+	void setParameter(const string& name, const T& value, const string& _tableNameSpace = "'", bool _saveOnFileWrite = false) {
+		//shared_ptr<AbstractParametersEntry> setParameter(const string& name, const T& value, const string& _tableNameSpace = "'", bool _saveOnFileWrite = false) {
 		string localTableNameSpace = (_tableNameSpace == "'")?tableNameSpace:_tableNameSpace;
 		if (localTableNameSpace != tableNameSpace) {  // if this table is not the table we are writing to...nameSpaceToNameParts
 			if ((*parametersTablesRegistry).find(localTableNameSpace) != (*parametersTablesRegistry).end()) {  // if the table we are writing to exists...
@@ -576,9 +606,7 @@ public:
 			if (_saveOnFileWrite) {
 				table[name]->setSaveOnFileWrite(true);
 			}
-			shared_ptr<T> ptr;
-			table[name]->getValuePtr(ptr);
-			return ptr;
+			//return table[name];
 		}
 	}
 // attempt to delete a value from this table also, remove any non-local children who are relying on this value.
@@ -663,16 +691,14 @@ public:
 	}
 
 	template<typename T>
-	shared_ptr<T> register_parameter(const string& name, const T& default_value, const string& documentation) {
+	shared_ptr<ParametersEntry<T>> register_parameter(const string& name, const T& default_value, const string& documentation) {
 		if (table.find(name) != table.end()) {  // if this table has entry called name
 			cout << "  WARRNING!! Attempting to register \"" << tableNameSpace << name << "\", but it already exists!\n      Updating with new values\n";
 		}
 		setParameter(name, default_value, rootTable->tableNameSpace);
 		setSaveOnFileWrite(name);
 		setDocumentation(name, documentation);
-		shared_ptr<T> ptr;
-		table[name]->getValuePtr(ptr);
-		return ptr;
+		return dynamic_pointer_cast<ParametersEntry<T>>(table[name]);
 	}
 
 	vector<shared_ptr<ParametersTable>> getChildren() {
@@ -762,14 +788,56 @@ public:
 
 };
 
+template<typename T>
+class ParameterLink {
+public:
+	string name;
+	shared_ptr<ParametersEntry<T>> entry;
+	shared_ptr<ParametersTable> table;
+
+	ParameterLink(string _name, shared_ptr<ParametersEntry<T>> _entry, shared_ptr<ParametersTable> _table) :
+			name(_name), entry(_entry), table(_table) {
+	}
+
+	~ParameterLink() = default;
+
+	T lookup() {
+		return entry->get();
+	}
+
+	void set(T value) {
+		if (entry->isLocal() == true) {
+			entry->set(value);
+		} else {
+			table->setParameter(name, value);
+		}
+	}
+
+};
+
 class Parameters {
 public:
 	static shared_ptr<ParametersTable> root;
 
-	static shared_ptr<bool> register_parameter(const string& name, const bool& default_value, const string& documentation);
-	static shared_ptr<string> register_parameter(const string& name, const string& default_value, const string& documentation);
-	static shared_ptr<int> register_parameter(const string& name, const int& default_value, const string& documentation);
-	static shared_ptr<double> register_parameter(const string& name, const double& default_value, const string& documentation);
+	template<typename T>
+	static shared_ptr<ParameterLink<T>> register_parameter(const string& name, const T& default_value, const string& documentation) {
+		if (root == nullptr) {
+			root = ParametersTable::makeTable();
+		}
+		auto entry = root->register_parameter(name, default_value, documentation);
+		auto newLink = make_shared<ParameterLink<T>>(name, entry, root);
+		return newLink;
+	}
+
+	static shared_ptr<ParameterLink<bool>> getBoolLink(const string& name, shared_ptr<ParametersTable> table);
+	static shared_ptr<ParameterLink<string>> getStringLink(const string& name, shared_ptr<ParametersTable> table);
+	static shared_ptr<ParameterLink<int>> getIntLink(const string& name, shared_ptr<ParametersTable> table);
+	static shared_ptr<ParameterLink<double>> getDoubleLink(const string& name, shared_ptr<ParametersTable> table);
+
+//	static shared_ptr<bool> register_parameter(const string& name, const bool& default_value, const string& documentation);
+//	static shared_ptr<string> register_parameter(const string& name, const string& default_value, const string& documentation);
+//	static shared_ptr<int> register_parameter(const string& name, const int& default_value, const string& documentation);
+//	static shared_ptr<double> register_parameter(const string& name, const double& default_value, const string& documentation);
 
 //	template<typename T>
 //	static shared_ptr<T> register_parameter(const string& name, const T& default_value, const string& documentation) {
@@ -1082,7 +1150,7 @@ public:
 
 	static void initializeParameters(int argc, const char * argv[]) {
 
-		if (root == nullptr){
+		if (root == nullptr) {
 			root = ParametersTable::makeTable();
 		}
 

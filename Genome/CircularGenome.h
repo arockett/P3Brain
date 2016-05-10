@@ -28,23 +28,34 @@ using namespace std;
 // needed to move static values to own class because of templating.
 class CircularGenomeParameters {
 public:
-	static shared_ptr<int> initialGenomeSize;
-	static shared_ptr<double> pointMutationRate;
-	static shared_ptr<double> insertionRate;
-	static shared_ptr<int> insertionMinSize;
-	static shared_ptr<int> insertionMaxSize;
-	static shared_ptr<double> deletionRate;
-	static shared_ptr<int> deletionMinSize;
-	static shared_ptr<int> deletionMaxSize;
-	static shared_ptr<int> maxGenomeSize;
-	static shared_ptr<int> minGenomeSize;
-	static shared_ptr<int> crossCount;  // number of crosses to make when performing crossover
+	static shared_ptr<ParameterLink<int>> initialGenomeSizePL;
+	static shared_ptr<ParameterLink<double>> pointMutationRatePL;
+	static shared_ptr<ParameterLink<double>> insertionRatePL;
+	static shared_ptr<ParameterLink<int>> insertionMinSizePL;
+	static shared_ptr<ParameterLink<int>> insertionMaxSizePL;
+	static shared_ptr<ParameterLink<double>> deletionRatePL;
+	static shared_ptr<ParameterLink<int>> deletionMinSizePL;
+	static shared_ptr<ParameterLink<int>> deletionMaxSizePL;
+	static shared_ptr<ParameterLink<int>> maxGenomeSizePL;
+	static shared_ptr<ParameterLink<int>> minGenomeSizePL;
+	static shared_ptr<ParameterLink<int>> crossCountPL;  // number of crosses to make when performing crossover
 };
 
 template<class T>
 class CircularGenome: public AbstractGenome {
 
 public:
+	shared_ptr<ParameterLink<int>> initialGenomeSizeLPL;
+	shared_ptr<ParameterLink<double>> pointMutationRateLPL;
+	shared_ptr<ParameterLink<double>> insertionRateLPL;
+	shared_ptr<ParameterLink<int>> insertionMinSizeLPL;
+	shared_ptr<ParameterLink<int>> insertionMaxSizeLPL;
+	shared_ptr<ParameterLink<double>> deletionRateLPL;
+	shared_ptr<ParameterLink<int>> deletionMinSizeLPL;
+	shared_ptr<ParameterLink<int>> deletionMaxSizeLPL;
+	shared_ptr<ParameterLink<int>> maxGenomeSizeLPL;
+	shared_ptr<ParameterLink<int>> minGenomeSizeLPL;
+	shared_ptr<ParameterLink<int>> crossCountLPL;
 
 	class Handler: public AbstractGenome::Handler {
 	public:
@@ -99,7 +110,7 @@ public:
 	double alphabetSize;
 
 	CircularGenome(double _alphabetSize = 256) {
-		setupCircularGenome(100,_alphabetSize);
+		setupCircularGenome(100, _alphabetSize);
 	}
 
 	CircularGenome(int _size, double _alphabetSize);
@@ -108,7 +119,7 @@ public:
 	virtual void setupCircularGenome(int _size, double _alphabetSize);
 
 	virtual shared_ptr<AbstractGenome> makeLike() override {
-		return make_shared < CircularGenome < T >> (sites.size(), alphabetSize);
+		return make_shared<CircularGenome<T>>(sites.size(), alphabetSize);
 	}
 
 	virtual int size();

@@ -1,28 +1,28 @@
 #include "SSwDArchivist.h"
 
-shared_ptr<int> SSwDArchivist::SSwD_Arch_dataInterval = Parameters::register_parameter("ARCHIVIST_SSWD-dataInterval", 100, "How often to save a data file");
-shared_ptr<int> SSwDArchivist::SSwD_Arch_genomeInterval = Parameters::register_parameter("ARCHIVIST_SSWD-genomeInterval", 1000, "How often to save a genome file");
-shared_ptr<int> SSwDArchivist::SSwD_Arch_dataIntervalDelay = Parameters::register_parameter("ARCHIVIST_SSWD-dataIntervalDelay", 10, "when using Snap Shot with Delay output Method, how long is the delay before saving data");
-shared_ptr<int> SSwDArchivist::SSwD_Arch_genomeIntervalDelay = Parameters::register_parameter("ARCHIVIST_SSWD-genomeIntervalDelay", 10, "when using Snap Shot with Delay output Method, how long is the delay before saving genomes ");
-shared_ptr<int> SSwDArchivist::SSwD_Arch_cleanupInterval = Parameters::register_parameter("ARCHIVIST_SSWD-cleanupInterval", 100, "How often to cleanup old checkpoints");
-shared_ptr<string> SSwDArchivist::SSwD_Arch_DataFilePrefix = Parameters::register_parameter("ARCHIVIST_SSWD-dataFilePrefix", (string) "data", "name of genome file (stores genomes)");
-shared_ptr<string> SSwDArchivist::SSwD_Arch_GenomeFilePrefix = Parameters::register_parameter("ARCHIVIST_SSWD-genomeFilePrefix", (string) "genome", "name of data file (stores everything but genomes)");
-shared_ptr<bool> SSwDArchivist::SSwD_Arch_writeDataFiles = Parameters::register_parameter("ARCHIVIST_SSWD-writeDataFiles", true, "if true, data files will be written");
-shared_ptr<bool> SSwDArchivist::SSwD_Arch_writeGenomeFiles = Parameters::register_parameter("ARCHIVIST_SSWD-writeGenomeFiles", true, "if true, genome files will be written");
+shared_ptr<ParameterLink<int>> SSwDArchivist::SSwD_Arch_dataIntervalPL = Parameters::register_parameter("ARCHIVIST_SSWD-dataInterval", 100, "How often to save a data file");
+shared_ptr<ParameterLink<int>> SSwDArchivist::SSwD_Arch_genomeIntervalPL = Parameters::register_parameter("ARCHIVIST_SSWD-genomeInterval", 1000, "How often to save a genome file");
+shared_ptr<ParameterLink<int>> SSwDArchivist::SSwD_Arch_dataIntervalDelayPL = Parameters::register_parameter("ARCHIVIST_SSWD-dataIntervalDelay", 10, "when using Snap Shot with Delay output Method, how long is the delay before saving data");
+shared_ptr<ParameterLink<int>> SSwDArchivist::SSwD_Arch_genomeIntervalDelayPL = Parameters::register_parameter("ARCHIVIST_SSWD-genomeIntervalDelay", 10, "when using Snap Shot with Delay output Method, how long is the delay before saving genomes ");
+shared_ptr<ParameterLink<int>> SSwDArchivist::SSwD_Arch_cleanupIntervalPL = Parameters::register_parameter("ARCHIVIST_SSWD-cleanupInterval", 100, "How often to cleanup old checkpoints");
+shared_ptr<ParameterLink<string>> SSwDArchivist::SSwD_Arch_DataFilePrefixPL = Parameters::register_parameter("ARCHIVIST_SSWD-dataFilePrefix", (string) "data", "name of genome file (stores genomes)");
+shared_ptr<ParameterLink<string>> SSwDArchivist::SSwD_Arch_GenomeFilePrefixPL = Parameters::register_parameter("ARCHIVIST_SSWD-genomeFilePrefix", (string) "genome", "name of data file (stores everything but genomes)");
+shared_ptr<ParameterLink<bool>> SSwDArchivist::SSwD_Arch_writeDataFilesPL = Parameters::register_parameter("ARCHIVIST_SSWD-writeDataFiles", true, "if true, data files will be written");
+shared_ptr<ParameterLink<bool>> SSwDArchivist::SSwD_Arch_writeGenomeFilesPL = Parameters::register_parameter("ARCHIVIST_SSWD-writeGenomeFiles", true, "if true, genome files will be written");
 
 SSwDArchivist::SSwDArchivist(vector<string> aveFileColumns) :
 		DefaultArchivist(aveFileColumns) {
 
-	dataInterval = *SSwD_Arch_dataInterval;
-	genomeInterval = *SSwD_Arch_genomeInterval;
-	dataIntervalDelay = *SSwD_Arch_dataIntervalDelay;
-	genomeIntervalDelay = *SSwD_Arch_genomeIntervalDelay;
+	dataInterval = SSwD_Arch_dataIntervalPL->lookup();
+	genomeInterval = SSwD_Arch_genomeIntervalPL->lookup();
+	dataIntervalDelay = SSwD_Arch_dataIntervalDelayPL->lookup();
+	genomeIntervalDelay = SSwD_Arch_genomeIntervalDelayPL->lookup();
 
-	cleanupInterval = *SSwD_Arch_cleanupInterval;
-	DataFilePrefix = *SSwD_Arch_DataFilePrefix;
-	GenomeFilePrefix = *SSwD_Arch_GenomeFilePrefix;
-	writeDataFiles = *SSwD_Arch_writeDataFiles;
-	writeGenomeFiles = *SSwD_Arch_writeGenomeFiles;
+	cleanupInterval = SSwD_Arch_cleanupIntervalPL->lookup();
+	DataFilePrefix = SSwD_Arch_DataFilePrefixPL->lookup();
+	GenomeFilePrefix = SSwD_Arch_GenomeFilePrefixPL->lookup();
+	writeDataFiles = SSwD_Arch_writeDataFilesPL->lookup();
+	writeGenomeFiles = SSwD_Arch_writeGenomeFilesPL->lookup();
 
 	nextDataWrite = 0;
 	nextGenomeWrite = 0;
@@ -85,7 +85,7 @@ bool SSwDArchivist::archive(vector<shared_ptr<Organism>> population, int flush) 
 				checkpoints[Global::update].push_back(org);
 				org->snapShotDataMaps[Global::update] = make_shared<DataMap>(org->dataMap);  // back up state of dataMap
 
-				if (Global::update == nextDataCheckPoint && Global::update <= *Global::updates) {  // if this is a data interval, add ancestors to snapshot dataMap
+				if (Global::update == nextDataCheckPoint && Global::update <= Global::updatesPL->lookup()) {  // if this is a data interval, add ancestors to snapshot dataMap
 					for (auto ancestor : org->ancestors) {
 						org->snapShotDataMaps[Global::update].Append("ancestors", ancestor);
 					}
@@ -94,10 +94,10 @@ bool SSwDArchivist::archive(vector<shared_ptr<Organism>> population, int flush) 
 													 // also, if this survives over intervals, it'll be pointing to self as ancestor in files (which is good)
 				}
 			}
-			if (Global::update == nextGenomeCheckPoint && Global::update <= *Global::updates) {  // we have now made a genome checkpoint, advance nextGenomeCheckPoint to get ready for the next interval
+			if (Global::update == nextGenomeCheckPoint && Global::update <= Global::updatesPL->lookup()) {  // we have now made a genome checkpoint, advance nextGenomeCheckPoint to get ready for the next interval
 				nextGenomeCheckPoint += genomeInterval;
 			}
-			if (Global::update == nextDataCheckPoint && Global::update <= *Global::updates) {  // we have now made a data checkpoint, advance nextDataCheckPoint to get ready for the next interval
+			if (Global::update == nextDataCheckPoint && Global::update <= Global::updatesPL->lookup()) {  // we have now made a data checkpoint, advance nextDataCheckPoint to get ready for the next interval
 				nextDataCheckPoint += dataInterval;
 			}
 		}
@@ -106,7 +106,7 @@ bool SSwDArchivist::archive(vector<shared_ptr<Organism>> population, int flush) 
 
 		////// WRITING GENOMES
 
-		if ((Global::update == nextGenomeWrite + genomeIntervalDelay) && (nextGenomeWrite <= *Global::updates) && writeGenomeFiles) {  // now it's time to write genomes in the checkpoint at time nextGenomeWrite
+		if ((Global::update == nextGenomeWrite + genomeIntervalDelay) && (nextGenomeWrite <= Global::updatesPL->lookup()) && writeGenomeFiles) {  // now it's time to write genomes in the checkpoint at time nextGenomeWrite
 			string genomeFileName = GenomeFilePrefix + "_" + to_string(nextGenomeWrite) + ".csv";
 
 			string dataString;
@@ -132,7 +132,7 @@ bool SSwDArchivist::archive(vector<shared_ptr<Organism>> population, int flush) 
 
 		////// WRITING DATA
 
-		if ((Global::update == nextDataWrite + dataIntervalDelay) && (nextDataWrite <= *Global::updates) && writeDataFiles) {  // now it's time to write data in the checkpoint at time nextDataWrite
+		if ((Global::update == nextDataWrite + dataIntervalDelay) && (nextDataWrite <= Global::updatesPL->lookup()) && writeDataFiles) {  // now it's time to write data in the checkpoint at time nextDataWrite
 			string dataFileName = DataFilePrefix + "_" + to_string(nextDataWrite) + ".csv";
 
 			// if file info has not been initialized yet, find a valid org and extract it's keys
@@ -172,5 +172,5 @@ bool SSwDArchivist::archive(vector<shared_ptr<Organism>> population, int flush) 
 		}
 	}
 	// if enough time has passed to save all data and genomes, then we are done!
-	return ((nextDataWrite > *Global::updates || !(writeDataFiles)) && (nextGenomeWrite > *Global::updates || !(writeGenomeFiles)) && Global::update >= *Global::updates);
+	return ((nextDataWrite > Global::updatesPL->lookup() || !(writeDataFiles)) && (nextGenomeWrite > Global::updatesPL->lookup() || !(writeGenomeFiles)) && Global::update >= Global::updatesPL->lookup());
 }

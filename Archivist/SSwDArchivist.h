@@ -14,15 +14,15 @@ using namespace std;
 
 class SSwDArchivist : public DefaultArchivist {  // SnapShot with Delay
  public:
-	static shared_ptr< int> SSwD_Arch_dataInterval;  // how often to write out data
-	static shared_ptr< int> SSwD_Arch_genomeInterval;  // how often to write out genomes
-	static shared_ptr< int> SSwD_Arch_dataIntervalDelay;  // when using SSwD, how long is the delay
-	static shared_ptr< int> SSwD_Arch_genomeIntervalDelay;  // when using SSwD, how long is the delay
-	static shared_ptr< int> SSwD_Arch_cleanupInterval;  // how often to attempt to prune the LOD
-	static shared_ptr< string> SSwD_Arch_DataFilePrefix;  // name of the Data file
-	static shared_ptr< string> SSwD_Arch_GenomeFilePrefix;  // name of the Genome file (genomes on LOD)
-	static shared_ptr< bool> SSwD_Arch_writeDataFiles;  // if true, write data file
-	static shared_ptr< bool> SSwD_Arch_writeGenomeFiles;  // if true, write genome file
+	static shared_ptr<ParameterLink<int>> SSwD_Arch_dataIntervalPL;  // how often to write out data
+	static shared_ptr<ParameterLink<int>> SSwD_Arch_genomeIntervalPL;  // how often to write out genomes
+	static shared_ptr<ParameterLink<int>> SSwD_Arch_dataIntervalDelayPL;  // when using SSwD, how long is the delay
+	static shared_ptr<ParameterLink<int>> SSwD_Arch_genomeIntervalDelayPL;  // when using SSwD, how long is the delay
+	static shared_ptr<ParameterLink<int>> SSwD_Arch_cleanupIntervalPL;  // how often to attempt to prune the LOD
+	static shared_ptr<ParameterLink<string>> SSwD_Arch_DataFilePrefixPL;  // name of the Data file
+	static shared_ptr<ParameterLink<string>> SSwD_Arch_GenomeFilePrefixPL;  // name of the Genome file (genomes on LOD)
+	static shared_ptr<ParameterLink<bool>> SSwD_Arch_writeDataFilesPL;  // if true, write data file
+	static shared_ptr<ParameterLink<bool>> SSwD_Arch_writeGenomeFilesPL;  // if true, write genome file
 
 	int dataInterval;  // how often to write out data
 	int genomeInterval;  // how often to write out genomes
