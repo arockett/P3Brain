@@ -10,7 +10,7 @@
 
 /* this gate behaves like a deterministic gate with a constant externally set error which may the gate to deliver the wrong set of output values */
 
-shared_ptr<ParameterLink<double>> FixedEpsilonGate::FixedEpsilonGate_ProbabilityPL = Parameters::register_parameter("GATES_FIXED_EPSILON-failProbability", 0.05, "chance that an output from a FixedEpsilonGate gate will be randomized");
+shared_ptr<ParameterLink<double>> FixedEpsilonGate::FixedEpsilonGate_ProbabilityPL = Parameters::register_parameter("BRAIN_MARKOV_GATES_FIXED_EPSILON-failProbability", 0.05, "chance that an output from a FixedEpsilonGate gate will be randomized");
 
 
 FixedEpsilonGate::FixedEpsilonGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID) :

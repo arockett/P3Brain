@@ -28,6 +28,8 @@ public:
 	static shared_ptr<ParameterLink<int>> hiddenNodesPL;
 	static shared_ptr<ParameterLink<bool>> serialProcessingPL;
 
+	const shared_ptr<ParametersTable> PT;
+
 	vector<string> aveFileColumns;
 
 	bool recordActivity;
@@ -42,14 +44,16 @@ public:
 	vector<double> nodes;
 	vector<double> nextNodes;
 
-	AbstractBrain() {
-		nrInNodes = nrOutNodes = nrHiddenNodes = nrOfBrainNodes = 0;
-		recordActivity = false;
-		cout << "ERROR: attempting to construct brain with no arguments. Check brain type for required parameters... most likely at least #in, #out and #hidden are required!\n\nExiting.\n" << endl;
-		exit(1);
-	}
+//	AbstractBrain() {
+//		nrInNodes = nrOutNodes = nrHiddenNodes = nrOfBrainNodes = 0;
+//		recordActivity = false;
+//		cout << "ERROR: attempting to construct brain with no arguments. Check brain type for required parameters... most likely at least #in, #out and #hidden are required!\n\nExiting.\n" << endl;
+//		exit(1);
+//	}
 
-	AbstractBrain(int ins, int outs, int hidden) {
+	AbstractBrain() = delete;
+
+	AbstractBrain(int ins, int outs, int hidden, shared_ptr<ParametersTable> _PT = nullptr) : PT(_PT) {
 		nrInNodes = ins;
 		nrOutNodes = outs;
 		nrHiddenNodes = hidden;

@@ -15,7 +15,6 @@
 #include <set>
 #include <vector>
 
-#include "Gate/GateBuilder.h"
 #include "GateListBuilder/GateListBuilder.h"
 #include "../../Genome/AbstractGenome.h"
 
@@ -52,10 +51,10 @@ class MarkovBrain : public AbstractBrain {
 
 	MarkovBrain() = delete;
 
-	MarkovBrain(vector<shared_ptr<AbstractGate>> _gates, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes);
+	MarkovBrain(vector<shared_ptr<AbstractGate>> _gates, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT = nullptr);
 
-	MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes);
-	MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes);
+	MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT = nullptr);
+	MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT = nullptr);
 	virtual ~MarkovBrain() = default;
 
 	virtual void update() override;

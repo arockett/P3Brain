@@ -89,11 +89,11 @@ int main(int argc, const char * argv[]) {
 		cout << "Using Random Seed: " << Global::randomSeedPL->lookup() << endl;
 	}
 
-	auto world = make_shared<BerryWorld>();
+	//auto world = make_shared<BerryWorld>();
 
 	//auto world = make_shared<NumeralClassifierWorld>();
 
-	//auto world = make_shared<TestWorld>();
+	auto world = make_shared<TestWorld>();
 
 	shared_ptr<Group> group;
 	{
@@ -134,6 +134,9 @@ int main(int argc, const char * argv[]) {
 			cout << "\n\nERROR: Unrecognized genome type in configuration!\n  \"" << AbstractGenome::genomeTypeStrPL->lookup() << "\" is not defined.\n\nExiting.\n" << endl;
 			exit(1);
 		}
+
+		//auto sheepTable = Parameters::root->makeTable("sheep::",Parameters::root);
+
 
 		shared_ptr<AbstractBrain> templateBrain;
 		if (AbstractBrain::brainTypeStrPL->lookup() == "Markov") {

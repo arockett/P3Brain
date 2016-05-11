@@ -1,44 +1,43 @@
 #include "DefaultArchivist.h"
 using namespace std;
 
-shared_ptr<ParameterLink<string>> DefaultArchivist::Arch_outputMethodStrPL = Parameters::register_parameter("ARCHIVIST_OUTPUT_METHOD-outputMethod", (string) "default", "output method, [default, LODwAP (Line of Decent with Aggressive Pruning), SSwD (SnapShot with Delay)]");  // string parameter for outputMethod;
+shared_ptr<ParameterLink<string>> DefaultArchivist::Arch_outputMethodStrPL = Parameters::register_parameter("ARCHIVIST-outputMethod", (string) "default", "output method, [default, LODwAP (Line of Decent with Aggressive Pruning), SSwD (SnapShot with Delay)]");  // string parameter for outputMethod;
 
-shared_ptr<ParameterLink<int>> DefaultArchivist::Arch_realtimeFilesIntervalPL = Parameters::register_parameter("ARCHIVIST-realtimeFilesInterval", 10, "How often to write to realtime data files");
-shared_ptr<ParameterLink<bool>> DefaultArchivist::Arch_writeAveFilePL = Parameters::register_parameter("ARCHIVIST-writeAveFile", true, "Save data to average file?");
-shared_ptr<ParameterLink<bool>> DefaultArchivist::Arch_writeDominantFilePL = Parameters::register_parameter("ARCHIVIST-writeDominantFile", true, "Save data to dominant file?");
-shared_ptr<ParameterLink<string>> DefaultArchivist::Arch_AveFileNamePL = Parameters::register_parameter("ARCHIVIST-aveFileName", (string) "ave.csv", "name of average file (saves population averages)");
-shared_ptr<ParameterLink<string>> DefaultArchivist::Arch_DominantFileNamePL = Parameters::register_parameter("ARCHIVIST-dominantFileName", (string) "dominant.csv", "name of dominant file (saves data on dominant organism)");
-shared_ptr<ParameterLink<string>> DefaultArchivist::Arch_DefaultAveFileColumnNamesPL = Parameters::register_parameter("ARCHIVIST-aveFileColumns", (string) "[]", "data to be saved into average file (must be values that can generate an average). If empty, MABE will try to figure it out");
-shared_ptr<ParameterLink<bool>> DefaultArchivist::Arch_DominantFileShowAllListsPL = Parameters::register_parameter("ARCHIVIST-dominantFileShowAllLists", true, "lists named 'all'* in data map will be averaged and added to file. if true, raw 'all'* lists will also be added to the file");
+shared_ptr<ParameterLink<int>> DefaultArchivist::Arch_realtimeFilesIntervalPL = Parameters::register_parameter("ARCHIVIST_DEFAULT-realtimeFilesInterval", 10, "How often to write to realtime data files");
+shared_ptr<ParameterLink<bool>> DefaultArchivist::Arch_writeAveFilePL = Parameters::register_parameter("ARCHIVIST_DEFAULT-writeAveFile", true, "Save data to average file?");
+shared_ptr<ParameterLink<bool>> DefaultArchivist::Arch_writeDominantFilePL = Parameters::register_parameter("ARCHIVIST_DEFAULT-writeDominantFile", true, "Save data to dominant file?");
+shared_ptr<ParameterLink<string>> DefaultArchivist::Arch_AveFileNamePL = Parameters::register_parameter("ARCHIVIST_DEFAULT-aveFileName", (string) "ave.csv", "name of average file (saves population averages)");
+shared_ptr<ParameterLink<string>> DefaultArchivist::Arch_DominantFileNamePL = Parameters::register_parameter("ARCHIVIST_DEFAULT-dominantFileName", (string) "dominant.csv", "name of dominant file (saves data on dominant organism)");
+shared_ptr<ParameterLink<string>> DefaultArchivist::Arch_DefaultAveFileColumnNamesPL = Parameters::register_parameter("ARCHIVIST_DEFAULT-aveFileColumns", (string) "[]", "data to be saved into average file (must be values that can generate an average). If empty, MABE will try to figure it out");
+shared_ptr<ParameterLink<bool>> DefaultArchivist::Arch_DominantFileShowAllListsPL = Parameters::register_parameter("ARCHIVIST_DEFAULT-dominantFileShowAllLists", true, "lists named 'all'* in data map will be averaged and added to file. if true, raw 'all'* lists will also be added to the file");
 
-shared_ptr<ParameterLink<int>> DefaultArchivist::SS_Arch_dataIntervalPL = Parameters::register_parameter("ARCHIVIST-snapshotDataInterval", 100, "How often to save a snapshot data file");
-shared_ptr<ParameterLink<int>> DefaultArchivist::SS_Arch_genomeIntervalPL = Parameters::register_parameter("ARCHIVIST-snapshotGenomeInterval", 1000, "How often to save a snapshot genome file");
-shared_ptr<ParameterLink<string>> DefaultArchivist::SS_Arch_DataFilePrefixPL = Parameters::register_parameter("ARCHIVIST-snapshotDataFilePrefix", (string) "snapshotData", "prefix for name of snapshot genome file (stores genomes)");
-shared_ptr<ParameterLink<string>> DefaultArchivist::SS_Arch_GenomeFilePrefixPL = Parameters::register_parameter("ARCHIVIST-snapshotGenomeFilePrefix", (string) "snapshotGenome", "prefix for name of snapshot data file (stores everything but genomes)");
-shared_ptr<ParameterLink<bool>> DefaultArchivist::SS_Arch_writeDataFilesPL = Parameters::register_parameter("ARCHIVIST-writeSnapshotDataFiles", false, "if true, snapshot data files will be written (with all non genome data for entire population)");
-shared_ptr<ParameterLink<bool>> DefaultArchivist::SS_Arch_writeGenomeFilesPL = Parameters::register_parameter("ARCHIVIST-writeSnapshotGenomeFiles", false, "if true, snapshot genome files will be written (with all genomes for entire population)");
+shared_ptr<ParameterLink<int>> DefaultArchivist::SS_Arch_dataIntervalPL = Parameters::register_parameter("ARCHIVIST_DEFAULT-snapshotDataInterval", 100, "How often to save a snapshot data file");
+shared_ptr<ParameterLink<int>> DefaultArchivist::SS_Arch_genomeIntervalPL = Parameters::register_parameter("ARCHIVIST_DEFAULT-snapshotGenomeInterval", 1000, "How often to save a snapshot genome file");
+shared_ptr<ParameterLink<string>> DefaultArchivist::SS_Arch_DataFilePrefixPL = Parameters::register_parameter("ARCHIVIST_DEFAULT-snapshotDataFilePrefix", (string) "snapshotData", "prefix for name of snapshot genome file (stores genomes)");
+shared_ptr<ParameterLink<string>> DefaultArchivist::SS_Arch_GenomeFilePrefixPL = Parameters::register_parameter("ARCHIVIST_DEFAULT-snapshotGenomeFilePrefix", (string) "snapshotGenome", "prefix for name of snapshot data file (stores everything but genomes)");
+shared_ptr<ParameterLink<bool>> DefaultArchivist::SS_Arch_writeDataFilesPL = Parameters::register_parameter("ARCHIVIST_DEFAULT-writeSnapshotDataFiles", false, "if true, snapshot data files will be written (with all non genome data for entire population)");
+shared_ptr<ParameterLink<bool>> DefaultArchivist::SS_Arch_writeGenomeFilesPL = Parameters::register_parameter("ARCHIVIST_DEFAULT-writeSnapshotGenomeFiles", false, "if true, snapshot genome files will be written (with all genomes for entire population)");
 
-DefaultArchivist::DefaultArchivist(shared_ptr<ParametersTable> _PT) {
-	PT = _PT;
-	realtimeFilesInterval = (PT == nullptr) ? Arch_realtimeFilesIntervalPL->lookup() : PT->lookupInt("ARCHIVIST-realtimeFilesInterval");
-	writeAveFile = (PT == nullptr) ? Arch_writeAveFilePL->lookup() : PT->lookupBool("ARCHIVIST-writeAveFile");
-	writeDominantFile = (PT == nullptr) ? Arch_writeDominantFilePL->lookup() : PT->lookupBool("ARCHIVIST-writeDominantFile");
-	AveFileName = (PT == nullptr) ? Arch_AveFileNamePL->lookup() : PT->lookupString("ARCHIVIST-aveFileName");
-	DominantFileName = (PT == nullptr) ? Arch_DominantFileNamePL->lookup() : PT->lookupString("ARCHIVIST-dominantFileName");
-	AveFileColumnNames = (PT == nullptr) ? Arch_DefaultAveFileColumnNamesPL->lookup() : PT->lookupString("ARCHIVIST-aveFileColumns");
-	DominantFileShowAllLists = (PT == nullptr) ? Arch_DominantFileShowAllListsPL->lookup() : PT->lookupBool("ARCHIVIST-dominantFileShowAllLists");
+DefaultArchivist::DefaultArchivist(shared_ptr<ParametersTable> _PT) : PT(_PT) {
+	realtimeFilesInterval = (PT == nullptr) ? Arch_realtimeFilesIntervalPL->lookup() : PT->lookupInt("ARCHIVIST_DEFAULT-realtimeFilesInterval");
+	writeAveFile = (PT == nullptr) ? Arch_writeAveFilePL->lookup() : PT->lookupBool("ARCHIVIST_DEFAULT-writeAveFile");
+	writeDominantFile = (PT == nullptr) ? Arch_writeDominantFilePL->lookup() : PT->lookupBool("ARCHIVIST_DEFAULT-writeDominantFile");
+	AveFileName = (PT == nullptr) ? Arch_AveFileNamePL->lookup() : PT->lookupString("ARCHIVIST_DEFAULT-aveFileName");
+	DominantFileName = (PT == nullptr) ? Arch_DominantFileNamePL->lookup() : PT->lookupString("ARCHIVIST_DEFAULT-dominantFileName");
+	AveFileColumnNames = (PT == nullptr) ? Arch_DefaultAveFileColumnNamesPL->lookup() : PT->lookupString("ARCHIVIST_DEFAULT-aveFileColumns");
+	DominantFileShowAllLists = (PT == nullptr) ? Arch_DominantFileShowAllListsPL->lookup() : PT->lookupBool("ARCHIVIST_DEFAULT-dominantFileShowAllLists");
 
-	dataInterval = SS_Arch_dataIntervalPL->lookup();
-	genomeInterval = SS_Arch_genomeIntervalPL->lookup();
-	DataFilePrefix = SS_Arch_DataFilePrefixPL->lookup();
-	GenomeFilePrefix = SS_Arch_GenomeFilePrefixPL->lookup();
-	writeSnapshotDataFiles = SS_Arch_writeDataFilesPL->lookup();
-	writeSnapshotGenomeFiles = SS_Arch_writeGenomeFilesPL->lookup();
+	dataInterval = (PT == nullptr) ? SS_Arch_dataIntervalPL->lookup() : PT->lookupInt("ARCHIVIST_DEFAULT-snapshotDataInterval");
+	genomeInterval = (PT == nullptr) ? SS_Arch_genomeIntervalPL->lookup() : PT->lookupInt("ARCHIVIST_DEFAULT-snapshotGenomeInterval");
+	DataFilePrefix = (PT == nullptr) ? SS_Arch_DataFilePrefixPL->lookup() : PT->lookupString("ARCHIVIST_DEFAULT-snapshotDataFilePrefix");
+	GenomeFilePrefix = (PT == nullptr) ? SS_Arch_GenomeFilePrefixPL->lookup() : PT->lookupString("ARCHIVIST_DEFAULT-snapshotGenomeFilePrefix");
+	writeSnapshotDataFiles = (PT == nullptr) ? SS_Arch_writeDataFilesPL->lookup() : PT->lookupBool("ARCHIVIST_DEFAULT-writeSnapshotDataFiles");
+	writeSnapshotGenomeFiles = (PT == nullptr) ? SS_Arch_writeGenomeFilesPL->lookup() : PT->lookupBool("ARCHIVIST_DEFAULT-writeSnapshotGenomeFiles");
 
 	finished = false;
 }
 
-DefaultArchivist::DefaultArchivist(vector<string> aveFileColumns, shared_ptr<ParametersTable> _PT) : DefaultArchivist(){
+DefaultArchivist::DefaultArchivist(vector<string> aveFileColumns, shared_ptr<ParametersTable> _PT) : DefaultArchivist(_PT){
 	convertCSVListToVector(AveFileColumnNames, DefaultAveFileColumns);
 	if (DefaultAveFileColumns.size() <= 0) {
 		DefaultAveFileColumns = aveFileColumns;

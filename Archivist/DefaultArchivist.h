@@ -77,7 +77,7 @@ shared_ptr<ParameterLink<bool>> DefaultArchivist::Arch_DominantFileShowAllListsP
 
 	bool finished;  // if finished, then as far as the archivist is concerned, we can stop the run.
 
-	shared_ptr<ParametersTable> PT;
+	const shared_ptr<ParametersTable> PT;
 
 	DefaultArchivist(shared_ptr<ParametersTable> _PT = nullptr);
 	DefaultArchivist(vector<string> aveFileColumns, shared_ptr<ParametersTable> _PT = nullptr);

@@ -2,15 +2,15 @@
 #define __BasicMarkovBrainTemplate__Gate_Builder__
 
 #include "../../../Utilities/Parameters.h"
-#include "DeterministicGate.h"
-#include "FeedbackGate.h"
-#include "FixedEpsilonGate.h"
-#include "GPGate.h"
-#include "NeuronGate.h"
-#include "ProbabilisticGate.h"
-#include "ThresholdGate.h"
-#include "TritDeterministicGate.h"
-#include "VoidGate.h"
+#include "../Gate/DeterministicGate.h"
+#include "../Gate/FeedbackGate.h"
+#include "../Gate/FixedEpsilonGate.h"
+#include "../Gate/GPGate.h"
+#include "../Gate/NeuronGate.h"
+#include "../Gate/ProbabilisticGate.h"
+#include "../Gate/ThresholdGate.h"
+#include "../Gate/TritDeterministicGate.h"
+#include "../Gate/VoidGate.h"
 
 class Gate_Builder {  // manages what kinds of gates can be built
 public:
@@ -43,11 +43,11 @@ public:
 
 	map<int, int> intialGateCounts;
 
-	shared_ptr<ParametersTable> PT = nullptr;
+	const shared_ptr<ParametersTable> PT;
 
-	Gate_Builder() = default;
-	Gate_Builder(shared_ptr<ParametersTable> _PT) {
-		PT = _PT;
+	//Gate_Builder() = default;
+	Gate_Builder(shared_ptr<ParametersTable> _PT = nullptr) : PT(_PT){
+		setupGates();
 	}
 
 	~Gate_Builder() = default;

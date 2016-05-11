@@ -8,8 +8,8 @@
 
 #include "GPGate.h"
 
-shared_ptr<ParameterLink<double>> GPGate::constValueMinPL = Parameters::register_parameter("GATES_GP-constValueMin", -1.0, "for the const values, min value the genome can generate");
-shared_ptr<ParameterLink<double>> GPGate::constValueMaxPL = Parameters::register_parameter("GATES_GP-constValueMax", 1.0, "for the const values, max value the genome can generate");
+shared_ptr<ParameterLink<double>> GPGate::constValueMinPL = Parameters::register_parameter("BRAIN_MARKOV_GATES_GP-constValueMin", -1.0, "for the const values, min value the genome can generate");
+shared_ptr<ParameterLink<double>> GPGate::constValueMaxPL = Parameters::register_parameter("BRAIN_MARKOV_GATES_GP-constValueMax", 1.0, "for the const values, max value the genome can generate");
 
 /* *** GP Gate implementation *** */
 

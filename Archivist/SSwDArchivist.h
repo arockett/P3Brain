@@ -43,7 +43,8 @@ class SSwDArchivist : public DefaultArchivist {  // SnapShot with Delay
 	map<int, vector<weak_ptr<Organism>>> checkpoints;  // used by SSwD only - this keeps lists of orgs that may be written (if they have living decendents)
 	// key is Global::nextGenomeWrite or Global::nextDataWrite
 
-	SSwDArchivist(vector<string> aveFileColumns = {});
+	SSwDArchivist() = delete;
+	SSwDArchivist(vector<string> aveFileColumns = {}, shared_ptr<ParametersTable> _PT = nullptr);
 
 	virtual ~SSwDArchivist() = default;
 

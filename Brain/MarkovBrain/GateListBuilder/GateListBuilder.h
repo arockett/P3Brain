@@ -15,7 +15,7 @@
 #include <set>
 #include <vector>
 
-#include "../Gate/GateBuilder.h"
+#include "../GateBuilder/GateBuilder.h"
 #include "../../../Genome/AbstractGenome.h"
 
 #include "../../../Utilities/Parameters.h"
@@ -24,19 +24,16 @@ using namespace std;
 class AbstractGateListBuilder {
 
  public:
+	shared_ptr<ParametersTable> PT;
 	Gate_Builder gateBuilder;
 
-	shared_ptr<ParametersTable> PT = nullptr;
 
-	AbstractGateListBuilder() {
-		gateBuilder.setupGates();
+	AbstractGateListBuilder(shared_ptr<ParametersTable> _PT = nullptr) : PT(_PT), gateBuilder(PT) {
 	}
 
-	AbstractGateListBuilder(shared_ptr<ParametersTable> _PT) {
-		PT = _PT;
-		gateBuilder.PT = PT;
-		gateBuilder.setupGates();
-	}
+//	AbstractGateListBuilder(shared_ptr<ParametersTable> _PT) : PT(_PT), AbstractGateListBuilder() {
+//		gateBuilder.PT = PT;
+//	}
 
 	virtual ~AbstractGateListBuilder() = default;
 //	virtual vector<shared_ptr<Gate>> buildGateList(shared_ptr<AbstractGenome> genome, int nrOfBrainStates,
@@ -71,14 +68,12 @@ class AbstractGateListBuilder {
 class ClassicGateListBuilder : public AbstractGateListBuilder {
  public:
 
-	ClassicGateListBuilder() {
-		gateBuilder.setupGates();
+//	ClassicGateListBuilder() {
+//		gateBuilder.setupGates();
+//	}
+	ClassicGateListBuilder(shared_ptr<ParametersTable> _PT = nullptr) : AbstractGateListBuilder(_PT){
 	}
-	ClassicGateListBuilder(shared_ptr<ParametersTable> _PT){
-		PT = _PT;
-		gateBuilder.PT = PT;
-		gateBuilder.setupGates();
-	}
+
 	virtual ~ClassicGateListBuilder() = default;
 
 	virtual vector<shared_ptr<AbstractGate>> buildGateListAndGetAllValues(shared_ptr<AbstractGenome> genome, int nrOfBrainStates,

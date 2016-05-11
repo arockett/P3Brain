@@ -8,8 +8,8 @@
 
 #include "MarkovBrain.h"
 
-MarkovBrain::MarkovBrain(vector<shared_ptr<AbstractGate>> _gates, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes) :
-		AbstractBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes) {
+MarkovBrain::MarkovBrain(vector<shared_ptr<AbstractGate>> _gates, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT) :
+		AbstractBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes,_PT) {
 	GLB = nullptr;
 	gates = _gates;
 	// columns to be added to ave file
@@ -21,8 +21,8 @@ MarkovBrain::MarkovBrain(vector<shared_ptr<AbstractGate>> _gates, int _nrInNodes
 	}
 }
 
-MarkovBrain::MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes) :
-		AbstractBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes) {
+MarkovBrain::MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT) :
+		AbstractBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes,_PT) {
 	GLB = _GLB;
 	//make a node map to handle genome value to brain state address look up.
 	makeNodeMap(nodeMap, Global::bitsPerBrainAddressPL->lookup(), nrOfBrainNodes);
@@ -35,8 +35,8 @@ MarkovBrain::MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, int _nrInNode
 	}
 }
 
-MarkovBrain::MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes) :
-		MarkovBrain(_GLB, _nrInNodes, _nrOutNodes, _nrHiddenNodes) {  //this is a constructor. it is run whenever a new brain is created.
+MarkovBrain::MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT) :
+		MarkovBrain(_GLB, _nrInNodes, _nrOutNodes, _nrHiddenNodes, _PT) {
 	//cout << "in MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrOfBrainStates)\n\tabout to - gates = GLB->buildGateList(genome, nrOfBrainStates);" << endl;
 	gates = GLB->buildGateList(genome, nrOfBrainNodes);
 	inOutReMap();  // map ins and outs from genome values to brain states

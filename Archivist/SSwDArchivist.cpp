@@ -10,8 +10,8 @@ shared_ptr<ParameterLink<string>> SSwDArchivist::SSwD_Arch_GenomeFilePrefixPL = 
 shared_ptr<ParameterLink<bool>> SSwDArchivist::SSwD_Arch_writeDataFilesPL = Parameters::register_parameter("ARCHIVIST_SSWD-writeDataFiles", true, "if true, data files will be written");
 shared_ptr<ParameterLink<bool>> SSwDArchivist::SSwD_Arch_writeGenomeFilesPL = Parameters::register_parameter("ARCHIVIST_SSWD-writeGenomeFiles", true, "if true, genome files will be written");
 
-SSwDArchivist::SSwDArchivist(vector<string> aveFileColumns) :
-		DefaultArchivist(aveFileColumns) {
+SSwDArchivist::SSwDArchivist(vector<string> aveFileColumns, shared_ptr<ParametersTable> _PT) :
+		DefaultArchivist(aveFileColumns, _PT) {
 
 	dataInterval = SSwD_Arch_dataIntervalPL->lookup();
 	genomeInterval = SSwD_Arch_genomeIntervalPL->lookup();
@@ -70,6 +70,13 @@ bool SSwDArchivist::archive(vector<shared_ptr<Organism>> population, int flush) 
 
 		if (Global::update % realtimeFilesInterval == 0) {  // do not write files on flush - these organisms have not been evaluated!
 			writeRealTimeFiles(population);  // write to dominant and average files
+		}
+
+		if ((Global::update % dataInterval == 0) && (flush == 0) && writeSnapshotDataFiles) {  // do not write files on flush - these organisms have not been evaluated!
+			saveSnapshotData(population, Global::update);
+		}
+		if ((Global::update % genomeInterval == 0) && (flush == 0) && writeSnapshotGenomeFiles) {  // do not write files on flush - these organisms have not been evaluated!
+			saveSnapshotGenomes(population, Global::update);
 		}
 
 		///// Clean up the checkpoints

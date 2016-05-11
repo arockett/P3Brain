@@ -10,7 +10,7 @@
 
 /* this gate behaves like a deterministic gate with a constant externally set error which may set a single output to 0 */
 
-shared_ptr<ParameterLink<double>> VoidGate::voidGate_ProbabilityPL = Parameters::register_parameter("GATES_VOID-voidGate_Probability", 0.05, "chance that an output from a void gate will be set to 0");
+shared_ptr<ParameterLink<double>> VoidGate::voidGate_ProbabilityPL = Parameters::register_parameter("BRAIN_MARKOV_GATES_VOID-voidGate_Probability", 0.05, "chance that an output from a void gate will be set to 0");
 
 VoidGate::VoidGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID) :
 		DeterministicGate(addresses, _table, _ID) {  // use DeterministicGate constructor to build set up everything (including a table of 0s and 1s)

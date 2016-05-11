@@ -55,33 +55,33 @@ class WireBrain: public AbstractBrain {
 	static shared_ptr<ParameterLink<int>> wiregenesSquiggleWireMaxLengthPL;
 	static shared_ptr<ParameterLink<string>> wiregenesSquiggleWireDirectionsPL;
 
-	shared_ptr<ParameterLink<bool>> allowNegativeChargeLPL;
-	shared_ptr<ParameterLink<int>> defaultWidthLPL;
-	shared_ptr<ParameterLink<int>> defaultHeightLPL;
-	shared_ptr<ParameterLink<int>> defaultDepthLPL;
-	shared_ptr<ParameterLink<int>> worldConnectionsSeparationLPL;
-	shared_ptr<ParameterLink<int>> overchargeThresholdLPL;
-	shared_ptr<ParameterLink<int>> decayDurationLPL;
-	shared_ptr<ParameterLink<int>> chargeUpdatesPerUpdateLPL;
-	shared_ptr<ParameterLink<bool>> constantInputsLPL;
-	shared_ptr<ParameterLink<bool>> cacheResultsLPL;
-	shared_ptr<ParameterLink<int>> cacheResultsCountLPL;
+	bool allowNegativeCharge;
+	int defaultWidth;
+	int defaultHeight;
+	int defaultDepth;
+	int worldConnectionsSeparation;
+	int overchargeThreshold;
+	int decayDuration;
+	int chargeUpdatesPerUpdate;
+	bool constantInputs;
+	bool cacheResults;
+	int cacheResultsCount;
 
-	shared_ptr<ParameterLink<string>> genomeDecodingMethodLPL;  // "bitmap" = convert genome directly, "wiregenes" = genes defined by start codeons, location, direction and location
-	shared_ptr<ParameterLink<int>> wiregenesInitialGeneCountLPL;
-	shared_ptr<ParameterLink<double>> bitmapInitialFillRatioLPL;
+	string genomeDecodingMethod;  // "bitmap" = convert genome directly, "wiregenes" = genes defined by start codeons, location, direction and location
+	int wiregenesInitialGeneCount;
+	double bitmapInitialFillRatio;
 
-	shared_ptr<ParameterLink<bool>> wiregenesAllowSimpleWiresLPL;
-	shared_ptr<ParameterLink<int>> wiregenesSimpleWireMaxLengthLPL;
-	shared_ptr<ParameterLink<string>> wiregenesSimpleWireDirectionsLPL;
+	bool wiregenesAllowSimpleWires;
+	int wiregenesSimpleWireMaxLength;
+	string wiregenesSimpleWireDirections;
 
-	shared_ptr<ParameterLink<bool>> wiregenesAllowWormholesLPL;
-	shared_ptr<ParameterLink<int>> wiregenesWormholesBidirectionalLPL;
+	bool wiregenesAllowWormholes;
+	int wiregenesWormholesBidirectional;
 
-	shared_ptr<ParameterLink<bool>> wiregenesAllowSquiggleWiresLPL;
-	shared_ptr<ParameterLink<int>> wiregenesSquiggleWireMinLengthLPL;
-	shared_ptr<ParameterLink<int>> wiregenesSquiggleWireMaxLengthLPL;
-	shared_ptr<ParameterLink<string>> wiregenesSquiggleWireDirectionsLPL;
+	bool wiregenesAllowSquiggleWires;
+	int wiregenesSquiggleWireMinLength;
+	int wiregenesSquiggleWireMaxLength;
+	string wiregenesSquiggleWireDirections;
 
 	int CHARGE;  // = 2 + *decayDuration;
 	int NEGCHARGE;  // = CHARGE * -1;
@@ -110,9 +110,9 @@ public:
 
 	int connectionsCount;
 
-	WireBrain(int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes);
-	WireBrain(shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes);
-	WireBrain(const vector<bool> &genome, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes);
+	WireBrain(int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT = nullptr);
+	WireBrain(shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT = nullptr);
+	WireBrain(const vector<bool> &genome, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT = nullptr);
 
 	virtual void initalize();
 	virtual void connectPruneAndSetAveColumns(vector<pair<int, int>> wormholeList);
