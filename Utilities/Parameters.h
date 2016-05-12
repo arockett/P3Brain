@@ -471,21 +471,21 @@ public:
 
 	shared_ptr<ParametersEntry<string>> lookupStringEntry(const string& name) {
 		if (table.find(name) == table.end()) {
-			lookupBool(name);
+			lookupString(name);
 		}
 		return dynamic_pointer_cast<ParametersEntry<string>>(table[name]);
 	}
 
 	shared_ptr<ParametersEntry<int>> lookupIntEntry(const string& name) {
 		if (table.find(name) == table.end()) {
-			lookupBool(name);
+			lookupInt(name);
 		}
 		return dynamic_pointer_cast<ParametersEntry<int>>(table[name]);
 	}
 
 	shared_ptr<ParametersEntry<double>> lookupDoubleEntry(const string& name) {
 		if (table.find(name) == table.end()) {
-			lookupBool(name);
+			lookupDouble(name);
 		}
 		return dynamic_pointer_cast<ParametersEntry<double>>(table[name]);
 	}

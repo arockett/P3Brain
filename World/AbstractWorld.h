@@ -23,7 +23,7 @@ public:
 	 static shared_ptr<ParameterLink<int>> repeatsPL;
 	 static shared_ptr<ParameterLink<bool>> showOnUpdatePL;
 
-	shared_ptr<ParametersTable> PT ;
+	const shared_ptr<ParametersTable> PT;
 
 	vector<string> aveFileColumns;
 

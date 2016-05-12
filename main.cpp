@@ -51,7 +51,6 @@ int main(int argc, const char * argv[]) {
 	Parameters::initializeParameters(argc, argv);  // loads command line and configFile values into registered parameters
 												   // also writes out a config file if requested
 
-
 //	shared_ptr<ParametersTable> pt = make_shared<ParametersTable>();
 //
 //	for (int i = 0; i < 100; i++) {
@@ -91,16 +90,26 @@ int main(int argc, const char * argv[]) {
 
 	//auto world = make_shared<BerryWorld>();
 
-	auto world = make_shared<NumeralClassifierWorld>();
+	//auto world = make_shared<NumeralClassifierWorld>();
 
-	//auto world = make_shared<TestWorld>();
+	auto world = make_shared<TestWorld>();
 
-	shared_ptr<Group> group;
-	{
+	vector<string> groupNameSpaces;
+	convertCSVListToVector(Global::groupNameSpacesPL->lookup(), groupNameSpaces);
+	groupNameSpaces.push_back("");
+	map<string, shared_ptr<Group>> groups;
+	shared_ptr<ParametersTable> PT;
+
+	for (auto NS : groupNameSpaces) {
+		if (NS == "") {
+			PT = Parameters::root;
+			NS = "root";
+		} else {
+			PT = Parameters::root->makeTable(NS, Parameters::root);
+		}
 
 		Global::update = -1;  // before there was time, there was a progenitor
 
-		//auto templateGenome = make_shared<CircularGenome<double>>(CircularGenomeParameters::initialGenomeSize,256);
 		shared_ptr<AbstractGenome> templateGenome;
 		if (AbstractGenome::genomeTypeStrPL->lookup() == "Multi") {
 			shared_ptr<AbstractChromosome> templateChromosome;
@@ -116,16 +125,16 @@ int main(int argc, const char * argv[]) {
 				cout << "\n\nERROR: Unrecognized genomeSitesType in configuration!\n  \"" << AbstractGenome::genomeSitesTypePL->lookup() << "\" is not defined.\n\nExiting.\n" << endl;
 				exit(1);
 			}
-			templateGenome = make_shared<MultiGenome>(templateChromosome, MultiGenome::initialChromosomesPL->lookup(), MultiGenome::initialPloidyPL->lookup());
+			templateGenome = make_shared<MultiGenome>(templateChromosome, MultiGenome::initialChromosomesPL->lookup(), MultiGenome::initialPloidyPL->lookup(), PT);
 		} else if (AbstractGenome::genomeTypeStrPL->lookup() == "Circular") {
 			if (AbstractGenome::genomeSitesTypePL->lookup() == "char") {
-				templateGenome = make_shared<CircularGenome<unsigned char>>(AbstractGenome::alphabetSizePL->lookup(), CircularGenomeParameters::initialGenomeSizePL->lookup());
+				templateGenome = make_shared<CircularGenome<unsigned char>>(AbstractGenome::alphabetSizePL->lookup(), CircularGenomeParameters::initialGenomeSizePL->lookup(), PT);
 			} else if (AbstractGenome::genomeSitesTypePL->lookup() == "int") {
-				templateGenome = make_shared<CircularGenome<int>>(AbstractGenome::alphabetSizePL->lookup(), CircularGenomeParameters::initialGenomeSizePL->lookup());
+				templateGenome = make_shared<CircularGenome<int>>(AbstractGenome::alphabetSizePL->lookup(), CircularGenomeParameters::initialGenomeSizePL->lookup(), PT);
 			} else if (AbstractGenome::genomeSitesTypePL->lookup() == "double") {
-				templateGenome = make_shared<CircularGenome<double>>(AbstractGenome::alphabetSizePL->lookup(), CircularGenomeParameters::initialGenomeSizePL->lookup());
+				templateGenome = make_shared<CircularGenome<double>>(AbstractGenome::alphabetSizePL->lookup(), CircularGenomeParameters::initialGenomeSizePL->lookup(), PT);
 			} else if (AbstractGenome::genomeSitesTypePL->lookup() == "bool") {
-				templateGenome = make_shared<CircularGenome<bool>>(AbstractGenome::alphabetSizePL->lookup(), CircularGenomeParameters::initialGenomeSizePL->lookup());
+				templateGenome = make_shared<CircularGenome<bool>>(AbstractGenome::alphabetSizePL->lookup(), CircularGenomeParameters::initialGenomeSizePL->lookup(), PT);
 			} else {
 				cout << "\n\nERROR: Unrecognized genomeSitesType in configuration!\n  \"" << AbstractGenome::genomeSitesTypePL->lookup() << "\" is not defined.\n\nExiting.\n" << endl;
 				exit(1);
@@ -134,14 +143,12 @@ int main(int argc, const char * argv[]) {
 			cout << "\n\nERROR: Unrecognized genome type in configuration!\n  \"" << AbstractGenome::genomeTypeStrPL->lookup() << "\" is not defined.\n\nExiting.\n" << endl;
 			exit(1);
 		}
-		//auto sheepTable = Parameters::root->makeTable("sheep::",Parameters::root);
-
 
 		shared_ptr<AbstractBrain> templateBrain;
 		if (AbstractBrain::brainTypeStrPL->lookup() == "Markov") {
-			templateBrain = make_shared<MarkovBrain>(make_shared<ClassicGateListBuilder>(), world->requiredInputs(), world->requiredOutputs(), AbstractBrain::hiddenNodesPL->lookup());
+			templateBrain = make_shared<MarkovBrain>(make_shared<ClassicGateListBuilder>(PT), world->requiredInputs(), world->requiredOutputs(), AbstractBrain::hiddenNodesPL->lookup(), PT);
 		} else if (AbstractBrain::brainTypeStrPL->lookup() == "Wire") {
-			templateBrain = make_shared<WireBrain>(world->requiredInputs(), world->requiredOutputs(), AbstractBrain::hiddenNodesPL->lookup());
+			templateBrain = make_shared<WireBrain>(world->requiredInputs(), world->requiredOutputs(), AbstractBrain::hiddenNodesPL->lookup(), PT);
 		} else if (AbstractBrain::brainTypeStrPL->lookup() == "Human") {
 			templateBrain = make_shared<HumanBrain>(world->requiredInputs(), world->requiredOutputs(), AbstractBrain::hiddenNodesPL->lookup());
 		} else {
@@ -165,36 +172,16 @@ int main(int argc, const char * argv[]) {
 		progenitor->kill();  // the progenitor has served it's purpose.
 		cout << "Population of " << Global::popSizePL->lookup() << " organisms with " << AbstractGenome::genomeTypeStrPL->lookup() << "<" << AbstractGenome::genomeSitesTypePL->lookup() << "> genomes and " << AbstractBrain::brainTypeStrPL->lookup() << " brains." << endl;
 
-/////// to test genome to brain conversion and coding regions, set popsize = 1 and uncomment the block below this comment
-//		shared_ptr<Organism> test_org = dynamic_pointer_cast<Organism>(population[0]);
-//		shared_ptr<Genome> test_genome = dynamic_pointer_cast<Genome>(test_org->genome);
-//		shared_ptr<MarkovBrain> test_brain = dynamic_pointer_cast<MarkovBrain>(test_org->brain);
-//
-//		cout << test_genome->genomeToStr();
-//
-//		for (int i = 0; i < 6; i++) {
-//			shared_ptr<Chromosome<int>> ch = dynamic_pointer_cast<Chromosome<int>>(test_genome->chromosomes[i]);
-//			cout << "chromosome " << i << endl;
-//			cout << ch->chromosomeToStr() << endl;
-//			cout << ch->codingRegionsToString() << endl;
-//		}
-//
-//		cout << endl << endl;
-//
-//		cout << test_brain->description();
-//		exit(1);
-/////// to test genome to brain conversion and coding regions, set popsize = 1 and uncomment the block above this comment
-
 		shared_ptr<AbstractOptimizer> optimizer;
 
 		if (AbstractOptimizer::Optimizer_MethodStrPL->lookup() == "GA") {
-			optimizer = make_shared<GAOptimizer>();
+			optimizer = make_shared<GAOptimizer>(PT);
 			cout << "Using GA Optimizer" << endl;
 		} else if (AbstractOptimizer::Optimizer_MethodStrPL->lookup() == "Tournament") {
-			optimizer = make_shared<TournamentOptimizer>();
+			optimizer = make_shared<TournamentOptimizer>(PT);
 			cout << "Using Tournament Optimizer" << endl;
 		} else if (AbstractOptimizer::Optimizer_MethodStrPL->lookup() == "Tournament2") {
-			optimizer = make_shared<Tournament2Optimizer>();
+			optimizer = make_shared<Tournament2Optimizer>(PT);
 			cout << "Using Tournament2 Optimizer" << endl;
 		} else {
 			cout << "\n\nERROR: Unrecognized optimizer type in configuration!\n  \"" << AbstractOptimizer::Optimizer_MethodStrPL->lookup() << "\" is not defined.\n\nExiting.\n" << endl;
@@ -211,48 +198,55 @@ int main(int argc, const char * argv[]) {
 		shared_ptr<DefaultArchivist> archivist;
 
 		if (DefaultArchivist::Arch_outputMethodStrPL->lookup() == "default") {
-			archivist = make_shared<DefaultArchivist>(aveFileColumns);
+			archivist = make_shared<DefaultArchivist>(aveFileColumns, PT);
 			cout << "Using Default Archivist" << endl;
 		} else if (DefaultArchivist::Arch_outputMethodStrPL->lookup() == "LODwAP") {
-			archivist = make_shared<LODwAPArchivist>(aveFileColumns);
+			archivist = make_shared<LODwAPArchivist>(aveFileColumns, PT);
 			cout << "Using Line of Decent with Aggressive Pruning Archivist" << endl;
 		} else if (DefaultArchivist::Arch_outputMethodStrPL->lookup() == "SSwD") {
-			archivist = make_shared<SSwDArchivist>(aveFileColumns);
+			archivist = make_shared<SSwDArchivist>(aveFileColumns, PT);
 			cout << "Using Snapshot with Delay Archivist" << endl;
 		} else {
 			cout << "\n\nERROR: Unrecognized archivist type in configuration!\n  \"" << DefaultArchivist::Arch_outputMethodStrPL->lookup() << "\" is not defined.\n\nExiting.\n" << endl;
 			exit(1);
 		}
-		group = make_shared<Group>(population, optimizer, archivist);
+
+		groups[NS] = make_shared<Group>(population, optimizer, archivist);
 	}
 
 //////////////////
 // evolution loop
 //////////////////
 
+	string defaultGroup = "sheep::";
+	Parameters::root->show(1);
+
+	cout << "\n\nroot" << groups["root"]->population[0]->brain->description() << endl;
+	cout << "\n\nwolf" << groups["wolf::"]->population[0]->brain->description() << endl;
+	cout << "\n\nsheep" << groups["sheep::"]->population[0]->brain->description() << endl;
 	if (Global::modePL->lookup() == "run") {
 		bool finished = false;  // when the archivist says we are done, we can stop!
 
 		while (!finished) {
-			world->evaluateFitness(group->population, false, AbstractWorld::showOnUpdatePL->lookup());  // evaluate each organism in the population using a World
+			world->evaluateFitness(groups[defaultGroup]->population, false, AbstractWorld::showOnUpdatePL->lookup());  // evaluate each organism in the population using a World
 			//cout << "  evaluation done\n";
-			finished = group->archive();  // save data, update memory and delete any unneeded data;
+			finished = groups[defaultGroup]->archive();  // save data, update memory and delete any unneeded data;
 			//cout << "  archive done\n";
 			Global::update++;
-			group->optimize();  // update the population (reproduction and death)
+			groups[defaultGroup]->optimize();  // update the population (reproduction and death)
 			//cout << "  optimize done\n";
-			cout << "update: " << Global::update - 1 << "   maxFitness: " << group->optimizer->maxFitness << "" << endl;
+			cout << "update: " << Global::update - 1 << "   maxFitness: " << groups[defaultGroup]->optimizer->maxFitness << "" << endl;
 		}
 
-		group->archive(1);  // flush any data that has not been output yet
+		groups[defaultGroup]->archive(1);  // flush any data that has not been output yet
 	} else if (Global::modePL->lookup() == "test") {
 
 		vector<shared_ptr<AbstractGenome>> mg;
-		group->population[0]->genome->loadGenomeFile("genome_20000.csv", mg);
+		groups[defaultGroup]->population[0]->genome->loadGenomeFile("genome_20000.csv", mg);
 
 		vector<shared_ptr<Organism>> testPopulation;
 		for (auto g : mg) {
-			auto newOrg = make_shared<Organism>(group->population[0], g);
+			auto newOrg = make_shared<Organism>(groups[defaultGroup]->population[0], g);
 			newOrg->brain->setRecordActivity(true);
 			newOrg->brain->setRecordFileName("wireBrain.run");
 			testPopulation.push_back(newOrg);  // add a new org to population using progenitors template and a new random genome

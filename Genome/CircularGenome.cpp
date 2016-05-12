@@ -237,7 +237,6 @@ vector<vector<int>> CircularGenome<T>::Handler::readTable(pair<int, int> tableSi
 
 template<class T>
 void CircularGenome<T>::setupCircularGenome(int _size, double _alphabetSize) {
-
 	initialGenomeSizeLPL = (PT == nullptr) ? CircularGenomeParameters::initialGenomeSizePL : Parameters::getIntLink("GENOME_CIRCULAR-sizeInitial", PT);
 	pointMutationRateLPL = (PT == nullptr) ? CircularGenomeParameters::pointMutationRatePL : Parameters::getDoubleLink("GENOME_CIRCULAR-mutationPointRate", PT);
 	insertionRateLPL = (PT == nullptr) ? CircularGenomeParameters::insertionRatePL : Parameters::getDoubleLink("GENOME_CIRCULAR-mutationCopyRate", PT);

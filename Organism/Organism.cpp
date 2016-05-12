@@ -66,6 +66,7 @@ Organism::Organism(shared_ptr<AbstractGenome> _genome) {
 Organism::Organism(shared_ptr<AbstractGenome> _genome, shared_ptr<AbstractBrain> _brain) {
 	genome = _genome;
 	//cout << "in Organism::Organism(shared_ptr<AbstractGenome> _genome, shared_ptr<AbstractBrain> _brain)\n\tabout to make brain from genome"<<endl;
+	cout << "in Organism::Organism _brain->PT = " << _brain->PT << endl;
 	brain = _brain->makeBrainFromGenome(genome);
 	//cout << "\tmade brain from genome"<<endl;
 	ID = registerOrganism();

@@ -30,7 +30,7 @@ class AbstractOptimizer {
 	static shared_ptr<ParameterLink<int>> tournamentSizePL;
 
  public:
-	shared_ptr<ParametersTable> PT;
+	const shared_ptr<ParametersTable> PT;
 	double maxFitness;
 	AbstractOptimizer(shared_ptr<ParametersTable> _PT = nullptr) : PT(_PT) {
 		maxFitness = 0;

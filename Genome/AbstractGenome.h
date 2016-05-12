@@ -32,8 +32,7 @@ public:
 	static shared_ptr<ParameterLink<int>> alphabetSizePL;
 	static shared_ptr<ParameterLink<string>> genomeSitesTypePL;
 
-	string nameSpace = "";
-	const shared_ptr<ParametersTable> PT = nullptr;
+	const shared_ptr<ParametersTable> PT;
 
 	// Handlers are how you access Genomes for reading and writting.
 	// to get a handle for a genome call that that genomes newHandler() method

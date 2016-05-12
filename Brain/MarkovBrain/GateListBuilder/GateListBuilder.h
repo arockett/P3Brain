@@ -24,7 +24,7 @@ using namespace std;
 class AbstractGateListBuilder {
 
  public:
-	shared_ptr<ParametersTable> PT;
+	const shared_ptr<ParametersTable> PT;
 	Gate_Builder gateBuilder;
 
 

@@ -479,7 +479,7 @@ WireBrain::WireBrain(shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrO
 }
 
 shared_ptr<AbstractBrain> WireBrain::makeBrainFromGenome(shared_ptr<AbstractGenome> _genome) {
-	shared_ptr<WireBrain> newBrain = make_shared<WireBrain>(_genome, nrInNodes, nrOutNodes, nrHiddenNodes);
+	shared_ptr<WireBrain> newBrain = make_shared<WireBrain>(_genome, nrInNodes, nrOutNodes, nrHiddenNodes,PT);
 	return newBrain;
 }
 
