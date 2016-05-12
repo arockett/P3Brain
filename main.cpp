@@ -88,11 +88,11 @@ int main(int argc, const char * argv[]) {
 		cout << "Using Random Seed: " << Global::randomSeedPL->lookup() << endl;
 	}
 
-	//auto world = make_shared<BerryWorld>();
+	auto world = make_shared<BerryWorld>();
 
 	//auto world = make_shared<NumeralClassifierWorld>();
 
-	auto world = make_shared<TestWorld>();
+	//auto world = make_shared<TestWorld>();
 
 	vector<string> groupNameSpaces;
 	convertCSVListToVector(Global::groupNameSpacesPL->lookup(), groupNameSpaces);
@@ -105,7 +105,7 @@ int main(int argc, const char * argv[]) {
 			PT = Parameters::root;
 			NS = "root";
 		} else {
-			PT = Parameters::root->makeTable(NS, Parameters::root);
+			PT = Parameters::root->getTable(NS);
 		}
 
 		Global::update = -1;  // before there was time, there was a progenitor
@@ -170,7 +170,7 @@ int main(int argc, const char * argv[]) {
 			population.push_back(newOrg);  // add a new org to population using progenitors template and a new random genome
 		}
 		progenitor->kill();  // the progenitor has served it's purpose.
-		cout << "Population of " << Global::popSizePL->lookup() << " organisms with " << AbstractGenome::genomeTypeStrPL->lookup() << "<" << AbstractGenome::genomeSitesTypePL->lookup() << "> genomes and " << AbstractBrain::brainTypeStrPL->lookup() << " brains." << endl;
+		cout << "Group: " << NS << " is a population of " << Global::popSizePL->lookup() << " organisms with " << AbstractGenome::genomeTypeStrPL->lookup() << "<" << AbstractGenome::genomeSitesTypePL->lookup() << "> genomes and " << AbstractBrain::brainTypeStrPL->lookup() << " brains." << endl;
 
 		shared_ptr<AbstractOptimizer> optimizer;
 
@@ -218,12 +218,8 @@ int main(int argc, const char * argv[]) {
 // evolution loop
 //////////////////
 
-	string defaultGroup = "sheep::";
-	Parameters::root->show(1);
+	string defaultGroup = "root";
 
-	cout << "\n\nroot" << groups["root"]->population[0]->brain->description() << endl;
-	cout << "\n\nwolf" << groups["wolf::"]->population[0]->brain->description() << endl;
-	cout << "\n\nsheep" << groups["sheep::"]->population[0]->brain->description() << endl;
 	if (Global::modePL->lookup() == "run") {
 		bool finished = false;  // when the archivist says we are done, we can stop!
 
