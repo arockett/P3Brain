@@ -91,9 +91,9 @@ int main(int argc, const char * argv[]) {
 
 	//auto world = make_shared<BerryWorld>();
 
-	//auto world = make_shared<NumeralClassifierWorld>();
+	auto world = make_shared<NumeralClassifierWorld>();
 
-	auto world = make_shared<TestWorld>();
+	//auto world = make_shared<TestWorld>();
 
 	shared_ptr<Group> group;
 	{
@@ -119,13 +119,13 @@ int main(int argc, const char * argv[]) {
 			templateGenome = make_shared<MultiGenome>(templateChromosome, MultiGenome::initialChromosomesPL->lookup(), MultiGenome::initialPloidyPL->lookup());
 		} else if (AbstractGenome::genomeTypeStrPL->lookup() == "Circular") {
 			if (AbstractGenome::genomeSitesTypePL->lookup() == "char") {
-				templateGenome = make_shared<CircularGenome<unsigned char>>(CircularGenomeParameters::initialGenomeSizePL->lookup(), AbstractGenome::alphabetSizePL->lookup());
+				templateGenome = make_shared<CircularGenome<unsigned char>>(AbstractGenome::alphabetSizePL->lookup(), CircularGenomeParameters::initialGenomeSizePL->lookup());
 			} else if (AbstractGenome::genomeSitesTypePL->lookup() == "int") {
-				templateGenome = make_shared<CircularGenome<int>>(CircularGenomeParameters::initialGenomeSizePL->lookup(), AbstractGenome::alphabetSizePL->lookup());
+				templateGenome = make_shared<CircularGenome<int>>(AbstractGenome::alphabetSizePL->lookup(), CircularGenomeParameters::initialGenomeSizePL->lookup());
 			} else if (AbstractGenome::genomeSitesTypePL->lookup() == "double") {
-				templateGenome = make_shared<CircularGenome<double>>(CircularGenomeParameters::initialGenomeSizePL->lookup(), AbstractGenome::alphabetSizePL->lookup());
+				templateGenome = make_shared<CircularGenome<double>>(AbstractGenome::alphabetSizePL->lookup(), CircularGenomeParameters::initialGenomeSizePL->lookup());
 			} else if (AbstractGenome::genomeSitesTypePL->lookup() == "bool") {
-				templateGenome = make_shared<CircularGenome<bool>>(CircularGenomeParameters::initialGenomeSizePL->lookup(), AbstractGenome::alphabetSizePL->lookup());
+				templateGenome = make_shared<CircularGenome<bool>>(AbstractGenome::alphabetSizePL->lookup(), CircularGenomeParameters::initialGenomeSizePL->lookup());
 			} else {
 				cout << "\n\nERROR: Unrecognized genomeSitesType in configuration!\n  \"" << AbstractGenome::genomeSitesTypePL->lookup() << "\" is not defined.\n\nExiting.\n" << endl;
 				exit(1);
@@ -134,7 +134,6 @@ int main(int argc, const char * argv[]) {
 			cout << "\n\nERROR: Unrecognized genome type in configuration!\n  \"" << AbstractGenome::genomeTypeStrPL->lookup() << "\" is not defined.\n\nExiting.\n" << endl;
 			exit(1);
 		}
-
 		//auto sheepTable = Parameters::root->makeTable("sheep::",Parameters::root);
 
 

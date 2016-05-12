@@ -109,17 +109,25 @@ public:
 	vector<T> sites;
 	double alphabetSize;
 
-	CircularGenome(double _alphabetSize = 256) {
-		setupCircularGenome(100, _alphabetSize);
+	CircularGenome() = delete;
+
+	//CircularGenome(double _alphabetSize = 256, shared_ptr<ParametersTable> _PT = nullptr);
+	CircularGenome(shared_ptr<ParametersTable> _PT) : AbstractGenome(_PT){
+		setupCircularGenome(256, 100);
 	}
 
-	CircularGenome(int _size, double _alphabetSize);
+//	CircularGenome(double _alphabetSize, shared_ptr<ParametersTable> _PT) : AbstractGenome(_PT){
+//		alphabetSize = _alphabetSize;
+//	}
+
+	CircularGenome(double _alphabetSize = 256, int _size = 100, shared_ptr<ParametersTable> _PT = nullptr);
+
 	virtual ~CircularGenome() = default;
 
 	virtual void setupCircularGenome(int _size, double _alphabetSize);
 
 	virtual shared_ptr<AbstractGenome> makeLike() override {
-		return make_shared<CircularGenome<T>>(sites.size(), alphabetSize);
+		return make_shared<CircularGenome<T>>(alphabetSize, sites.size(),PT);
 	}
 
 	virtual int size();

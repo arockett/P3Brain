@@ -43,7 +43,7 @@ MarkovBrain::MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, shared_ptr<Ab
 }
 
 shared_ptr<AbstractBrain> MarkovBrain::makeBrainFromGenome(shared_ptr<AbstractGenome> _genome) {
-	shared_ptr<MarkovBrain> newBrain = make_shared<MarkovBrain>(GLB, _genome, nrInNodes, nrOutNodes, nrHiddenNodes);
+	shared_ptr<MarkovBrain> newBrain = make_shared<MarkovBrain>(GLB, _genome, nrInNodes, nrOutNodes, nrHiddenNodes,PT);
 	return newBrain;
 }
 

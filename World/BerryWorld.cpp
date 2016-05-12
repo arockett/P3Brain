@@ -56,43 +56,42 @@ shared_ptr<ParameterLink<bool>> BerryWorld::recordFoodListEatEmptyPL = Parameter
 shared_ptr<ParameterLink<bool>> BerryWorld::recordFoodListNoEatPL = Parameters::register_parameter("WORLD_BERRY-recordFoodListNoEat", false, "if true, if true foodList will include no eat (-1)");
 
 
-BerryWorld::BerryWorld() {
+BerryWorld::BerryWorld(shared_ptr<ParametersTable> _PT) : AbstractWorld(_PT){
 
-	worldUpdates = worldUpdatesPL->lookup();
+	worldUpdates = (PT == nullptr) ? worldUpdatesPL->lookup(): PT->lookupInt("WORLD_BERRY-worldUpdates");
 
-	foodTypes = foodTypesPL->lookup();
+	foodTypes = (PT == nullptr) ? foodTypesPL->lookup() : PT->lookupInt("WORLD_BERRY-foodTypes");
 
 
-	 TSK = TSKPL->lookup();
+	 TSK = (PT == nullptr) ? TSKPL->lookup() : PT->lookupDouble("WORLD_BERRY-taskSwitchingCost");
 
-	 rewardForTurn = rewardForTurnPL->lookup();
-	 rewardForMove = rewardForMovePL->lookup();
+	 rewardForTurn = (PT == nullptr) ? rewardForTurnPL->lookup() : PT->lookupDouble("WORLD_BERRY_ADVANCED-rewardForTurn");
+	 rewardForMove = (PT == nullptr) ? rewardForMovePL->lookup() : PT->lookupDouble("WORLD_BERRY_ADVANCED-rewardForMove");
 
-	 WorldY = WorldYPL->lookup();
-	 WorldX = WorldXPL->lookup();
-	 borderWalls = borderWallsPL->lookup();
-	 randomWalls = randomWallsPL->lookup();
+	 WorldY = (PT == nullptr) ? WorldYPL->lookup() : PT->lookupInt("WORLD_BERRY-worldY");
+	 WorldX = (PT == nullptr) ? WorldXPL->lookup() : PT->lookupInt("WORLD_BERRY-worldX");
+	 borderWalls = (PT == nullptr) ? borderWallsPL->lookup() : PT->lookupBool("WORLD_BERRY-makeBorderWalls");
+	 randomWalls = (PT == nullptr) ? randomWallsPL->lookup() : PT->lookupInt("WORLD_BERRY_ADVANCED-makeRandomWalls");
 
-	 allowMoveAndEat = rewardForTurnPL->lookup();
+	 allowMoveAndEat = (PT == nullptr) ? allowMoveAndEatPL->lookup() : PT->lookupBool("WORLD_BERRY_ADVANCED-allowMoveAndEat");
 
-	 senseDown = senseDownPL->lookup();
-	 senseFront = senseFrontPL->lookup();
-	 senseFrontSides = senseFrontSidesPL->lookup();
-	 senseWalls = senseWallsPL->lookup();
-	 clearOutputs = clearOutputsPL->lookup();
+	 senseDown = (PT == nullptr) ? senseDownPL->lookup() : PT->lookupBool("WORLD_BERRY-senseDown");
+	 senseFront = (PT == nullptr) ? senseFrontPL->lookup() : PT->lookupBool("WORLD_BERRY-senseFront");
+	 senseFrontSides = (PT == nullptr) ? senseFrontSidesPL->lookup() : PT->lookupBool("WORLD_BERRY-senseFrontSides");
+	 senseWalls = (PT == nullptr) ? senseWallsPL->lookup() : PT->lookupBool("WORLD_BERRY-senseWalls");
+	 clearOutputs = (PT == nullptr) ? clearOutputsPL->lookup() : PT->lookupBool("WORLD_BERRY-clearOutputs");
 
-	 replacement = replacementPL->lookup();
+	 replacement = (PT == nullptr) ? replacementPL->lookup() : PT->lookupInt("WORLD_BERRY-replacement");
 
-	 recordConsumptionRatio = recordConsumptionRatioPL->lookup();
-	 recordFoodList = recordFoodListPL->lookup();
-	 recordFoodListEatEmpty = recordFoodListEatEmptyPL->lookup();
-	 recordFoodListNoEat = recordFoodListNoEatPL->lookup();
+	 recordConsumptionRatio = (PT == nullptr) ? recordConsumptionRatioPL->lookup() : PT->lookupBool("BerryWorld::recordConsumptionRatioPL");
+	 recordFoodList = (PT == nullptr) ? recordFoodListPL->lookup() : PT->lookupBool("WORLD_BERRY-recordFoodList");
+	 recordFoodListEatEmpty = (PT == nullptr) ? recordFoodListEatEmptyPL->lookup() : PT->lookupBool("WORLD_BERRY-recordFoodListEatEmpty");
+	 recordFoodListNoEat = (PT == nullptr) ? recordFoodListNoEatPL->lookup() : PT->lookupBool("WORLD_BERRY-recordFoodListNoEat");
 
 	if (foodTypes < 1 || foodTypes > 8) {
 		cout << "In BerryWorld you either have too few or too many foodTypes (must be >0 and <=8)\n\nExiting\n\n";
 		exit(1);
 	}
-	//senseWalls = senseWalls & (borderWalls | (randomWalls > 0));  // if there are no walls, there is no need to sense them!
 
 	outputNodesCount = 3;  // number of brain nodes used for output, 2 for move, 1 for eat
 
@@ -115,15 +114,15 @@ BerryWorld::BerryWorld() {
 
 	}
 	foodRatioLookup.resize(9);  // stores reward of each type of food NOTE: food is indexed from 1 so 0th entry is chance to leave empty
-	foodRatioLookup[0] = ratioFood0PL->lookup();
-	foodRatioLookup[1] = ratioFood1PL->lookup();
-	foodRatioLookup[2] = ratioFood2PL->lookup();
-	foodRatioLookup[3] = ratioFood3PL->lookup();
-	foodRatioLookup[4] = ratioFood4PL->lookup();
-	foodRatioLookup[5] = ratioFood5PL->lookup();
-	foodRatioLookup[6] = ratioFood6PL->lookup();
-	foodRatioLookup[7] = ratioFood7PL->lookup();
-	foodRatioLookup[8] = ratioFood8PL->lookup();
+	foodRatioLookup[0] = (PT == nullptr) ? ratioFood0PL->lookup() : PT->lookupInt("WORLD_BERRY_ADVANCED-replacementRatioFood0");
+	foodRatioLookup[1] = (PT == nullptr) ? ratioFood1PL->lookup() : PT->lookupInt("WORLD_BERRY_ADVANCED-replacementRatioFood1");
+	foodRatioLookup[2] = (PT == nullptr) ? ratioFood2PL->lookup() : PT->lookupInt("WORLD_BERRY_ADVANCED-replacementRatioFood2");
+	foodRatioLookup[3] = (PT == nullptr) ? ratioFood3PL->lookup() : PT->lookupInt("WORLD_BERRY_ADVANCED-replacementRatioFood3");
+	foodRatioLookup[4] = (PT == nullptr) ? ratioFood4PL->lookup() : PT->lookupInt("WORLD_BERRY_ADVANCED-replacementRatioFood4");
+	foodRatioLookup[5] = (PT == nullptr) ? ratioFood5PL->lookup() : PT->lookupInt("WORLD_BERRY_ADVANCED-replacementRatioFood5");
+	foodRatioLookup[6] = (PT == nullptr) ? ratioFood6PL->lookup() : PT->lookupInt("WORLD_BERRY_ADVANCED-replacementRatioFood6");
+	foodRatioLookup[7] = (PT == nullptr) ? ratioFood7PL->lookup() : PT->lookupInt("WORLD_BERRY_ADVANCED-replacementRatioFood7");
+	foodRatioLookup[8] = (PT == nullptr) ? ratioFood8PL->lookup() : PT->lookupInt("WORLD_BERRY_ADVANCED-replacementRatioFood8");
 
 	foodRatioTotal = 0;
 	for (int i = 0; i <= foodTypes; i++) {
@@ -132,14 +131,14 @@ BerryWorld::BerryWorld() {
 
 	foodRewards.resize(9);  // stores reward of each type of food
 	foodRewards[0] = 0;
-	foodRewards[1] = rewardForFood1PL->lookup();
-	foodRewards[2] = rewardForFood2PL->lookup();
-	foodRewards[3] = rewardForFood3PL->lookup();
-	foodRewards[4] = rewardForFood4PL->lookup();
-	foodRewards[5] = rewardForFood5PL->lookup();
-	foodRewards[6] = rewardForFood6PL->lookup();
-	foodRewards[7] = rewardForFood7PL->lookup();
-	foodRewards[8] = rewardForFood8PL->lookup();
+	foodRewards[1] = (PT == nullptr) ? rewardForFood1PL->lookup() : PT->lookupDouble("WORLD_BERRY-rewardForFood1");
+	foodRewards[2] = (PT == nullptr) ? rewardForFood2PL->lookup() : PT->lookupDouble("WORLD_BERRY-rewardForFood2");
+	foodRewards[3] = (PT == nullptr) ? rewardForFood3PL->lookup() : PT->lookupDouble("WORLD_BERRY-rewardForFood3");
+	foodRewards[4] = (PT == nullptr) ? rewardForFood4PL->lookup() : PT->lookupDouble("WORLD_BERRY-rewardForFood4");
+	foodRewards[5] = (PT == nullptr) ? rewardForFood5PL->lookup() : PT->lookupDouble("WORLD_BERRY-rewardForFood5");
+	foodRewards[6] = (PT == nullptr) ? rewardForFood6PL->lookup() : PT->lookupDouble("WORLD_BERRY-rewardForFood6");
+	foodRewards[7] = (PT == nullptr) ? rewardForFood7PL->lookup() : PT->lookupDouble("WORLD_BERRY-rewardForFood7");
+	foodRewards[8] = (PT == nullptr) ? rewardForFood8PL->lookup() : PT->lookupDouble("WORLD_BERRY-rewardForFood8");
 
 	// columns to be added to ave file
 	aveFileColumns.clear();

@@ -266,19 +266,24 @@ void CircularGenome<T>::setupCircularGenome(int _size, double _alphabetSize) {
 	recordDataMap();
 }
 
+//template<class T>
+//CircularGenome<T>::CircularGenome(double _alphabetSize, int _size, shared_ptr<ParametersTable> _PT) : AbstractGenome(_PT){
+//	setupCircularGenome(_size, _alphabetSize);
+//}
+
 template<class T>
-CircularGenome<T>::CircularGenome(int _size, double _alphabetSize) {
-	setupCircularGenome(_size, _alphabetSize);
+CircularGenome<T>::CircularGenome(double _alphabetSize, int _size, shared_ptr<ParametersTable> _PT) : AbstractGenome(_PT) {
+	setupCircularGenome(_alphabetSize, _size);
 	cout << "ERROR : TYPE specified for CircularGenome is not supported.\nTypes supported are: int, double, bool, unsigned char\n";
 	exit(1);
 }
 
 template<>
-CircularGenome<int>::CircularGenome(int _size, double _alphabetSize) {
+CircularGenome<int>::CircularGenome(double _alphabetSize, int _size, shared_ptr<ParametersTable> _PT) : AbstractGenome(_PT) {
 	setupCircularGenome(_size, _alphabetSize);
 }
 template<>
-CircularGenome<bool>::CircularGenome(int _size, double _alphabetSize) {
+CircularGenome<bool>::CircularGenome(double _alphabetSize, int _size, shared_ptr<ParametersTable> _PT) : AbstractGenome(_PT) {
 	if (_alphabetSize != 2) {
 		cout << "ERROR: in CircularGenome constructor, alphabetSize for bool must be 2!\n";
 		exit(1);
@@ -286,11 +291,11 @@ CircularGenome<bool>::CircularGenome(int _size, double _alphabetSize) {
 	setupCircularGenome(_size, _alphabetSize);
 }
 template<>
-CircularGenome<double>::CircularGenome(int _size, double _alphabetSize) {
+CircularGenome<double>::CircularGenome(double _alphabetSize, int _size, shared_ptr<ParametersTable> _PT) : AbstractGenome(_PT) {
 	setupCircularGenome(_size, _alphabetSize);
 }
 template<>
-CircularGenome<unsigned char>::CircularGenome(int _size, double _alphabetSize) {
+CircularGenome<unsigned char>::CircularGenome(double _alphabetSize, int _size, shared_ptr<ParametersTable> _PT) : AbstractGenome(_PT) {
 	if (_alphabetSize > 256 || _alphabetSize < 2) {
 		cout << "ERROR: in CircularGenome constructor, alphabetSize for unsigned char must be 2 or greater and 256 or less!\n";
 		exit(1);
@@ -439,7 +444,6 @@ void CircularGenome<T>::mutate() {
 		}
 		int segmentStart = Random::getInt(sites.size() - segmentSize);
 		sites.erase(sites.begin() + segmentStart, sites.begin() + segmentStart + segmentSize);
-
 	}
 }
 
@@ -447,7 +451,7 @@ void CircularGenome<T>::mutate() {
 // the undefined action is to return a new genome
 template<class T>
 shared_ptr<AbstractGenome> CircularGenome<T>::makeMutatedGenomeFrom(shared_ptr<AbstractGenome> parent) {
-	auto newGenome = make_shared<CircularGenome<T>>();
+	auto newGenome = make_shared<CircularGenome<T>>(parent->PT);
 	newGenome->copyFrom(parent);
 	newGenome->mutate();
 	newGenome->recordDataMap();
@@ -467,8 +471,8 @@ shared_ptr<AbstractGenome> CircularGenome<T>::makeMutatedGenomeFromMany(vector<s
 	// first, check to make sure that parent genomes are conpatable.
 	auto castParent0 = dynamic_pointer_cast<CircularGenome<T>>(parents[0]);  // we will be pulling all sorts of stuff from this genome so lets just cast it once.
 
-	auto newGenome = make_shared<CircularGenome<T>>();
-	newGenome->alphabetSize = castParent0->alphabetSize;
+	auto newGenome = make_shared<CircularGenome<T>>(castParent0->alphabetSize,0,castParent0->PT);
+	//newGenome->alphabetSize = castParent0->alphabetSize;
 
 //	vector<shared_ptr<AbstractChromosome>> parentChromosomes;
 //	for (auto rawParent : parents) {
@@ -574,7 +578,8 @@ void CircularGenome<T>::loadGenomeFile(string fileName, vector<shared_ptr<Abstra
 //				}
 			ss >> _update >> rubbish >> _ID >> rubbish >> _alphabetSize >> rubbish >> _genomeLength >> rubbish >> rubbish >> rubbish;
 
-			shared_ptr<CircularGenome> newGenome = make_shared<CircularGenome>(_alphabetSize);
+			shared_ptr<CircularGenome<T>> newGenome = make_shared<CircularGenome<T>>(PT);
+			newGenome->alphabetSize = _alphabetSize;
 			newGenome->sites.clear();
 			for (int i = 0; i < _genomeLength; i++) {
 				ss >> value >> rubbish;

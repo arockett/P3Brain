@@ -35,10 +35,10 @@ public:
 
 	// end parameters
 
-	shared_ptr<ParameterLink<int>> worldUpdatesLPL;
-	shared_ptr<ParameterLink<int>> testsPreWorldEvalLPL;
-	shared_ptr<ParameterLink<int>> retinaTypeLPL;
-	shared_ptr<ParameterLink<string>> numeralDataFileNameLPL;
+	int worldUpdates;
+	int testsPreWorldEval;
+	int retinaType;
+	string numeralDataFileName;
 
 	vector<pair<int, int>> retinalOffsets = { { 0, 0 }, { -1, 0 }, { 1, 0 }, { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { -2, -2 }, { -1, -2 }, { 0, -2 }, { 1, -2 }, { 2, -2 }, { -2, 2 }, { -1, 2 }, { 0, 2 }, { 1, 2 }, { 2, 2 }, { -2, -1 }, { 2, -1 }, { -2, 0 }, { 2, 0 }, { -2, 1 }, { 2, 1 }, { -3, -3 }, { -2, -3 }, { -1, -3 }, { 0, -3 }, { 1, -3 }, { 2, -3 }, { 3, -3 }, { -3, 3 }, { -2, 3 }, { -1, 3 }, { 0, 3 }, { 1, 3 }, { 2, 3 }, { 3, 3 }, { -3, -2 }, { 3, -2 }, { -3, -1 }, { 3, -1 }, { -3, 0 }, { 3, 0 }, { -3, 1 }, { 3, 1 }, { -3, 2 }, { 3, 2 } };
 	// retina is a list of offsets defining input sensor array to brain
@@ -54,7 +54,7 @@ public:
 	vector<vector<bool>>numeralData;
 
 
-	NumeralClassifierWorld();
+	NumeralClassifierWorld(shared_ptr<ParametersTable> _PT = nullptr);
 
 //  double testIndividual(shared_ptr<Organism> org, bool analyse);
 

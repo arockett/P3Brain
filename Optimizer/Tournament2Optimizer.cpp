@@ -42,11 +42,11 @@ void Tournament2Optimizer::makeNextGeneration(vector<shared_ptr<Organism>> &popu
 	while (nextPopulation.size() < population.size()) {  // while we have not filled up the next generation
 		// chance for each pick that this org survives to the next population
 		//cout << "picking p1..." << flush;
-		if ((int) nextPopulation.size() < elitismPL->lookup()) {  // if next population has less members then elitism, then p1 is best.
+		if ((int) nextPopulation.size() < elitismLPL->lookup()) {  // if next population has less members then elitism, then p1 is best.
 			p1 = best;
 		} else {  // otherwise, p1 is the best of tournamentSize random picks
 			p1 = Random::getIndex(population.size());
-			for (int i = 0; i < tournamentSizePL->lookup() - 1; i++) {
+			for (int i = 0; i < tournamentSizeLPL->lookup() - 1; i++) {
 				challanger = Random::getIndex(population.size());
 				if (Scores[challanger] > Scores[p1]) {
 					p1 = challanger;
@@ -72,7 +72,7 @@ void Tournament2Optimizer::makeNextGeneration(vector<shared_ptr<Organism>> &popu
 				p2 = Random::getIndex(population.size());
 				//cout << "  " << p2 << " " << p1 << endl;
 
-				for (int i = 0; i < tournamentSizePL->lookup() - 1; i++) {
+				for (int i = 0; i < tournamentSizeLPL->lookup() - 1; i++) {
 					challanger = Random::getIndex(population.size());
 					//cout << "  ch = " << challanger << "\n";
 					if (Scores[challanger] > Scores[p2]) {

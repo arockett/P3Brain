@@ -251,7 +251,7 @@ vector<vector<int>> MultiGenome::Handler::readTable(pair<int, int> tableSize, pa
 }
 
 // make an empty genome and ploidy = 1
-MultiGenome::MultiGenome() {
+MultiGenome::MultiGenome(shared_ptr<ParametersTable> _PT) : AbstractGenome(_PT){
 
 	//initialPloidyLPL = (PT == nullptr) ? initialGenomeSizePL : Parameters::getIntLink("GENOME_CIRCULAR-sizeInitial", PT);;
 	//initialChromosomesLPL = ;
@@ -284,8 +284,8 @@ MultiGenome::MultiGenome() {
 }
 
 // make a genome with 1 chromosome
-MultiGenome::MultiGenome(shared_ptr<AbstractChromosome> _chromosome) :
-		MultiGenome() {
+MultiGenome::MultiGenome(shared_ptr<AbstractChromosome> _chromosome, shared_ptr<ParametersTable> _PT) :
+		MultiGenome(_PT) {
 	//ploidy = 1;
 	chromosomes.push_back(_chromosome->makeLike());
 	/////////chromosomes[0]->fillRandom();  // resize and set with random values
@@ -293,8 +293,8 @@ MultiGenome::MultiGenome(shared_ptr<AbstractChromosome> _chromosome) :
 }
 
 // make a genome with 1 or more chromosome and ploidy >= 1
-MultiGenome::MultiGenome(shared_ptr<AbstractChromosome> _chromosome, int chromosomeCount, int _ploidy) :
-		MultiGenome() {
+MultiGenome::MultiGenome(shared_ptr<AbstractChromosome> _chromosome, int chromosomeCount, int _ploidy, shared_ptr<ParametersTable> _PT) :
+		MultiGenome(_PT) {
 	ploidy = _ploidy;
 	if (ploidy < 1) {
 		cout << "Error: Genome must have plodiy >= 1";
@@ -424,7 +424,7 @@ void MultiGenome::mutate() {
 // make a mutated genome. from this genome
 // the undefined action is to return a new genome
 shared_ptr<AbstractGenome> MultiGenome::makeMutatedGenomeFrom(shared_ptr<AbstractGenome> parent) {
-	auto newGenome = make_shared<MultiGenome>();
+	auto newGenome = make_shared<MultiGenome>(parent->PT);
 	newGenome->copyFrom(parent);
 	newGenome->mutate();
 	newGenome->recordDataMap();
@@ -456,7 +456,7 @@ shared_ptr<AbstractGenome> MultiGenome::makeMutatedGenomeFromMany(vector<shared_
 		}
 
 	}
-	auto newGenome = make_shared<MultiGenome>();
+	auto newGenome = make_shared<MultiGenome>(castParent0->PT);
 	newGenome->ploidy = castParent0->ploidy;  // copy ploidy from 0th parent
 	int crossCount = crossCountLPL->lookup();
 	if (ploidy == 1) {  // if haploid then cross chromosomes from all parents
@@ -547,7 +547,7 @@ void MultiGenome::loadGenomeFile(string fileName, vector<shared_ptr<AbstractGeno
 			}
 			ss >> rubbish >> rubbish >> rubbish >> rubbish;
 
-			shared_ptr<MultiGenome> newGenome = make_shared<MultiGenome>(chromosomes[0], _chromosomeCount / _ploidy, _ploidy);
+			shared_ptr<MultiGenome> newGenome = make_shared<MultiGenome>(chromosomes[0], _chromosomeCount / _ploidy, _ploidy,PT);
 			for (int i = 0; i < _chromosomeCount; i++) {
 				newGenome->chromosomes[i]->readChromosomeFromSS(ss, _chromosomeLengths[i]);
 			}

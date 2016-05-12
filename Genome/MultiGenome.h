@@ -113,13 +113,14 @@ public:
 	int ploidy;
 	vector<shared_ptr<AbstractChromosome>> chromosomes;
 
-	MultiGenome();
-	MultiGenome(shared_ptr<AbstractChromosome> _chromosome);
-	MultiGenome(shared_ptr<AbstractChromosome> _chromosome, int chromosomeCount, int _plodiy = 1);
+	MultiGenome() = delete;
+	MultiGenome(shared_ptr<ParametersTable> _PT = nullptr);
+	MultiGenome(shared_ptr<AbstractChromosome> _chromosome, shared_ptr<ParametersTable> _PT = nullptr);
+	MultiGenome(shared_ptr<AbstractChromosome> _chromosome, int chromosomeCount, int _plodiy, shared_ptr<ParametersTable> _PT = nullptr);
 	virtual ~MultiGenome() = default;
 
 	virtual shared_ptr<AbstractGenome> makeLike() override {
-		return make_shared<MultiGenome>(chromosomes[0], (int) chromosomes.size() / ploidy, ploidy);
+		return make_shared<MultiGenome>(chromosomes[0], (int) chromosomes.size() / ploidy, ploidy,PT);
 	}
 
 	virtual shared_ptr<AbstractGenome::Handler> newHandler(shared_ptr<AbstractGenome> _genome, bool _readDirection = true) override;

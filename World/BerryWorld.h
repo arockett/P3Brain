@@ -114,7 +114,7 @@ public:
 	vector<int> foodRatioLookup;
 	vector<double> foodRewards;
 
-	BerryWorld();
+	BerryWorld(shared_ptr<ParametersTable> _PT = nullptr);
 
 //  double testIndividual(shared_ptr<Organism> org, bool analyse);
 
