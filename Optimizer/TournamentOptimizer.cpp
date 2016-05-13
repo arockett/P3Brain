@@ -36,11 +36,11 @@ void TournamentOptimizer::makeNextGeneration(vector<shared_ptr<Organism>> &popul
 
 	while (nextPopulation.size() < population.size()) {
 		int winner, challanger;
-		if ((int) nextPopulation.size() < AbstractOptimizer::elitism) {
+		if ((int) nextPopulation.size() < elitismLPL->lookup()) {
 			winner = best;
 		} else {
 			winner = Random::getIndex(population.size());
-			for (int i = 0; i < AbstractOptimizer::tournamentSize - 1; i++) {
+			for (int i = 0; i < tournamentSizeLPL->lookup() - 1; i++) {
 				challanger = Random::getIndex(population.size());
 				if (Scores[challanger] > Scores[winner]) {
 					winner = challanger;

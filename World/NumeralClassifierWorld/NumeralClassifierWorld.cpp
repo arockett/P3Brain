@@ -9,17 +9,18 @@
 #include "../../Utilities/Utilities.h"
 #include "NumeralClassifierWorld.h"
 
-const int& NumeralClassifierWorld::defaulttestsPreWorldEval = Parameters::register_parameter("NumeralClassifier_testsPreWorldEval", 5, "number of values each brain attempts to evaluate in a world evaluation", "WORLD - NUMERALCLASSIFIER");
-const int& NumeralClassifierWorld::defaultWorldUpdates = Parameters::register_parameter("NumeralClassifier_WorldUpdates", 100, "amount of time an brain is tested", "WORLD - NUMERALCLASSIFIER");
-const int& NumeralClassifierWorld::defaultRetinaType = Parameters::register_parameter("retinaType", 3, "//1 = center only, 2 = 3 across, 3 = 3x3, 4 = 5x5, 5 = 7x7", "WORLD - NUMERALCLASSIFIER");
-const string& NumeralClassifierWorld::numeralDataFileName = Parameters::register_parameter("numeralDataFileName", (string) "World/NumeralClassifierWorld/mnist.train.discrete.28x28-only100", "name of file with numeral data", "WORLD - NUMERALCLASSIFIER");
+shared_ptr<ParameterLink<int>> NumeralClassifierWorld::defaulttestsPreWorldEvalPL = Parameters::register_parameter("WORLD_NUMERALCLASSIFIER-testsPreWorldEval", 5, "number of values each brain attempts to evaluate in a world evaluation");
+shared_ptr<ParameterLink<int>> NumeralClassifierWorld::defaultWorldUpdatesPL = Parameters::register_parameter("WORLD_NUMERALCLASSIFIER-WorldUpdates", 100, "number of world updates brain has to evaluate each value");
+shared_ptr<ParameterLink<int>> NumeralClassifierWorld::defaultRetinaTypePL = Parameters::register_parameter("WORLD_NUMERALCLASSIFIER-retinaType", 3, "1 = center only, 2 = 3 across, 3 = 3x3, 4 = 5x5, 5 = 7x7");
+shared_ptr<ParameterLink<string>> NumeralClassifierWorld::numeralDataFileNamePL = Parameters::register_parameter("WORLD_NUMERALCLASSIFIER-dataFileName", (string) "World/NumeralClassifierWorld/mnist.train.discrete.28x28-only100", "name of file with numeral data");
 
-NumeralClassifierWorld::NumeralClassifierWorld() {
-	worldUpdates = defaultWorldUpdates;
-	testsPreWorldEval = defaulttestsPreWorldEval;
+NumeralClassifierWorld::NumeralClassifierWorld(shared_ptr<ParametersTable> _PT) : AbstractWorld(_PT){
+	worldUpdates = (PT == nullptr) ? defaultWorldUpdatesPL->lookup() : PT->lookupInt("WORLD_NUMERALCLASSIFIER-WorldUpdates");
+	testsPreWorldEval = (PT == nullptr) ? defaulttestsPreWorldEvalPL->lookup() : PT->lookupInt("WORLD_NUMERALCLASSIFIER-testsPreWorldEval");
+	retinaType = (PT == nullptr) ? defaultRetinaTypePL->lookup() : PT->lookupInt("WORLD_NUMERALCLASSIFIER-retinaType"); //1 = center only, 2 = 3 across, 3 = 3x3, 4 = 5x5, 5 = 7x7
+	numeralDataFileName = (PT == nullptr) ? numeralDataFileNamePL->lookup() : PT->lookupString("WORLD_NUMERALCLASSIFIER-dataFileName");
 
 	outputNodesCount = 13;  // moveX(1), moveY(1), 0->9(10), done(1)
-	retinaType = defaultRetinaType;  //1 = center only, 2 = 3 across, 3 = 3x3, 4 = 5x5, 5 = 7x7
 	switch (retinaType) {
 	case 1:
 		retinaSensors = 1;

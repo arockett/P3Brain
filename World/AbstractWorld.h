@@ -14,17 +14,21 @@
 #include <vector>
 
 #include "../Group/Group.h"
+#include "../Utilities/Parameters.h"
 
 using namespace std;
 
 class AbstractWorld {
 public:
-	const static int& repeats;
-	const static bool& showOnUpdate;
+	 static shared_ptr<ParameterLink<int>> repeatsPL;
+	 static shared_ptr<ParameterLink<bool>> showOnUpdatePL;
+
+	const shared_ptr<ParametersTable> PT;
 
 	vector<string> aveFileColumns;
 
-	AbstractWorld() = default;
+	AbstractWorld(shared_ptr<ParametersTable> _PT = nullptr) : PT(_PT){
+	}
 	virtual ~AbstractWorld() = default;
 	virtual void evaluateFitness(vector<shared_ptr<Organism>> population, bool analyse, bool show = 0);
 	virtual double testIndividual(shared_ptr<Organism> org, bool analyse, bool show = 0) = 0;

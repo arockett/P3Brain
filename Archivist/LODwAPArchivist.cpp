@@ -1,26 +1,31 @@
 #include "LODwAPArchivist.h"
 
-const int& LODwAPArchivist::LODwAP_Arch_dataInterval = Parameters::register_parameter("dataInterval_LODwAP", 100, "How often to write to data file", "ARCHIVIST_LODWAP");
-const int& LODwAPArchivist::LODwAP_Arch_genomeInterval = Parameters::register_parameter("genomeInterval_LODwAP", 1000, "How often to write genome file", "ARCHIVIST_LODWAP");
-const int& LODwAPArchivist::LODwAP_Arch_pruneInterval = Parameters::register_parameter("pruneInterval_LODwAP", 100, "How often to attempt to prune LOD and actually write out to files", "ARCHIVIST_LODWAP");
-const int& LODwAPArchivist::LODwAP_Arch_terminateAfter = Parameters::register_parameter("terminateAfter_LODwAP", 100, "how long to run after updates (to get better coalescence)", "ARCHIVIST_LODWAP");
-const string& LODwAPArchivist::LODwAP_Arch_DataFileName = Parameters::register_parameter("dataFileName_LODwAP", (string) "data.csv", "name of genome file (stores genomes for line of decent)", "ARCHIVIST_LODWAP");
-const string& LODwAPArchivist::LODwAP_Arch_GenomeFileName = Parameters::register_parameter("genomeFileName_LODwAP", (string) "genome.csv", "name of data file (stores everything but genomes)", "ARCHIVIST_LODWAP");
-const bool& LODwAPArchivist::LODwAP_Arch_writeDataFile = Parameters::register_parameter("writeDataFile_LODwAP", true, "if true, a data file will be written", "ARCHIVIST_LODWAP");
-const bool& LODwAPArchivist::LODwAP_Arch_writeGenomeFile = Parameters::register_parameter("writeGenomeFile_LODwAP", true, "if true, a genome file will be written", "ARCHIVIST_LODWAP");
-const bool& LODwAPArchivist::LODwAP_Arch_DataFileShowAllLists = Parameters::register_parameter("dataFileShowAllLists", true, "if true, lists named 'all'* in data map will be saved", "ARCHIVIST_LODWAP");
-const bool& LODwAPArchivist::LODwAP_Arch_DataFileConvertAllLists = Parameters::register_parameter("dataFileConvertAllLists", true, "if true, lists named 'all'* in data map will be averaged and added to file", "ARCHIVIST_LODWAP");
-LODwAPArchivist::LODwAPArchivist(vector<string> aveFileColumns) :
-		DefaultArchivist(aveFileColumns) {
+shared_ptr<ParameterLink<int>> LODwAPArchivist::LODwAP_Arch_dataIntervalPL = Parameters::register_parameter("ARCHIVIST_LODWAP-dataInterval", 100, "How often to write to data file");
+shared_ptr<ParameterLink<int>> LODwAPArchivist::LODwAP_Arch_genomeIntervalPL = Parameters::register_parameter("ARCHIVIST_LODWAP-genomeInterval", 1000, "How often to write genome file");
+shared_ptr<ParameterLink<int>> LODwAPArchivist::LODwAP_Arch_pruneIntervalPL = Parameters::register_parameter("ARCHIVIST_LODWAP-pruneInterval", 100, "How often to attempt to prune LOD and actually write out to files");
+shared_ptr<ParameterLink<int>> LODwAPArchivist::LODwAP_Arch_terminateAfterPL = Parameters::register_parameter("ARCHIVIST_LODWAP-terminateAfter", 100, "how long to run after updates (to get better coalescence)");
+shared_ptr<ParameterLink<string>> LODwAPArchivist::LODwAP_Arch_DataFileNamePL = Parameters::register_parameter("ARCHIVIST_LODWAP-dataFileName", (string) "data.csv", "name of genome file (stores genomes for line of decent)");
+shared_ptr<ParameterLink<string>> LODwAPArchivist::LODwAP_Arch_GenomeFileNamePL = Parameters::register_parameter("ARCHIVIST_LODWAP-genomeFileName", (string) "genome.csv", "name of data file (stores everything but genomes)");
+shared_ptr<ParameterLink<bool>> LODwAPArchivist::LODwAP_Arch_writeDataFilePL = Parameters::register_parameter("ARCHIVIST_LODWAP-writeDataFile", true, "if true, a data file will be written");
+shared_ptr<ParameterLink<bool>> LODwAPArchivist::LODwAP_Arch_writeGenomeFilePL = Parameters::register_parameter("ARCHIVIST_LODWAP-writeGenomeFile", true, "if true, a genome file will be written");
+shared_ptr<ParameterLink<bool>> LODwAPArchivist::LODwAP_Arch_dataFileShowAllListsPL = Parameters::register_parameter("ARCHIVIST_LODWAP-dataFileShowAllLists", true, "if true, lists named 'all'* in data map will be saved");
+shared_ptr<ParameterLink<bool>> LODwAPArchivist::LODwAP_Arch_dataFileConvertAllListsPL = Parameters::register_parameter("ARCHIVIST_LODWAP-dataFileConvertAllLists", true, "if true, lists named 'all'* in data map will be averaged and added to file");
 
-	dataInterval = LODwAP_Arch_dataInterval;
-	genomeInterval = LODwAP_Arch_genomeInterval;
-	pruneInterval = LODwAP_Arch_pruneInterval;
-	terminateAfter = LODwAP_Arch_terminateAfter;
-	DataFileName = LODwAP_Arch_DataFileName;
-	GenomeFileName = LODwAP_Arch_GenomeFileName;
-	writeDataFile = LODwAP_Arch_writeDataFile;
-	writeGenomeFile = LODwAP_Arch_writeGenomeFile;
+LODwAPArchivist::LODwAPArchivist(vector<string> aveFileColumns, shared_ptr<ParametersTable> _PT) :
+		DefaultArchivist(aveFileColumns,_PT) {
+
+	//realtimeFilesInterval = (PT == nullptr) ? Arch_realtimeFilesIntervalPL->lookup() : PT->lookupInt("ARCHIVIST_DEFAULT-realtimeFilesInterval");
+
+	dataInterval = (PT == nullptr) ? LODwAP_Arch_dataIntervalPL->lookup() : PT->lookupInt("ARCHIVIST_LODWAP-dataInterval");
+	genomeInterval = (PT == nullptr) ? LODwAP_Arch_genomeIntervalPL->lookup() : PT->lookupInt("ARCHIVIST_LODWAP-genomeInterval");
+	pruneInterval = (PT == nullptr) ? LODwAP_Arch_pruneIntervalPL->lookup() : PT->lookupInt("ARCHIVIST_LODWAP-pruneInterval");
+	terminateAfter = (PT == nullptr) ? LODwAP_Arch_terminateAfterPL->lookup() : PT->lookupInt("ARCHIVIST_LODWAP-terminateAfter");
+	DataFileName = (PT == nullptr) ? LODwAP_Arch_DataFileNamePL->lookup() : PT->lookupString("ARCHIVIST_LODWAP-dataFileName");
+	GenomeFileName = (PT == nullptr) ? LODwAP_Arch_GenomeFileNamePL->lookup() : PT->lookupString("ARCHIVIST_LODWAP-genomeFileName");
+	writeDataFile = (PT == nullptr) ? LODwAP_Arch_writeDataFilePL->lookup() : PT->lookupBool("ARCHIVIST_LODWAP-writeDataFile");
+	writeGenomeFile = (PT == nullptr) ? LODwAP_Arch_writeGenomeFilePL->lookup() : PT->lookupBool("ARCHIVIST_LODWAP-writeGenomeFile");
+	dataFileShowAllLists = (PT == nullptr) ? LODwAP_Arch_dataFileShowAllListsPL->lookup() : PT->lookupBool("ARCHIVIST_LODWAP-dataFileShowAllLists");
+	dataFileConvertAllLists = (PT == nullptr) ? LODwAP_Arch_dataFileConvertAllListsPL->lookup() : PT->lookupBool("ARCHIVIST_LODWAP-dataFileConvertAllLists");
 
 	nextDataWrite = 0;
 	nextGenomeWrite = 0;
@@ -32,13 +37,20 @@ LODwAPArchivist::LODwAPArchivist(vector<string> aveFileColumns) :
 
 bool LODwAPArchivist::archive(vector<shared_ptr<Organism>> population, int flush) {
 
-	if ((Global::update % dataInterval == 0) && (flush == 0)) {  // do not write files on flush - these organisms have not been evaluated!
+	if ((Global::update % realtimeFilesInterval == 0) && (flush == 0)) {  // do not write files on flush - these organisms have not been evaluated!
 		writeRealTimeFiles(population);  // write to dominant and average files
 	}
+	if ((Global::update % dataInterval == 0) && (flush == 0) && writeSnapshotDataFiles) {  // do not write files on flush - these organisms have not been evaluated!
+		saveSnapshotData(population, Global::update);
+	}
+	if ((Global::update % genomeInterval == 0) && (flush == 0) && writeSnapshotGenomeFiles) {  // do not write files on flush - these organisms have not been evaluated!
+		saveSnapshotGenomes(population, Global::update);
+	}
+
 	if ((Global::update % pruneInterval == 0) || (flush == 1)) {
 
 		if (files.find("data.csv") == files.end()) {  // if file has not be initialized yet
-			if (LODwAP_Arch_DataFileConvertAllLists) {
+			if (dataFileConvertAllLists) {
 				DataMap TempMap;
 				for (auto key : population[0]->dataMap.getKeys()) {
 					if (key[0] == 'a' && key[1] == 'l' && key[2] == 'l') {
@@ -51,7 +63,7 @@ bool LODwAPArchivist::archive(vector<shared_ptr<Organism>> population, int flush
 						}
 						temp /= (double) values.size();
 						TempMap.Set(key.substr(3, key.size() - 1), temp);
-						if (LODwAP_Arch_DataFileShowAllLists) {
+						if (dataFileShowAllLists) {
 							TempMap.Set(key, population[0]->dataMap.Get(key));
 						}
 					} else {
@@ -76,9 +88,9 @@ bool LODwAPArchivist::archive(vector<shared_ptr<Organism>> population, int flush
 
 		// Save Data
 		if (writeDataFile) {
-			while ((effective_MRCA->timeOfBirth >= nextDataWrite) && (nextDataWrite <= Global::updates)) {  // if there is convergence before the next data interval
+			while ((effective_MRCA->timeOfBirth >= nextDataWrite) && (nextDataWrite <= Global::updatesPL->lookup())) {  // if there is convergence before the next data interval
 				shared_ptr<Organism> current = LOD[nextDataWrite - lastPrune];
-				if (LODwAP_Arch_DataFileConvertAllLists) {
+				if (dataFileConvertAllLists) {
 					DataMap TempMap;
 					for (auto key : current->dataMap.getKeys()) {
 						if (key[0] == 'a' && key[1] == 'l' && key[2] == 'l') {
@@ -91,7 +103,7 @@ bool LODwAPArchivist::archive(vector<shared_ptr<Organism>> population, int flush
 							}
 							temp /= (double) values.size();
 							TempMap.Set(key.substr(3, key.size() - 1), temp);
-							if (LODwAP_Arch_DataFileShowAllLists) {
+							if (dataFileShowAllLists) {
 								TempMap.Set(key, current->dataMap.Get(key));
 							}
 						} else {
@@ -113,7 +125,7 @@ bool LODwAPArchivist::archive(vector<shared_ptr<Organism>> population, int flush
 		//Save Genomes
 		if (writeGenomeFile) {
 
-			while ((effective_MRCA->timeOfBirth >= nextGenomeWrite) && (nextGenomeWrite <= Global::updates)) {  // if there is convergence before the next data interval
+			while ((effective_MRCA->timeOfBirth >= nextGenomeWrite) && (nextGenomeWrite <= Global::updatesPL->lookup())) {  // if there is convergence before the next data interval
 				shared_ptr<Organism> current = LOD[nextGenomeWrite - lastPrune];
 				//string dataString = to_string(nextGenomeWrite) + FileManager::separator + "\"[" + current->genome->genomeToStr() + "]\"";  // add write update and padding to genome string
 				//FileManager::writeToFile(GenomeFileName, dataString, "update,genome");  // write data to file
@@ -132,5 +144,5 @@ bool LODwAPArchivist::archive(vector<shared_ptr<Organism>> population, int flush
 	}
 
 	// if we have reached the end of time OR we have pruned past updates (i.e. written out all data up to updates), then we ae done!
-	return (Global::update >= Global::updates + terminateAfter || lastPrune >= Global::updates);
+	return (Global::update >= Global::updatesPL->lookup() + terminateAfter || lastPrune >= Global::updatesPL->lookup());
 }

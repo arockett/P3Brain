@@ -22,14 +22,17 @@ using namespace std;
 
 class AbstractOptimizer {
  public:
-	const static string& Optimizer_MethodStr;
 
-	const static int& elitism;
-	const static int& tournamentSize;
+
+	static shared_ptr<ParameterLink<string>> Optimizer_MethodStrPL;
+
+	static shared_ptr<ParameterLink<int>> elitismPL;
+	static shared_ptr<ParameterLink<int>> tournamentSizePL;
 
  public:
+	const shared_ptr<ParametersTable> PT;
 	double maxFitness;
-	AbstractOptimizer() {
+	AbstractOptimizer(shared_ptr<ParametersTable> _PT = nullptr) : PT(_PT) {
 		maxFitness = 0;
 	}
 	virtual ~AbstractOptimizer() = default;

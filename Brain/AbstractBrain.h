@@ -15,18 +15,20 @@
 #include <set>
 #include <vector>
 
-#include "../Gate/GateBuilder.h"
-#include "../GateListBuilder/GateListBuilder.h"
+//#include "Gate/GateBuilder.h"
+//#include "GateListBuilder/GateListBuilder.h"
 #include "../Genome/AbstractGenome.h"
-
 #include "../Utilities/Parameters.h"
+#include "../Global.h"
 
 using namespace std;
 class AbstractBrain {
 public:
-	static const string& brainTypeStr;
-	static const int& hiddenNodes;
-	static const bool& serialProcessing;
+	static shared_ptr<ParameterLink<string>> brainTypeStrPL;
+	static shared_ptr<ParameterLink<int>> hiddenNodesPL;
+	static shared_ptr<ParameterLink<bool>> serialProcessingPL;
+
+	const shared_ptr<ParametersTable> PT;
 
 	vector<string> aveFileColumns;
 
@@ -38,28 +40,30 @@ public:
 	int nrInNodes;
 	int nrOutNodes;
 	int nrHiddenNodes;
-	vector<int> inputNodesList, outputNodesList;//maps inputs to nodes and outputs to nodes
+	vector<int> inputNodesList, outputNodesList;  //maps inputs to nodes and outputs to nodes
 	vector<double> nodes;
 	vector<double> nextNodes;
 
-	AbstractBrain() {
-		nrInNodes = nrOutNodes = nrHiddenNodes = nrOfBrainNodes = 0;
-		recordActivity = false;
-		cout << "ERROR: attempting to construct brain with no arguments. Check brain type for required parameters... most likely at least #in, #out and #hidden are required!\n\nExiting.\n" << endl;
-		exit(1);
-	}
+//	AbstractBrain() {
+//		nrInNodes = nrOutNodes = nrHiddenNodes = nrOfBrainNodes = 0;
+//		recordActivity = false;
+//		cout << "ERROR: attempting to construct brain with no arguments. Check brain type for required parameters... most likely at least #in, #out and #hidden are required!\n\nExiting.\n" << endl;
+//		exit(1);
+//	}
 
-	AbstractBrain(int ins, int outs, int hidden) {
+	AbstractBrain() = delete;
+
+	AbstractBrain(int ins, int outs, int hidden, shared_ptr<ParametersTable> _PT = nullptr) : PT(_PT) {
 		nrInNodes = ins;
 		nrOutNodes = outs;
 		nrHiddenNodes = hidden;
 		recordActivity = false;
 
 		// setup default input and output nodes lists
-		for (int i = 0;i<nrInNodes;i++){
+		for (int i = 0; i < nrInNodes; i++) {
 			inputNodesList.push_back(i);
 		}
-		for (int i = nrInNodes; i<nrInNodes+nrOutNodes;i++){
+		for (int i = nrInNodes; i < nrInNodes + nrOutNodes; i++) {
 			outputNodesList.push_back(i);
 		}
 		nrOfBrainNodes = ins + outs + hidden;
@@ -83,11 +87,11 @@ public:
 		}
 	}
 
-	virtual void inline setRecordActivity(bool _recordActivity){
+	virtual void inline setRecordActivity(bool _recordActivity) {
 		recordActivity = _recordActivity;
 	}
 
-	virtual void inline setRecordFileName(string _recordActivityFileName){
+	virtual void inline setRecordFileName(string _recordActivityFileName) {
 		recordActivityFileName = _recordActivityFileName;
 	}
 
@@ -95,7 +99,7 @@ public:
 //		for (int i = nrInNodes; i < (nrInNodes + nrOutNodes); i++) {
 //			nodes[i] = 0.0;
 //		}
-		for (auto i:outputNodesList){
+		for (auto i : outputNodesList) {
 			nodes[i] = 0.0;
 		}
 	}
@@ -162,29 +166,29 @@ public:
 
 	}
 
-	void setOutputNodesList(vector<int> nodesList){
-		if ((int)nodesList.size() == nrOutNodes){
+	void setOutputNodesList(vector<int> nodesList) {
+		if ((int) nodesList.size() == nrOutNodes) {
 			outputNodesList = nodesList;
 		} else {
-			cout << "ERROR: In setOutputNodesList(). size of nodesList does not match nrOutNodes.\n\nExiting.\n"<<endl;
+			cout << "ERROR: In setOutputNodesList(). size of nodesList does not match nrOutNodes.\n\nExiting.\n" << endl;
 			exit(1);
 		}
 	}
 
-	void setInputNodesList(vector<int> nodesList){
-		if ((int)nodesList.size() == nrInNodes){
+	void setInputNodesList(vector<int> nodesList) {
+		if ((int) nodesList.size() == nrInNodes) {
 			inputNodesList = nodesList;
 		} else {
-			cout << "ERROR: In setInputNodesList(). size of nodesList does not match nrInNodes.\n\nExiting.\n"<<endl;
+			cout << "ERROR: In setInputNodesList(). size of nodesList does not match nrInNodes.\n\nExiting.\n" << endl;
 			exit(1);
 		}
 	}
 
-	vector<int> getOutputNodesList(){
+	vector<int> getOutputNodesList() {
 		return outputNodesList;
 	}
 
-	vector<int> getInputNodesList(){
+	vector<int> getInputNodesList() {
 		return inputNodesList;
 	}
 

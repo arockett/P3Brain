@@ -31,59 +31,90 @@ public:
 	const int WALL = 9;
 
 	// Parameters
-	static const double& TSK;
-	static const int& defaultWorldUpdates;
-	static const int& foodTypes;
-	static const double& rewardForFood1;
-	static const double& rewardForFood2;
-	static const double& rewardForFood3;
-	static const double& rewardForFood4;
-	static const double& rewardForFood5;
-	static const double& rewardForFood6;
-	static const double& rewardForFood7;
-	static const double& rewardForFood8;
+	static shared_ptr<ParameterLink<double>> TSKPL;
+	static shared_ptr<ParameterLink<int>> worldUpdatesPL;
+	static shared_ptr<ParameterLink<int>> foodTypesPL;
+	static shared_ptr<ParameterLink<double>> rewardForFood1PL;
+	static shared_ptr<ParameterLink<double>> rewardForFood2PL;
+	static shared_ptr<ParameterLink<double>> rewardForFood3PL;
+	static shared_ptr<ParameterLink<double>> rewardForFood4PL;
+	static shared_ptr<ParameterLink<double>> rewardForFood5PL;
+	static shared_ptr<ParameterLink<double>> rewardForFood6PL;
+	static shared_ptr<ParameterLink<double>> rewardForFood7PL;
+	static shared_ptr<ParameterLink<double>> rewardForFood8PL;
 
-	static const double& rewardForTurn;
-	static const double& rewardForMove;
+	static shared_ptr<ParameterLink<double>> rewardForTurnPL;
+	static shared_ptr<ParameterLink<double>> rewardForMovePL;
 
-	static const int& ratioFood0;
-	static const int& ratioFood1;
-	static const int& ratioFood2;
-	static const int& ratioFood3;
-	static const int& ratioFood4;
-	static const int& ratioFood5;
-	static const int& ratioFood6;
-	static const int& ratioFood7;
-	static const int& ratioFood8;
+	static shared_ptr<ParameterLink<int>> ratioFood0PL;
+	static shared_ptr<ParameterLink<int>> ratioFood1PL;
+	static shared_ptr<ParameterLink<int>> ratioFood2PL;
+	static shared_ptr<ParameterLink<int>> ratioFood3PL;
+	static shared_ptr<ParameterLink<int>> ratioFood4PL;
+	static shared_ptr<ParameterLink<int>> ratioFood5PL;
+	static shared_ptr<ParameterLink<int>> ratioFood6PL;
+	static shared_ptr<ParameterLink<int>> ratioFood7PL;
+	static shared_ptr<ParameterLink<int>> ratioFood8PL;
 
-	static const int& WorldY;
-	static const int& WorldX;
-	static const bool& borderWalls;
-	static const int& randomWalls;
+	static shared_ptr<ParameterLink<int>> WorldYPL;
+	static shared_ptr<ParameterLink<int>> WorldXPL;
+	static shared_ptr<ParameterLink<bool>> borderWallsPL;
+	static shared_ptr<ParameterLink<int>> randomWallsPL;
 
-	static const bool& allowMoveAndEat;
+	static shared_ptr<ParameterLink<bool>> allowMoveAndEatPL;
 
-	static const bool& senseDown;
-	static const bool& senseFront;
-	static const bool& senseFrontSides;
-	static const bool& senseWalls;
-	static const bool& clearOutputs;
+	static shared_ptr<ParameterLink<bool>> senseDownPL;
+	static shared_ptr<ParameterLink<bool>> senseFrontPL;
+	static shared_ptr<ParameterLink<bool>> senseFrontSidesPL;
+	static shared_ptr<ParameterLink<bool>> senseWallsPL;
+	static shared_ptr<ParameterLink<bool>> clearOutputsPL;
 
-	static const int& replacement;
+	static shared_ptr<ParameterLink<int>> replacementPL;
 
-	static const bool& recordConsumptionRatio;
-	static const bool& recordFoodList;
-	static const bool& recordFoodListEatEmpty;
-	static const bool& recordFoodListNoEat;
+	static shared_ptr<ParameterLink<bool>> recordConsumptionRatioPL;
+	static shared_ptr<ParameterLink<bool>> recordFoodListPL;
+	static shared_ptr<ParameterLink<bool>> recordFoodListEatEmptyPL;
+	static shared_ptr<ParameterLink<bool>> recordFoodListNoEatPL;
 	// end parameters
 
+
+
 	int worldUpdates;
+
+	double TSK;
+
+	int foodTypes;
+
+	double rewardForTurn;
+	double rewardForMove;
+
+	int WorldY;
+	int WorldX;
+	bool borderWalls;
+	int randomWalls;
+
+	bool allowMoveAndEat;
+
+	bool senseDown;
+	bool senseFront;
+	bool senseFrontSides;
+	bool senseWalls;
+	bool clearOutputs;
+
+	int replacement;
+
+	bool recordConsumptionRatio;
+	bool recordFoodList;
+	bool recordFoodListEatEmpty;
+	bool recordFoodListNoEat;
+
+
 
 	int foodRatioTotal;  // sum of ratioFood for foods in use
 	vector<int> foodRatioLookup;
 	vector<double> foodRewards;
 
-	BerryWorld();
+	BerryWorld(shared_ptr<ParametersTable> _PT = nullptr);
 
 //  double testIndividual(shared_ptr<Organism> org, bool analyse);
 
@@ -134,7 +165,7 @@ public:
 
 	// convert x,y into a grid index
 	int getGridIndexFromXY(pair<int, int> loc) {
-		return loc.first + (loc.second * BerryWorld::WorldX);
+		return loc.first + (loc.second * WorldX);
 	}
 
 	// return value on grid at index
@@ -149,7 +180,7 @@ public:
 
 	// takes x,y and updates them by moving one step in facing
 	pair<int, int> moveOnGrid(pair<int, int> loc, int facing) {
-		return {loopMod((loc.first + xm[facing]), BerryWorld::WorldX), loopMod((loc.second + ym[facing]), BerryWorld::WorldY)};
+		return {loopMod((loc.first + xm[facing]), WorldX), loopMod((loc.second + ym[facing]), WorldY)};
 	}
 
 	// update value at index in grid

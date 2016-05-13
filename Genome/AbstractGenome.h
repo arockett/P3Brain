@@ -20,28 +20,29 @@
 #include "../Utilities/Utilities.h"
 #include "../Utilities/Data.h"
 #include "../Utilities/Parameters.h"
-#include "../Utilities/ParametersTable.h"
 #include "../Utilities/Random.h"
 
 using namespace std;
 
 class AbstractGenome {
 
- public:
+public:
 
-	static const string& genomeTypeStr;
-	static const int& alphabetSize;
-	static const string& genomeSitesType;
+	static shared_ptr<ParameterLink<string>> genomeTypeStrPL;
+	static shared_ptr<ParameterLink<int>> alphabetSizePL;
+	static shared_ptr<ParameterLink<string>> genomeSitesTypePL;
+
+	const shared_ptr<ParametersTable> PT;
 
 	// Handlers are how you access Genomes for reading and writting.
 	// to get a handle for a genome call that that genomes newHandler() method
 	class Handler {
- 	public:
+	public:
 		//shared_ptr<AbstractGenome> genome;
 		bool readDirection;  // true = forward, false = backwards
 		bool EOG;  // end of genome
 		bool EOC;  // end of chromosome - in this context chromosome is a subsection of the genome
-				// which after having passed we may want to perform some different behavior
+				   // which after having passed we may want to perform some different behavior
 
 		Handler() {
 			readDirection = true;
@@ -90,7 +91,7 @@ class AbstractGenome {
 		}
 
 		virtual void writeInt(int value, int valueMin, int valueMax) = 0;
-		virtual vector<vector<int>> readTable(pair<int,int> tableSize, pair<int,int> tableMaxSize, pair<int,int> valueRange, int code = -1, int CodingRegionIndex = 0)=0;
+		virtual vector<vector<int>> readTable(pair<int, int> tableSize, pair<int, int> tableMaxSize, pair<int, int> valueRange, int code = -1, int CodingRegionIndex = 0)=0;
 		virtual void advanceIndex(int distance = 1) = 0;
 
 		virtual void copyTo(shared_ptr<Handler> to) = 0;
@@ -116,8 +117,8 @@ class AbstractGenome {
 	vector<string> genomeFileColumns;  // = {"ID","alphabetSize","chromosomeCount","chromosomeLength","sitesCount","genomeAncestors","sites"};
 	vector<string> aveFileColumns;  // = {"genomeLength"};
 
-
-	AbstractGenome() = default;
+	AbstractGenome() = delete;
+	AbstractGenome(shared_ptr<ParametersTable> _PT = nullptr) : PT(_PT) {}
 
 	virtual ~AbstractGenome() = default;
 	//virtual shared_ptr<AbstractGenome::Handler> newHandler(shared_ptr<AbstractGenome> _genome, bool _readDirection = true) override {
@@ -160,14 +161,13 @@ class AbstractGenome {
 	virtual shared_ptr<AbstractGenome> loadGenome(string fileName, string key, string value) {
 		vector<shared_ptr<AbstractGenome>> genomes;
 		loadGenomeFile(fileName, genomes);
-		for (auto g:genomes){
-				if (g->dataMap.Get(key) == value){
-					return g;
-				}
+		for (auto g : genomes) {
+			if (g->dataMap.Get(key) == value) {
+				return g;
+			}
 		}
 		return nullptr;
 	}
-
 
 	virtual bool isEmpty() = 0;
 
@@ -175,7 +175,7 @@ class AbstractGenome {
 	virtual shared_ptr<AbstractGenome> makeMutatedGenomeFrom(shared_ptr<AbstractGenome> parent) = 0;
 	virtual shared_ptr<AbstractGenome> makeMutatedGenomeFromMany(vector<shared_ptr<AbstractGenome>> parents) = 0;
 
-	virtual int countSites(){
+	virtual int countSites() {
 		cout << "Warning! In AbstractGenome::countSites()...\n";
 		return 0;
 	}
