@@ -39,7 +39,7 @@ shared_ptr<ParameterLink<string>> WireBrain::wiregenesSquiggleWireDirectionsPL =
 WireBrain::WireBrain(int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT) :
 		AbstractBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes,  _PT) {
 
-	allowNegativeCharge =  (PT == nullptr) ? allowNegativeChargePL->lookup() : PT->lookupInt("BRAIN_WIRE-allowNegativeCharge");
+	allowNegativeCharge =  (PT == nullptr) ? allowNegativeChargePL->lookup() : PT->lookupBool("BRAIN_WIRE-allowNegativeCharge");
 	defaultWidth =  (PT == nullptr) ? defaultWidthPL->lookup() : PT->lookupInt("BRAIN_WIRE-size_width");
 	defaultHeight =  (PT == nullptr) ? defaultHeightPL->lookup() : PT->lookupInt("BRAIN_WIRE-size_height");
 	defaultDepth =  (PT == nullptr) ? defaultDepthPL->lookup() : PT->lookupInt("BRAIN_WIRE-size_depth");
@@ -52,20 +52,20 @@ WireBrain::WireBrain(int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared
 	cacheResultsCount =  (PT == nullptr) ? cacheResultsCountPL->lookup() : PT->lookupInt("BRAIN_WIRE-cacheResultsCount");
 
 	genomeDecodingMethod =  (PT == nullptr) ? genomeDecodingMethodPL->lookup() : PT->lookupString("BRAIN_WIRE-genomeDecodingMethod");
-	wiregenesInitialGeneCount =  (PT == nullptr) ? wiregenesInitialGeneCountPL->lookup() : PT->lookupInt("BRAIN_WIRE-initialGeneCount");
+	wiregenesInitialGeneCount =  (PT == nullptr) ? wiregenesInitialGeneCountPL->lookup() : PT->lookupInt("BRAIN_WIRE_WIREGENE-initialGeneCount");
 	bitmapInitialFillRatio =  (PT == nullptr) ? bitmapInitialFillRatioPL->lookup() : PT->lookupDouble("BRAIN_WIRE-bitmap_InitialFillRatio");
 
-	wiregenesAllowSimpleWires =  (PT == nullptr) ? wiregenesAllowSimpleWiresPL->lookup() : PT->lookupBool("BRAIN_WIRE-allowSimpeWires");
-	wiregenesSimpleWireMaxLength =  (PT == nullptr) ? wiregenesSimpleWireMaxLengthPL->lookup() : PT->lookupInt("BRAIN_WIRE-simpleWireMaxLength");
-	wiregenesSimpleWireDirections =  (PT == nullptr) ? wiregenesSimpleWireDirectionsPL->lookup() : PT->lookupString("BRAIN_WIRE-simpleWireDirections");
+	wiregenesAllowSimpleWires =  (PT == nullptr) ? wiregenesAllowSimpleWiresPL->lookup() : PT->lookupBool("BRAIN_WIRE_WIREGENE-allowSimpeWires");
+	wiregenesSimpleWireMaxLength =  (PT == nullptr) ? wiregenesSimpleWireMaxLengthPL->lookup() : PT->lookupInt("BRAIN_WIRE_WIREGENE-simpleWireMaxLength");
+	wiregenesSimpleWireDirections =  (PT == nullptr) ? wiregenesSimpleWireDirectionsPL->lookup() : PT->lookupString("BRAIN_WIRE_WIREGENE-simpleWireDirections");
 
-	wiregenesAllowWormholes =  (PT == nullptr) ? wiregenesAllowWormholesPL->lookup() : PT->lookupBool("BRAIN_WIRE-allowWormholes");
-	wiregenesWormholesBidirectional =  (PT == nullptr) ? wiregenesWormholesBidirectionalPL->lookup() : PT->lookupInt("BRAIN_WIRE-wormholesBidirectional");
+	wiregenesAllowWormholes =  (PT == nullptr) ? wiregenesAllowWormholesPL->lookup() : PT->lookupBool("BRAIN_WIRE_WIREGENE-allowWormholes");
+	wiregenesWormholesBidirectional =  (PT == nullptr) ? wiregenesWormholesBidirectionalPL->lookup() : PT->lookupInt("BRAIN_WIRE_WIREGENE-wormholesBidirectional");
 
-	wiregenesAllowSquiggleWires =  (PT == nullptr) ? wiregenesAllowSquiggleWiresPL->lookup() : PT->lookupBool("BRAIN_WIRE-allowSquiggleWires");
-	wiregenesSquiggleWireMinLength =  (PT == nullptr) ? wiregenesSquiggleWireMinLengthPL->lookup() : PT->lookupInt("BRAIN_WIRE-squiggleWireMinLength");
-	wiregenesSquiggleWireMaxLength =  (PT == nullptr) ? wiregenesSquiggleWireMaxLengthPL->lookup() : PT->lookupInt("BRAIN_WIRE-squiggleWireMaxLength");
-	wiregenesSquiggleWireDirections =  (PT == nullptr) ? wiregenesSquiggleWireDirectionsPL->lookup() : PT->lookupString("BRAIN_WIRE-squiggleWireDirections");
+	wiregenesAllowSquiggleWires =  (PT == nullptr) ? wiregenesAllowSquiggleWiresPL->lookup() : PT->lookupBool("BRAIN_WIRE_WIREGENE-allowSquiggleWires");
+	wiregenesSquiggleWireMinLength =  (PT == nullptr) ? wiregenesSquiggleWireMinLengthPL->lookup() : PT->lookupInt("BRAIN_WIRE_WIREGENE-squiggleWireMinLength");
+	wiregenesSquiggleWireMaxLength =  (PT == nullptr) ? wiregenesSquiggleWireMaxLengthPL->lookup() : PT->lookupInt("BRAIN_WIRE_WIREGENE-squiggleWireMaxLength");
+	wiregenesSquiggleWireDirections =  (PT == nullptr) ? wiregenesSquiggleWireDirectionsPL->lookup() : PT->lookupString("BRAIN_WIRE_WIREGENE-squiggleWireDirections");
 
 	width = defaultWidth;
 	height = defaultHeight;

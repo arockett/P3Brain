@@ -495,6 +495,7 @@ public:
 		// check for the name in this table
 		if (table.find(name) != table.end()) {  // if this table has entry called name
 			table[name]->get(value);
+
 		} else {
 			//value = 10.0;
 			shared_ptr<ParametersTable> searchTable;// used to determine which ancestor table we are looking at

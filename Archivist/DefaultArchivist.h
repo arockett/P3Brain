@@ -86,9 +86,9 @@ shared_ptr<ParameterLink<bool>> DefaultArchivist::Arch_DominantFileShowAllListsP
 	//save dominant and average file data
 	void writeRealTimeFiles(vector<shared_ptr<Organism>> &population);
 
-	void saveSnapshotData(vector<shared_ptr<Organism>> population, int update);
+	void saveSnapshotData(vector<shared_ptr<Organism>> population);
 
-	void saveSnapshotGenomes(vector<shared_ptr<Organism>> population, int update);
+	void saveSnapshotGenomes(vector<shared_ptr<Organism>> population);
 
 	// save data and manage in memory data
 	// return true if next save will be > updates + terminate after

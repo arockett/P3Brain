@@ -34,8 +34,9 @@ Organism::Organism() {
 	alive = true;
 	gender = 0;  // by default all orgs are female.
 	offspringCount = 0;  // because it's alive;
-	genomeAncestors.insert(ID);  // it is it's own Ancestor for genome tracking purposes
+	//genomeAncestors.insert(ID);  // it is it's own Ancestor for genome tracking purposes
 	ancestors.insert(ID);  // it is it's own Ancestor for data tracking purposes
+	snapshotAncestors.insert(ID);
 	timeOfBirth = Global::update;  // happy birthday!
 	timeOfDeath = -1;  // still alive
 	dataMap.Set("ID", ID);
@@ -55,6 +56,7 @@ Organism::Organism(shared_ptr<AbstractGenome> _genome) {
 	gender = 0;  // by default all orgs are female.
 	offspringCount = 0;  // because it's alive;
 	ancestors.insert(ID);  // it is it's own Ancestor for data tracking purposes
+	snapshotAncestors.insert(ID);
 	timeOfBirth = Global::update;  // happy birthday!
 	timeOfDeath = -1;  // still alive
 	dataMap.Set("ID", ID);
@@ -73,6 +75,7 @@ Organism::Organism(shared_ptr<AbstractGenome> _genome, shared_ptr<AbstractBrain>
 	gender = 0;  // by default all orgs are female.
 	offspringCount = 0;  // because it's alive;
 	ancestors.insert(ID);  // it is it's own Ancestor for data tracking purposes
+	snapshotAncestors.insert(ID);
 	timeOfBirth = Global::update;  // happy birthday!
 	timeOfDeath = -1;  // still alive
 	dataMap.Set("ID", ID);
@@ -96,6 +99,9 @@ Organism::Organism(shared_ptr<Organism> from, shared_ptr<AbstractGenome> _genome
 	from->offspringCount++;  // this parent has an(other) offspring
 	for (auto ancestorID : from->ancestors) {
 		ancestors.insert(ancestorID);  // union all parents ancestors into this organisms ancestor set.
+	}
+	for (auto ancestorID : from->snapshotAncestors) {
+		snapshotAncestors.insert(ancestorID);  // union all parents ancestors into this organisms ancestor set.
 	}
 	timeOfBirth = Global::update;  // happy birthday!
 	timeOfDeath = -1;  // still alive
@@ -125,6 +131,9 @@ Organism::Organism(const vector<shared_ptr<Organism>> from, shared_ptr<AbstractG
 		parent->offspringCount++;  // this parent has an(other) offspring
 		for (auto ancestorID : parent->ancestors) {
 			ancestors.insert(ancestorID);  // union all parents ancestors into this organisms ancestor set
+		}
+		for (auto ancestorID : parent->snapshotAncestors) {
+			snapshotAncestors.insert(ancestorID);  // union all parents ancestors into this organisms ancestor set.
 		}
 	}
 	timeOfBirth = Global::update;  // happy birthday!

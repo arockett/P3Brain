@@ -41,15 +41,15 @@ bool LODwAPArchivist::archive(vector<shared_ptr<Organism>> population, int flush
 		writeRealTimeFiles(population);  // write to dominant and average files
 	}
 	if ((Global::update % dataInterval == 0) && (flush == 0) && writeSnapshotDataFiles) {  // do not write files on flush - these organisms have not been evaluated!
-		saveSnapshotData(population, Global::update);
+		saveSnapshotData(population);
 	}
 	if ((Global::update % genomeInterval == 0) && (flush == 0) && writeSnapshotGenomeFiles) {  // do not write files on flush - these organisms have not been evaluated!
-		saveSnapshotGenomes(population, Global::update);
+		saveSnapshotGenomes(population);
 	}
 
 	if ((Global::update % pruneInterval == 0) || (flush == 1)) {
 
-		if (files.find("data.csv") == files.end()) {  // if file has not be initialized yet
+		if (files.find(DataFileName) == files.end()) {  // if file has not be initialized yet
 			if (dataFileConvertAllLists) {
 				DataMap TempMap;
 				for (auto key : population[0]->dataMap.getKeys()) {
@@ -74,6 +74,7 @@ bool LODwAPArchivist::archive(vector<shared_ptr<Organism>> population, int flush
 			} else {
 				files[DataFileName] = population[0]->dataMap.getKeys();  // store keys from data map associated with file name
 			}
+			files[DataFileName].push_back("update");
 		}
 
 		// get the MRCA
@@ -90,6 +91,8 @@ bool LODwAPArchivist::archive(vector<shared_ptr<Organism>> population, int flush
 		if (writeDataFile) {
 			while ((effective_MRCA->timeOfBirth >= nextDataWrite) && (nextDataWrite <= Global::updatesPL->lookup())) {  // if there is convergence before the next data interval
 				shared_ptr<Organism> current = LOD[nextDataWrite - lastPrune];
+				cout << nextDataWrite << " ::: " << lastPrune << endl;
+				current->dataMap.Set("update", nextDataWrite);
 				if (dataFileConvertAllLists) {
 					DataMap TempMap;
 					for (auto key : current->dataMap.getKeys()) {
@@ -110,13 +113,14 @@ bool LODwAPArchivist::archive(vector<shared_ptr<Organism>> population, int flush
 							TempMap.Set(key, current->dataMap.Get(key));
 						}
 					}
-					for (auto file : files) {  // for each file in files
-						TempMap.writeToFile(file.first, file.second);  // append new data to the file
-					}
+//					for (auto file : files) {  // for each file in files
+//						TempMap.writeToFile(file.first, file.second);  // append new data to the file
+//					}
+					TempMap.writeToFile(DataFileName,files[DataFileName]);
 				} else {
-					for (auto file : files) {  // for each file in files
-						current->dataMap.writeToFile(file.first, file.second);  // append new data to the file
-					}
+//					for (auto file : files) {  // for each file in files
+					current->dataMap.writeToFile(DataFileName,files[DataFileName]);  // append new data to the file
+//					}
 				}
 				nextDataWrite += dataInterval;
 			}

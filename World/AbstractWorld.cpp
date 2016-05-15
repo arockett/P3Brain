@@ -25,6 +25,6 @@ void AbstractWorld::evaluateFitness(vector<shared_ptr<Organism>> population, boo
 			population[i]->dataMap.Append("allscore", score);
 		}
 		population[i]->score = (scoreTotal / (double) repeatsPL->lookup());
-		population[i]->dataMap.Set("update", Global::update);
+		//population[i]->dataMap.Set("update", Global::update);
 	}
 }
