@@ -22,10 +22,12 @@ class TestWorld : public AbstractWorld {
 public:
 	TestWorld();
 	virtual ~TestWorld() = default;
-	virtual double testIndividual(shared_ptr<Organism> org, bool analyse, bool show = 0) override;
+	virtual void runWorldSolo(shared_ptr<Organism> org, bool analyse, bool debug) override;
+
 	virtual int requiredInputs() override;
 	virtual int requiredOutputs() override;
-
+	virtual int maxOrgsAllowed() override;
+	virtual int minOrgsAllowed() override;
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__WorldTest__) */

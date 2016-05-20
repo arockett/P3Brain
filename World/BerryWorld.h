@@ -67,6 +67,9 @@ public:
 	static shared_ptr<ParameterLink<bool>> senseFrontPL;
 	static shared_ptr<ParameterLink<bool>> senseFrontSidesPL;
 	static shared_ptr<ParameterLink<bool>> senseWallsPL;
+
+	static shared_ptr<ParameterLink<bool>> senseOtherPL;
+
 	static shared_ptr<ParameterLink<bool>> clearOutputsPL;
 
 	static shared_ptr<ParameterLink<int>> replacementPL;
@@ -75,6 +78,8 @@ public:
 	static shared_ptr<ParameterLink<bool>> recordFoodListPL;
 	static shared_ptr<ParameterLink<bool>> recordFoodListEatEmptyPL;
 	static shared_ptr<ParameterLink<bool>> recordFoodListNoEatPL;
+
+	static shared_ptr<ParameterLink<bool>> alwaysStartOnFood1PL;
 	// end parameters
 
 
@@ -99,6 +104,8 @@ public:
 	bool senseFront;
 	bool senseFrontSides;
 	bool senseWalls;
+
+	bool senseOther;
 	bool clearOutputs;
 
 	int replacement;
@@ -108,6 +115,7 @@ public:
 	bool recordFoodListEatEmpty;
 	bool recordFoodListNoEat;
 
+	bool alwaysStartOnFood1;
 
 
 	int foodRatioTotal;  // sum of ratioFood for foods in use
@@ -116,9 +124,7 @@ public:
 
 	BerryWorld(shared_ptr<ParametersTable> _PT = nullptr);
 
-//  double testIndividual(shared_ptr<Organism> org, bool analyse);
-
-	double testIndividual(shared_ptr<Organism> org, bool analyse, bool show = 0) override;
+	virtual void runWorld(shared_ptr<Group> group, bool analyse, bool debug) override;
 
 	// if lastfood < 0, do not consider last food, pick randomly
 	// if
@@ -249,6 +255,15 @@ public:
 		return outputNodesCount;
 	}
 
+	virtual int maxOrgsAllowed() override {
+		return -1;
+	}
+
+	virtual int minOrgsAllowed() override {
+		return 1;
+	}
+
+	void SaveWorldState(string fileName, vector<int> grid, vector<pair<int, int>> currentLocation, vector<int> facing);
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__BerryWorld__) */

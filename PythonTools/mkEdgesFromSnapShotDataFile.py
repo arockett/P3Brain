@@ -21,7 +21,7 @@ from networkx import graphviz_layout
 nodes = [-1]
 edges = []
 
-for time in np.arange(6,-1,-1):
+for time in np.arange(0,10010,10):
   file_name = 'data_' + str(time) + '.csv'
   data_csv = pandas.read_csv(file_name)
   num_orgs = 0
@@ -32,7 +32,7 @@ for time in np.arange(6,-1,-1):
 
   print (num_orgs)
   for i in range(num_orgs):
-    for a in literal_eval(data_csv['dataAncestors'][i]):
+    for a in literal_eval(data_csv['ancestors'][i]):
       edges.append((data_csv['ID'][i],a))
 
 f = open('workfile2.sif', 'w')

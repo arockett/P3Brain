@@ -113,8 +113,8 @@ NumeralClassifierWorld::NumeralClassifierWorld(shared_ptr<ParametersTable> _PT) 
 	aveFileColumns.push_back("totalIncorrect");
 }
 
-double NumeralClassifierWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool show) {
-
+void NumeralClassifierWorld::runWorldSolo(shared_ptr<Organism> org, bool analyse, bool debug) {
+	// numeralClassifierWorld assumes there will only ever be one agent being tested at a time. It uses org by default.
 	double score = 0.0;
 	int currentX, currentY;  // = { Random::getIndex(28), Random::getIndex(28) };  // place organism somewhere in the world
 
@@ -234,7 +234,7 @@ double NumeralClassifierWorld::testIndividual(shared_ptr<Organism> org, bool ana
 //			org->brain->resetOutputs();
 //		}
 
-			if (show) {
+			if (debug) {
 				cout << "\n----------------------------\n";
 				cout << "\ngeneration update: " << Global::update << "  world update: " << worldUpdate << "\n";
 				cout << "currentLocation: " << currentX << "," << currentY << "\n";
@@ -256,7 +256,7 @@ double NumeralClassifierWorld::testIndividual(shared_ptr<Organism> org, bool ana
 			currentX += Trit(org->brain->readOutput(0)) * stepSize;  // left and right
 			currentY += Trit(org->brain->readOutput(1)) * stepSize;  // up and down
 
-			if (show) {
+			if (debug) {
 				cout << "outNodes: ";
 				for (int i = 0; i < outputNodesCount; i++) {
 					cout << org->brain->readOutput(i) << " ";
@@ -337,5 +337,9 @@ double NumeralClassifierWorld::testIndividual(shared_ptr<Organism> org, bool ana
 	org->dataMap.Append("alltotalCorrect", total_correct);  // total food eaten (regardless of type)
 	org->dataMap.Append("alltotalIncorrect", total_incorrect);  // total food eaten (regardless of type)
 
-	return score;
+	if (score < 0.0) {
+		score= 0.0;
+	}
+	org->score = score;
+	org->dataMap.Append("allscore", score);
 }

@@ -222,8 +222,8 @@ int main(int argc, const char * argv[]) {
 //////////////////
 
 	string defaultGroup = "default";
-	if (groups.find(defaultGroup) == groups.end()){
-		cout << "Default group " << defaultGroup << " not found in groups.\nExiting."<<endl;
+	if (groups.find(defaultGroup) == groups.end()) {
+		cout << "Default group " << defaultGroup << " not found in groups.\nExiting." << endl;
 		exit(1);
 	}
 
@@ -231,7 +231,7 @@ int main(int argc, const char * argv[]) {
 		bool finished = false;  // when the archivist says we are done, we can stop!
 
 		while (!finished) {
-			world->evaluateFitness(groups[defaultGroup]->population, false, AbstractWorld::showOnUpdatePL->lookup());  // evaluate each organism in the population using a World
+			world->evaluate(groups[defaultGroup], AbstractWorld::groupEvaluationPL->lookup(), false, AbstractWorld::showOnUpdatePL->lookup());  // evaluate each organism in the population using a World
 			//cout << "  evaluation done\n";
 			finished = groups[defaultGroup]->archive();  // save data, update memory and delete any unneeded data;
 			//cout << "  archive done\n";
@@ -245,21 +245,43 @@ int main(int argc, const char * argv[]) {
 	} else if (Global::modePL->lookup() == "test") {
 
 		vector<shared_ptr<AbstractGenome>> mg;
-		groups[defaultGroup]->population[0]->genome->loadGenomeFile("genome_20000.csv", mg);
-
+		groups[defaultGroup]->population[0]->genome->loadGenomeFile(Global::visualizePopulationFilePL->lookup(), mg);
+		cout << "file loaded";
+		int num_genomes = (int) mg.size();
+		int counter = 0;
+		while ((int) mg.size() < Global::popSizePL->lookup()) {
+			cout << ".";
+			mg.push_back(mg[counter]);
+			counter++;
+			if (counter >= num_genomes) {
+				counter = 0;
+			}
+		}
 		vector<shared_ptr<Organism>> testPopulation;
 		for (auto g : mg) {
 			auto newOrg = make_shared<Organism>(groups[defaultGroup]->population[0], g);
-			newOrg->brain->setRecordActivity(true);
-			newOrg->brain->setRecordFileName("wireBrain.run");
+			//newOrg->brain->setRecordActivity(true);
+			//newOrg->brain->setRecordFileName("wireBrain.run");
 			testPopulation.push_back(newOrg);  // add a new org to population using progenitors template and a new random genome
 		}
+		cout << "\npopulation created." << endl;
+//		auto newOrg = make_shared<Organism>(groups[defaultGroup]->population[0], mg[2]);
+//		testPopulation.push_back(newOrg);
 
+//////////////////////////////////////////////
+// rebuild testGroup with one particular org.
+//		testPopulation.clear();
+//		auto newOrg = make_shared<Organism>(groups[defaultGroup]->population[0], mg[2]);
+//		testPopulation.push_back(newOrg);
+//////////////////////////////////////////////
+
+		shared_ptr<Group> testGroup = make_shared<Group>(testPopulation, groups[defaultGroup]->optimizer, groups[defaultGroup]->archivist);
+		cout << "\ngroup created." << endl;
 		//shared_ptr<Group> testGroup = make_shared<Group>(testPopulation, group->optimizer, group->archivist);
 		//world->worldUpdates = 400;
-		world->evaluateFitness( { testPopulation[1] }, false);
+		world->runWorld(testGroup, true, false);
 
-		for (auto o : testPopulation) {
+		for (auto o : testGroup->population) {
 			cout << o->score << " " << o->genome->dataMap.Get("ID") << endl;
 		}
 

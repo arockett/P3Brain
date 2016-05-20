@@ -6,6 +6,8 @@ shared_ptr<ParameterLink<int>> Global::updatesPL = Parameters::register_paramete
 shared_ptr<ParameterLink<int>> Global::popSizePL = Parameters::register_parameter("GLOBAL-popSize", 100, "number of genomes in the populaiton");
 shared_ptr<ParameterLink<string>> Global::modePL = Parameters::register_parameter("GLOBAL-mode", (string) "run", "mode to run MABE in [run,test]");
 
+shared_ptr<ParameterLink<string>> Global::visualizePopulationFilePL = Parameters::register_parameter("GLOBAL_TEST_MODE-visualizePopulationFile", (string) "genome_1000.csv", "in test mode, this population will be used to generate visualization");
+
 shared_ptr<ParameterLink<string>> Global::outputDirectoryPL = Parameters::register_parameter("GLOBAL-outputDirectory", (string) "./", "where files will be written");
 
 shared_ptr<ParameterLink<string>> Global::groupNameSpacesPL = Parameters::register_parameter("GLOBAL-groups", (string) "[]", "name spaces (also names) of groups to be created (in addition to the defualt no name space group.)");
