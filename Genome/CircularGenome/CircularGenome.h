@@ -17,11 +17,11 @@
 #include <sstream>
 #include <utility>
 
-#include "../Utilities/Utilities.h"
-#include "../Utilities/Data.h"
-#include "../Utilities/Parameters.h"
-#include "../Utilities/Random.h"
-#include "AbstractGenome.h"
+#include "../../Utilities/Utilities.h"
+#include "../../Utilities/Data.h"
+#include "../../Utilities/Parameters.h"
+#include "../../Utilities/Random.h"
+#include "../AbstractGenome.h"
 
 using namespace std;
 

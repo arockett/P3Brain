@@ -16,9 +16,8 @@ shared_ptr<ParameterLink<int>> AbstractWorld::repeatsPL = Parameters::register_p
 shared_ptr<ParameterLink<bool>> AbstractWorld::showOnUpdatePL = Parameters::register_parameter("WORLD-showOnUpdate", false, "display world while running world updates (if world allows)");
 
 shared_ptr<ParameterLink<bool>> AbstractWorld::groupEvaluationPL = Parameters::register_parameter("WORLD-groupEvaluation", false, "if true, evaluate population concurrently");
-shared_ptr<ParameterLink<bool>> AbstractWorld::useOldMethodPL = Parameters::register_parameter("WORLD-useOldMethod", false, "Use evaluateFitness() instead of the newer evaluateGroup() - if true, WORLD-groupEvaluation is ignored");
 
-void AbstractWorld::evaluate(shared_ptr<Group> group, bool groupEvaluation, bool analyse, bool debug) {
+void AbstractWorld::evaluate(shared_ptr<Group> group, bool groupEvaluation, bool analyse, bool visualize, bool debug) {
 	vector<double> scores(group->population.size(), 0);
 
 	//for (size_t i = 0; i < group->population.size(); i++) {
@@ -30,7 +29,7 @@ void AbstractWorld::evaluate(shared_ptr<Group> group, bool groupEvaluation, bool
 	}
 	if (groupEvaluation) {
 		for (int r = 0; r < repeatsPL->lookup(); r++) {
-			runWorld(group, analyse, debug);
+			runWorld(group, analyse, visualize, debug);
 			for (size_t i = 0; i < group->population.size(); i++) {
 				scores[i] += group->population[i]->score;
 			}
@@ -42,7 +41,7 @@ void AbstractWorld::evaluate(shared_ptr<Group> group, bool groupEvaluation, bool
 			soloGroup->population.clear();
 			soloGroup->population.push_back(group->population[i]);
 			for (int r = 0; r < repeatsPL->lookup(); r++) {
-				runWorld(soloGroup, analyse, debug);
+				runWorld(soloGroup, analyse, visualize, debug);
 				scores[i] += group->population[i]->score;
 				//scores[i] += testIndividual(group->population[i],0,0);
 				//group->population[i]->dataMap.Append("allscore",group->population[i]->score);

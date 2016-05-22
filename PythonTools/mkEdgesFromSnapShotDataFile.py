@@ -1,4 +1,4 @@
-# https://bespokeblog.wordpress.com/2011/07/07/basic-data-plotting-with-matplotlib-part-2-lines-points-formatting/
+#!/usr/bin/python
 
 import matplotlib.pyplot as plt
 import numpy as np

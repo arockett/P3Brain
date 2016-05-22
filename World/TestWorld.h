@@ -22,7 +22,7 @@ class TestWorld : public AbstractWorld {
 public:
 	TestWorld();
 	virtual ~TestWorld() = default;
-	virtual void runWorldSolo(shared_ptr<Organism> org, bool analyse, bool debug) override;
+	virtual void runWorldSolo(shared_ptr<Organism> org, bool analyse, bool visualize, bool debug) override;
 
 	virtual int requiredInputs() override;
 	virtual int requiredOutputs() override;

@@ -56,7 +56,7 @@ public:
 
 	NumeralClassifierWorld(shared_ptr<ParametersTable> _PT = nullptr);
 
-	virtual void runWorldSolo(shared_ptr<Organism> org, bool analyse, bool debug) override;
+	virtual void runWorldSolo(shared_ptr<Organism> org, bool analyse, bool visualize, bool debug) override;
 
 	virtual int requiredInputs() override {
 		return inputNodesCount;

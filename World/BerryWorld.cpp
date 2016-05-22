@@ -181,7 +181,7 @@ void BerryWorld::printGrid(vector<int> grid, pair<int, int> loc, int facing) {
 	cout << "\n";
 }
 
-void BerryWorld::runWorld(shared_ptr<Group> group, bool analyse, bool debug) {
+void BerryWorld::runWorld(shared_ptr<Group> group, bool analyse, bool visualize, bool debug) {
 	vector<double> scores(group->population.size(), 0);
 
 	vector<int> grid = makeTestGrid();
@@ -429,7 +429,7 @@ void BerryWorld::runWorld(shared_ptr<Group> group, bool analyse, bool debug) {
 //				cout << "score: " << score << "\nfood1: " << eaten[1] << "  food2: " << eaten[2] << "  switches: " << switches << "\n";
 //			}
 		}  // end world evaluation loop
-		if (analyse) {
+		if (visualize) {
 			BerryWorld::SaveWorldState("worldUpdatesFile.txt", grid, currentLocation, facing);
 		}
 	}

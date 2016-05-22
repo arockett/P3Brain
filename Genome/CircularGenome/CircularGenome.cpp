@@ -6,11 +6,8 @@
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
 //
 
-#include "../Global.h"
+#include "../../Global.h"
 #include "CircularGenome.h"
-
-#include "../Utilities/Random.h"
-#include "../Utilities/Utilities.h"
 
 // Initialize Parameters
 shared_ptr<ParameterLink<int>> CircularGenomeParameters::initialGenomeSizePL = Parameters::register_parameter("GENOME_CIRCULAR-sizeInitial", 2000, "starting size for genome");

@@ -6,11 +6,8 @@
 //  Copyright (c) 2015 Arend Hintze. All rights reserved.
 //
 
-#include "../Global.h"
+#include "../../Global.h"
 #include "MultiGenome.h"
-
-#include "../Utilities/Random.h"
-#include "../Utilities/Utilities.h"
 
 // Initialize Parameters
 

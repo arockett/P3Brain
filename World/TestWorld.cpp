@@ -18,7 +18,7 @@ TestWorld::TestWorld() {
 }
 
 // score is number of outputs set to 1 (i.e. output > 0) squared
-void TestWorld::runWorldSolo(shared_ptr<Organism> org, bool analyse, bool debug) {
+void TestWorld::runWorldSolo(shared_ptr<Organism> org, bool analyse, bool visualize, bool debug) {
 
 	org->brain->resetBrain();
 	org->brain->setInput(0,1); // give the brain a constant 1 (for wire brain)

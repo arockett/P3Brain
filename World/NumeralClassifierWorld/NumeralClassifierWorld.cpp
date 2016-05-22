@@ -113,7 +113,7 @@ NumeralClassifierWorld::NumeralClassifierWorld(shared_ptr<ParametersTable> _PT) 
 	aveFileColumns.push_back("totalIncorrect");
 }
 
-void NumeralClassifierWorld::runWorldSolo(shared_ptr<Organism> org, bool analyse, bool debug) {
+void NumeralClassifierWorld::runWorldSolo(shared_ptr<Organism> org, bool analyse, bool visualize , bool debug) {
 	// numeralClassifierWorld assumes there will only ever be one agent being tested at a time. It uses org by default.
 	double score = 0.0;
 	int currentX, currentY;  // = { Random::getIndex(28), Random::getIndex(28) };  // place organism somewhere in the world

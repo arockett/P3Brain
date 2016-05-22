@@ -21,9 +21,9 @@
 #include "Brain/MarkovBrain/MarkovBrain.h"
 #include "Brain/WireBrain/WireBrain.h"
 
-#include "Genome/CircularGenome.h"
-#include "Genome/MultiGenome.h"
-#include "Genome/TemplatedChromosome.h"
+#include "Genome/CircularGenome/CircularGenome.h"
+#include "Genome/MultiGenome/MultiGenome.h"
+#include "Genome/Chromosome/TemplatedChromosome.h"
 
 #include "Group/Group.h"
 #include "Optimizer/GAOptimizer.h"
@@ -48,32 +48,10 @@ int main(int argc, const char * argv[]) {
 
 	cout << "\n\n" << "\tMM   MM      A       BBBBBB    EEEEEE\n" << "\tMMM MMM     AAA      BB   BB   EE\n" << "\tMMMMMMM    AA AA     BBBBBB    EEEEEE\n" << "\tMM M MM   AAAAAAA    BB   BB   EE\n" << "\tMM   MM  AA     AA   BBBBBB    EEEEEE\n" << "\n" << "\tModular    Agent      Based    Evolver\n\n\n\thttp://hintzelab.msu.edu/MABE\n\n" << endl;
 
+	cout << "\tfor help run MABE with the \"-h\" flag (i.e. ./MABE -h)." << endl << endl;
 	Parameters::initializeParameters(argc, argv);  // loads command line and configFile values into registered parameters
 												   // also writes out a config file if requested
 
-//	shared_ptr<ParametersTable> pt = make_shared<ParametersTable>();
-//
-//	for (int i = 0; i < 100; i++) {
-//		pt->setGlobal(to_string(i) + "_keyabcdefghijlmnopqrstuvwxyz", 202.222);
-//		pt->setLocal(to_string(i) + "_key12345678901234567890", 101.111);
-//	}
-//
-//	for (int i = 0; i < 1000000; i++) {
-//		for (int j = 0; j < 100; j++) {
-//
-//			//double moo = Parameters::lookupDouble("GATES_FIXED_EPSILON_fixedEpsilonGate_Probability");
-//			//double moo = pt->lookup("GATES_FIXED_EPSILON_fixedEpsilonGate_Probability");
-//			double moo = FixedEpsilonGate::FixedEpsilonGate_Probability;
-//			moo++;
-//			if (i % 100000000 == 0) {
-//				cout << moo << " " << flush;
-//			}
-//		}
-//	}
-//	cout << "done";
-//	exit(1);
-
-	//Gate_Builder::setupGates();  // determines which gate types will be in use.
 
 	// outputDirectory must exist. If outputDirectory does not exist, no error will occur, but no data will be writen.
 	FileManager::outputDirectory = Global::outputDirectoryPL->lookup();
@@ -242,6 +220,7 @@ int main(int argc, const char * argv[]) {
 		}
 
 		groups[defaultGroup]->archive(1);  // flush any data that has not been output yet
+
 	} else if (Global::modePL->lookup() == "test") {
 
 		vector<shared_ptr<AbstractGenome>> mg;
@@ -265,8 +244,6 @@ int main(int argc, const char * argv[]) {
 			testPopulation.push_back(newOrg);  // add a new org to population using progenitors template and a new random genome
 		}
 		cout << "\npopulation created." << endl;
-//		auto newOrg = make_shared<Organism>(groups[defaultGroup]->population[0], mg[2]);
-//		testPopulation.push_back(newOrg);
 
 //////////////////////////////////////////////
 // rebuild testGroup with one particular org.
@@ -277,9 +254,7 @@ int main(int argc, const char * argv[]) {
 
 		shared_ptr<Group> testGroup = make_shared<Group>(testPopulation, groups[defaultGroup]->optimizer, groups[defaultGroup]->archivist);
 		cout << "\ngroup created." << endl;
-		//shared_ptr<Group> testGroup = make_shared<Group>(testPopulation, group->optimizer, group->archivist);
-		//world->worldUpdates = 400;
-		world->runWorld(testGroup, true, false);
+		world->runWorld(testGroup, false, true, false);
 
 		for (auto o : testGroup->population) {
 			cout << o->score << " " << o->genome->dataMap.Get("ID") << endl;
@@ -290,10 +265,5 @@ int main(int argc, const char * argv[]) {
 		exit(1);
 	}
 
-	//if (Archivist::Arch_outputMethodStr == "LODwAP") {  // if using LODwAP, write out some info about MRCA
-	//	shared_ptr<Organism> FinalMRCA = group->population[0]->getMostRecentCommonAncestor(group->population[0]);
-	//	cout << "MRCA - ID: " << FinalMRCA->ID << " born on: " << FinalMRCA->timeOfBirth << endl << FinalMRCA->brain->description() << endl;
-	//	//cout << "\n\n" << FinalMRCA->genome->showCodingRegions();
-	//}
 	return 0;
 }

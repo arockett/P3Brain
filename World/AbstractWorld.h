@@ -24,7 +24,6 @@ public:
 	static shared_ptr<ParameterLink<bool>> showOnUpdatePL;
 
 	static shared_ptr<ParameterLink<bool>> groupEvaluationPL;
-	static shared_ptr<ParameterLink<bool>> useOldMethodPL;
 
 	const shared_ptr<ParametersTable> PT;
 
@@ -38,11 +37,11 @@ public:
 	virtual int requiredOutputs() = 0;
 
 	// new stuff
-	virtual void evaluate(shared_ptr<Group> group, bool groupEvaluation = 0, bool analyse = 0, bool debug = 0);
-	virtual void runWorld(shared_ptr<Group> group, bool analyse, bool debug) {
-		runWorldSolo(group->population[0],analyse,debug);
+	virtual void evaluate(shared_ptr<Group> group, bool groupEvaluation = 0, bool analyse = 0, bool visualize = 0, bool debug = 0);
+	virtual void runWorld(shared_ptr<Group> group, bool analyse, bool visualize, bool debug) {
+		runWorldSolo(group->population[0], analyse, visualize, debug);
 	}
-	virtual void runWorldSolo(shared_ptr<Organism> org, bool analyse, bool debug) {
+	virtual void runWorldSolo(shared_ptr<Organism> org, bool analyse, bool visualize, bool debug) {
 		cout << "  AbstractWorld::runWorldSolo : a call was made to the abstract function runWorldSolo. Your world must impliment runWorldSolo.\n  Exiting.";
 		exit(1);
 	}
