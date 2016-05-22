@@ -9,7 +9,7 @@
 #ifndef __BasicMarkovBrainTemplate__Tournament2_Optimizer__
 #define __BasicMarkovBrainTemplate__Tournament2_Optimizer__
 
-#include "AbstractOptimizer.h"
+#include "../AbstractOptimizer.h"
 
 class Tournament2Optimizer : public AbstractOptimizer {
  public:

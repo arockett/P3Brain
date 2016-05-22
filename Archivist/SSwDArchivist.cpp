@@ -73,10 +73,10 @@ bool SSwDArchivist::archive(vector<shared_ptr<Organism>> population, int flush) 
 		}
 
 		if ((Global::update % dataInterval == 0) && (flush == 0) && writeSnapshotDataFiles) {  // do not write files on flush - these organisms have not been evaluated!
-			saveSnapshotData(population, Global::update);
+			saveSnapshotData(population);
 		}
 		if ((Global::update % genomeInterval == 0) && (flush == 0) && writeSnapshotGenomeFiles) {  // do not write files on flush - these organisms have not been evaluated!
-			saveSnapshotGenomes(population, Global::update);
+			saveSnapshotGenomes(population);
 		}
 
 		///// Clean up the checkpoints
@@ -116,13 +116,13 @@ bool SSwDArchivist::archive(vector<shared_ptr<Organism>> population, int flush) 
 		if ((Global::update == nextGenomeWrite + genomeIntervalDelay) && (nextGenomeWrite <= Global::updatesPL->lookup()) && writeGenomeFiles) {  // now it's time to write genomes in the checkpoint at time nextGenomeWrite
 			string genomeFileName = GenomeFilePrefix + "_" + to_string(nextGenomeWrite) + ".csv";
 
-			string dataString;
+			//string dataString;
 			size_t index = 0;
 			while (index < checkpoints[nextGenomeWrite].size()) {
 				if (auto org = checkpoints[nextGenomeWrite][index].lock()) {  // this ptr is still good
 
 					org->genome->dataMap.Set("ID", org->dataMap.Get("ID"));
-					org->genome->dataMap.Set("update", org->dataMap.Get("update"));
+					org->genome->dataMap.Set("update", to_string(nextGenomeWrite));
 
 					org->genome->dataMap.Set("sites", org->genome->genomeToStr());
 
@@ -158,8 +158,9 @@ bool SSwDArchivist::archive(vector<shared_ptr<Organism>> population, int flush) 
 				}
 
 				vector<string> tempKeysList = org->snapShotDataMaps[nextDataWrite].getKeys();  // get all keys from the valid orgs dataMap (all orgs should have the same keys in their dataMaps)
+				files["data"].push_back("update");
 				for (auto key : tempKeysList) {  // for every key in dataMap...
-					files["data"].push_back(key);  // add it to the list of keys associated with the genome file.
+					files["data"].push_back(key);  // add it to the list of keys associated with the data file.
 				}
 			}
 
@@ -168,6 +169,7 @@ bool SSwDArchivist::archive(vector<shared_ptr<Organism>> population, int flush) 
 			size_t index = 0;
 			while (index < checkpoints[nextDataWrite].size()) {
 				if (auto org = checkpoints[nextDataWrite][index].lock()) {  // this ptr is still good
+					org->snapShotDataMaps[nextDataWrite].Set("update",nextDataWrite);
 					org->snapShotDataMaps[nextDataWrite].writeToFile(dataFileName, files["data"]);  // append new data to the file
 					index++;  // advance to nex element
 				} else {  // this ptr is expired - cut it out of the vector

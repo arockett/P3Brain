@@ -56,15 +56,19 @@ public:
 
 	NumeralClassifierWorld(shared_ptr<ParametersTable> _PT = nullptr);
 
-//  double testIndividual(shared_ptr<Organism> org, bool analyse);
-
-	double testIndividual(shared_ptr<Organism> org, bool analyse, bool show = 0) override;
+	virtual void runWorldSolo(shared_ptr<Organism> org, bool analyse, bool visualize, bool debug) override;
 
 	virtual int requiredInputs() override {
 		return inputNodesCount;
 	}
 	virtual int requiredOutputs() override {
 		return outputNodesCount;
+	}
+	virtual int maxOrgsAllowed() override {
+		return 1;
+	}
+	virtual int minOrgsAllowed() override {
+		return 1;
 	}
 
 };

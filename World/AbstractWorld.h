@@ -14,26 +14,41 @@
 #include <vector>
 
 #include "../Group/Group.h"
+#include "../Utilities/Data.h"
 #include "../Utilities/Parameters.h"
 
 using namespace std;
 
 class AbstractWorld {
 public:
-	 static shared_ptr<ParameterLink<int>> repeatsPL;
-	 static shared_ptr<ParameterLink<bool>> showOnUpdatePL;
+	static shared_ptr<ParameterLink<int>> repeatsPL;
+	static shared_ptr<ParameterLink<bool>> showOnUpdatePL;
+
+	static shared_ptr<ParameterLink<bool>> groupEvaluationPL;
 
 	const shared_ptr<ParametersTable> PT;
 
 	vector<string> aveFileColumns;
 
-	AbstractWorld(shared_ptr<ParametersTable> _PT = nullptr) : PT(_PT){
+	AbstractWorld(shared_ptr<ParametersTable> _PT = nullptr) :
+			PT(_PT) {
 	}
 	virtual ~AbstractWorld() = default;
-	virtual void evaluateFitness(vector<shared_ptr<Organism>> population, bool analyse, bool show = 0);
-	virtual double testIndividual(shared_ptr<Organism> org, bool analyse, bool show = 0) = 0;
 	virtual int requiredInputs() = 0;
 	virtual int requiredOutputs() = 0;
+
+	// new stuff
+	virtual void evaluate(shared_ptr<Group> group, bool groupEvaluation = 0, bool analyse = 0, bool visualize = 0, bool debug = 0);
+	virtual void runWorld(shared_ptr<Group> group, bool analyse, bool visualize, bool debug) {
+		runWorldSolo(group->population[0], analyse, visualize, debug);
+	}
+	virtual void runWorldSolo(shared_ptr<Organism> org, bool analyse, bool visualize, bool debug) {
+		cout << "  AbstractWorld::runWorldSolo : a call was made to the abstract function runWorldSolo. Your world must impliment runWorldSolo.\n  Exiting.";
+		exit(1);
+	}
+
+	virtual int maxOrgsAllowed() = 0;
+	virtual int minOrgsAllowed() = 0;
 
 };
 

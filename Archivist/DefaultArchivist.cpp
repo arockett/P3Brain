@@ -51,10 +51,12 @@ void DefaultArchivist::writeRealTimeFiles(vector<shared_ptr<Organism>> &populati
 	if (writeAveFile) {
 		double aveValue, temp;
 		DataMap AveMap;
+
 		for (auto key : DefaultAveFileColumns) {
 			temp = 0;
 			aveValue = 0;
 			for (auto org : population) {
+				org->dataMap.Set("update", Global::update);
 				if (org->dataMap.fieldExists(key)) {
 					stringstream ss(org->dataMap.Get(key));
 					ss >> temp;
@@ -77,6 +79,7 @@ void DefaultArchivist::writeRealTimeFiles(vector<shared_ptr<Organism>> &populati
 					}
 				}
 				aveValue += temp;
+				org->dataMap.Clear("update");
 			}
 			aveValue /= population.size();
 			AveMap.Set(key, aveValue);
@@ -92,6 +95,7 @@ void DefaultArchivist::writeRealTimeFiles(vector<shared_ptr<Organism>> &populati
 
 		int best = findGreatestInVector(Scores);
 		DataMap DomMap;
+		population[best]->dataMap.Set("update", Global::update);
 		for (auto key : population[best]->dataMap.getKeys()) {
 			if (key[0] == 'a' && key[1] == 'l' && key[2] == 'l') {
 				double temp = 0;
@@ -108,34 +112,39 @@ void DefaultArchivist::writeRealTimeFiles(vector<shared_ptr<Organism>> &populati
 				DomMap.Set(key, population[best]->dataMap.Get(key));
 			}
 		}
+		population[best]->dataMap.Clear("update");
 		DomMap.writeToFile(DominantFileName);
 	}
 }
 
 
-void DefaultArchivist::saveSnapshotData(vector<shared_ptr<Organism>> population, int update) {
+void DefaultArchivist::saveSnapshotData(vector<shared_ptr<Organism>> population) {
 	// write out data
-	string dataFileName = DataFilePrefix + "_" + to_string(update) + ".csv";
-
-	if (files.find("data") == files.end()) {  // first make sure that the dataFile has been set up.
-		population[0]->dataMap.Set("ancestors", "placeHolder");  // add ancestors so it will be in files (holds columns to be output for each file)
-		files["data"] = population[0]->dataMap.getKeys();  // get all keys from the valid orgs dataMap (all orgs should have the same keys in their dataMaps)
+	string dataFileName = DataFilePrefix + "_" + to_string(Global::update) + ".csv";
+	cout << DataFilePrefix << " " << to_string(Global::update) << " .csv" << " -> " << dataFileName << endl;
+	if (files.find("snapshotData") == files.end()) {  // first make sure that the dataFile has been set up.
+		//population[0]->dataMap.Set("ancestors", "placeHolder");  // add ancestors so it will be in files (holds columns to be output for each file)
+		files["snapshotData"] = population[0]->dataMap.getKeys();  // get all keys from the valid orgs dataMap (all orgs should have the same keys in their dataMaps)
+		files["snapshotData"].push_back("snapshotAncestors");
+		//population[0]->dataMap.Clear("ancestors");
 	}
 	for (auto org : population) {
-		population[0]->dataMap.Clear("ancestors");
-		for (auto ancestor : org->ancestors) {
-			org->dataMap.Append("ancestors", ancestor);
+		for (auto ancestor : org->snapshotAncestors) {
+			org->dataMap.Append("snapshotAncestors", ancestor);
 		}
-		org->ancestors.clear();
-		org->ancestors.insert(org->ID);  // now that we have saved the ancestor data, set ancestors to self (so that others will inherit correctly)
-		org->dataMap.writeToFile(dataFileName, files["data"]);  // append new data to the file
+		org->snapshotAncestors.clear();
+		org->snapshotAncestors.insert(org->ID);  // now that we have saved the ancestor data, set ancestors to self (so that others will inherit correctly)
+		org->dataMap.Set("update", Global::update);
+		org->dataMap.writeToFile(dataFileName, files["snapshotData"]);  // append new data to the file
+		org->dataMap.Clear("snapshotAncestors");
+		org->dataMap.Clear("update");
 	}
 }
 
-void DefaultArchivist::saveSnapshotGenomes(vector<shared_ptr<Organism>> population, int update) {
+void DefaultArchivist::saveSnapshotGenomes(vector<shared_ptr<Organism>> population) {
 
 	// write out genomes
-	string genomeFileName = GenomeFilePrefix + "_" + to_string(update) + ".csv";
+	string genomeFileName = GenomeFilePrefix + "_" + to_string(Global::update) + ".csv";
 
 	string dataString;
 	for (auto org : population) {
@@ -144,11 +153,12 @@ void DefaultArchivist::saveSnapshotGenomes(vector<shared_ptr<Organism>> populati
 
 		org->genome->dataMap.Set("sites", org->genome->genomeToStr());
 		org->genome->dataMap.Set("ID", org->dataMap.Get("ID"));
-		org->genome->dataMap.Set("update", org->dataMap.Get("update"));
+		org->genome->dataMap.Set("update", Global::update);
 
 		//org->genome->dataMap.writeToFile(genomeFileName, org->genome->dataMap.getKeys());  // append new data to the file
 		org->genome->dataMap.writeToFile(genomeFileName, org->genome->genomeFileColumns);  // append new data to the file
-		org->genome->dataMap.Clear("sites");  // this is large, clean it up now!
+		//org->genome->dataMap.Clear("sites");  // this is large, clean it up now!
+		org->genome->dataMap.Clear("update"); // we dont' need this anymore.
 	}
 }
 // save data and manage in memory data
@@ -160,10 +170,10 @@ bool DefaultArchivist::archive(vector<shared_ptr<Organism>> population, int flus
 		}
 
 		if ((Global::update % dataInterval == 0) && (flush == 0) && writeSnapshotDataFiles) {  // do not write files on flush - these organisms have not been evaluated!
-			saveSnapshotData(population, Global::update);
+			saveSnapshotData(population);
 		}
 		if ((Global::update % genomeInterval == 0) && (flush == 0) && writeSnapshotGenomeFiles) {  // do not write files on flush - these organisms have not been evaluated!
-			saveSnapshotGenomes(population, Global::update);
+			saveSnapshotGenomes(population);
 		}
 
 		for (auto org : population) {  // we don't need to worry about tracking parents or lineage, so we clear out this data every generation.
