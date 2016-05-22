@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "AbstractWorld.h"
+#include "../AbstractWorld.h"
 
 using namespace std;
 

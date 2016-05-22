@@ -8,8 +8,6 @@
 
 #include "Tournament2Optimizer.h"
 
-#include "../Utilities/Random.h"
-
 using namespace std;
 
 void Tournament2Optimizer::makeNextGeneration(vector<shared_ptr<Organism>> &population) {

@@ -9,7 +9,7 @@
 #ifndef __BasicMarkovBrainTemplate__WorldTest__
 #define __BasicMarkovBrainTemplate__WorldTest__
 
-#include "AbstractWorld.h"
+#include "../AbstractWorld.h"
 
 #include <stdlib.h>
 #include <thread>

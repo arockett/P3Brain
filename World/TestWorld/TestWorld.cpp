@@ -8,9 +8,6 @@
 
 #include "TestWorld.h"
 
-//#include "../Utilities/Utilities.h"
-#include "../Utilities/Data.h"
-
 TestWorld::TestWorld() {
 	// columns to be added to ave file
 	aveFileColumns.clear();

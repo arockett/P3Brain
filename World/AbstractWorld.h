@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "../Group/Group.h"
+#include "../Utilities/Data.h"
 #include "../Utilities/Parameters.h"
 
 using namespace std;

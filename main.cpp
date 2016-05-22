@@ -26,10 +26,10 @@
 #include "Genome/Chromosome/TemplatedChromosome.h"
 
 #include "Group/Group.h"
-#include "Optimizer/GAOptimizer.h"
 
-#include "Optimizer/Tournament2Optimizer.h"
-#include "Optimizer/TournamentOptimizer.h"
+#include "Optimizer/GAOptimizer/GAOptimizer.h"
+#include "Optimizer/TournamentOptimizer/TournamentOptimizer.h"
+#include "Optimizer/Tournament2Optimizer/Tournament2Optimizer.h"
 
 #include "Organism/Organism.h"
 
@@ -38,8 +38,8 @@
 #include "Utilities/Data.h"
 #include "Utilities/Utilities.h"
 
-#include "World/BerryWorld.h"
-#include "World/TestWorld.h"
+#include "World/BerryWorld/BerryWorld.h"
+#include "World/TestWorld/TestWorld.h"
 #include "World/NumeralClassifierWorld/NumeralClassifierWorld.h"
 
 using namespace std;
