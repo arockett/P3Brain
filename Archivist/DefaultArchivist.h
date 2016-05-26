@@ -94,6 +94,7 @@ shared_ptr<ParameterLink<bool>> DefaultArchivist::Arch_DominantFileShowAllListsP
 	// return true if next save will be > updates + terminate after
 	virtual bool archive(vector<shared_ptr<Organism>> population, int flush = 0);
 
+	virtual void processAllLists(DataMap &dm);
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__DefaultArchivist__) */
