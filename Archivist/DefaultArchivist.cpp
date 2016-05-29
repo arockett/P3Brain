@@ -122,7 +122,6 @@ void DefaultArchivist::writeRealTimeFiles(vector<shared_ptr<Organism>> &populati
 void DefaultArchivist::saveSnapshotData(vector<shared_ptr<Organism>> population) {
 	// write out data
 	string dataFileName = DataFilePrefix + "_" + to_string(Global::update) + ".csv";
-	cout << DataFilePrefix << " " << to_string(Global::update) << " .csv" << " -> " << dataFileName << endl;
 	if (files.find("snapshotData") == files.end()) {  // first make sure that the dataFile has been set up.
 			//population[0]->dataMap.Set("ancestors", "placeHolder");  // add ancestors so it will be in files (holds columns to be output for each file)
 		files["snapshotData"] = population[0]->dataMap.getKeys();  // get all keys from the valid orgs dataMap (all orgs should have the same keys in their dataMaps)

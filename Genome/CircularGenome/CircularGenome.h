@@ -28,34 +28,34 @@ using namespace std;
 // needed to move static values to own class because of templating.
 class CircularGenomeParameters {
 public:
-	static shared_ptr<ParameterLink<int>> initialGenomeSizePL;
-	static shared_ptr<ParameterLink<double>> pointMutationRatePL;
-	static shared_ptr<ParameterLink<double>> insertionRatePL;
-	static shared_ptr<ParameterLink<int>> insertionMinSizePL;
-	static shared_ptr<ParameterLink<int>> insertionMaxSizePL;
-	static shared_ptr<ParameterLink<double>> deletionRatePL;
-	static shared_ptr<ParameterLink<int>> deletionMinSizePL;
-	static shared_ptr<ParameterLink<int>> deletionMaxSizePL;
-	static shared_ptr<ParameterLink<int>> maxGenomeSizePL;
-	static shared_ptr<ParameterLink<int>> minGenomeSizePL;
-	static shared_ptr<ParameterLink<int>> crossCountPL;  // number of crosses to make when performing crossover
+	static shared_ptr<ParameterLink<int>> sizeInitialPL;
+	static shared_ptr<ParameterLink<double>> mutationPointRatePL;
+	static shared_ptr<ParameterLink<double>> mutationCopyRatePL;
+	static shared_ptr<ParameterLink<int>> mutationCopyMinSizePL;
+	static shared_ptr<ParameterLink<int>> mutationCopyMaxSizePL;
+	static shared_ptr<ParameterLink<double>> mutationDeleteRatePL;
+	static shared_ptr<ParameterLink<int>> mutationDeleteMinSizePL;
+	static shared_ptr<ParameterLink<int>> mutationDeleteMaxSizePL;
+	static shared_ptr<ParameterLink<int>> sizeMaxPL;
+	static shared_ptr<ParameterLink<int>> sizeMinPL;
+	static shared_ptr<ParameterLink<int>> mutationCrossCountPL;  // number of crosses to make when performing crossover
 };
 
 template<class T>
 class CircularGenome: public AbstractGenome {
 
 public:
-	shared_ptr<ParameterLink<int>> initialGenomeSizeLPL;
-	shared_ptr<ParameterLink<double>> pointMutationRateLPL;
-	shared_ptr<ParameterLink<double>> insertionRateLPL;
-	shared_ptr<ParameterLink<int>> insertionMinSizeLPL;
-	shared_ptr<ParameterLink<int>> insertionMaxSizeLPL;
-	shared_ptr<ParameterLink<double>> deletionRateLPL;
-	shared_ptr<ParameterLink<int>> deletionMinSizeLPL;
-	shared_ptr<ParameterLink<int>> deletionMaxSizeLPL;
-	shared_ptr<ParameterLink<int>> maxGenomeSizeLPL;
-	shared_ptr<ParameterLink<int>> minGenomeSizeLPL;
-	shared_ptr<ParameterLink<int>> crossCountLPL;
+	shared_ptr<ParameterLink<int>> initialSizeLPL;
+	shared_ptr<ParameterLink<double>> mutationPointRateLPL;
+	shared_ptr<ParameterLink<double>> mutationCopyRateLPL;
+	shared_ptr<ParameterLink<int>> mutationCopyMinSizeLPL;
+	shared_ptr<ParameterLink<int>> mutationCopyMaxSizeLPL;
+	shared_ptr<ParameterLink<double>> mutationDeleteRateLPL;
+	shared_ptr<ParameterLink<int>> mutationDeleteMinSizeLPL;
+	shared_ptr<ParameterLink<int>> mutationDeleteMaxSizeLPL;
+	shared_ptr<ParameterLink<int>> sizeMaxLPL;
+	shared_ptr<ParameterLink<int>> sizeMinLPL;
+	shared_ptr<ParameterLink<int>> mutationCrossCountLPL;
 
 	class Handler: public AbstractGenome::Handler {
 	public:

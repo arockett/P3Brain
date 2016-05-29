@@ -103,7 +103,7 @@ int main(int argc, const char * argv[]) {
 				cout << "\n\nERROR: Unrecognized genomeSitesType in configuration!\n  \"" << PT->lookupString("GENOME-sitesType") << "\" is not defined.\n\nExiting.\n" << endl;
 				exit(1);
 			}
-			templateGenome = make_shared<MultiGenome>(templateChromosome, PT->lookupInt("GENOME_MULTI-chromosomes"), PT->lookupInt("GENOME_MULTI-ploidy"), PT);
+			templateGenome = make_shared<MultiGenome>(templateChromosome, PT->lookupInt("GENOME_MULTI-chromosome_sets"), PT->lookupInt("GENOME_MULTI-chromosome_ploidy"), PT);
 
 		} else if (PT->lookupString("GENOME-type") == "Circular") {
 			if (PT->lookupString("GENOME-sitesType") == "char") {
