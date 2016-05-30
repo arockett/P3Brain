@@ -18,7 +18,8 @@ shared_ptr<ParameterLink<string>> DefaultArchivist::SS_Arch_GenomeFilePrefixPL =
 shared_ptr<ParameterLink<bool>> DefaultArchivist::SS_Arch_writeDataFilesPL = Parameters::register_parameter("ARCHIVIST_DEFAULT-writeSnapshotDataFiles", false, "if true, snapshot data files will be written (with all non genome data for entire population)");
 shared_ptr<ParameterLink<bool>> DefaultArchivist::SS_Arch_writeGenomeFilesPL = Parameters::register_parameter("ARCHIVIST_DEFAULT-writeSnapshotGenomeFiles", false, "if true, snapshot genome files will be written (with all genomes for entire population)");
 
-DefaultArchivist::DefaultArchivist(shared_ptr<ParametersTable> _PT) : PT(_PT) {
+DefaultArchivist::DefaultArchivist(shared_ptr<ParametersTable> _PT) :
+		PT(_PT) {
 	realtimeFilesInterval = (PT == nullptr) ? Arch_realtimeFilesIntervalPL->lookup() : PT->lookupInt("ARCHIVIST_DEFAULT-realtimeFilesInterval");
 	writeAveFile = (PT == nullptr) ? Arch_writeAveFilePL->lookup() : PT->lookupBool("ARCHIVIST_DEFAULT-writeAveFile");
 	writeDominantFile = (PT == nullptr) ? Arch_writeDominantFilePL->lookup() : PT->lookupBool("ARCHIVIST_DEFAULT-writeDominantFile");
@@ -37,7 +38,8 @@ DefaultArchivist::DefaultArchivist(shared_ptr<ParametersTable> _PT) : PT(_PT) {
 	finished = false;
 }
 
-DefaultArchivist::DefaultArchivist(vector<string> aveFileColumns, shared_ptr<ParametersTable> _PT) : DefaultArchivist(_PT){
+DefaultArchivist::DefaultArchivist(vector<string> aveFileColumns, shared_ptr<ParametersTable> _PT) :
+		DefaultArchivist(_PT) {
 	convertCSVListToVector(AveFileColumnNames, DefaultAveFileColumns);
 	if (DefaultAveFileColumns.size() <= 0) {
 		DefaultAveFileColumns = aveFileColumns;
@@ -117,13 +119,11 @@ void DefaultArchivist::writeRealTimeFiles(vector<shared_ptr<Organism>> &populati
 	}
 }
 
-
 void DefaultArchivist::saveSnapshotData(vector<shared_ptr<Organism>> population) {
 	// write out data
 	string dataFileName = DataFilePrefix + "_" + to_string(Global::update) + ".csv";
-	cout << DataFilePrefix << " " << to_string(Global::update) << " .csv" << " -> " << dataFileName << endl;
 	if (files.find("snapshotData") == files.end()) {  // first make sure that the dataFile has been set up.
-		//population[0]->dataMap.Set("ancestors", "placeHolder");  // add ancestors so it will be in files (holds columns to be output for each file)
+			//population[0]->dataMap.Set("ancestors", "placeHolder");  // add ancestors so it will be in files (holds columns to be output for each file)
 		files["snapshotData"] = population[0]->dataMap.getKeys();  // get all keys from the valid orgs dataMap (all orgs should have the same keys in their dataMaps)
 		files["snapshotData"].push_back("snapshotAncestors");
 		//population[0]->dataMap.Clear("ancestors");
@@ -158,7 +158,7 @@ void DefaultArchivist::saveSnapshotGenomes(vector<shared_ptr<Organism>> populati
 		//org->genome->dataMap.writeToFile(genomeFileName, org->genome->dataMap.getKeys());  // append new data to the file
 		org->genome->dataMap.writeToFile(genomeFileName, org->genome->genomeFileColumns);  // append new data to the file
 		//org->genome->dataMap.Clear("sites");  // this is large, clean it up now!
-		org->genome->dataMap.Clear("update"); // we dont' need this anymore.
+		org->genome->dataMap.Clear("update");  // we dont' need this anymore.
 	}
 }
 // save data and manage in memory data
@@ -182,4 +182,23 @@ bool DefaultArchivist::archive(vector<shared_ptr<Organism>> population, int flus
 	}
 	// if we are at the end of the run
 	return (Global::update >= Global::updatesPL->lookup());
+}
+
+void DefaultArchivist::processAllLists(DataMap &dm) {
+	vector<string> allKeys = dm.getKeys();
+	for (auto key : allKeys) {
+		if (key.substr(0, 3) == "all") {
+			if (find(allKeys.begin(), allKeys.end(), key.substr(3, key.size() - 1)) == allKeys.end()) {
+				double temp = 0;
+				vector<double> values;
+				convertCSVListToVector(dm.Get(key), values);
+				for (auto v : values) {
+					temp += v;
+					//cout << key << " " << allKey << " " << v << " " << temp << endl;
+				}
+				temp /= (double) values.size();
+				dm.Set(key.substr(3, key.size() - 1), temp);
+			}
+		}
+	}
 }

@@ -262,7 +262,7 @@ void BerryWorld::runWorld(shared_ptr<Group> group, bool analyse, bool visualize,
 	int orgListIndex;
 	int orgIndex;
 
-	if (analyse) {  // save state of world before we get started.
+	if (visualize) {  // save state of world before we get started.
 		BerryWorld::SaveWorldState("worldUpdatesFile.txt", grid, currentLocation, facing);
 	}
 

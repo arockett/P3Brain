@@ -156,7 +156,7 @@ bool SSwDArchivist::archive(vector<shared_ptr<Organism>> population, int flush) 
 						checkpoints[nextDataWrite].pop_back();  // pop expired ptr from back of vector
 					}
 				}
-
+				processAllLists(org->snapShotDataMaps[nextDataWrite]);
 				vector<string> tempKeysList = org->snapShotDataMaps[nextDataWrite].getKeys();  // get all keys from the valid orgs dataMap (all orgs should have the same keys in their dataMaps)
 				files["data"].push_back("update");
 				for (auto key : tempKeysList) {  // for every key in dataMap...
@@ -169,6 +169,7 @@ bool SSwDArchivist::archive(vector<shared_ptr<Organism>> population, int flush) 
 			size_t index = 0;
 			while (index < checkpoints[nextDataWrite].size()) {
 				if (auto org = checkpoints[nextDataWrite][index].lock()) {  // this ptr is still good
+					processAllLists(org->snapShotDataMaps[nextDataWrite]);
 					org->snapShotDataMaps[nextDataWrite].Set("update",nextDataWrite);
 					org->snapShotDataMaps[nextDataWrite].writeToFile(dataFileName, files["data"]);  // append new data to the file
 					index++;  // advance to nex element
