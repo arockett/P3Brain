@@ -15,12 +15,26 @@ import ast
 
 import argparse
 
-def MultiPlot(data, NamesList, ConditionsList, PrimaryDataAxis, PltWhat = ['ave','error'], PltStyle = '-', ErrStyle = 'stderr', ErrDraw = 'lines', Reps = [''], XCoordinateName = '', Columns = 3, title = '', legendLocation = "lower right"):
+def MultiPlot(data, NamesList, ConditionsList, dataIndex, CombineData = False, PltWhat = ['ave','error'], PltStyle = 'line', ErrStyle = 'stderr', ErrDraw = 'lines', Reps = [''], XCoordinateName = '', Columns = 3, title = '', legendLocation = "lower right"):
 	styleListColor = [(0,0,1),(0,1,0),(1,0,0),(.5,.5,0),(0,.5,.5),(.5,0,.5),(0,0,0),(1,0,0),(0,1,0),(0,0,1),(.5,.5,0),(0,.5,.5),(.5,0,.5),(0,0,0),(1,0,0),(0,1,0),(0,0,1),(.5,.5,0),(0,.5,.5),(.5,0,.5),(0,0,0)]
 	styleListPoint = ['o','*','s','D','^','.','o','*','s','D','^','.','o','*','s','D','^','.','o','*','s','D','^','.','o','*','s','D','^','.']
-	styleListLine = ['-','-','--','-','-D','-^','-.','-o','-*','-s','-D','-^','-.','-o','-*','-s','-D','-^','-.','-o','-*','-s','-D','-^','-.','-o','-*','-s','-D','-^','-.']
+	styleListLine = ['-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-',]
+	styleListRandomLine = ['-^','-o','-*','-s','-D','-^','-.','-o','-*','-s','-D','-^','-.','-o','-*','-s','-D','-^','-.','-o','-*','-s','-D','-^','-.']
+	styleListRandomPoint = ['^','.','o','*','s','D','^','.','o','*','s','D','^','.','o','*','s','D','^','.','o','*','s','D','^','.']
 	PltColor = (0,0,0)
 
+	if PltStyle == 'line':
+	  styleList = styleListLine
+	  PltStyle = '-'
+	if PltStyle == 'point':
+	  styleList = styleListPoint
+	  PltStyle = 'o'
+	if PltStyle == 'randomLine':
+	  styleList = styleListRandomLine
+	  PltStyle = '-'
+	if PltStyle == 'randomPoint':
+	  styleList = styleListRandomPoint
+	  PltStyle = 'o'
 
 	fig = plt.figure(figsize=(20,10))                                                # create a new figure
 	fig.subplots_adjust(hspace=.35)
@@ -33,13 +47,14 @@ def MultiPlot(data, NamesList, ConditionsList, PrimaryDataAxis, PltWhat = ['ave'
 
 	Rows = math.ceil(float(len(NamesList))/float(Columns))      # calcualate how many rows we need
 	for conditionCount in range(len(ConditionsList)):
-		if len(ConditionsList) > 1:
-			PltStyle = styleListLine[conditionCount]
-			PltColor = styleListColor[conditionCount]
 		for nameCount in range(len(NamesList)):
-			ax = plt.subplot(Rows,Columns,nameCount+1)
-			plt.title(NamesList[nameCount], fontsize=8) 	              # set the title for this plot
-			ax.title.set_position([.5, 1])
+			if not CombineData:
+				ax = plt.subplot(Rows,Columns,nameCount+1)
+				plt.title(NamesList[nameCount], fontsize=8) 	              # set the title for this plot
+				ax.title.set_position([.5, 1])
+			elif len(ConditionsList) > 1 or len(NamesList) > 1:
+				PltStyle = styleList[conditionCount + (nameCount * len(ConditionsList))]
+				PltColor = styleListColor[conditionCount + (nameCount * len(ConditionsList))]
 			plt.grid(b=True, which='major', color=(0,0,0), linestyle='--', alpha = .25)
 			if 'reps' in PltWhat:
 				for Rep in Reps:
@@ -47,13 +62,13 @@ def MultiPlot(data, NamesList, ConditionsList, PrimaryDataAxis, PltWhat = ['ave'
 						data[data["repName"] == Rep][data["con"] == ConditionsList[conditionCount]][NamesList[nameCount]],
 						PltStyle, alpha = .25, color = PltColor)
 			if 'ave' in PltWhat:
-				aveLine = data[data["con"] == ConditionsList[conditionCount]].pivot(index = PrimaryDataAxis, columns ='repName', values = NamesList[nameCount]).mean(axis=1)
-				aveXCoordinate = data[data["con"] == ConditionsList[conditionCount]].pivot(index = PrimaryDataAxis, columns ='repName', values = XCoordinateName).mean(axis=1)
-				plt.plot(aveXCoordinate, aveLine, PltStyle, color = PltColor, linewidth = 1, label = ConditionsList[conditionCount])
+				aveLine = data[data["con"] == ConditionsList[conditionCount]].pivot(index = dataIndex, columns ='repName', values = NamesList[nameCount]).mean(axis=1)
+				aveXCoordinate = data[data["con"] == ConditionsList[conditionCount]].pivot(index = dataIndex, columns ='repName', values = XCoordinateName).mean(axis=1)
+				plt.plot(aveXCoordinate, aveLine, PltStyle, color = PltColor, linewidth = 1, label = ConditionsList[conditionCount]+' '+NamesList[nameCount])
 			if 'error' in PltWhat:
-				stdLine = data[data["con"] == ConditionsList[conditionCount]].pivot(index = PrimaryDataAxis, columns='repName', values = NamesList[nameCount]).std(axis=1)
+				stdLine = data[data["con"] == ConditionsList[conditionCount]].pivot(index = dataIndex, columns='repName', values = NamesList[nameCount]).std(axis=1)
 				plt.fill_between(data[data["repName"] == Reps[0]][data["con"] == ConditionsList[conditionCount]][XCoordinateName], aveLine - stdLine,aveLine + stdLine, color = PltColor, alpha = .15)
-			if (len(ConditionsList) > 1) and legendLocation != '':
+			if ((len(ConditionsList) > 1) or (CombineData))and legendLocation != '':
 				plt.legend(loc=legendLocation, shadow=True)                    # add a legend
 	return plt.gcf()                                            # gcf = get current figure - return that.		
 
@@ -71,28 +86,30 @@ parser.add_argument('-save', type=str, choices=('pdf','png'), default = '',  hel
 parser.add_argument('-data', type=str, metavar='COLUMN_NAME', default = [''],  help='column names of data to be graphed - default : none (will attempt to graph all columns from all files)',nargs='+', required=False)
 parser.add_argument('-dataFromFile', type=str, metavar='FILE_NAME', default = '',  help='this file will be used to determine with column names of data will be graphed - default : none (will attempt to graph all columns from all files)', required=False)
 parser.add_argument('-xAxis', type=str, metavar='COLUMN_NAME', default = 'update',  help='column name of data to be used on x axis - default : update', required=False)
-#parser.add_argument('-primaryDataAxis', type=str, metavar='COLUMN_NAME', default = 'undefined',  help='column name of data to be used to generate averages - default : value of -xAxis', required=False)
+parser.add_argument('-dataIndex', type=str, metavar='COLUMN_NAME', default = 'undefined',  help='column name of data to be used as index when generating averages - default : value of -xAxis', required=False)
 
 parser.add_argument('-pltWhat', type=str, choices=('ave','error','reps'), default = ['ave','error'], help='what should be ploted. ave (averages), error, reps (show data for all reps) - default : ave error', nargs='+', required=False)
-parser.add_argument('-pltStyle', type=str, metavar='STYLE', default = '-', help='line style. -(solid lines), .(small dots), --(dashed line), etc - default : -', required=False)
+parser.add_argument('-pltStyle', type=str, choices=('line','point','randomLine','randomPoint'), default = 'line', help='plot style. Random is useful if plotting multiple data on the same plot - default : line', required=False)
 
 parser.add_argument('-numCol', type=str, metavar='#', default = '3', help='if ploting a multi plot (default), how many columns in plot - default : 3', required=False)
 parser.add_argument('-combineConditions', action='store_true', default = False, help='if ploting multiple conditions, adding this flag will combine data from files with same name - default (if not set) : OFF', required=False)
+parser.add_argument('-combineData', action='store_true', default = False, help='if ploting multiple data lines, adding this flag will combine data into one plot - default (if not set) : OFF', required=False)
 
 parser.add_argument('-verbose', action='store_true', default = False, help='adding this flag will provide more text output while running (useful if you are working with a lot of data to make sure that you are not hanging) - default (if not set) : OFF', required=False)
 
 parser.add_argument('-legendLocation', type=str, choices=('ur','ul','lr','ll','cr','cl','lc','uc','c'), default = 'lr', help='if ledgends are needed this is determins placement (first letter u = upper, c = center, l = lower. second letter l = left, c = center, r = right) - default : lr (lower right)', required=False)
-# trick to allow "-" in an argument name! Parse it seperatly and then remove from sys.argv
-tempPltStyle = '-'
-if ('-pltStyle' in sys.argv):
-	pltStyleIndex = sys.argv.index('-pltStyle')
-	tempPltStyle = sys.argv[pltStyleIndex+1]
-	sys.argv.remove(sys.argv[pltStyleIndex+1])
-	sys.argv.remove('-pltStyle')
-# end of trick	
+
+## trick to allow "-" in an argument name! Parse it seperatly and then remove from sys.argv
+#tempPltStyle = '-'
+#if ('-pltStyle' in sys.argv):
+#	pltStyleIndex = sys.argv.index('-pltStyle')
+#	tempPltStyle = sys.argv[pltStyleIndex+1]
+#	sys.argv.remove(sys.argv[pltStyleIndex+1])
+#	sys.argv.remove('-pltStyle')
+## end of trick	
 
 args = parser.parse_args()
-args.pltStyle = tempPltStyle
+#args.pltStyle = tempPltStyle
 
 plt.rcParams['figure.figsize'] = (10,8)
 
@@ -160,9 +177,8 @@ if namesList == ['']:
 	namesList.remove("con")
 	if args.xAxis in namesList:
 		namesList.remove(args.xAxis)
-#if args.primaryDataAxis == 'undefined':
-#	args.primaryDataAxis = args.xAxis
-args.primaryDataAxis = args.xAxis
+if args.dataIndex == 'undefined':
+	args.dataIndex = args.xAxis
 
 allGraphs = {}
 
@@ -170,14 +186,14 @@ if args.combineConditions:
 	for file in files:
 		if args.verbose:
 			print ("generating plot for: " + file)
-		allGraphs[file] = MultiPlot(data = godFrames[file], PltWhat = args.pltWhat, ConditionsList = cons, PltStyle = args.pltStyle, Reps = reps, NamesList = namesList, XCoordinateName = args.xAxis, PrimaryDataAxis = args.primaryDataAxis, Columns = args.numCol, title = file,legendLocation = args.legendLocation)#plt.gcf()
+		allGraphs[file] = MultiPlot(data = godFrames[file], PltWhat = args.pltWhat, ConditionsList = cons, CombineData = args.combineData, PltStyle = args.pltStyle, Reps = reps, NamesList = namesList, XCoordinateName = args.xAxis, dataIndex = args.dataIndex, Columns = args.numCol, title = file,legendLocation = args.legendLocation)#plt.gcf()
 
 else:
 	for con in cons:
 		for file in files:
 			if args.verbose:
 				print ("generating plot for: " + con + file)
-			allGraphs[con+file] = MultiPlot(data = godFrames[file], PltWhat = args.pltWhat, ConditionsList = [con], PltStyle = args.pltStyle, Reps = reps, NamesList = namesList, XCoordinateName = args.xAxis, PrimaryDataAxis = args.primaryDataAxis, Columns = args.numCol, title = con+file)#plt.gcf()
+			allGraphs[con+file] = MultiPlot(data = godFrames[file], PltWhat = args.pltWhat, ConditionsList = [con], CombineData = args.combineData, PltStyle = args.pltStyle, Reps = reps, NamesList = namesList, XCoordinateName = args.xAxis, dataIndex = args.dataIndex, Columns = args.numCol, title = con+file)#plt.gcf()
 
 if args.save == '':
  plt.show()
@@ -211,4 +227,3 @@ if args.save == 'pdf':
   #pp = PdfPages(customTitle + 'MABE_CustomGraph.pdf')
   #pp.savefig(customGraph)
   #pp.close()
-
