@@ -135,6 +135,9 @@ parser.add_argument('-fontSizeMajor', type=int, default = 15, help='size of "Maj
 parser.add_argument('-fontSizeMinor', type=int, default = 10, help='size of "Minor" fonts (subplot titles and lables) - default : 10', required=False)
 parser.add_argument('-fontSizeTicks', type=int, default = 8, help='size of font for axis ticks - default : 8', required=False)
 
+parser.add_argument('-whereValue', type=str, default = 'update', help='only plot data where this column has values defined by whereRange - default : update', required=False)
+parser.add_argument('-whereRange', type=int, default = [], help='only plot data where column with name set by whereValue has values defined this range. Single value, just this value. Two values, inclusive range. Three values, inclusive range with step. - default : none', nargs='+', required=False)
+
 ## trick to allow "-" in an argument name! Parse it seperatly and then remove from sys.argv
 #tempPltStyle = '-'
 #if ('-pltStyle' in sys.argv):
@@ -178,7 +181,7 @@ else:
   exit()
 if conFileNames != ['']:
  conFileNames = [i+'/' for i in conFileNames]
- cons = [i+'__' for i in cons]
+ #cons = [i+'__' for i in cons]
 
 realLedgendList = ['upper right','upper left','lower right','lower left','center right','center left','lower center','upper center','center']
 abrvLedgendList = ['ur','ul','lr','ll','cr','cl','lc','uc','c']
@@ -216,7 +219,15 @@ if args.dataIndex == 'undefined':
 
 for name in godFrames:
 	godFrames[name].reindex()
-	
+	if len(args.whereRange)==1:
+		godFrames[name]=godFrames[name][godFrames[name][args.whereValue]==args.whereRange[0]]
+	if len(args.whereRange)==2:
+		godFrames[name]=godFrames[name][godFrames[name][args.whereValue] >= args.whereRange[0]]
+		godFrames[name]=godFrames[name][godFrames[name][args.whereValue] <= args.whereRange[1]]
+	if len(args.whereRange)==3:
+		cropRange = list(range(args.whereRange[0],args.whereRange[1]+1,args.whereRange[2]))
+		godFrames[name]=godFrames[name][godFrames[name][args.whereValue].isin(cropRange)]
+
 allGraphs = {}
 
 if args.combineConditions:
@@ -229,8 +240,8 @@ else:
 	for con in cons:
 		for file in files:
 			if args.verbose:
-				print ("generating plot for: " + con + file)
-			allGraphs[con+file] = MultiPlot(data = godFrames[file], PltWhat = args.pltWhat, ConditionsList = [con], CombineData = args.combineData, PltStyle = args.pltStyle, ErrorMethod = 'stderr', ErrorStyle = args.errorStyle, Reps = reps, NamesList = namesList, XCoordinateName = args.xAxis, dataIndex = args.dataIndex, Columns = args.numCol, title = con+file)#plt.gcf()
+				print ("generating plot for: " + con + "__" + file)
+			allGraphs[con+'__'+file] = MultiPlot(data = godFrames[file], PltWhat = args.pltWhat, ConditionsList = [con], CombineData = args.combineData, PltStyle = args.pltStyle, ErrorMethod = 'stderr', ErrorStyle = args.errorStyle, Reps = reps, NamesList = namesList, XCoordinateName = args.xAxis, dataIndex = args.dataIndex, Columns = args.numCol, title = con + "__" + file)#plt.gcf()
 
 if args.save == '':
  plt.show()
