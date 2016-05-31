@@ -15,8 +15,12 @@ import ast
 
 import argparse
 
-def MultiPlot(data, NamesList, ConditionsList, dataIndex, CombineData = False, PltWhat = ['ave','error'], PltStyle = 'line', ErrStyle = 'stderr', ErrDraw = 'lines', Reps = [''], XCoordinateName = '', Columns = 3, title = '', legendLocation = "lower right"):
-	styleListColor = [(0,0,1),(0,1,0),(1,0,0),(.5,.5,0),(0,.5,.5),(.5,0,.5),(0,0,0),(1,0,0),(0,1,0),(0,0,1),(.5,.5,0),(0,.5,.5),(.5,0,.5),(0,0,0),(1,0,0),(0,1,0),(0,0,1),(.5,.5,0),(0,.5,.5),(.5,0,.5),(0,0,0)]
+def MultiPlot(data, NamesList, ConditionsList, dataIndex, CombineData = False, PltWhat = ['ave','error'], PltStyle = 'line', ErrorMethod = 'stderr', ErrorStyle = 'region', Reps = [''], XCoordinateName = '', Columns = 3, title = '', legendLocation = "lower right"):
+	MajorFontSize = args.fontSizeMajor
+	MinorFontSize = args.fontSizeMinor
+	TickFontSize = args.fontSizeTicks
+
+	styleListColor = [(0,0,1),(0,1,0),(1,0,0),(.25,.75,0),(0,.25,.75),(.75,0,.25),(0,0,0),(1,0,0),(0,1,0),(0,0,1),(.25,.75,0),(0,.25,.75),(.75,0,.25),(0,0,0),(1,0,0),(0,1,0),(0,0,1),(.5,.5,0),(0,.5,.5),(.5,0,.5),(0,0,0)]
 	styleListPoint = ['o','*','s','D','^','.','o','*','s','D','^','.','o','*','s','D','^','.','o','*','s','D','^','.','o','*','s','D','^','.']
 	styleListLine = ['-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-',]
 	styleListRandomLine = ['-^','-o','-*','-s','-D','-^','-.','-o','-*','-s','-D','-^','-.','-o','-*','-s','-D','-^','-.','-o','-*','-s','-D','-^','-.']
@@ -43,37 +47,60 @@ def MultiPlot(data, NamesList, ConditionsList, dataIndex, CombineData = False, P
 		NamesList.remove(XCoordinateName)
 	
 	title += '    x axis = ' + XCoordinateName
-	plt.suptitle(title, fontsize=20, fontweight='bold')
+	plt.suptitle(title, fontsize=MajorFontSize, fontweight='bold')
 
 	Rows = math.ceil(float(len(NamesList))/float(Columns))      # calcualate how many rows we need
 	for conditionCount in range(len(ConditionsList)):
 		for nameCount in range(len(NamesList)):
+			plt.tick_params(labelsize=TickFontSize)
 			if not CombineData:
 				ax = plt.subplot(Rows,Columns,nameCount+1)
-				plt.title(NamesList[nameCount], fontsize=8) 	              # set the title for this plot
+				plt.title(NamesList[nameCount], fontsize=MinorFontSize) 	              # set the title for this plot
 				ax.title.set_position([.5, 1])
+				if (len(ConditionsList) > 1):
+					PltStyle = styleList[conditionCount]
+					PltColor = styleListColor[conditionCount]
+				ThisLabel = ConditionsList[conditionCount]
 			elif len(ConditionsList) > 1 or len(NamesList) > 1:
 				PltStyle = styleList[conditionCount + (nameCount * len(ConditionsList))]
 				PltColor = styleListColor[conditionCount + (nameCount * len(ConditionsList))]
-			plt.grid(b=True, which='major', color=(0,0,0), linestyle='--', alpha = .25)
+				if (len(ConditionsList) == 1):
+					ThisLabel = NamesList[nameCount]
+				else:
+					ThisLabel = ConditionsList[conditionCount] + ' ' + NamesList[nameCount]
+			if args.grid:
+				plt.grid(b=True, which='major', color=(0,0,0), linestyle='-', alpha = .25)
 			if 'reps' in PltWhat:
 				for Rep in Reps:
 					plt.plot(data[data["repName"] == Rep][data["con"] == ConditionsList[conditionCount]][XCoordinateName],
 						data[data["repName"] == Rep][data["con"] == ConditionsList[conditionCount]][NamesList[nameCount]],
 						PltStyle, alpha = .25, color = PltColor)
-			if 'ave' in PltWhat:
+			if ('ave' in PltWhat) or ('error' in PltWhat):
 				aveLine = data[data["con"] == ConditionsList[conditionCount]].pivot(index = dataIndex, columns ='repName', values = NamesList[nameCount]).mean(axis=1)
 				aveXCoordinate = data[data["con"] == ConditionsList[conditionCount]].pivot(index = dataIndex, columns ='repName', values = XCoordinateName).mean(axis=1)
-				plt.plot(aveXCoordinate, aveLine, PltStyle, color = PltColor, linewidth = 1, label = ConditionsList[conditionCount]+' '+NamesList[nameCount])
+				plt.plot(aveXCoordinate, aveLine, PltStyle, color = PltColor, linewidth = args.lineWeight, label = ThisLabel)
 			if 'error' in PltWhat:
-				stdLine = data[data["con"] == ConditionsList[conditionCount]].pivot(index = dataIndex, columns='repName', values = NamesList[nameCount]).std(axis=1)
-				plt.fill_between(data[data["repName"] == Reps[0]][data["con"] == ConditionsList[conditionCount]][XCoordinateName], aveLine - stdLine,aveLine + stdLine, color = PltColor, alpha = .15)
+				if (ErrorMethod == "stderr"):
+					errorLine = data[data["con"] == ConditionsList[conditionCount]].pivot(index = dataIndex, columns='repName', values = NamesList[nameCount]).std(axis=1)
+				else:
+					print ('ERROR: errorMethod "' + ErrorMethod + '" not found.')
+					exit()
+				if (ErrorStyle == 'bar'):
+					plt.errorbar(aveXCoordinate, aveLine,yerr = errorLine,color = PltColor, alpha = .5,fmt='.')
+				if (ErrorStyle == 'region'):
+					plt.fill_between(aveXCoordinate, aveLine - errorLine,aveLine + errorLine, color = PltColor, alpha = .15)
 			if ((len(ConditionsList) > 1) or (CombineData))and legendLocation != '':
-				plt.legend(loc=legendLocation, shadow=True)                    # add a legend
+				plt.xlabel(XCoordinateName, fontsize=MinorFontSize)
+				leg = plt.legend(loc=legendLocation, shadow=True)                    # add a legend
+				if (args.legendLinesWeight > 0):
+					for legobj in leg.legendHandles:
+						legobj.set_linewidth(args.legendLinesWeight)
 	return plt.gcf()                                            # gcf = get current figure - return that.		
 
 
 parser = argparse.ArgumentParser()
+
+
 parser.add_argument('-path', type=str, metavar='PATH', default = '',  help='path to files - default : none (will read files in current directory)', required=False)
 parser.add_argument('-conditions', type=str, metavar=('CONDITION'), default = [''],  help='names of condition directories - default: none (will use files in path directly)',nargs='+', required=False)
 parser.add_argument('-conditionNames', type=str, metavar=('CONDITION_NAME'), default = [''],  help='names to dispaly. must have same number of elements as conditions if defined - default: none (will use conditionNames)', nargs='+',required=False)
@@ -84,12 +111,14 @@ parser.add_argument('-repList', type=str, metavar='REP', default = [],  help='re
 parser.add_argument('-save', type=str, choices=('pdf','png'), default = '',  help='save files rather then display as either pdf or png - default: none (display image)', required=False)
 
 parser.add_argument('-data', type=str, metavar='COLUMN_NAME', default = [''],  help='column names of data to be graphed - default : none (will attempt to graph all columns from all files)',nargs='+', required=False)
-parser.add_argument('-dataFromFile', type=str, metavar='FILE_NAME', default = '',  help='this file will be used to determine with column names of data will be graphed - default : none (will attempt to graph all columns from all files)', required=False)
+parser.add_argument('-dataFromFile', type=str, metavar='FILE_NAME', default = 'ave',  help='this file will be used to determine with column names of data will be graphed. If this file is not in files, then all data will be plotted - default : ave', required=False)
 parser.add_argument('-xAxis', type=str, metavar='COLUMN_NAME', default = 'update',  help='column name of data to be used on x axis - default : update', required=False)
-parser.add_argument('-dataIndex', type=str, metavar='COLUMN_NAME', default = 'undefined',  help='column name of data to be used as index when generating averages - default : value of -xAxis', required=False)
+parser.add_argument('-dataIndex', type=str, metavar='COLUMN_NAME', default = 'update',  help='column name of data to be used as index when generating averages - default : update', required=False)
 
-parser.add_argument('-pltWhat', type=str, choices=('ave','error','reps'), default = ['ave','error'], help='what should be ploted. ave (averages), error, reps (show data for all reps) - default : ave error', nargs='+', required=False)
+parser.add_argument('-pltWhat', type=str, metavar='{ave,error,reps}',choices=('ave','error','reps'), default = ['ave','error'], help='what should be ploted. ave (averages), error, reps (show data for all reps) - default : ave error', nargs='+', required=False)
 parser.add_argument('-pltStyle', type=str, choices=('line','point','randomLine','randomPoint'), default = 'line', help='plot style. Random is useful if plotting multiple data on the same plot - default : line', required=False)
+parser.add_argument('-errorStyle', type=str, choices=('region','bar'), default = 'region', help='how error is ploted - default : region', required=False)
+#parser.add_argument('-errorMethod', type=str, choices=('stderr'), default = ['stderr'], help='what error is ploted - default : region', required=False)
 
 parser.add_argument('-numCol', type=str, metavar='#', default = '3', help='if ploting a multi plot (default), how many columns in plot - default : 3', required=False)
 parser.add_argument('-combineConditions', action='store_true', default = False, help='if ploting multiple conditions, adding this flag will combine data from files with same name - default (if not set) : OFF', required=False)
@@ -98,6 +127,13 @@ parser.add_argument('-combineData', action='store_true', default = False, help='
 parser.add_argument('-verbose', action='store_true', default = False, help='adding this flag will provide more text output while running (useful if you are working with a lot of data to make sure that you are not hanging) - default (if not set) : OFF', required=False)
 
 parser.add_argument('-legendLocation', type=str, choices=('ur','ul','lr','ll','cr','cl','lc','uc','c'), default = 'lr', help='if ledgends are needed this is determins placement (first letter u = upper, c = center, l = lower. second letter l = left, c = center, r = right) - default : lr (lower right)', required=False)
+parser.add_argument('-legendLinesWeight', type=int, default = -1, help='changes line thickness in legend - default : lineWeight', required=False)
+parser.add_argument('-lineWeight', type=int, default = 1, help='changes line thickness of lines in plots - default : 1', required=False)
+
+parser.add_argument('-grid', action='store_true', default = False, help='if set, this flag cause a grid to be displayed on plots - default : OFF', required=False)
+parser.add_argument('-fontSizeMajor', type=int, default = 15, help='size of "Major" fonts (main title) - default : 15', required=False)
+parser.add_argument('-fontSizeMinor', type=int, default = 10, help='size of "Minor" fonts (subplot titles and lables) - default : 10', required=False)
+parser.add_argument('-fontSizeTicks', type=int, default = 8, help='size of font for axis ticks - default : 8', required=False)
 
 ## trick to allow "-" in an argument name! Parse it seperatly and then remove from sys.argv
 #tempPltStyle = '-'
@@ -163,12 +199,10 @@ for con in cons:
 			tempFrame["repName"]=rep
 			tempFrame["con"]=con
 			godFrames[file] = godFrames[file].append(tempFrame, ignore_index=True)
-		if args.dataFromFile == file:
+		if args.dataFromFile == file and args.data == ['']:
 			namesList = list(tempFrame.columns.values)
 			namesList.remove("repName")
 			namesList.remove("con")
-
-
 	conCount = conCount + 1
 
 if namesList == ['']:
@@ -180,20 +214,23 @@ if namesList == ['']:
 if args.dataIndex == 'undefined':
 	args.dataIndex = args.xAxis
 
+for name in godFrames:
+	godFrames[name].reindex()
+	
 allGraphs = {}
 
 if args.combineConditions:
 	for file in files:
 		if args.verbose:
 			print ("generating plot for: " + file)
-		allGraphs[file] = MultiPlot(data = godFrames[file], PltWhat = args.pltWhat, ConditionsList = cons, CombineData = args.combineData, PltStyle = args.pltStyle, Reps = reps, NamesList = namesList, XCoordinateName = args.xAxis, dataIndex = args.dataIndex, Columns = args.numCol, title = file,legendLocation = args.legendLocation)#plt.gcf()
+		allGraphs[file] = MultiPlot(data = godFrames[file], PltWhat = args.pltWhat, ConditionsList = cons, CombineData = args.combineData, PltStyle = args.pltStyle, ErrorMethod = 'stderr', ErrorStyle = args.errorStyle, Reps = reps, NamesList = namesList, XCoordinateName = args.xAxis, dataIndex = args.dataIndex, Columns = args.numCol, title = file,legendLocation = args.legendLocation)#plt.gcf()
 
 else:
 	for con in cons:
 		for file in files:
 			if args.verbose:
 				print ("generating plot for: " + con + file)
-			allGraphs[con+file] = MultiPlot(data = godFrames[file], PltWhat = args.pltWhat, ConditionsList = [con], CombineData = args.combineData, PltStyle = args.pltStyle, Reps = reps, NamesList = namesList, XCoordinateName = args.xAxis, dataIndex = args.dataIndex, Columns = args.numCol, title = con+file)#plt.gcf()
+			allGraphs[con+file] = MultiPlot(data = godFrames[file], PltWhat = args.pltWhat, ConditionsList = [con], CombineData = args.combineData, PltStyle = args.pltStyle, ErrorMethod = 'stderr', ErrorStyle = args.errorStyle, Reps = reps, NamesList = namesList, XCoordinateName = args.xAxis, dataIndex = args.dataIndex, Columns = args.numCol, title = con+file)#plt.gcf()
 
 if args.save == '':
  plt.show()
