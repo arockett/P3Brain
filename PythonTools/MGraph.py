@@ -81,14 +81,19 @@ def MultiPlot(data, NamesList, ConditionsList, dataIndex, CombineData = False, P
 				plt.plot(aveXCoordinate, aveLine, PltStyle, color = PltColor, linewidth = args.lineWeight, label = ThisLabel)
 			if 'error' in PltWhat:
 				if (ErrorMethod == "stderr"):
-					errorLine = data[data["con"] == ConditionsList[conditionCount]].pivot(index = dataIndex, columns='repName', values = NamesList[nameCount]).std(axis=1)
+					errorLineY = data[data["con"] == ConditionsList[conditionCount]].pivot(index = dataIndex, columns='repName', values = NamesList[nameCount]).std(axis=1)
+					errorLineX = data[data["con"] == ConditionsList[conditionCount]].pivot(index = dataIndex, columns='repName', values = XCoordinateName).std(axis=1)
 				else:
 					print ('ERROR: errorMethod "' + ErrorMethod + '" not found.')
 					exit()
 				if (ErrorStyle == 'bar'):
-					plt.errorbar(aveXCoordinate, aveLine,yerr = errorLine,color = PltColor, alpha = .5,fmt='.')
+					plt.errorbar(aveXCoordinate, aveLine,yerr = errorLineY,color = PltColor, alpha = .5,fmt='.')
+				if (ErrorStyle == 'barX'):
+					plt.errorbar(aveXCoordinate, aveLine,xerr = errorLineX,color = PltColor, alpha = .5,fmt='.')
+				if (ErrorStyle == 'barXY'):
+					plt.errorbar(aveXCoordinate, aveLine,xerr = errorLineX,yerr = errorLineY,color = PltColor, alpha = .5,fmt='.')
 				if (ErrorStyle == 'region'):
-					plt.fill_between(aveXCoordinate, aveLine - errorLine,aveLine + errorLine, color = PltColor, alpha = .15)
+					plt.fill_between(aveXCoordinate, aveLine - errorLineY,aveLine + errorLineY, color = PltColor, alpha = .15)
 			if ((len(ConditionsList) > 1) or (CombineData))and legendLocation != '':
 				plt.xlabel(XCoordinateName, fontsize=MinorFontSize)
 				leg = plt.legend(loc=legendLocation, shadow=True)                    # add a legend
@@ -117,7 +122,7 @@ parser.add_argument('-dataIndex', type=str, metavar='COLUMN_NAME', default = 'up
 
 parser.add_argument('-pltWhat', type=str, metavar='{ave,error,reps}',choices=('ave','error','reps'), default = ['ave','error'], help='what should be ploted. ave (averages), error, reps (show data for all reps) - default : ave error', nargs='+', required=False)
 parser.add_argument('-pltStyle', type=str, choices=('line','point','randomLine','randomPoint'), default = 'line', help='plot style. Random is useful if plotting multiple data on the same plot - default : line', required=False)
-parser.add_argument('-errorStyle', type=str, choices=('region','bar'), default = 'region', help='how error is ploted - default : region', required=False)
+parser.add_argument('-errorStyle', type=str, choices=('region','bar','barX','barXY'), default = 'region', help='how error is ploted - default : region', required=False)
 #parser.add_argument('-errorMethod', type=str, choices=('stderr'), default = ['stderr'], help='what error is ploted - default : region', required=False)
 
 parser.add_argument('-numCol', type=str, metavar='#', default = '3', help='if ploting a multi plot (default), how many columns in plot - default : 3', required=False)

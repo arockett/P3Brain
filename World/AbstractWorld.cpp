@@ -13,7 +13,7 @@
 #include "../Utilities/Data.h"
 
 shared_ptr<ParameterLink<int>> AbstractWorld::repeatsPL = Parameters::register_parameter("WORLD-repeats", 3, "Number of times to test each Genome per generation");
-shared_ptr<ParameterLink<bool>> AbstractWorld::showOnUpdatePL = Parameters::register_parameter("WORLD-showOnUpdate", false, "display world while running world updates (if world allows)");
+shared_ptr<ParameterLink<bool>> AbstractWorld::debugPL = Parameters::register_parameter("WORLD-debug", false, "run world in debug mode (if available)");
 
 shared_ptr<ParameterLink<bool>> AbstractWorld::groupEvaluationPL = Parameters::register_parameter("WORLD-groupEvaluation", false, "if true, evaluate population concurrently");
 

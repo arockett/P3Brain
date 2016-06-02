@@ -18,7 +18,7 @@
 
 using namespace std;
 
-class BerryWorld: public AbstractWorld {
+class BerryWorld : public AbstractWorld {
 private:
 	int outputNodesCount, inputNodesCount;
 public:
