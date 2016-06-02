@@ -39,6 +39,7 @@
 #include "Utilities/Utilities.h"
 
 #include "World/BerryWorld/BerryWorld.h"
+#include "World/IPDWorld/IPDWorld.h"
 #include "World/TestWorld/TestWorld.h"
 #include "World/NumeralClassifierWorld/NumeralClassifierWorld.h"
 
@@ -66,10 +67,10 @@ int main(int argc, const char * argv[]) {
 		cout << "Using Random Seed: " << Global::randomSeedPL->lookup() << endl;
 	}
 
+
 	auto world = make_shared<BerryWorld>();
-
+	//auto world = make_shared<IPDWorld>();
 	//auto world = make_shared<NumeralClassifierWorld>();
-
 	//auto world = make_shared<TestWorld>();
 
 	vector<string> groupNameSpaces;
@@ -209,7 +210,7 @@ int main(int argc, const char * argv[]) {
 		bool finished = false;  // when the archivist says we are done, we can stop!
 
 		while (!finished) {
-			world->evaluate(groups[defaultGroup], AbstractWorld::groupEvaluationPL->lookup(), false, AbstractWorld::showOnUpdatePL->lookup());  // evaluate each organism in the population using a World
+			world->evaluate(groups[defaultGroup], AbstractWorld::groupEvaluationPL->lookup(), false, false, AbstractWorld::debugPL->lookup());  // evaluate each organism in the population using a World
 			//cout << "  evaluation done\n";
 			finished = groups[defaultGroup]->archive();  // save data, update memory and delete any unneeded data;
 			//cout << "  archive done\n";
@@ -247,9 +248,9 @@ int main(int argc, const char * argv[]) {
 
 //////////////////////////////////////////////
 // rebuild testGroup with one particular org.
-//		testPopulation.clear();
-//		auto newOrg = make_shared<Organism>(groups[defaultGroup]->population[0], mg[2]);
-//		testPopulation.push_back(newOrg);
+		testPopulation.clear();
+		auto newOrg = make_shared<Organism>(groups[defaultGroup]->population[0], mg[0]);
+		testPopulation.push_back(newOrg);
 //////////////////////////////////////////////
 
 		shared_ptr<Group> testGroup = make_shared<Group>(testPopulation, groups[defaultGroup]->optimizer, groups[defaultGroup]->archivist);

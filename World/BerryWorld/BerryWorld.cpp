@@ -282,9 +282,6 @@ void BerryWorld::runWorld(shared_ptr<Group> group, bool analyse, bool visualize,
 			leftFront = getGridValue(grid, moveOnGrid(currentLocation[orgIndex], turnLeft(facing[orgIndex])));
 			rightFront = getGridValue(grid, moveOnGrid(currentLocation[orgIndex], turnRight(facing[orgIndex])));
 
-			otherFront = getGridValue(orgPositionsGrid, moveOnGrid(currentLocation[orgIndex], facing[orgIndex]));
-			otherLeftFront = getGridValue(orgPositionsGrid, moveOnGrid(currentLocation[orgIndex], turnLeft(facing[orgIndex])));
-			otherRightFront = getGridValue(orgPositionsGrid, moveOnGrid(currentLocation[orgIndex], turnRight(facing[orgIndex])));
 
 			nodesAssignmentCounter = 0;  // get ready to start assigning inputs
 			if (senseWalls) {
@@ -327,6 +324,10 @@ void BerryWorld::runWorld(shared_ptr<Group> group, bool analyse, bool visualize,
 			}
 
 			if (senseOther) {
+				otherFront = getGridValue(orgPositionsGrid, moveOnGrid(currentLocation[orgIndex], facing[orgIndex]));
+				otherLeftFront = getGridValue(orgPositionsGrid, moveOnGrid(currentLocation[orgIndex], turnLeft(facing[orgIndex])));
+				otherRightFront = getGridValue(orgPositionsGrid, moveOnGrid(currentLocation[orgIndex], turnRight(facing[orgIndex])));
+
 				if (senseFront) {
 					group->population[orgIndex]->brain->setInput(nodesAssignmentCounter++, otherFront);
 				}
@@ -336,21 +337,20 @@ void BerryWorld::runWorld(shared_ptr<Group> group, bool analyse, bool visualize,
 
 				}
 			}
-
-//			if (show) {
-//				cout << "\n----------------------------\n";
-//				cout << "\ngeneration update: " << Global::update << "  world update: " << t << "\n";
-//				cout << "currentLocation: " << currentLocation[orgIndex].first << "," << currentLocation[orgIndex].second << "  :  " << facing << "\n";
-//				cout << "inNodes: ";
-//				for (int i = 0; i < inputNodesCount; i++) {
-//					cout << group->population[orgIndex]->brain->readInput(i) << " ";
-//				}
-//				cout << "\nlast outNodes: ";
-//				for (int i = 0; i < outputNodesCount; i++) {
-//					cout << group->population[orgIndex]->brain->readOutput(i) << " ";
-//				}
-//				cout << "\n\n  -- brain update --\n\n";
-//			}
+			if (debug) {
+				cout << "\n----------------------------\n";
+				cout << "\ngeneration update: " << Global::update << "  world update: " << t << "\n";
+				cout << "currentLocation: " << currentLocation[orgIndex].first << "," << currentLocation[orgIndex].second << "  :  " << facing[orgIndex] << "\n";
+				cout << "inNodes: ";
+				for (int i = 0; i < inputNodesCount; i++) {
+					cout << group->population[orgIndex]->brain->readInput(i) << " ";
+				}
+				cout << "\nlast outNodes: ";
+				for (int i = 0; i < outputNodesCount; i++) {
+					cout << group->population[orgIndex]->brain->readOutput(i) << " ";
+				}
+				cout << "\n\n  -- brain update --\n\n";
+			}
 
 			// inputNodesCount is now set to the first output Brain State Address. we will not move it until the next world update!
 			if (clearOutputs) {
@@ -420,14 +420,14 @@ void BerryWorld::runWorld(shared_ptr<Group> group, bool analyse, bool visualize,
 				}
 			}
 
-//			if (show) {
-//				cout << "outNodes: " << Bit(org->brain->readOutput(0)) << " " << Bit(org->brain->readOutput(1)) << " " << Bit(org->brain->readOutput(2)) << "\n";
-//				cout << "output1: " << output1 << "  output2: " << output2 << "\n";
-//				cout << "\n  -- world update --\n\n";
-//				printGrid(grid, currentLocation, facing);
-//				cout << "last: " << lastFood << " here: " << getGridValue(grid, currentLocation) << "\nloc: " << currentLocation.first << "," << currentLocation.second << "  facing: " << facing << "\n";
-//				cout << "score: " << score << "\nfood1: " << eaten[1] << "  food2: " << eaten[2] << "  switches: " << switches << "\n";
-//			}
+			if (debug) {
+				cout << "outNodes: " << Bit(group->population[orgIndex]->brain->readOutput(0)) << " " << Bit(group->population[orgIndex]->brain->readOutput(1)) << " " << Bit(group->population[orgIndex]->brain->readOutput(2)) << "\n";
+				cout << "output1: " << output1 << "  output2: " << output2 << "\n";
+				cout << "\n  -- world update --\n\n";
+				printGrid(grid, currentLocation[orgIndex], facing[orgIndex]);
+				cout << "last: " << lastFood[orgIndex] << " here: " << getGridValue(grid, currentLocation[orgIndex]) << "\nloc: " << currentLocation[orgIndex].first << "," << currentLocation[orgIndex].second << "  facing: " << facing[orgIndex] << "\n";
+				cout << "score: " << scores[orgIndex] << "\nfood1: " << eaten[orgIndex][1] << "  food2: " << eaten[orgIndex][2] << "  switches: " << switches[orgIndex] << "\n";
+			}
 		}  // end world evaluation loop
 		if (visualize) {
 			BerryWorld::SaveWorldState("worldUpdatesFile.txt", grid, currentLocation, facing);

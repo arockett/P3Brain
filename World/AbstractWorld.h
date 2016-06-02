@@ -22,7 +22,7 @@ using namespace std;
 class AbstractWorld {
 public:
 	static shared_ptr<ParameterLink<int>> repeatsPL;
-	static shared_ptr<ParameterLink<bool>> showOnUpdatePL;
+	static shared_ptr<ParameterLink<bool>> debugPL;
 
 	static shared_ptr<ParameterLink<bool>> groupEvaluationPL;
 

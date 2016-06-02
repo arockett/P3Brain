@@ -53,7 +53,7 @@ void HumanBrain::resetBrain() {
 
 void HumanBrain::update() {
 	cout << "Inputs: ";
-	for (int i = 0; i < nrOutNodes; i++) {
+	for (int i = 0; i < nrInNodes; i++) {
 		cout << nodes[inputNodesList[i]] << " ";
 	}
 	cout << "\nLast Outputs: ";

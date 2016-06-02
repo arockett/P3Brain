@@ -91,7 +91,8 @@ bool LODwAPArchivist::archive(vector<shared_ptr<Organism>> population, int flush
 		if (writeDataFile) {
 			while ((effective_MRCA->timeOfBirth >= nextDataWrite) && (nextDataWrite <= Global::updatesPL->lookup())) {  // if there is convergence before the next data interval
 				shared_ptr<Organism> current = LOD[nextDataWrite - lastPrune];
-				cout << nextDataWrite << " ::: " << lastPrune << endl;
+
+				//cout << nextDataWrite << " ::: " << lastPrune << endl;
 				current->dataMap.Set("update", nextDataWrite);
 				if (dataFileConvertAllLists) {
 					DataMap TempMap;
