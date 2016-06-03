@@ -8,8 +8,17 @@
 
 #include "MarkovBrain.h"
 
+shared_ptr<ParameterLink<bool>> MarkovBrain::randomizeUnconnectedOutputsPL = Parameters::register_parameter("BRAIN_MARKOV_ADVANCED-randomizeUnconnectedOutputs", false, "output nodes with no connections will be set randomly (default : false, behavior set to 0)");
+shared_ptr<ParameterLink<int>> MarkovBrain::randomizeUnconnectedOutputsTypePL = Parameters::register_parameter("BRAIN_MARKOV_ADVANCED-randomizeUnconnectedOutputsType", 0, "random values resulting from randomizeUnconnectedOutput will be of type [0 = int, 1 = double]");
+shared_ptr<ParameterLink<double>> MarkovBrain::randomizeUnconnectedOutputsMaxPL = Parameters::register_parameter("BRAIN_MARKOV_ADVANCED-randomizeUnconnectedOutputsMax", 1.0, "random values resulting from randomizeUnconnectedOutput will be in the range of 0 to randomizeUnconnectedOutputsMax");
+
 MarkovBrain::MarkovBrain(vector<shared_ptr<AbstractGate>> _gates, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT) :
-		AbstractBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes,_PT) {
+		AbstractBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes, _PT) {
+
+	randomizeUnconnectedOutputs = (PT == nullptr) ? randomizeUnconnectedOutputsPL->lookup() : PT->lookupBool("BRAIN_MARKOV_ADVANCED-randomizeUnconnectedOutputs");
+	randomizeUnconnectedOutputsType = (PT == nullptr) ? randomizeUnconnectedOutputsTypePL->lookup() : PT->lookupInt("BRAIN_MARKOV_ADVANCED-randomizeUnconnectedOutputsType");
+	randomizeUnconnectedOutputsMax = (PT == nullptr) ? randomizeUnconnectedOutputsMaxPL->lookup() : PT->lookupDouble("BRAIN_MARKOV_ADVANCED-randomizeUnconnectedOutputsMax");
+
 	GLB = nullptr;
 	gates = _gates;
 	// columns to be added to ave file
@@ -19,12 +28,20 @@ MarkovBrain::MarkovBrain(vector<shared_ptr<AbstractGate>> _gates, int _nrInNodes
 	for (auto name : GLB->getInUseGateNames()) {
 		aveFileColumns.push_back(name + "Gates");
 	}
+	nodesConnections.resize(nrOfBrainNodes, 0);
+	nextNodesConnections.resize(nrOfBrainNodes, 0);
+	fillInConnectionsLists();
 }
 
 MarkovBrain::MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT) :
-		AbstractBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes,_PT) {
+		AbstractBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes, _PT) {
 	GLB = _GLB;
 	//make a node map to handle genome value to brain state address look up.
+
+	randomizeUnconnectedOutputs = (PT == nullptr) ? randomizeUnconnectedOutputsPL->lookup() : PT->lookupBool("BRAIN_MARKOV_ADVANCED-randomizeUnconnectedOutputs");
+	randomizeUnconnectedOutputsType = (PT == nullptr) ? randomizeUnconnectedOutputsTypePL->lookup() : PT->lookupInt("BRAIN_MARKOV_ADVANCED-randomizeUnconnectedOutputsType");
+	randomizeUnconnectedOutputsMax = (PT == nullptr) ? randomizeUnconnectedOutputsMaxPL->lookup() : PT->lookupDouble("BRAIN_MARKOV_ADVANCED-randomizeUnconnectedOutputsMax");
+
 	makeNodeMap(nodeMap, Global::bitsPerBrainAddressPL->lookup(), nrOfBrainNodes);
 
 	// columns to be added to ave file
@@ -33,6 +50,8 @@ MarkovBrain::MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, int _nrInNode
 	for (auto name : GLB->getInUseGateNames()) {
 		aveFileColumns.push_back(name + "Gates");
 	}
+	nodesConnections.resize(nrOfBrainNodes, 0);
+	nextNodesConnections.resize(nrOfBrainNodes, 0);
 }
 
 MarkovBrain::MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT) :
@@ -40,10 +59,11 @@ MarkovBrain::MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, shared_ptr<Ab
 	//cout << "in MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrOfBrainStates)\n\tabout to - gates = GLB->buildGateList(genome, nrOfBrainStates);" << endl;
 	gates = GLB->buildGateList(genome, nrOfBrainNodes);
 	inOutReMap();  // map ins and outs from genome values to brain states
+	fillInConnectionsLists();
 }
 
 shared_ptr<AbstractBrain> MarkovBrain::makeBrainFromGenome(shared_ptr<AbstractGenome> _genome) {
-	shared_ptr<MarkovBrain> newBrain = make_shared<MarkovBrain>(GLB, _genome, nrInNodes, nrOutNodes, nrHiddenNodes,PT);
+	shared_ptr<MarkovBrain> newBrain = make_shared<MarkovBrain>(GLB, _genome, nrInNodes, nrOutNodes, nrHiddenNodes, PT);
 	return newBrain;
 }
 
@@ -58,6 +78,24 @@ void MarkovBrain::update() {
 	nextNodes.assign(nrOfBrainNodes, 0.0);
 	for (size_t i = 0; i < gates.size(); i++) {  //update each gate
 		gates[i]->update(nodes, nextNodes);
+	}
+	if (randomizeUnconnectedOutputs) {
+		if (randomizeUnconnectedOutputsType == 0) {
+			for (int i = 0; i < nrOutNodes; i++) {
+				if (nextNodesConnections[outputNodesList[i]] == 0) {
+					nextNodes[outputNodesList[i]] = Random::getInt(0, (int) randomizeUnconnectedOutputsMax);
+				}
+			}
+		} else if (randomizeUnconnectedOutputsType == 1) {
+			for (int i = 0; i < nrOutNodes; i++) {
+				if (nextNodesConnections[outputNodesList[i]] == 0) {
+					nextNodes[outputNodesList[i]] = Random::getDouble(0, randomizeUnconnectedOutputsMax);
+				}
+			}
+		} else {
+			cout << "  ERROR! BRAIN_MARKOV_ADVANCED::randomizeUnconnectedOutputsType is invalid. current value: " << randomizeUnconnectedOutputsType << endl;
+			exit(1);
+		}
 	}
 	swap(nodes, nextNodes);
 }
@@ -74,11 +112,21 @@ string MarkovBrain::description() {
 	return S;
 }
 
+void MarkovBrain::fillInConnectionsLists() {
+	//nodesConnections.resize(nrOfBrainNodes);
+	//nextNodesConnections.resize(nrOfBrainNodes);
+	for (auto g : gates) {
+		auto gateConnections = g->getConnectionsLists();
+		for (auto c : gateConnections.first) {
+			nodesConnections[c]++;
+		}
+		for (auto c : gateConnections.second) {
+			nextNodesConnections[c]++;
+		}
+	}
+}
 vector<string> MarkovBrain::getStats() {
 	vector<string> dataPairs;
-	vector<int> nodesConnections, nextNodesConnections;
-	nodesConnections.resize(nrOfBrainNodes);
-	nextNodesConnections.resize(nrOfBrainNodes);
 
 	dataPairs.push_back("gates");
 	dataPairs.push_back(to_string(gates.size()));
@@ -88,38 +136,36 @@ vector<string> MarkovBrain::getStats() {
 		gatecounts[n + "Gates"] = 0;
 	}
 	for (auto g : gates) {
-		auto gateConnections = g->getConnectionsLists();
-		for (auto c : gateConnections.first){
-			nodesConnections[c]++;
-		}
-		for (auto c : gateConnections.second){
-			nextNodesConnections[c]++;
-		}
+		//auto gateConnections = g->getConnectionsLists();
+		//for (auto c : gateConnections.first){
+		//	nodesConnections[c]++;
+		//}
+		//for (auto c : gateConnections.second){
+		//	nextNodesConnections[c]++;
+		//}
 		gatecounts[g->gateType() + "Gates"]++;
 	}
 
 	string nodesConnectionsString = "\"[";
 	string nextNodesConnectionsString = "\"[";
 
-	for (int i = 0; i < nrOfBrainNodes; i++){
-		nodesConnectionsString+=to_string(nodesConnections[i])+",";
-		nextNodesConnectionsString+=to_string(nextNodesConnections[i])+",";
+	for (int i = 0; i < nrOfBrainNodes; i++) {
+		nodesConnectionsString += to_string(nodesConnections[i]) + ",";
+		nextNodesConnectionsString += to_string(nextNodesConnections[i]) + ",";
 	}
 	nodesConnectionsString.pop_back();
-	nodesConnectionsString+="]\"";
+	nodesConnectionsString += "]\"";
 	dataPairs.push_back("nodesConnections");
 	dataPairs.push_back(nodesConnectionsString);
 	nextNodesConnectionsString.pop_back();
-	nextNodesConnectionsString+="]\"";
+	nextNodesConnectionsString += "]\"";
 	dataPairs.push_back("nextNodesConnections");
 	dataPairs.push_back(nextNodesConnectionsString);
-
 
 	for (auto n : GLB->getInUseGateNames()) {
 		dataPairs.push_back(n + "Gates");
 		dataPairs.push_back(to_string(gatecounts[n + "Gates"]));
 	}
-
 	return (dataPairs);
 }
 

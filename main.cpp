@@ -17,6 +17,7 @@
 #include "Archivist/SSwDArchivist.h"
 #include "Global.h"
 
+#include "Brain/ConstantValuesBrain/ConstantValuesBrain.h"
 #include "Brain/HumanBrain/HumanBrain.h"
 #include "Brain/MarkovBrain/MarkovBrain.h"
 #include "Brain/WireBrain/WireBrain.h"
@@ -68,10 +69,10 @@ int main(int argc, const char * argv[]) {
 	}
 
 
-	auto world = make_shared<BerryWorld>();
+	//auto world = make_shared<BerryWorld>();
 	//auto world = make_shared<IPDWorld>();
 	//auto world = make_shared<NumeralClassifierWorld>();
-	//auto world = make_shared<TestWorld>();
+	auto world = make_shared<TestWorld>();
 
 	vector<string> groupNameSpaces;
 	convertCSVListToVector(Global::groupNameSpacesPL->lookup(), groupNameSpaces);
@@ -132,6 +133,8 @@ int main(int argc, const char * argv[]) {
 			templateBrain = make_shared<WireBrain>(world->requiredInputs(), world->requiredOutputs(), PT->lookupInt("BRAIN-hiddenNodes"), PT);
 		} else if (PT->lookupString("BRAIN-brainType") == "Human") {
 			templateBrain = make_shared<HumanBrain>(world->requiredInputs(), world->requiredOutputs(), PT->lookupInt("BRAIN-hiddenNodes"));
+		} else if (PT->lookupString("BRAIN-brainType") == "ConstantValues") {
+			templateBrain = make_shared<ConstantValuesBrain>(world->requiredInputs(), world->requiredOutputs(), PT->lookupInt("BRAIN-hiddenNodes"));
 		} else {
 			cout << "\n\nERROR: Unrecognized brain type in configuration!\n  \"" << PT->lookupString("BRAIN-brainType") << "\" is not defined.\n\nExiting.\n" << endl;
 			exit(1);
@@ -202,7 +205,7 @@ int main(int argc, const char * argv[]) {
 
 	string defaultGroup = "default";
 	if (groups.find(defaultGroup) == groups.end()) {
-		cout << "Default group " << defaultGroup << " not found in groups.\nExiting." << endl;
+		cout << "Group " << defaultGroup << " not found in groups.\nExiting." << endl;
 		exit(1);
 	}
 

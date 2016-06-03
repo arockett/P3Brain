@@ -29,7 +29,16 @@ class MarkovBrain : public AbstractBrain {
 	vector<shared_ptr<AbstractGate>> gates;
 
  public:
+	static shared_ptr<ParameterLink<bool>> randomizeUnconnectedOutputsPL;
+	static shared_ptr<ParameterLink<int>> randomizeUnconnectedOutputsTypePL;
+	static shared_ptr<ParameterLink<double>> randomizeUnconnectedOutputsMaxPL;
+
+	bool randomizeUnconnectedOutputs;
+	bool randomizeUnconnectedOutputsType;
+	double randomizeUnconnectedOutputsMax;
+
 	shared_ptr<AbstractGateListBuilder> GLB;
+	vector<int> nodesConnections, nextNodesConnections;
 
 //	static bool& cacheResults;
 //	static int& cacheResultsCount;
@@ -64,6 +73,7 @@ class MarkovBrain : public AbstractBrain {
 	virtual shared_ptr<AbstractBrain> makeBrainFromGenome(shared_ptr<AbstractGenome> _genome) override;
 
 	virtual string description() override;
+	void fillInConnectionsLists();
 	virtual vector<string> getStats() override;
 
 	virtual void resetBrain() override;
