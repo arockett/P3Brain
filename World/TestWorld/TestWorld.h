@@ -20,6 +20,14 @@ using namespace std;
 class TestWorld : public AbstractWorld {
 
 public:
+
+	static shared_ptr<ParameterLink<int>> modePL;
+	static shared_ptr<ParameterLink<int>> numberOfOutputsPL;
+
+	int mode;
+	int numberOfOutputs;
+
+
 	TestWorld();
 	virtual ~TestWorld() = default;
 	virtual void runWorldSolo(shared_ptr<Organism> org, bool analyse, bool visualize, bool debug) override;
