@@ -65,6 +65,9 @@ class MarkovBrain : public AbstractBrain {
 	MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT = nullptr);
 	MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT = nullptr);
 	virtual ~MarkovBrain() = default;
+	static shared_ptr<AbstractBrain> brainFactory(int ins, int outs, int hidden, shared_ptr<ParametersTable> PT) {
+		return make_shared<MarkovBrain>(make_shared<ClassicGateListBuilder>(PT), ins, outs, hidden, PT);
+	}
 
 	virtual void update() override;
 

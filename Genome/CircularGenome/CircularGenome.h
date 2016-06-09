@@ -124,6 +124,27 @@ public:
 
 	virtual ~CircularGenome() = default;
 
+	static shared_ptr<AbstractGenome> genomeFactory(shared_ptr<ParametersTable> PT) {
+		shared_ptr<AbstractGenome> newGenome;
+		string sitesType = (PT == nullptr) ? AbstractGenome::genomeSitesTypePL->lookup() : PT->lookupString("GENOME-sitesType");
+		double alphabetSize = (PT == nullptr) ? AbstractGenome::alphabetSizePL->lookup() : PT->lookupDouble("GENOME-alphabetSize");
+		int sizeInitial = (PT == nullptr) ? CircularGenomeParameters::sizeInitialPL->lookup() : PT->lookupInt("GENOME_CIRCULAR-sizeInitial");
+
+		if (sitesType == "char") {
+			newGenome = make_shared<CircularGenome<unsigned char>>(alphabetSize, sizeInitial, PT);
+		} else if (sitesType == "int") {
+			newGenome = make_shared<CircularGenome<int>>(alphabetSize, sizeInitial, PT);
+		} else if (sitesType == "double") {
+			newGenome = make_shared<CircularGenome<double>>(alphabetSize, sizeInitial, PT);
+		} else if (sitesType == "bool") {
+			newGenome = make_shared<CircularGenome<bool>>(alphabetSize, sizeInitial, PT);
+		} else {
+			cout << "\n\nERROR: Unrecognized genomeSitesType in configuration!\n  \"" << PT->lookupString("GENOME-sitesType") << "\" is not defined.\n\nExiting.\n" << endl;
+			exit(1);
+		}
+		return newGenome;
+	}
+
 	virtual void setupCircularGenome(int _size, double _alphabetSize);
 
 	virtual shared_ptr<AbstractGenome> makeLike() override {

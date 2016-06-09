@@ -11,10 +11,10 @@
 shared_ptr<ParameterLink<bool>> HumanBrain::useActionMapPL = Parameters::register_parameter("BRAIN_HUMAN-useActionMap", false, "if true, an action map will be used to translate user input");
 shared_ptr<ParameterLink<string>> HumanBrain::actionMapFileNamePL = Parameters::register_parameter("BRAIN_HUMAN-actionMapFileName", (string) "actionMap.txt", "if useActionMap = true, use this file");
 
-HumanBrain::HumanBrain(int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes) :
-		AbstractBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes) {
-	if (useActionMapPL->lookup()) {  // if using an action map, load map with lines of format char output1 output2 output3... file must match brain # of outputs
-		string fileName = actionMapFileNamePL->lookup();
+HumanBrain::HumanBrain(int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT) :
+		AbstractBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes, _PT) {
+	if (PT->lookupBool("BRAIN_HUMAN-useActionMap")) {  // if using an action map, load map with lines of format char output1 output2 output3... file must match brain # of outputs
+		string fileName = PT->lookupString("BRAIN_HUMAN-actionMapFileName");
 		ifstream FILE(fileName);
 		string rawLine;
 		double readDouble;
@@ -33,7 +33,7 @@ HumanBrain::HumanBrain(int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes) :
 				actionMap[readChar] = action;
 			}
 		} else {
-			cout << "\n\nERROR: NumeralClassifierWorld constructor, unable to open file \"" << fileName << "\"\n\nExiting\n" << endl;
+			cout << "\n\nERROR:HumanBrain constructor, unable to open file \"" << fileName << "\"\n\nExiting\n" << endl;
 			exit(1);
 		}
 	}
@@ -64,7 +64,7 @@ void HumanBrain::update() {
 
 	nextNodes.assign(nrOfBrainNodes, 0.0);
 	char key;
-	if (useActionMapPL->lookup()) {
+	if (PT->lookupBool("BRAIN_HUMAN-useActionMap")) {
 		cout << "please enter action (* for options): ";
 		cin >> key;
 		while (actionMap.find(key) == actionMap.end()) {

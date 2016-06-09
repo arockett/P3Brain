@@ -12,19 +12,19 @@
 #include <stdlib.h>
 #include <vector>
 
-#include "Archivist/DefaultArchivist.h"
-#include "Archivist/LODwAPArchivist.h"
-#include "Archivist/SSwDArchivist.h"
+//#include "Archivist/DefaultArchivist.h"
+//#include "Archivist/LODwAPArchivist.h"
+//#include "Archivist/SSwDArchivist.h"
 #include "Global.h"
 
-#include "Brain/ConstantValuesBrain/ConstantValuesBrain.h"
-#include "Brain/HumanBrain/HumanBrain.h"
-#include "Brain/MarkovBrain/MarkovBrain.h"
-#include "Brain/WireBrain/WireBrain.h"
+//#include "Brain/ConstantValuesBrain/ConstantValuesBrain.h"
+//#include "Brain/HumanBrain/HumanBrain.h"
+//#include "Brain/MarkovBrain/MarkovBrain.h"
+//#include "Brain/WireBrain/WireBrain.h"
 
 #include "Genome/CircularGenome/CircularGenome.h"
 #include "Genome/MultiGenome/MultiGenome.h"
-#include "Genome/Chromosome/TemplatedChromosome.h"
+////#include "Genome/Chromosome/TemplatedChromosome.h"
 
 #include "Group/Group.h"
 
@@ -39,11 +39,12 @@
 #include "Utilities/Data.h"
 #include "Utilities/Utilities.h"
 
-#include "World/BerryWorld/BerryWorld.h"
-#include "World/IPDWorld/IPDWorld.h"
-#include "World/TestWorld/TestWorld.h"
-#include "World/NumeralClassifierWorld/NumeralClassifierWorld.h"
+//#include "World/BerryWorld/BerryWorld.h"
+//#include "World/IPDWorld/IPDWorld.h"
+//#include "World/TestWorld/TestWorld.h"
+//#include "World/NumeralClassifierWorld/NumeralClassifierWorld.h"
 
+#include "modules.h"
 using namespace std;
 
 int main(int argc, const char * argv[]) {
@@ -69,10 +70,8 @@ int main(int argc, const char * argv[]) {
 	}
 
 
-	//auto world = make_shared<BerryWorld>();
-	//auto world = make_shared<IPDWorld>();
 	//auto world = make_shared<NumeralClassifierWorld>();
-	auto world = make_shared<TestWorld>();
+	auto world = makeWorld();
 
 	vector<string> groupNameSpaces;
 	convertCSVListToVector(Global::groupNameSpacesPL->lookup(), groupNameSpaces);
@@ -90,55 +89,55 @@ int main(int argc, const char * argv[]) {
 
 		Global::update = -1;  // before there was time, there was a progenitor
 
-		shared_ptr<AbstractGenome> templateGenome;
-		if (PT->lookupString("GENOME-type") == "Multi") {
-			shared_ptr<AbstractChromosome> templateChromosome;
-			if (PT->lookupString("GENOME-sitesType") == "char") {
-				templateChromosome = make_shared<TemplatedChromosome<unsigned char>>(PT->lookupInt("GENOME_MULTI-chromosomeSizeInitial"), PT->lookupDouble("GENOME-alphabetSize"));
-			} else if (PT->lookupString("GENOME-sitesType") == "int") {
-				templateChromosome = make_shared<TemplatedChromosome<int>>(PT->lookupInt("GENOME_MULTI-chromosomeSizeInitial"), PT->lookupDouble("GENOME-alphabetSize"));
-			} else if (PT->lookupString("GENOME-sitesType") == "double") {
-				templateChromosome = make_shared<TemplatedChromosome<double>>(PT->lookupInt("GENOME_MULTI-chromosomeSizeInitial"), PT->lookupDouble("GENOME-alphabetSize"));
-			} else if (PT->lookupString("GENOME-sitesType") == "bool") {
-				templateChromosome = make_shared<TemplatedChromosome<bool>>(PT->lookupInt("GENOME_MULTI-chromosomeSizeInitial"), PT->lookupDouble("GENOME-alphabetSize"));
-			} else {
-				cout << "\n\nERROR: Unrecognized genomeSitesType in configuration!\n  \"" << PT->lookupString("GENOME-sitesType") << "\" is not defined.\n\nExiting.\n" << endl;
-				exit(1);
-			}
-			templateGenome = make_shared<MultiGenome>(templateChromosome, PT->lookupInt("GENOME_MULTI-chromosome_sets"), PT->lookupInt("GENOME_MULTI-chromosome_ploidy"), PT);
+		shared_ptr<AbstractGenome> templateGenome = makeTemplateGenome(PT);
+//		if (PT->lookupString("GENOME-genomeType") == "Multi") {
+//			shared_ptr<AbstractChromosome> templateChromosome;
+//			if (PT->lookupString("GENOME-sitesType") == "char") {
+//				templateChromosome = make_shared<TemplatedChromosome<unsigned char>>(PT->lookupInt("GENOME_MULTI-chromosomeSizeInitial"), PT->lookupDouble("GENOME-alphabetSize"));
+//			} else if (PT->lookupString("GENOME-sitesType") == "int") {
+//				templateChromosome = make_shared<TemplatedChromosome<int>>(PT->lookupInt("GENOME_MULTI-chromosomeSizeInitial"), PT->lookupDouble("GENOME-alphabetSize"));
+//			} else if (PT->lookupString("GENOME-sitesType") == "double") {
+//				templateChromosome = make_shared<TemplatedChromosome<double>>(PT->lookupInt("GENOME_MULTI-chromosomeSizeInitial"), PT->lookupDouble("GENOME-alphabetSize"));
+//			} else if (PT->lookupString("GENOME-sitesType") == "bool") {
+//				templateChromosome = make_shared<TemplatedChromosome<bool>>(PT->lookupInt("GENOME_MULTI-chromosomeSizeInitial"), PT->lookupDouble("GENOME-alphabetSize"));
+//			} else {
+//				cout << "\n\nERROR: Unrecognized genomeSitesType in configuration!\n  \"" << PT->lookupString("GENOME-sitesType") << "\" is not defined.\n\nExiting.\n" << endl;
+//				exit(1);
+//			}
+//			templateGenome = make_shared<MultiGenome>(templateChromosome, PT->lookupInt("GENOME_MULTI-chromosome_sets"), PT->lookupInt("GENOME_MULTI-chromosome_ploidy"), PT);
+//
+//		} else if (PT->lookupString("GENOME-genomeType") == "Circular") {
+//			if (PT->lookupString("GENOME-sitesType") == "char") {
+//				templateGenome = make_shared<CircularGenome<unsigned char>>(PT->lookupDouble("GENOME-alphabetSize"), PT->lookupInt("GENOME_CIRCULAR-sizeInitial"), PT);
+//			} else if (PT->lookupString("GENOME-sitesType") == "int") {
+//				templateGenome = make_shared<CircularGenome<int>>(PT->lookupDouble("GENOME-alphabetSize"), PT->lookupInt("GENOME_CIRCULAR-sizeInitial"), PT);
+//			} else if (PT->lookupString("GENOME-sitesType") == "double") {
+//				templateGenome = make_shared<CircularGenome<double>>(PT->lookupDouble("GENOME-alphabetSize"), PT->lookupInt("GENOME_CIRCULAR-sizeInitial"), PT);
+//			} else if (PT->lookupString("GENOME-sitesType") == "bool") {
+//				templateGenome = make_shared<CircularGenome<bool>>(PT->lookupDouble("GENOME-alphabetSize"), PT->lookupInt("GENOME_CIRCULAR-sizeInitial"), PT);
+//			} else {
+//				cout << "\n\nERROR: Unrecognized genomeSitesType in configuration!\n  \"" << PT->lookupString("GENOME-sitesType") << "\" is not defined.\n\nExiting.\n" << endl;
+//				exit(1);
+//			}
+//
+//		} else {
+//			cout << "\n\nERROR: Unrecognized genome type in configuration!\n  \"" << PT->lookupString("GENOME-genomeType") << "\" is not defined.\n\nExiting.\n" << endl;
+//			exit(1);
+//		}
 
-		} else if (PT->lookupString("GENOME-type") == "Circular") {
-			if (PT->lookupString("GENOME-sitesType") == "char") {
-				templateGenome = make_shared<CircularGenome<unsigned char>>(PT->lookupDouble("GENOME-alphabetSize"), PT->lookupInt("GENOME_CIRCULAR-sizeInitial"), PT);
-			} else if (PT->lookupString("GENOME-sitesType") == "int") {
-				templateGenome = make_shared<CircularGenome<int>>(PT->lookupDouble("GENOME-alphabetSize"), PT->lookupInt("GENOME_CIRCULAR-sizeInitial"), PT);
-			} else if (PT->lookupString("GENOME-sitesType") == "double") {
-				templateGenome = make_shared<CircularGenome<double>>(PT->lookupDouble("GENOME-alphabetSize"), PT->lookupInt("GENOME_CIRCULAR-sizeInitial"), PT);
-			} else if (PT->lookupString("GENOME-sitesType") == "bool") {
-				templateGenome = make_shared<CircularGenome<bool>>(PT->lookupDouble("GENOME-alphabetSize"), PT->lookupInt("GENOME_CIRCULAR-sizeInitial"), PT);
-			} else {
-				cout << "\n\nERROR: Unrecognized genomeSitesType in configuration!\n  \"" << PT->lookupString("GENOME-sitesType") << "\" is not defined.\n\nExiting.\n" << endl;
-				exit(1);
-			}
-
-		} else {
-			cout << "\n\nERROR: Unrecognized genome type in configuration!\n  \"" << PT->lookupString("GENOME-type") << "\" is not defined.\n\nExiting.\n" << endl;
-			exit(1);
-		}
-
-		shared_ptr<AbstractBrain> templateBrain;
-		if (PT->lookupString("BRAIN-brainType") == "Markov") {
-			templateBrain = make_shared<MarkovBrain>(make_shared<ClassicGateListBuilder>(PT), world->requiredInputs(), world->requiredOutputs(), PT->lookupInt("BRAIN-hiddenNodes"), PT);
-		} else if (PT->lookupString("BRAIN-brainType") == "Wire") {
-			templateBrain = make_shared<WireBrain>(world->requiredInputs(), world->requiredOutputs(), PT->lookupInt("BRAIN-hiddenNodes"), PT);
-		} else if (PT->lookupString("BRAIN-brainType") == "Human") {
-			templateBrain = make_shared<HumanBrain>(world->requiredInputs(), world->requiredOutputs(), PT->lookupInt("BRAIN-hiddenNodes"));
-		} else if (PT->lookupString("BRAIN-brainType") == "ConstantValues") {
-			templateBrain = make_shared<ConstantValuesBrain>(world->requiredInputs(), world->requiredOutputs(), PT->lookupInt("BRAIN-hiddenNodes"));
-		} else {
-			cout << "\n\nERROR: Unrecognized brain type in configuration!\n  \"" << PT->lookupString("BRAIN-brainType") << "\" is not defined.\n\nExiting.\n" << endl;
-			exit(1);
-		}
+		shared_ptr<AbstractBrain> templateBrain = makeTemplateBrain(world, PT);
+//		if (PT->lookupString("BRAIN-brainType") == "Markov") {
+//			templateBrain = make_shared<MarkovBrain>(make_shared<ClassicGateListBuilder>(PT), world->requiredInputs(), world->requiredOutputs(), PT->lookupInt("BRAIN-hiddenNodes"), PT);
+//		} else if (PT->lookupString("BRAIN-brainType") == "Wire") {
+//			templateBrain = make_shared<WireBrain>(world->requiredInputs(), world->requiredOutputs(), PT->lookupInt("BRAIN-hiddenNodes"), PT);
+//		} else if (PT->lookupString("BRAIN-brainType") == "Human") {
+//			templateBrain = make_shared<HumanBrain>(world->requiredInputs(), world->requiredOutputs(), PT->lookupInt("BRAIN-hiddenNodes"));
+//		} else if (PT->lookupString("BRAIN-brainType") == "ConstantValues") {
+//			templateBrain = make_shared<ConstantValuesBrain>(world->requiredInputs(), world->requiredOutputs(), PT->lookupInt("BRAIN-hiddenNodes"));
+//		} else {
+//			cout << "\n\nERROR: Unrecognized brain type in configuration!\n  \"" << PT->lookupString("BRAIN-brainType") << "\" is not defined.\n\nExiting.\n" << endl;
+//			exit(1);
+//		}
 
 		shared_ptr<Organism> progenitor = make_shared<Organism>(templateGenome, templateBrain);  // make a organism with a genome and brain - progenitor serves as an ancestor to all and a template organism
 
@@ -154,7 +153,11 @@ int main(int argc, const char * argv[]) {
 			population.push_back(newOrg);  // add a new org to population using progenitors template and a new random genome
 		}
 		progenitor->kill();  // the progenitor has served it's purpose.
-		cout << "The " << NS << " group is a population of " << Global::popSizePL->lookup() << " organisms with " << PT->lookupString("GENOME-type") << "<" << PT->lookupString("GENOME-sitesType") << "> genomes and " << PT->lookupString("BRAIN-brainType") << " brains." << endl;
+
+		if (PT == nullptr){
+			PT = Parameters::root;
+		}
+		cout << "The " << NS << " group is a population of " << Global::popSizePL->lookup() << " organisms with " << PT->lookupString("GENOME-genomeType") << "<" << PT->lookupString("GENOME-sitesType") << "> genomes and " << PT->lookupString("BRAIN-brainType") << " brains." << endl;
 
 		shared_ptr<AbstractOptimizer> optimizer;
 

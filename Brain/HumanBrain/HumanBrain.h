@@ -21,7 +21,6 @@
 
 #include "../AbstractBrain.h"
 
-
 using namespace std;
 
 class HumanBrain: public AbstractBrain {
@@ -35,9 +34,13 @@ public:
 
 	HumanBrain() = delete;
 
-	HumanBrain(int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes);
+	HumanBrain(int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT = Parameters::root);
 
 	virtual ~HumanBrain() = default;
+
+	static shared_ptr<AbstractBrain> brainFactory(int ins, int outs, int hidden, shared_ptr<ParametersTable> PT = Parameters::root) {
+		return make_shared<HumanBrain>(ins, outs, hidden, PT);
+	}
 
 	virtual void update() override;
 

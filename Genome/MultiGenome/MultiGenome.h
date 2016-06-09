@@ -22,6 +22,7 @@
 #include "../../Utilities/Parameters.h"
 #include "../../Utilities/Random.h"
 #include "../Chromosome/AbstractChromosome.h"
+#include "../Chromosome/TemplatedChromosome.h"
 #include "../AbstractGenome.h"
 
 using namespace std;
@@ -118,6 +119,28 @@ public:
 	MultiGenome(shared_ptr<AbstractChromosome> _chromosome, shared_ptr<ParametersTable> _PT = nullptr);
 	MultiGenome(shared_ptr<AbstractChromosome> _chromosome, int chromosomeCount, int _plodiy, shared_ptr<ParametersTable> _PT = nullptr);
 	virtual ~MultiGenome() = default;
+
+	static shared_ptr<AbstractGenome> genomeFactory(shared_ptr<ParametersTable> PT) {
+		shared_ptr<AbstractChromosome> templateChromosome;
+		string sitesType = (PT == nullptr) ? AbstractGenome::genomeSitesTypePL->lookup() : PT->lookupString("GENOME-sitesType");
+		double alphabetSize = (PT == nullptr) ? AbstractGenome::alphabetSizePL->lookup() : PT->lookupDouble("GENOME-alphabetSize");
+		int chromosomeSizeInitial = (PT == nullptr) ? initialChromosomeSizePL->lookup() : PT->lookupInt("GENOME_MULTI-chromosomeSizeInitial");
+		int chromosome_sets = (PT == nullptr) ? initialChromosomesPL->lookup() : PT->lookupInt("GENOME_MULTI-chromosome_sets");
+		int chromosome_ploidy = (PT == nullptr) ? initialPloidyPL->lookup() : PT->lookupInt("GENOME_MULTI-chromosome_ploidy");
+		if (sitesType == "char") {
+			templateChromosome = make_shared<TemplatedChromosome<unsigned char>>(chromosomeSizeInitial, alphabetSize);
+		} else if (sitesType == "int") {
+			templateChromosome = make_shared<TemplatedChromosome<int>>(chromosomeSizeInitial, alphabetSize);
+		} else if (sitesType == "double") {
+			templateChromosome = make_shared<TemplatedChromosome<double>>(chromosomeSizeInitial, alphabetSize);
+		} else if (sitesType == "bool") {
+			templateChromosome = make_shared<TemplatedChromosome<bool>>(chromosomeSizeInitial, alphabetSize);
+		} else {
+			cout << "\n\nERROR: Unrecognized genomeSitesType in configuration!\n  \"" << sitesType << "\" is not defined.\n\nExiting.\n" << endl;
+			exit(1);
+		}
+		return make_shared<MultiGenome>(templateChromosome, chromosome_sets, chromosome_ploidy, PT);
+	}
 
 	virtual shared_ptr<AbstractGenome> makeLike() override {
 		return make_shared<MultiGenome>(chromosomes[0], (int) chromosomes.size() / ploidy, ploidy,PT);

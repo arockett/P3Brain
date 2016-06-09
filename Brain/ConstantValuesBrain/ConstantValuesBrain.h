@@ -39,9 +39,13 @@ public:
 
 	ConstantValuesBrain() = delete;
 
-	ConstantValuesBrain(int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes);
+	ConstantValuesBrain(int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT = nullptr);
 
 	virtual ~ConstantValuesBrain() = default;
+
+	static shared_ptr<AbstractBrain> brainFactory(int ins, int outs, int hidden, shared_ptr<ParametersTable> PT) {
+		return make_shared<ConstantValuesBrain>(ins, outs, hidden, PT);
+	}
 
 	virtual void update() override;
 

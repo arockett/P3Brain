@@ -73,6 +73,12 @@ public:
 	}
 
 	virtual ~AbstractBrain() = default;
+
+//	virtual static shared_ptr<AbstractBrain> brainFactory(int ins, int outs, int hidden, shared_ptr<ParametersTable> _PT = nullptr){
+//		cout << "  You are calling AbstractBrain::brainFactory()... this is not allowed (you can not construct an AbstractBrain!).\n Exiting."<<endl;
+//		exit(1);
+//	}
+
 	virtual void update() = 0;
 
 	virtual string description() = 0;  // returns a desription of this brain in it's current state

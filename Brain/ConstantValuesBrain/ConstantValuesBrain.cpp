@@ -13,8 +13,8 @@ shared_ptr<ParameterLink<double>> ConstantValuesBrain::valueMaxPL = Parameters::
 shared_ptr<ParameterLink<int>> ConstantValuesBrain::valueTypePL = Parameters::register_parameter("BRAIN_CONSTANT-valueType", 0, "0 = int, 1 = double");
 shared_ptr<ParameterLink<int>> ConstantValuesBrain::samplesPerValuePL = Parameters::register_parameter("BRAIN_CONSTANT-samplesPerValue", 1, "for each brain value, this many samples will be taken from genome and averaged");
 
-ConstantValuesBrain::ConstantValuesBrain(int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes) :
-		AbstractBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes) {
+ConstantValuesBrain::ConstantValuesBrain(int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT) :
+		AbstractBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes, _PT) {
 
 	//WorldY = (PT == nullptr) ? WorldYPL->lookup() : PT->lookupInt("WORLD_BERRY-worldY");
 

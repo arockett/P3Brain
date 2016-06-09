@@ -28,7 +28,7 @@ public:
 	int numberOfOutputs;
 
 
-	TestWorld();
+	TestWorld(shared_ptr<ParametersTable> _PT = nullptr);
 	virtual ~TestWorld() = default;
 	virtual void runWorldSolo(shared_ptr<Organism> org, bool analyse, bool visualize, bool debug) override;
 
