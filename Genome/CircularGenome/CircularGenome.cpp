@@ -159,7 +159,7 @@ void CircularGenome<T>::Handler::writeInt(int value, int valueMin, int valueMax)
 	int writeValueBase = valueMax - valueMin + 1;
 	value = value - valueMin;
 	if (writeValueBase < value) {
-		cout << "ERROR : attempting to write value to chromosome. \n value is too large :: (valueMax - valueMin + 1) < value!\n";
+		cout << "ERROR : attempting to write value to Circular Genome. \n value is too large :: (valueMax - valueMin + 1) < value!\n";
 		exit(1);
 	}
 	while (writeValueBase > genome->alphabetSize) {  // load value in alphabetSize chunks into decomposedValue

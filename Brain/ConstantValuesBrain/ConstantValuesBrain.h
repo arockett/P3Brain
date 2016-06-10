@@ -32,20 +32,24 @@ public:
 	static shared_ptr<ParameterLink<int>> valueTypePL;
 	static shared_ptr<ParameterLink<int>> samplesPerValuePL;
 
+	static shared_ptr<ParameterLink<bool>> initializeUniformPL;
+	static shared_ptr<ParameterLink<bool>> initializeConstantPL;
+	static shared_ptr<ParameterLink<int>> initializeConstantValuePL;
+
 	double valueMin;
 	double valueMax;
 	double valueType;
 	int samplesPerValue;
+
+	bool initializeUniform;
+	bool initializeConstant;
+	int initializeConstantValue;
 
 	ConstantValuesBrain() = delete;
 
 	ConstantValuesBrain(int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT = nullptr);
 
 	virtual ~ConstantValuesBrain() = default;
-
-	static shared_ptr<AbstractBrain> brainFactory(int ins, int outs, int hidden, shared_ptr<ParametersTable> PT) {
-		return make_shared<ConstantValuesBrain>(ins, outs, hidden, PT);
-	}
 
 	virtual void update() override;
 
@@ -58,7 +62,10 @@ public:
 	virtual void resetOutputs() override;
 
 	virtual void initalizeGenome(shared_ptr<AbstractGenome> _genome);
-
 };
+
+inline shared_ptr<AbstractBrain> ConstantValuesBrain_brainFactory(int ins, int outs, int hidden, shared_ptr<ParametersTable> PT) {
+	return make_shared<ConstantValuesBrain>(ins, outs, hidden, PT);
+}
 
 #endif /* defined(__BasicMarkovBrainTemplate__ConstantValuesBrain__) */

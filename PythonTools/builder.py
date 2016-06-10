@@ -79,10 +79,12 @@ for line in lines:
 	if line[0] == '*':
 		options[currentOption].append(line[1])
 		options[currentOption][0], options[currentOption][len(options[currentOption])-1] = options[currentOption][len(options[currentOption])-1], options[currentOption][0]
-	if line[0] == "+":
+	if line[0] == '+':
 		options[currentOption].append(line[1])
 
-
+if not('Default' in options['Archivist']):
+	options['Archivist'].append('Default');
+	
 print("Building MABE with:")
 print()
 for option in options:
@@ -109,7 +111,7 @@ for option in options["Brain"]:
 outFile.write('\n#include "Optimizer/AbstractOptimizer.h"\n')
 for option in options["Optimizer"]:
 	outFile.write('#include "Optimizer/'+option+'Optimizer/'+option+'Optimizer.h"\n')
-outFile.write('\n#include "Archivist/DefaultArchivist.h"\n')
+outFile.write('\n')
 for option in options["Archivist"]:
 	outFile.write('#include "Archivist/'+option+'Archivist.h"\n')
 
@@ -117,27 +119,61 @@ outFile.write('\n\n//create a world\n')
 outFile.write('shared_ptr<AbstractWorld> makeWorld(shared_ptr<ParametersTable> PT = Parameters::root){\n')
 outFile.write('  shared_ptr<AbstractWorld> newWorld;\n')
 outFile.write('  bool found = false;\n')
-outFile.write('  string worldType = (PT == nullptr) ? Global::worldTypePL->lookup() : PT->lookupString("GLOBAL-worldType");\n')
+outFile.write('  string worldType = (PT == nullptr) ? AbstractWorld::worldTypePL->lookup() : PT->lookupString("WORLD-worldType");\n')
 for option in options["World"]:
 	outFile.write('  if (worldType == "'+option+'") {\n')
 	outFile.write('    newWorld = make_shared<'+option+'World>(PT);\n')
 	outFile.write('    found = true;\n')	
 	outFile.write('    }\n')
 outFile.write('  if (!found){\n')
-outFile.write('    cout << "  ERROR! could not find GLOBAL-worldType \\"" << PT->lookupString("GLOBAL-worldType") << "\\".\\n  Exiting." << endl;\n')
+outFile.write('    cout << "  ERROR! could not find WORLD-worldType \\"" << worldType << "\\".\\n  Exiting." << endl;\n')
 outFile.write('    exit(1);\n')
 outFile.write('    }\n')
 outFile.write('  return newWorld;\n')
 outFile.write('}\n')
 
+outFile.write('\n\n//create an optimizer\n')
+outFile.write('shared_ptr<AbstractOptimizer> makeOptimizer(shared_ptr<ParametersTable> PT = Parameters::root){\n')
+outFile.write('  shared_ptr<AbstractOptimizer> newOptimizer;\n')
+outFile.write('  bool found = false;\n')
+outFile.write('  string optimizerType = (PT == nullptr) ? AbstractOptimizer::Optimizer_MethodStrPL->lookup() : PT->lookupString("OPTIMIZER-optimizer");\n')
+for option in options["Optimizer"]:
+	outFile.write('  if (optimizerType == "'+option+'") {\n')
+	outFile.write('    newOptimizer = make_shared<'+option+'Optimizer>(PT);\n')
+	outFile.write('    found = true;\n')	
+	outFile.write('    }\n')
+outFile.write('  if (!found){\n')
+outFile.write('    cout << "  ERROR! could not find OPTIMIZER-optimizer \\"" << optimizerType << "\\".\\n  Exiting." << endl;\n')
+outFile.write('    exit(1);\n')
+outFile.write('    }\n')
+outFile.write('  return newOptimizer;\n')
+outFile.write('}\n')
+
+outFile.write('\n\n//create an archivist\n')
+outFile.write('shared_ptr<DefaultArchivist> makeArchivist(vector<string> aveFileColumns, shared_ptr<ParametersTable> PT = Parameters::root){\n')
+outFile.write('  shared_ptr<DefaultArchivist> newArchivist;\n')
+outFile.write('  bool found = false;\n')
+outFile.write('  string archivistType = (PT == nullptr) ? DefaultArchivist::Arch_outputMethodStrPL->lookup() : PT->lookupString("ARCHIVIST-outputMethod");\n')
+for option in options["Archivist"]:
+	outFile.write('  if (archivistType == "'+option+'") {\n')
+	outFile.write('    newArchivist = make_shared<'+option+'Archivist>(aveFileColumns, PT);\n')
+	outFile.write('    found = true;\n')	
+	outFile.write('    }\n')
+outFile.write('  if (!found){\n')
+outFile.write('    cout << "  ERROR! could not find ARCHIVIST-outputMethod \\"" << archivistType << "\\".\\n  Exiting." << endl;\n')
+outFile.write('    exit(1);\n')
+outFile.write('    }\n')
+outFile.write('  return newArchivist;\n')
+outFile.write('}\n')
+
 outFile.write('\n\n//create a template genome\n')
-outFile.write('shared_ptr<AbstractGenome> makeTemplateGenome(shared_ptr<ParametersTable> PT = Parameters::root){\n')
+outFile.write('shared_ptr<AbstractGenome> makeTemplateGenome(shared_ptr<ParametersTable> PT = nullptr){\n')
 outFile.write('  shared_ptr<AbstractGenome> newGenome;\n')
 outFile.write('  bool found = false;\n')
 outFile.write('  string genomeType = (PT == nullptr) ? AbstractGenome::genomeTypeStrPL->lookup() : PT->lookupString("GENOME-genomeType");\n')
 for option in options["Genome"]:
 	outFile.write('  if (genomeType == "'+option+'") {\n')
-	outFile.write('    newGenome = '+option+'Genome::genomeFactory(PT);\n')
+	outFile.write('    newGenome = '+option+'Genome_genomeFactory(PT);\n')
 	outFile.write('    found = true;\n')	
 	outFile.write('    }\n')
 outFile.write('  if (found == false){\n')
@@ -148,13 +184,13 @@ outFile.write('  return newGenome;\n')
 outFile.write('}\n')
 
 outFile.write('\n\n//create a template brain\n')
-outFile.write('shared_ptr<AbstractBrain> makeTemplateBrain(shared_ptr<AbstractWorld> world, shared_ptr<ParametersTable> PT = Parameters::root){\n')
+outFile.write('shared_ptr<AbstractBrain> makeTemplateBrain(shared_ptr<AbstractWorld> world, shared_ptr<ParametersTable> PT = nullptr){\n')
 outFile.write('  shared_ptr<AbstractBrain> newBrain;\n')
 outFile.write('  bool found = false;\n')
 outFile.write('  string brainType = (PT == nullptr) ? AbstractBrain::brainTypeStrPL->lookup() : PT->lookupString("BRAIN-brainType");\n')
 for option in options["Brain"]:
 	outFile.write('  if (brainType == "'+option+'") {\n')
-	outFile.write('    newBrain = '+option+'Brain::brainFactory(world->requiredInputs(), world->requiredOutputs(), PT->lookupInt("BRAIN-hiddenNodes"),PT);\n')
+	outFile.write('    newBrain = '+option+'Brain_brainFactory(world->requiredInputs(), world->requiredOutputs(), PT->lookupInt("BRAIN-hiddenNodes"),PT);\n')
 	outFile.write('    found = true;\n')	
 	outFile.write('    }\n')
 outFile.write('  if (found == false){\n')

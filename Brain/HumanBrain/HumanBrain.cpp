@@ -13,8 +13,13 @@ shared_ptr<ParameterLink<string>> HumanBrain::actionMapFileNamePL = Parameters::
 
 HumanBrain::HumanBrain(int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT) :
 		AbstractBrain(_nrInNodes, _nrOutNodes, _nrHiddenNodes, _PT) {
-	if (PT->lookupBool("BRAIN_HUMAN-useActionMap")) {  // if using an action map, load map with lines of format char output1 output2 output3... file must match brain # of outputs
-		string fileName = PT->lookupString("BRAIN_HUMAN-actionMapFileName");
+	useActionMap = (PT == nullptr) ? useActionMapPL->lookup() : PT->lookupBool("BRAIN_HUMAN-useActionMap");
+	actionMapFileName = (PT == nullptr) ? actionMapFileNamePL->lookup() : PT->lookupString("BRAIN_HUMAN-actionMapFileName");
+
+
+
+	if (useActionMap) {  // if using an action map, load map with lines of format char output1 output2 output3... file must match brain # of outputs
+		string fileName = actionMapFileName;
 		ifstream FILE(fileName);
 		string rawLine;
 		double readDouble;
@@ -64,7 +69,7 @@ void HumanBrain::update() {
 
 	nextNodes.assign(nrOfBrainNodes, 0.0);
 	char key;
-	if (PT->lookupBool("BRAIN_HUMAN-useActionMap")) {
+	if (useActionMap) {
 		cout << "please enter action (* for options): ";
 		cin >> key;
 		while (actionMap.find(key) == actionMap.end()) {

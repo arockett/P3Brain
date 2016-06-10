@@ -16,6 +16,7 @@ shared_ptr<ParameterLink<int>> AbstractWorld::repeatsPL = Parameters::register_p
 shared_ptr<ParameterLink<bool>> AbstractWorld::debugPL = Parameters::register_parameter("WORLD-debug", false, "run world in debug mode (if available)");
 
 shared_ptr<ParameterLink<bool>> AbstractWorld::groupEvaluationPL = Parameters::register_parameter("WORLD-groupEvaluation", false, "if true, evaluate population concurrently");
+shared_ptr<ParameterLink<string>> AbstractWorld::worldTypePL = Parameters::register_parameter("WORLD-worldType", (string) "Berry", "type of world to use in evolution loop");
 
 void AbstractWorld::evaluate(shared_ptr<Group> group, bool groupEvaluation, bool analyse, bool visualize, bool debug) {
 	vector<double> scores(group->population.size(), 0);
