@@ -9,7 +9,7 @@
 #include "BerryWorld.h"
 
 shared_ptr<ParameterLink<double>> BerryWorld::TSKPL = Parameters::register_parameter("WORLD_BERRY-taskSwitchingCost", 1.4, "cost to change food sources");
-shared_ptr<ParameterLink<int>> BerryWorld::worldUpdatesPL = Parameters::register_parameter("WORLD_BERRY-worldUpdates", 400, "amount of time an brain is tested");
+shared_ptr<ParameterLink<int>> BerryWorld::worldUpdatesPL = Parameters::register_parameter("WORLD_BERRY-worldUpdates", 400, "amount of time a brain is tested");
 
 shared_ptr<ParameterLink<int>> BerryWorld::foodTypesPL = Parameters::register_parameter("WORLD_BERRY-foodTypes", 2, "number of types of food");
 shared_ptr<ParameterLink<double>> BerryWorld::rewardForFood1PL = Parameters::register_parameter("WORLD_BERRY-rewardForFood1", 1.0, "reward for eating a Food1");
@@ -50,7 +50,7 @@ shared_ptr<ParameterLink<bool>> BerryWorld::senseOtherPL = Parameters::register_
 
 shared_ptr<ParameterLink<int>> BerryWorld::replacementPL = Parameters::register_parameter("WORLD_BERRY-replacement", -1, "-1 = random, 0 = nPL = eplacement, 1 = replace other (note: Food0, can be replace by Food0)");
 
-shared_ptr<ParameterLink<bool>> BerryWorld::recordConsumptionRatioPL = Parameters::register_parameter("WORLD_BERRY-recordConsumptionRatio", false, "if true, record greater of red/blue+1 or blue/red+1");
+shared_ptr<ParameterLink<bool>> BerryWorld::recordConsumptionRatioPL = Parameters::register_parameter("WORLD_BERRY_ADVANCED-recordConsumptionRatio", false, "if true, record greater of red/blue+1 or blue/red+1");
 shared_ptr<ParameterLink<bool>> BerryWorld::recordFoodListPL = Parameters::register_parameter("WORLD_BERRY-recordFoodList", true, "if true, record list of food eaten");
 shared_ptr<ParameterLink<bool>> BerryWorld::recordFoodListEatEmptyPL = Parameters::register_parameter("WORLD_BERRY-recordFoodListEatEmpty", false, "if true, foodList will include attempts to eat 0");
 shared_ptr<ParameterLink<bool>> BerryWorld::recordFoodListNoEatPL = Parameters::register_parameter("WORLD_BERRY-recordFoodListNoEat", false, "if true, if true foodList will include no eat (-1)");
@@ -87,7 +87,7 @@ BerryWorld::BerryWorld(shared_ptr<ParametersTable> _PT) :
 
 	replacement = (PT == nullptr) ? replacementPL->lookup() : PT->lookupInt("WORLD_BERRY-replacement");
 
-	recordConsumptionRatio = (PT == nullptr) ? recordConsumptionRatioPL->lookup() : PT->lookupBool("BerryWorld::recordConsumptionRatioPL");
+	recordConsumptionRatio = (PT == nullptr) ? recordConsumptionRatioPL->lookup() : PT->lookupBool("WORLD_BERRY_ADVANCED-recordConsumptionRatio");
 	recordFoodList = (PT == nullptr) ? recordFoodListPL->lookup() : PT->lookupBool("WORLD_BERRY-recordFoodList");
 	recordFoodListEatEmpty = (PT == nullptr) ? recordFoodListEatEmptyPL->lookup() : PT->lookupBool("WORLD_BERRY-recordFoodListEatEmpty");
 	recordFoodListNoEat = (PT == nullptr) ? recordFoodListNoEatPL->lookup() : PT->lookupBool("WORLD_BERRY-recordFoodListNoEat");

@@ -86,4 +86,8 @@ class MarkovBrain : public AbstractBrain {
 
 };
 
+inline shared_ptr<AbstractBrain> MarkovBrain_brainFactory(int ins, int outs, int hidden, shared_ptr<ParametersTable> PT) {
+	return make_shared<MarkovBrain>(make_shared<ClassicGateListBuilder>(PT), ins, outs, hidden, PT);
+}
+
 #endif /* defined(__BasicMarkovBrainTemplate__MarkovBrain__) */

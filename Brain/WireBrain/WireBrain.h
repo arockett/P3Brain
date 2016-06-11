@@ -113,10 +113,10 @@ public:
 	WireBrain(int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT = nullptr);
 	WireBrain(shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT = nullptr);
 	WireBrain(const vector<bool> &genome, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT = nullptr);
+	virtual ~WireBrain() = default;
 
 	virtual void initalize();
 	virtual void connectPruneAndSetAveColumns(vector<pair<int, int>> wormholeList);
-	virtual ~WireBrain() = default;
 	virtual shared_ptr<AbstractBrain> makeBrainFromGenome(shared_ptr<AbstractGenome> _genome) override;
 	virtual void chargeUpdate();
 	virtual void chargeUpdateTrit();
@@ -127,5 +127,9 @@ public:
 	virtual vector<string> getStats() override;
 	virtual void initalizeGenome(shared_ptr<AbstractGenome> _genome) override;
 };
+
+inline shared_ptr<AbstractBrain> WireBrain_brainFactory(int ins, int outs, int hidden, shared_ptr<ParametersTable> PT) {
+	return make_shared<WireBrain>(ins, outs, hidden, PT);
+}
 
 #endif /* defined(__BasicMarkovBrainTemplate__WireBrain__) */

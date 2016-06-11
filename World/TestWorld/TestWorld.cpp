@@ -11,9 +11,10 @@
 shared_ptr<ParameterLink<int>> TestWorld::modePL = Parameters::register_parameter("WORLD_TEST-mode", 0, "0 = bit outputs before adding, 1 = add outputs");
 shared_ptr<ParameterLink<int>> TestWorld::numberOfOutputsPL = Parameters::register_parameter("WORLD_TEST-numberOfOutputs", 10, "number of outputs in this world");
 
-TestWorld::TestWorld() {
-	mode = (PT == nullptr) ? modePL->lookup() : PT->lookupDouble("WORLD_TEST-mode");
-	numberOfOutputs = (PT == nullptr) ? numberOfOutputsPL->lookup() : PT->lookupDouble("WORLD_TEST-numberOfOutputs");
+TestWorld::TestWorld(shared_ptr<ParametersTable> _PT) :
+		AbstractWorld(_PT) {
+	mode = (PT == nullptr) ? modePL->lookup() : PT->lookupInt("WORLD_TEST-mode");
+	numberOfOutputs = (PT == nullptr) ? numberOfOutputsPL->lookup() : PT->lookupInt("WORLD_TEST-numberOfOutputs");
 
 	// columns to be added to ave file
 	aveFileColumns.clear();

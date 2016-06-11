@@ -21,7 +21,8 @@
 #include "../../Utilities/Data.h"
 #include "../../Utilities/Parameters.h"
 #include "../../Utilities/Random.h"
-#include "../Chromosome/AbstractChromosome.h"
+#include "Chromosome/AbstractChromosome.h"
+#include "Chromosome/TemplatedChromosome.h"
 #include "../AbstractGenome.h"
 
 using namespace std;
@@ -120,7 +121,7 @@ public:
 	virtual ~MultiGenome() = default;
 
 	virtual shared_ptr<AbstractGenome> makeLike() override {
-		return make_shared<MultiGenome>(chromosomes[0], (int) chromosomes.size() / ploidy, ploidy,PT);
+		return make_shared<MultiGenome>(chromosomes[0], (int) chromosomes.size() / ploidy, ploidy, PT);
 	}
 
 	virtual shared_ptr<AbstractGenome::Handler> newHandler(shared_ptr<AbstractGenome> _genome, bool _readDirection = true) override;
@@ -189,7 +190,30 @@ public:
 
 	virtual void printGenome() override;
 
+};
+
+inline shared_ptr<AbstractGenome> MultiGenome_genomeFactory(shared_ptr<ParametersTable> PT) {
+	shared_ptr<AbstractChromosome> templateChromosome;
+	string sitesType = (PT == nullptr) ? AbstractGenome::genomeSitesTypePL->lookup() : PT->lookupString("GENOME-sitesType");
+	double alphabetSize = (PT == nullptr) ? AbstractGenome::alphabetSizePL->lookup() : PT->lookupDouble("GENOME-alphabetSize");
+	int chromosomeSizeInitial = (PT == nullptr) ? MultiGenome::initialChromosomeSizePL->lookup() : PT->lookupInt("GENOME_MULTI-chromosomeSizeInitial");
+	int chromosome_sets = (PT == nullptr) ? MultiGenome::initialChromosomesPL->lookup() : PT->lookupInt("GENOME_MULTI-chromosome_sets");
+	int chromosome_ploidy = (PT == nullptr) ? MultiGenome::initialPloidyPL->lookup() : PT->lookupInt("GENOME_MULTI-chromosome_ploidy");
+	if (sitesType == "char") {
+		templateChromosome = make_shared<TemplatedChromosome<unsigned char>>(chromosomeSizeInitial, alphabetSize);
+	} else if (sitesType == "int") {
+		templateChromosome = make_shared<TemplatedChromosome<int>>(chromosomeSizeInitial, alphabetSize);
+	} else if (sitesType == "double") {
+		templateChromosome = make_shared<TemplatedChromosome<double>>(chromosomeSizeInitial, alphabetSize);
+	} else if (sitesType == "bool") {
+		templateChromosome = make_shared<TemplatedChromosome<bool>>(chromosomeSizeInitial, alphabetSize);
+	} else {
+		cout << "\n\nERROR: Unrecognized genomeSitesType in configuration!\n  \"" << sitesType << "\" is not defined.\n\nExiting.\n" << endl;
+		exit(1);
+	}
+	return make_shared<MultiGenome>(templateChromosome, chromosome_sets, chromosome_ploidy, PT);
 }
-;
+
+
 
 #endif /* defined(__BasicMarkovBrainTemplate__MultiGenome__) */

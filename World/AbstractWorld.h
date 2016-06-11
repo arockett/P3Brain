@@ -26,6 +26,8 @@ public:
 
 	static shared_ptr<ParameterLink<bool>> groupEvaluationPL;
 
+	static shared_ptr<ParameterLink<string>> worldTypePL;
+
 	const shared_ptr<ParametersTable> PT;
 
 	vector<string> aveFileColumns;

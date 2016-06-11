@@ -10,16 +10,16 @@
 
 shared_ptr<ParameterLink<bool>> WireBrain::allowNegativeChargePL = Parameters::register_parameter("BRAIN_WIRE-allowNegativeCharge", false, "if true, wire brain can interpret negative input, deliver negative output, and charge negatively");
 
-shared_ptr<ParameterLink<int>> WireBrain::defaultWidthPL = Parameters::register_parameter("BRAIN_WIRE-size_width", 10, "width of the wire brain cube");
-shared_ptr<ParameterLink<int>> WireBrain::defaultHeightPL = Parameters::register_parameter("BRAIN_WIRE-size_height", 10, "height of the wire brain cube");
-shared_ptr<ParameterLink<int>> WireBrain::defaultDepthPL = Parameters::register_parameter("BRAIN_WIRE-size_depth", 10, "depth of the wire brain cube");
+shared_ptr<ParameterLink<int>> WireBrain::defaultWidthPL = Parameters::register_parameter("BRAIN_WIRE-size_width", 6, "width of the wire brain cube");
+shared_ptr<ParameterLink<int>> WireBrain::defaultHeightPL = Parameters::register_parameter("BRAIN_WIRE-size_height", 6, "height of the wire brain cube");
+shared_ptr<ParameterLink<int>> WireBrain::defaultDepthPL = Parameters::register_parameter("BRAIN_WIRE-size_depth", 6, "depth of the wire brain cube");
 shared_ptr<ParameterLink<int>> WireBrain::worldConnectionsSeparationPL = Parameters::register_parameter("BRAIN_WIRE-worldConnectionsSeparation", 7, "distance between nodes input and output connections (I/O)");
 shared_ptr<ParameterLink<int>> WireBrain::overchargeThresholdPL = Parameters::register_parameter("BRAIN_WIRE-overchargeThreshold", 3, "If a cell receives this much charge or more, it will not charge");
 shared_ptr<ParameterLink<int>> WireBrain::decayDurationPL = Parameters::register_parameter("BRAIN_WIRE-decayDuration", 1, "length of time a cell will decay (while in decay a cell can not become charged)");
 shared_ptr<ParameterLink<int>> WireBrain::chargeUpdatesPerUpdatePL = Parameters::register_parameter("BRAIN_WIRE-chargeUpdatesPerUpdate", 30, "Number of charge updates per brain update");
 shared_ptr<ParameterLink<bool>> WireBrain::constantInputsPL = Parameters::register_parameter("BRAIN_WIRE-constantInputs", true, "if true, input values are reset every charge update, if not, input values are set on first charge update only.");
 
-shared_ptr<ParameterLink<bool>> WireBrain::cacheResultsPL = Parameters::register_parameter("BRAIN_WIRE-cacheResults", true, "if true, t+1 nodes will be cached. If the same input is seen, the cached node values will be used.");
+shared_ptr<ParameterLink<bool>> WireBrain::cacheResultsPL = Parameters::register_parameter("BRAIN_WIRE-cacheResults", false, "if true, t+1 nodes will be cached. If the same input is seen, the cached node values will be used.");
 shared_ptr<ParameterLink<int>> WireBrain::cacheResultsCountPL = Parameters::register_parameter("BRAIN_WIRE-cacheResultsCount", 1, "input combinations will be cached this many times, after this, repeats of a given input array will look up a random value from cached values");
 
 shared_ptr<ParameterLink<string>> WireBrain::genomeDecodingMethodPL = Parameters::register_parameter("BRAIN_WIRE-genomeDecodingMethod", (string) "bitmap", "bitmap = convert genome directly, wiregenes = genes defined by start codeons, location, direction and location");

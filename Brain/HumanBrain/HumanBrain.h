@@ -21,7 +21,6 @@
 
 #include "../AbstractBrain.h"
 
-
 using namespace std;
 
 class HumanBrain: public AbstractBrain {
@@ -30,12 +29,15 @@ public:
 	static shared_ptr<ParameterLink<bool>> useActionMapPL;
 	static shared_ptr<ParameterLink<string>> actionMapFileNamePL;
 
+	bool useActionMap;
+	string actionMapFileName;
+
 	map<char, vector<double>> actionMap;
 	map<char, string> actionNames;
 
 	HumanBrain() = delete;
 
-	HumanBrain(int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes);
+	HumanBrain(int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT = Parameters::root);
 
 	virtual ~HumanBrain() = default;
 
@@ -49,7 +51,11 @@ public:
 	virtual void resetBrain() override;
 
 	virtual void initalizeGenome(shared_ptr<AbstractGenome> _genome);
-
 };
+
+inline shared_ptr<AbstractBrain> HumanBrain_brainFactory(int ins, int outs, int hidden, shared_ptr<ParametersTable> PT = Parameters::root) {
+	return make_shared<HumanBrain>(ins, outs, hidden, PT);
+}
+
 
 #endif /* defined(__BasicMarkovBrainTemplate__HumanBrain__) */

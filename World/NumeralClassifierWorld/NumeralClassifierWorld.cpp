@@ -14,10 +14,11 @@ shared_ptr<ParameterLink<int>> NumeralClassifierWorld::defaultWorldUpdatesPL = P
 shared_ptr<ParameterLink<int>> NumeralClassifierWorld::defaultRetinaTypePL = Parameters::register_parameter("WORLD_NUMERALCLASSIFIER-retinaType", 3, "1 = center only, 2 = 3 across, 3 = 3x3, 4 = 5x5, 5 = 7x7");
 shared_ptr<ParameterLink<string>> NumeralClassifierWorld::numeralDataFileNamePL = Parameters::register_parameter("WORLD_NUMERALCLASSIFIER-dataFileName", (string) "World/NumeralClassifierWorld/mnist.train.discrete.28x28-only100", "name of file with numeral data");
 
-NumeralClassifierWorld::NumeralClassifierWorld(shared_ptr<ParametersTable> _PT) : AbstractWorld(_PT){
+NumeralClassifierWorld::NumeralClassifierWorld(shared_ptr<ParametersTable> _PT) :
+		AbstractWorld(_PT) {
 	worldUpdates = (PT == nullptr) ? defaultWorldUpdatesPL->lookup() : PT->lookupInt("WORLD_NUMERALCLASSIFIER-WorldUpdates");
 	testsPreWorldEval = (PT == nullptr) ? defaulttestsPreWorldEvalPL->lookup() : PT->lookupInt("WORLD_NUMERALCLASSIFIER-testsPreWorldEval");
-	retinaType = (PT == nullptr) ? defaultRetinaTypePL->lookup() : PT->lookupInt("WORLD_NUMERALCLASSIFIER-retinaType"); //1 = center only, 2 = 3 across, 3 = 3x3, 4 = 5x5, 5 = 7x7
+	retinaType = (PT == nullptr) ? defaultRetinaTypePL->lookup() : PT->lookupInt("WORLD_NUMERALCLASSIFIER-retinaType");  //1 = center only, 2 = 3 across, 3 = 3x3, 4 = 5x5, 5 = 7x7
 	numeralDataFileName = (PT == nullptr) ? numeralDataFileNamePL->lookup() : PT->lookupString("WORLD_NUMERALCLASSIFIER-dataFileName");
 
 	outputNodesCount = 13;  // moveX(1), moveY(1), 0->9(10), done(1)
@@ -113,7 +114,7 @@ NumeralClassifierWorld::NumeralClassifierWorld(shared_ptr<ParametersTable> _PT) 
 	aveFileColumns.push_back("totalIncorrect");
 }
 
-void NumeralClassifierWorld::runWorldSolo(shared_ptr<Organism> org, bool analyse, bool visualize , bool debug) {
+void NumeralClassifierWorld::runWorldSolo(shared_ptr<Organism> org, bool analyse, bool visualize, bool debug) {
 	// numeralClassifierWorld assumes there will only ever be one agent being tested at a time. It uses org by default.
 	double score = 0.0;
 	int currentX, currentY;  // = { Random::getIndex(28), Random::getIndex(28) };  // place organism somewhere in the world
@@ -134,7 +135,6 @@ void NumeralClassifierWorld::runWorldSolo(shared_ptr<Organism> org, bool analyse
 	int nodesAssignmentCounter;  // this world can has number of brainState inputs set by parameter. This counter is used while assigning inputs
 	// make sure the brain does not have values from last run
 	org->brain->resetBrain();
-
 	for (int test = 0; test < testsPreWorldEval; test++) {  //run agent for "worldUpdates" brain updates
 		numeralPick = Random::getIndex(10);  // pick a number
 		counts[numeralPick]++;
@@ -338,7 +338,7 @@ void NumeralClassifierWorld::runWorldSolo(shared_ptr<Organism> org, bool analyse
 	org->dataMap.Append("alltotalIncorrect", total_incorrect);  // total food eaten (regardless of type)
 
 	if (score < 0.0) {
-		score= 0.0;
+		score = 0.0;
 	}
 	org->score = score;
 	org->dataMap.Append("allscore", score);
