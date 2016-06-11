@@ -97,9 +97,9 @@ def MultiPlot(data, NamesList, ConditionsList, dataIndex, CombineData = False, P
 			if ((len(ConditionsList) > 1) or (CombineData))and legendLocation != '':
 				plt.xlabel(XCoordinateName, fontsize=MinorFontSize)
 				leg = plt.legend(loc=legendLocation, shadow=True)                    # add a legend
-				if (args.legendLinesWeight > 0):
+				if (args.legendLineWeight > 0):
 					for legobj in leg.legendHandles:
-						legobj.set_linewidth(args.legendLinesWeight)
+						legobj.set_linewidth(args.legendLineWeight)
 	return plt.gcf()                                            # gcf = get current figure - return that.		
 
 
@@ -132,7 +132,7 @@ parser.add_argument('-combineData', action='store_true', default = False, help='
 parser.add_argument('-verbose', action='store_true', default = False, help='adding this flag will provide more text output while running (useful if you are working with a lot of data to make sure that you are not hanging) - default (if not set) : OFF', required=False)
 
 parser.add_argument('-legendLocation', type=str, choices=('ur','ul','lr','ll','cr','cl','lc','uc','c'), default = 'lr', help='if ledgends are needed this is determins placement (first letter u = upper, c = center, l = lower. second letter l = left, c = center, r = right) - default : lr (lower right)', required=False)
-parser.add_argument('-legendLinesWeight', type=int, default = -1, help='changes line thickness in legend - default : lineWeight', required=False)
+parser.add_argument('-legendLineWeight', type=int, default = -1, help='changes line thickness in legend - default : lineWeight', required=False)
 parser.add_argument('-lineWeight', type=int, default = 1, help='changes line thickness of lines in plots - default : 1', required=False)
 
 parser.add_argument('-grid', action='store_true', default = False, help='if set, this flag cause a grid to be displayed on plots - default : OFF', required=False)

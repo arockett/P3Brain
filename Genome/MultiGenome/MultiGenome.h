@@ -21,8 +21,8 @@
 #include "../../Utilities/Data.h"
 #include "../../Utilities/Parameters.h"
 #include "../../Utilities/Random.h"
-#include "../Chromosome/AbstractChromosome.h"
-#include "../Chromosome/TemplatedChromosome.h"
+#include "Chromosome/AbstractChromosome.h"
+#include "Chromosome/TemplatedChromosome.h"
 #include "../AbstractGenome.h"
 
 using namespace std;

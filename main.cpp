@@ -31,6 +31,7 @@ int main(int argc, const char * argv[]) {
 	cout << "\n\n" << "\tMM   MM      A       BBBBBB    EEEEEE\n" << "\tMMM MMM     AAA      BB   BB   EE\n" << "\tMMMMMMM    AA AA     BBBBBB    EEEEEE\n" << "\tMM M MM   AAAAAAA    BB   BB   EE\n" << "\tMM   MM  AA     AA   BBBBBB    EEEEEE\n" << "\n" << "\tModular    Agent      Based    Evolver\n\n\n\thttp://hintzelab.msu.edu/MABE\n\n" << endl;
 
 	cout << "\tfor help run MABE with the \"-h\" flag (i.e. ./MABE -h)." << endl << endl;
+	configureDefaultsAndDocumentation();
 	Parameters::initializeParameters(argc, argv);  // loads command line and configFile values into registered parameters
 												   // also writes out a config file if requested
 
@@ -49,7 +50,6 @@ int main(int argc, const char * argv[]) {
 	}
 
 
-	//auto world = make_shared<NumeralClassifierWorld>();
 	auto world = makeWorld();
 
 	vector<string> groupNameSpaces;
@@ -107,7 +107,6 @@ int main(int argc, const char * argv[]) {
 //////////////////
 // evolution loop
 //////////////////
-
 	string defaultGroup = "default";
 	if (groups.find(defaultGroup) == groups.end()) {
 		cout << "Group " << defaultGroup << " not found in groups.\nExiting." << endl;

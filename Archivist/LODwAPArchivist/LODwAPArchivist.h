@@ -8,7 +8,7 @@
 #ifndef __BasicMarkovBrainTemplate__LODwAP_Archivist__
 #define __BasicMarkovBrainTemplate__LODwAP_Archivist__
 
-#include "DefaultArchivist.h"
+#include "../DefaultArchivist.h"
 
 using namespace std;
 
