@@ -20,7 +20,7 @@ public:
 	vector<int> defaultOutput;
 	double epsilon;
 	FixedEpsilonGate() = delete;
-	FixedEpsilonGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID);
+	FixedEpsilonGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID, shared_ptr<ParametersTable> _PT = nullptr);
 	virtual ~FixedEpsilonGate() = default;
 	virtual void update(vector<double> & states, vector<double> & nextStates) override;
 	virtual string gateType() override{

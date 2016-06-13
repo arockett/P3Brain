@@ -17,7 +17,7 @@ class TritDeterministicGate : public AbstractGate {
 	vector<vector<int>> table;
 
 	TritDeterministicGate() = delete;
-	TritDeterministicGate(pair<vector<int>,vector<int>> addresses, vector<vector<int>> _table, int _ID);
+	TritDeterministicGate(pair<vector<int>,vector<int>> addresses, vector<vector<int>> _table, int _ID, shared_ptr<ParametersTable> _PT = nullptr);
 
 	virtual ~TritDeterministicGate() = default;
 	virtual void update(vector<double> & states, vector<double> & nextStates) override;

@@ -18,7 +18,7 @@ class ProbabilisticGate: public AbstractGate {  //conventional probabilistic gat
 public:
 	vector<vector<double>> table;
 	ProbabilisticGate() = delete;
-	ProbabilisticGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _rawTable, int _ID);
+	ProbabilisticGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _rawTable, int _ID, shared_ptr<ParametersTable> _PT = nullptr);
 	virtual ~ProbabilisticGate() = default;
 	virtual void update(vector<double> & states, vector<double> & nextStates) override;
 	virtual string gateType() override{

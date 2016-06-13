@@ -18,7 +18,7 @@ class DeterministicGate: public AbstractGate {
 public:
 	vector<vector<int>> table;
 	DeterministicGate() = delete;
-	DeterministicGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID);
+	DeterministicGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID, shared_ptr<ParametersTable> _PT = nullptr);
 	virtual ~DeterministicGate() = default;
 	virtual void update(vector<double> & states, vector<double> & nextStates) override;
 	//void setupForBits(int* Ins, int nrOfIns, int Out, int logic);

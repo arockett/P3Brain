@@ -10,7 +10,8 @@
 
 bool FeedbackGate::feedbackON = true;
 
-FeedbackGate::FeedbackGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
+FeedbackGate::FeedbackGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID, shared_ptr<ParametersTable> _PT) :
+	AbstractGate(_PT) {
 
 	ID = gateID;
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

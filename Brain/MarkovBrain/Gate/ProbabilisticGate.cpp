@@ -8,7 +8,8 @@
 
 #include "ProbabilisticGate.h"
 
-ProbabilisticGate::ProbabilisticGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> rawTable, int _ID) {
+ProbabilisticGate::ProbabilisticGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> rawTable, int _ID, shared_ptr<ParametersTable> _PT) :
+	AbstractGate(_PT) {
 	ID = _ID;
 	int i, j;
 	inputs = addresses.first;

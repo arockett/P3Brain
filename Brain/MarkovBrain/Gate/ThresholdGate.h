@@ -18,7 +18,7 @@ class Thresholdgate : public AbstractGate {
 	int threshold;
  public:
 	Thresholdgate() = delete;
-	Thresholdgate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
+	Thresholdgate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID, shared_ptr<ParametersTable> _PT = nullptr);
 	virtual ~Thresholdgate() = default;
 	virtual void update(vector<double> & states, vector<double> & nextStates) override;
 	virtual string description() override;

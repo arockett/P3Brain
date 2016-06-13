@@ -25,7 +25,7 @@ class GPGate : public AbstractGate {
 
 	GPGate() = delete;
 	//GPGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
-	GPGate(pair<vector<int>, vector<int>> _addresses, int _operation, vector<double> _constValues, int gateID);
+	GPGate(pair<vector<int>, vector<int>> _addresses, int _operation, vector<double> _constValues, int gateID, shared_ptr<ParametersTable> _PT = nullptr);
 
 	virtual ~GPGate() = default;
 	virtual void update(vector<double> & states, vector<double> & nextStates) override;

@@ -45,7 +45,8 @@ public:
 	//double costOfDelivery;
 
 	NeuronGate() = delete;
-	NeuronGate(vector<int> ins, int out, int _dischargeBehavior, double _thresholdValue, bool _thresholdActivates, double _decayRate, double _deliveryCharge, double _deliveryError, int _thresholdFromNode, int _deliveryChargeFromNode, int _ID) {
+	NeuronGate(vector<int> ins, int out, int _dischargeBehavior, double _thresholdValue, bool _thresholdActivates, double _decayRate, double _deliveryCharge, double _deliveryError, int _thresholdFromNode, int _deliveryChargeFromNode, int _ID, shared_ptr<ParametersTable> _PT = nullptr) :
+		AbstractGate(_PT) {
 		ID = _ID;
 		inputs = ins;
 		outputs.clear();

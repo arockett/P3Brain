@@ -8,7 +8,8 @@
 
 #include "DeterministicGate.h"
 
-DeterministicGate::DeterministicGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID) {
+DeterministicGate::DeterministicGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID, shared_ptr<ParametersTable> _PT) :
+	AbstractGate(_PT) {
 	ID = _ID;
 	inputs = addresses.first;
 	outputs = addresses.second;

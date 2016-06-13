@@ -12,8 +12,8 @@
 
 shared_ptr<ParameterLink<double>> VoidGate::voidGate_ProbabilityPL = Parameters::register_parameter("BRAIN_MARKOV_GATES_VOID-voidGate_Probability", 0.05, "chance that an output from a void gate will be set to 0");
 
-VoidGate::VoidGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID) :
-		DeterministicGate(addresses, _table, _ID) {  // use DeterministicGate constructor to build set up everything (including a table of 0s and 1s)
+VoidGate::VoidGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID, shared_ptr<ParametersTable> _PT) :
+		DeterministicGate(addresses, _table, _ID, _PT) {  // use DeterministicGate constructor to build set up everything (including a table of 0s and 1s)
 	epsilon = voidGate_ProbabilityPL->lookup();  // in case you want to have different epsilon for different gates (who am I to judge?)
 }
 
