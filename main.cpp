@@ -32,7 +32,11 @@ int main(int argc, const char * argv[]) {
 
 	cout << "\tfor help run MABE with the \"-h\" flag (i.e. ./MABE -h)." << endl << endl;
 	configureDefaultsAndDocumentation();
-	Parameters::initializeParameters(argc, argv);  // loads command line and configFile values into registered parameters
+	
+	//TODO: ADD MAX LINE LENGHT FROM GLOBAL
+	int maxLineLength = Global::maxLineLengthPL->lookup(); 
+	int commentIndent = Global::commentIndentPL->lookup();
+	Parameters::initializeParameters(argc, argv, maxLineLength, commentIndent);  // loads command line and configFile values into registered parameters
 												   // also writes out a config file if requested
 
 
@@ -75,7 +79,8 @@ int main(int argc, const char * argv[]) {
 		Global::update = 0;  // the beginning of time - now we construct the first population
 
 		vector<shared_ptr<Organism>> population;
-		for (int i = 0; i < Global::popSizePL->lookup(); i++) {
+		int popSize = PT == nullptr ? Global::popSizePL->lookup() : PT->lookupInt("GLOBAL-popSize"); 
+		for (int i = 0; i < popSize; i++) {
 			auto newGenome = templateGenome->makeLike();
 			templateBrain->initalizeGenome(newGenome);  // use progenitors brain to prepare genome (add start codons, change ratio of site values, etc)
 			auto newOrg = make_shared<Organism>(progenitor, newGenome);
@@ -87,7 +92,7 @@ int main(int argc, const char * argv[]) {
 		if (PT == nullptr){
 			PT = Parameters::root;
 		}
-		cout << "The " << NS << " group is a population of " << Global::popSizePL->lookup() << " organisms with " << PT->lookupString("GENOME-genomeType") << "<" << PT->lookupString("GENOME-sitesType") << "> genomes and " << PT->lookupString("BRAIN-brainType") << " brains." << endl;
+		cout << "The " << NS << " group is a population of " << popSize << " organisms with " << PT->lookupString("GENOME-genomeType") << "<" << PT->lookupString("GENOME-sitesType") << "> genomes and " << PT->lookupString("BRAIN-brainType") << " brains." << endl;
 
 		shared_ptr<AbstractOptimizer> optimizer = makeOptimizer(PT);
 

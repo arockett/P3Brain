@@ -351,7 +351,7 @@ unordered_map<string, string> Parameters::readParametersFile(string fileName) {
 	return config_file_list;
 }
 
-void Parameters::initializeParameters(int argc, const char * argv[]) {
+void Parameters::initializeParameters(int argc, const char * argv[], int _maxLineLength, int _commentIndent) {
 
 	if (root == nullptr) {
 		root = ParametersTable::makeTable();
@@ -420,13 +420,13 @@ void Parameters::initializeParameters(int argc, const char * argv[]) {
 	}
 	if (saveFiles) {
 
-		Parameters::saveSettingsFiles( { "*" }, { { "settings_organism.cfg", { "GATE*", "GENOME*", "BRAIN*" } }, { "settings_world.cfg", { "WORLD*" } }, { "settings.cfg", { "" } } });
+		Parameters::saveSettingsFiles(_maxLineLength, _commentIndent, { "*" }, { { "settings_organism.cfg", { "GATE*", "GENOME*", "BRAIN*" } }, { "settings_world.cfg", { "WORLD*" } }, { "settings.cfg", { "" } } });
 		cout << "Saving config Files and Exiting." << endl;
 		exit(0);
 	}
 }
 
-void Parameters::saveSettingsFile(const string& nameSpace, stringstream& FILE, vector<string> categoryList, bool alsoChildren, int nameSpaceLevel) {
+void Parameters::saveSettingsFile(const string& nameSpace, stringstream& FILE, vector<string> categoryList, int _maxLineLength, int _commentIndent, bool alsoChildren, int nameSpaceLevel) {
 	map<string, vector<string>> sortedParameters;
 	root->lookupTable(nameSpace)->parametersToSortedList(sortedParameters);
 	if (!root->lookupTable(nameSpace)->neverSave) {
@@ -511,7 +511,7 @@ void Parameters::saveSettingsFile(const string& nameSpace, stringstream& FILE, v
 			vector<shared_ptr<ParametersTable>> checklist = root->lookupTable(nameSpace)->getChildren();
 			sort(checklist.begin(), checklist.end());
 			for (auto c : checklist) {
-				saveSettingsFile(c->getTableNameSpace(), FILE, categoryList, true, nameSpaceLevel);
+				saveSettingsFile(c->getTableNameSpace(), FILE, categoryList, _maxLineLength, _commentIndent, true, nameSpaceLevel);
 			}
 		}
 
@@ -524,7 +524,7 @@ void Parameters::saveSettingsFile(const string& nameSpace, stringstream& FILE, v
 	}
 }
 
-void Parameters::saveSettingsFiles(vector<string> nameSpaceList, vector<pair<string, vector<string>>> categoryLists) {
+void Parameters::saveSettingsFiles(int _maxLineLength, int _commentIndent, vector<string> nameSpaceList, vector<pair<string, vector<string>>> categoryLists) {
 	bool alsoChildren;
 	string fileName;
 	vector<string> otherCategoryList;
@@ -556,9 +556,9 @@ void Parameters::saveSettingsFiles(vector<string> nameSpaceList, vector<pair<str
 			stringstream ss;
 			if (cList.second.size() == 1 && cList.second[0]=="") {
 				otherCategoryList.insert(otherCategoryList.begin(),"-");
-				saveSettingsFile(nameSpace, ss, otherCategoryList, alsoChildren);
+				saveSettingsFile(nameSpace, ss, otherCategoryList, _maxLineLength, _commentIndent, alsoChildren);
 			} else {
-				saveSettingsFile(nameSpace, ss, cList.second, alsoChildren);
+				saveSettingsFile(nameSpace, ss, cList.second, _maxLineLength, _commentIndent, alsoChildren);
 			}
 			string workingString = ss.str();
 			workingString.erase (remove (workingString.begin(), workingString.end(), ' '), workingString.end());
