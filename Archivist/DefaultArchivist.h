@@ -37,7 +37,6 @@ shared_ptr<ParameterLink<bool>> DefaultArchivist::Arch_DominantFileShowAllListsP
 
 	static shared_ptr<ParameterLink<string>> Arch_outputMethodStrPL;  // string parameter for outputMethod;
 
-	static shared_ptr<ParameterLink<int>> Arch_realtimeFilesIntervalPL;  // how often to write out data
 	static shared_ptr<ParameterLink<bool>> Arch_writeAveFilePL;  // if true, ave file will be created
 	static shared_ptr<ParameterLink<bool>> Arch_writeDominantFilePL;  // if true, dominant file will be created
 	static shared_ptr<ParameterLink<string>> Arch_AveFileNamePL;  // name of the Averages file (ave for all brains when file is written to)
@@ -45,8 +44,10 @@ shared_ptr<ParameterLink<bool>> DefaultArchivist::Arch_DominantFileShowAllListsP
 	static shared_ptr<ParameterLink<string>> Arch_DefaultAveFileColumnNamesPL;  // data to be saved into average file (must be values that can generate an average)
 	static shared_ptr<ParameterLink<bool>> Arch_DominantFileShowAllListsPL;
 
-	static shared_ptr<ParameterLink<int>> SS_Arch_dataIntervalPL;  // how often to save data
-	static shared_ptr<ParameterLink<int>> SS_Arch_genomeIntervalPL;  // how often to save genomes
+	static shared_ptr<ParameterLink<string>> Arch_realtimeSequencePL;  // how often to write out data
+	static shared_ptr<ParameterLink<string>> SS_Arch_dataSequencePL;  // how often to save data
+	static shared_ptr<ParameterLink<string>> SS_Arch_genomeSequencePL;  // how often to save genomes
+
 	static shared_ptr<ParameterLink<string>> SS_Arch_DataFilePrefixPL;  // name of the Data file
 	static shared_ptr<ParameterLink<string>> SS_Arch_GenomeFilePrefixPL;  // name of the Genome file (genomes on LOD)
 	static shared_ptr<ParameterLink<bool>> SS_Arch_writeDataFilesPL;  // if true, write data file
@@ -55,7 +56,6 @@ shared_ptr<ParameterLink<bool>> DefaultArchivist::Arch_DominantFileShowAllListsP
 
 
 
-	int realtimeFilesInterval;  // how often to write out data
 	bool writeAveFile;  // if true, ave file will be created
 	bool writeDominantFile;  // if true, dominant file will be created
 	string AveFileName;  // name of the Averages file (ave for all brains when file is written to)
@@ -63,8 +63,16 @@ shared_ptr<ParameterLink<bool>> DefaultArchivist::Arch_DominantFileShowAllListsP
 	string AveFileColumnNames;  // data to be saved into average file (must be values that can generate an average)
 	bool DominantFileShowAllLists;
 
-	int dataInterval;
-	int genomeInterval;
+
+	vector<int> realtimeSequence;  // how often to write out data
+	int realtimeSequenceIndex;
+
+	vector<int> realtimeDataSequence;
+	vector<int> realtimeGenomeSequence;
+	int realtimeDataSeqIndex;
+	int realtimeGenomeSeqIndex;
+
+
 	string DataFilePrefix;  // name of the Data file
 	string GenomeFilePrefix;  // name of the Genome file (genomes on LOD)
 	bool writeSnapshotDataFiles;  // if true, write data file

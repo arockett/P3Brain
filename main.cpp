@@ -26,6 +26,7 @@
 #include "modules.h"
 using namespace std;
 
+
 int main(int argc, const char * argv[]) {
 
 	cout << "\n\n" << "\tMM   MM      A       BBBBBB    EEEEEE\n" << "\tMMM MMM     AAA      BB   BB   EE\n" << "\tMMMMMMM    AA AA     BBBBBB    EEEEEE\n" << "\tMM M MM   AAAAAAA    BB   BB   EE\n" << "\tMM   MM  AA     AA   BBBBBB    EEEEEE\n" << "\n" << "\tModular    Agent      Based    Evolver\n\n\n\thttp://hintzelab.msu.edu/MABE\n\n" << endl;
@@ -34,7 +35,6 @@ int main(int argc, const char * argv[]) {
 	configureDefaultsAndDocumentation();
 	Parameters::initializeParameters(argc, argv);  // loads command line and configFile values into registered parameters
 												   // also writes out a config file if requested
-
 
 	// outputDirectory must exist. If outputDirectory does not exist, no error will occur, but no data will be writen.
 	FileManager::outputDirectory = Global::outputDirectoryPL->lookup();
@@ -49,7 +49,6 @@ int main(int argc, const char * argv[]) {
 		cout << "Using Random Seed: " << Global::randomSeedPL->lookup() << endl;
 	}
 
-
 	auto world = makeWorld();
 
 	vector<string> groupNameSpaces;
@@ -60,7 +59,7 @@ int main(int argc, const char * argv[]) {
 
 	for (auto NS : groupNameSpaces) {
 		if (NS == "") {
-			PT = nullptr;//Parameters::root;
+			PT = nullptr;  //Parameters::root;
 			NS = "default";
 		} else {
 			PT = Parameters::root->getTable(NS);
@@ -73,9 +72,9 @@ int main(int argc, const char * argv[]) {
 		shared_ptr<Organism> progenitor = make_shared<Organism>(templateGenome, templateBrain);  // make a organism with a genome and brain - progenitor serves as an ancestor to all and a template organism
 
 		Global::update = 0;  // the beginning of time - now we construct the first population
-
+		int popSize = (PT == nullptr)?Global::popSizePL->lookup():PT->lookupInt("GLOBAL-popSize");
 		vector<shared_ptr<Organism>> population;
-		for (int i = 0; i < Global::popSizePL->lookup(); i++) {
+		for (int i = 0; i < popSize; i++) {
 			auto newGenome = templateGenome->makeLike();
 			templateBrain->initalizeGenome(newGenome);  // use progenitors brain to prepare genome (add start codons, change ratio of site values, etc)
 			auto newOrg = make_shared<Organism>(progenitor, newGenome);
@@ -84,10 +83,6 @@ int main(int argc, const char * argv[]) {
 		}
 		progenitor->kill();  // the progenitor has served it's purpose.
 
-		if (PT == nullptr){
-			PT = Parameters::root;
-		}
-		cout << "The " << NS << " group is a population of " << Global::popSizePL->lookup() << " organisms with " << PT->lookupString("GENOME-genomeType") << "<" << PT->lookupString("GENOME-sitesType") << "> genomes and " << PT->lookupString("BRAIN-brainType") << " brains." << endl;
 
 		shared_ptr<AbstractOptimizer> optimizer = makeOptimizer(PT);
 
@@ -101,8 +96,52 @@ int main(int argc, const char * argv[]) {
 		shared_ptr<DefaultArchivist> archivist = makeArchivist(aveFileColumns, PT);
 
 		groups[NS] = make_shared<Group>(population, optimizer, archivist);
+
+		if (PT == nullptr) {
+			PT = Parameters::root;
+		}
+		cout << "Group name: " << NS << "\n  " << popSize << " organisms with " << PT->lookupString("GENOME-genomeType") << "<" << PT->lookupString("GENOME-sitesType") << "> genomes and " << PT->lookupString("BRAIN-brainType") << " brains.\n  Optimizer: " << PT->lookupString("OPTIMIZER-optimizer") << "\n  Archivist: " << PT->lookupString("ARCHIVIST-outputMethod") << endl;
 		cout << endl;
 	}
+
+
+////////////////////
+//// find org with score loop
+////////////////////
+//bool done = false;
+//int tempRepeats = AbstractWorld::repeatsPL->lookup();
+//AbstractWorld::repeatsPL->set(1);
+//
+//while (!done){
+//	shared_ptr<AbstractGenome> templateGenome = makeTemplateGenome(PT);
+//	shared_ptr<AbstractBrain> templateBrain = makeTemplateBrain(world, PT);
+//	shared_ptr<Organism> progenitor = make_shared<Organism>(templateGenome, templateBrain);
+//
+//	vector<shared_ptr<Organism>> population;
+//
+//	auto newGenome = templateGenome->makeLike();
+//	templateBrain->initalizeGenome(newGenome);  // use progenitors brain to prepare genome (add start codons, change ratio of site values, etc)
+//	auto newOrg = make_shared<Organism>(progenitor, newGenome);
+//	population.push_back(newOrg);  // add a new org to population using progenitors template and a new random genome
+//
+//	auto group = make_shared<Group>(population, groups["default"]->optimizer, groups["default"]->archivist);
+//
+//	double targetScore = 1.6;
+//	int targetCount = 0;
+//	for (int i = 0; i < 3; i++){
+//		world->evaluate(group, AbstractWorld::groupEvaluationPL->lookup(), false, false, false);
+//		if (group->population[0]->score >= targetScore){
+//			targetCount++;
+//		}
+//		//cout << targetCount << " " << group->population[0]->score << endl;
+//		if (targetCount >= 3){
+//			done = true;
+//		}
+//	}
+//}
+//cout << "DONE" << endl;
+//
+//AbstractWorld::repeatsPL->set(tempRepeats);
 
 //////////////////
 // evolution loop

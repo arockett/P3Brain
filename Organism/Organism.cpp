@@ -82,6 +82,7 @@ Organism::Organism(shared_ptr<AbstractGenome> _genome, shared_ptr<AbstractBrain>
 	dataMap.Set("alive", alive);
 	dataMap.Set("timeOfBirth", timeOfBirth);
 	dataMap.SetMany(genome->getStats());
+	dataMap.SetMany(brain->getStats());
 }
 
 /*
