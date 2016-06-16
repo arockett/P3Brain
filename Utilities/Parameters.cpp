@@ -524,6 +524,27 @@ void Parameters::saveSettingsFile(const string& nameSpace, stringstream& FILE, v
 	}
 }
 
+void Parameters::printParameterWithWraparound(stringstream& FILE, string _currentIndent, string _parameter, int _maxLineLength, int _commentIndent) {
+	int currentLineLength = _currentIndent.size(); 
+	FILE << _currentIndent; 
+	int beforeIndentLength = currentLineLength + _parameter.find("@@@#"); 
+	string betweenString = "";
+	for (int i = beforeIndentLength; i < _commentIndent; i++) {
+		betweenString.append(" "); 
+	}
+	betweenString.append("#"); 
+	_parameter.replace(_parameter.find("@@@#"), 4, betweenString); 
+	if (currentLineLength + _parameter.size() < _maxLineLength) {
+		FILE << _parameter << endl; 
+	}
+	else
+	{
+		string parameterName = _parameter.substr(0, _parameter.find("#")); 
+		string parameterRemainder = _parameter.substr(_parameter.find("#"));
+		//TODO: finish wraparound capabilities 
+	}
+}
+
 void Parameters::saveSettingsFiles(int _maxLineLength, int _commentIndent, vector<string> nameSpaceList, vector<pair<string, vector<string>>> categoryLists) {
 	bool alsoChildren;
 	string fileName;
