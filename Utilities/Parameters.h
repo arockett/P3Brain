@@ -841,7 +841,7 @@ public:
 	static void initializeParameters(int argc, const char * argv[], int _maxLineLength, int _commentIndent);
 	static void saveSettingsFile(const string& nameSpace, stringstream& FILE, vector<string> categoryList, int _maxLineLength, int _commentIndent, bool alsoChildren = false, int nameSpaceLevel = 0);
 	static void saveSettingsFiles(int _maxLineLength, int _commentIndent, vector<string> nameSpaceList = { "*" }, vector<pair<string, vector<string>>> categoryLists = { {"settings.cfg", {""}}});
-	static void printParameterWithWraparound(stringstream& FILE, string _currentIndent, string _parameter , int _maxLineLength, int _commentIndent)
+	static void printParameterWithWraparound(stringstream& FILE, string _currentIndent, string _parameter, int _maxLineLength, int _commentIndent);
 };
 
 #endif // __MABE__Parameters__

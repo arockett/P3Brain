@@ -33,7 +33,6 @@ int main(int argc, const char * argv[]) {
 	cout << "\tfor help run MABE with the \"-h\" flag (i.e. ./MABE -h)." << endl << endl;
 	configureDefaultsAndDocumentation();
 	
-	//TODO: ADD MAX LINE LENGHT FROM GLOBAL
 	int maxLineLength = Global::maxLineLengthPL->lookup(); 
 	int commentIndent = Global::commentIndentPL->lookup();
 	Parameters::initializeParameters(argc, argv, maxLineLength, commentIndent);  // loads command line and configFile values into registered parameters

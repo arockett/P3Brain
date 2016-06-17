@@ -449,7 +449,8 @@ void Parameters::saveSettingsFile(const string& nameSpace, stringstream& FILE, v
 			if (sortedParameters.find("GLOBAL") != sortedParameters.end() && !(find(categoryList.begin(), categoryList.end(), "GLOBAL") != categoryList.end())) {
 				FILE << currentIndent << "% GLOBAL" << "\n";
 				for (auto parameter : sortedParameters["GLOBAL"]) {
-					FILE << currentIndent << "  " << parameter << "\n";
+					printParameterWithWraparound(FILE, currentIndent, parameter, _maxLineLength, _commentIndent);
+//					FILE << currentIndent << "  " << parameter << "\n";
 				}
 				FILE << "\n";
 			}
@@ -457,7 +458,8 @@ void Parameters::saveSettingsFile(const string& nameSpace, stringstream& FILE, v
 			if (sortedParameters.find("GLOBAL") != sortedParameters.end() && find(categoryList.begin(), categoryList.end(), "GLOBAL") != categoryList.end()) {
 				FILE << currentIndent << "% GLOBAL" << "\n";
 				for (auto parameter : sortedParameters["GLOBAL"]) {
-					FILE << currentIndent << "  " << parameter << "\n";
+					printParameterWithWraparound(FILE, currentIndent, parameter, _maxLineLength, _commentIndent);
+//					FILE << currentIndent << "  " << parameter << "\n";
 				}
 				FILE << "\n";
 			}
@@ -501,7 +503,8 @@ void Parameters::saveSettingsFile(const string& nameSpace, stringstream& FILE, v
 			if (saveThis) {
 				FILE << currentIndent << "% " << group.first << "\n";
 				for (auto parameter : group.second) {
-					FILE << currentIndent << "  " << parameter << "\n";
+					printParameterWithWraparound(FILE, currentIndent, parameter, _maxLineLength, _commentIndent); 
+//					FILE << currentIndent << "  " << parameter << "\n";
 				}
 				FILE << "\n";
 			}
@@ -539,9 +542,64 @@ void Parameters::printParameterWithWraparound(stringstream& FILE, string _curren
 	}
 	else
 	{
+		string indent = ""; 
+		for (int i = 0; i < _commentIndent; i++) {
+			indent.append(" "); 
+		}
+		indent.append("#    "); 
+
 		string parameterName = _parameter.substr(0, _parameter.find("#")); 
 		string parameterRemainder = _parameter.substr(_parameter.find("#"));
-		//TODO: finish wraparound capabilities 
+		FILE << parameterName;
+		currentLineLength += parameterName.size(); 
+		int remainderMaxLength = _maxLineLength - _commentIndent; 
+		while (parameterRemainder.size() > 0) {
+			int newLine = parameterRemainder.substr(0, remainderMaxLength).find("\n");
+			if (newLine == -1) {
+				int lastSpace = parameterRemainder.substr(0, remainderMaxLength).find_last_of(" ");
+				if (lastSpace == -1) {
+					if (currentLineLength == 0) {
+						FILE << indent;
+						currentLineLength += _commentIndent;
+					}
+					if (parameterRemainder.size() > remainderMaxLength) {
+						string takenPart = parameterRemainder.substr(0, remainderMaxLength - 1);
+						parameterRemainder = parameterRemainder.substr(remainderMaxLength - 1);
+						takenPart.append("-");
+						FILE << takenPart << endl;
+					}
+					else {
+						FILE << parameterRemainder << endl;
+						parameterRemainder = "";
+					}
+				}
+				else {
+					if (currentLineLength == 0) {
+						FILE << indent;
+						currentLineLength += _commentIndent;
+					}
+					if (parameterRemainder.size() > remainderMaxLength) {
+						string remainderBeforeSpace = parameterRemainder.substr(0, lastSpace);
+						parameterRemainder = parameterRemainder.substr(lastSpace+1);
+						FILE << remainderBeforeSpace << endl;
+					}
+					else {
+						FILE << parameterRemainder << endl;
+						parameterRemainder = "";
+					}
+				}
+			}
+			else {
+				if (currentLineLength == 0) {
+					FILE << indent;
+					currentLineLength += _commentIndent;
+				}
+				string remainderBeforeNewLine = parameterRemainder.substr(0, newLine);
+				parameterRemainder = parameterRemainder.substr(newLine+1);
+				FILE << remainderBeforeNewLine << endl;
+			}
+			currentLineLength = 0;
+		} 
 	}
 }
 
