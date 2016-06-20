@@ -22,7 +22,7 @@ class TritDeterministicGate : public AbstractGate {
 	virtual ~TritDeterministicGate() = default;
 	virtual void update(vector<double> & states, vector<double> & nextStates) override;
 
-	void setupForBits(int* Ins, int nrOfIns, int Out, int logic);
+	//void setupForBits(int* Ins, int nrOfIns, int Out, int logic);
 
 	virtual string gateType() override{
 		return "TritDeterministic";

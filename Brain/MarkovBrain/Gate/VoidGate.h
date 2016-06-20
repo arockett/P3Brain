@@ -25,6 +25,7 @@ public:
 	virtual string gateType() override{
 			return "Void";
 		}
+	virtual shared_ptr<AbstractGate> makeCopy(shared_ptr<ParametersTable> _PT = nullptr) override;
 
 };
 

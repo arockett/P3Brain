@@ -26,6 +26,7 @@ public:
 	virtual string gateType() override{
 		return "FixedEpsilon";
 	}
+	virtual shared_ptr<AbstractGate> makeCopy(shared_ptr<ParametersTable> _PT = nullptr) override;
 
 };
 

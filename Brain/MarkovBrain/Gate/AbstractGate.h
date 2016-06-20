@@ -42,6 +42,7 @@ public:
 	}
 	virtual ~AbstractGate() = default;
 
+	virtual shared_ptr<AbstractGate> makeCopy(shared_ptr<ParametersTable> _PT = nullptr);
 	vector<int> inputs;
 	vector<int> outputs;
 

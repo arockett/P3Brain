@@ -36,3 +36,16 @@ void DeterministicGate::update(vector<double> & nodes, vector<double> & nextNode
 	}
 }
 
+shared_ptr<AbstractGate> DeterministicGate::makeCopy(shared_ptr<ParametersTable> _PT)
+{
+	if (_PT = nullptr) {
+		_PT = PT; 
+	}
+	auto newGate = make_shared<DeterministicGate>(_PT); 
+	newGate->table = table; 
+	newGate->ID = ID;	
+	newGate->inputs = inputs;
+	newGate->outputs = outputs;
+	return newGate;
+}
+

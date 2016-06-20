@@ -1,4 +1,5 @@
 #include "GateBuilder.h"
+#include <cmath>
 
 shared_ptr<ParameterLink<bool>> Gate_Builder::usingProbGatePL = Parameters::register_parameter("BRAIN_MARKOV_GATES-probabilisticGate", false, "set to true to enable probabilistic gates");
 shared_ptr<ParameterLink<int>> Gate_Builder::probGateInitialCountPL = Parameters::register_parameter("BRAIN_MARKOV_GATES-probabilisticGate_InitialCount", 3, "seed genome with this many start codons");
@@ -146,18 +147,29 @@ void Gate_Builder::setupGates() {
 			//Change to add function options for epsilon
 			
 			
-			double epsilon = (_PT == nullptr) ? FixedEpsilonGate::EpsilonSourcePL->lookup() : _PT->lookupInt("BRAIN_MARKOV_GATES_FIXED_EPSILON-epsilonSource");
-
-			if (epsilon >= 1) {
-
-			}
-			else if(epsilon < 0) {
-
-			}
+			bool check; 
 
 			pair<vector<int>,vector<int>> addresses = getInputsAndOutputs( {1, 4}, {1, 4}, genomeHandler, gateID);
 			vector<vector<int>> table = genomeHandler->readTable( {1 << addresses.first.size(), addresses.second.size()}, {16, 4}, {0, 1}, AbstractGate::DATA_CODE, gateID);
-			if (genomeHandler->atEOC()) {
+			
+			
+			double epsilon = (_PT == nullptr) ? FixedEpsilonGate::EpsilonSourcePL->lookup() : _PT->lookupInt("BRAIN_MARKOV_GATES_FIXED_EPSILON-epsilonSource");
+
+			check = genomeHandler->atEOC();
+
+			if (epsilon > 1) {
+				genomeHandler->advanceIndex((int)epsilon);
+				epsilon = genomeHandler->readDouble(0, 1, AbstractGate::DATA_CODE, gateID);
+				check = check || genomeHandler->atEOC();
+			}
+			else if (epsilon < 0) {
+				genomeHandler->resetHandler();
+				genomeHandler->advanceIndex((int)abs(epsilon));
+				epsilon = genomeHandler->readDouble(0, 1, AbstractGate::DATA_CODE, gateID);
+				check = check || genomeHandler->atEOC();
+			}
+
+			if (check) {
 				shared_ptr<FixedEpsilonGate> nullObj = nullptr;;
 				return nullObj;
 			}
@@ -177,22 +189,34 @@ void Gate_Builder::setupGates() {
 		AddGate(codonOne, [](shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID, shared_ptr<ParametersTable> _PT) {
 
 
-			double epsilon = (_PT == nullptr) ? VoidGate::voidGate_ProbabilityPL->lookup() : _PT->lookupInt("BRAIN_MARKOV_GATES_VOID-epsilonSource");
-
-			if (epsilon >= 1) {
-
-			}
-			else if (epsilon < 0) {
-
-			}
+			bool check; 
 
 			pair<vector<int>,vector<int>> addresses = getInputsAndOutputs( {1, 4}, {1, 4}, genomeHandler, gateID);
 			vector<vector<int>> table = genomeHandler->readTable( {1 << addresses.first.size(), addresses.second.size()}, {16, 4}, {0, 1}, AbstractGate::DATA_CODE, gateID);
-			if (genomeHandler->atEOC()) {
+			
+			
+			double epsilon = (_PT == nullptr) ? VoidGate::voidGate_ProbabilityPL->lookup() : _PT->lookupInt("BRAIN_MARKOV_GATES_VOID-epsilonSource");
+
+			check = genomeHandler->atEOC(); 
+
+			if (epsilon > 1) {
+				genomeHandler->advanceIndex((int)epsilon);
+				epsilon = genomeHandler->readDouble(0, 1, AbstractGate::DATA_CODE, gateID);
+				check = check || genomeHandler->atEOC();
+			}
+			else if (epsilon < 0) {
+				genomeHandler->resetHandler();
+				genomeHandler->advanceIndex((int)abs(epsilon));
+				epsilon = genomeHandler->readDouble(0, 1, AbstractGate::DATA_CODE, gateID);
+				check = check || genomeHandler->atEOC();
+			}
+
+			if (check) {
 				shared_ptr<VoidGate> nullObj = nullptr;;
 				return nullObj;
 			}
-			return make_shared<VoidGate>(addresses,table,gateID, _PT);
+
+			return make_shared<VoidGate>(addresses,table,gateID, epsilon, _PT);
 		});
 	}
 	if ((PT == nullptr) ? usingFBGatePL->lookup() : PT->lookupBool("BRAIN_MARKOV_GATES-feedBackGate")) {

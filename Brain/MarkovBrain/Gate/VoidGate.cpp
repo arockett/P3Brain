@@ -30,3 +30,19 @@ void VoidGate::update(vector<double> & nodes, vector<double> & nextNodes) {
 	}
 }
 
+shared_ptr<AbstractGate> VoidGate::makeCopy(shared_ptr<ParametersTable> _PT)
+{
+	if (_PT = nullptr) {
+		_PT = PT;
+	}
+	auto newGate = make_shared<VoidGate>(_PT);
+	newGate->table = table;
+	newGate->ID = ID;
+	newGate->inputs = inputs;
+	newGate->outputs = outputs;
+	newGate->defaultOutput = defaultOutput; 
+	newGate->epsilon = epsilon; 
+	return newGate;
+}
+
+
