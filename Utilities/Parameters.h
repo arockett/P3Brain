@@ -737,12 +737,8 @@ public:
 				workingValue = p.second->getStringValuePair();
 				build_string << fixed << workingParameterName << " = " << workingValue.first;
 
-				int size = build_string.str().size();
-				while (size < 40) {
-					build_string << " ";
-					size++;
-				}
-				build_string << " # (" << workingValue.second << ") " << (*parameterDocumentation)[p.first];
+
+				build_string << " @@@# (" << workingValue.second << ") " << (*parameterDocumentation)[p.first];
 				sorted_parameters[workingCategory].push_back(build_string.str());
 			}
 		}
@@ -842,9 +838,10 @@ public:
 	}
 	static void readCommandLine(int argc, const char** argv, unordered_map<string, string>& comand_line_list, vector<string>& fileList, bool& saveFiles);
 	static unordered_map<string, string> readParametersFile(string fileName);
-	static void initializeParameters(int argc, const char * argv[]);
-	static void saveSettingsFile(const string& nameSpace, stringstream& FILE, vector<string> categoryList, bool alsoChildren = false, int nameSpaceLevel = 0);
-	static void saveSettingsFiles(vector<string> nameSpaceList = { "*" }, vector<pair<string, vector<string>>> categoryLists = { {"settings.cfg", {""}}});
+	static void initializeParameters(int argc, const char * argv[], int _maxLineLength, int _commentIndent);
+	static void saveSettingsFile(const string& nameSpace, stringstream& FILE, vector<string> categoryList, int _maxLineLength, int _commentIndent, bool alsoChildren = false, int nameSpaceLevel = 0);
+	static void saveSettingsFiles(int _maxLineLength, int _commentIndent, vector<string> nameSpaceList = { "*" }, vector<pair<string, vector<string>>> categoryLists = { {"settings.cfg", {""}}});
+	static void printParameterWithWraparound(stringstream& FILE, string _currentIndent, string _parameter, int _maxLineLength, int _commentIndent);
 };
 
 #endif // __MABE__Parameters__

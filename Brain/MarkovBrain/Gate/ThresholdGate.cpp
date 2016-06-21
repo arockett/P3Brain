@@ -8,7 +8,8 @@
 
 #include "ThresholdGate.h"
 
-Thresholdgate::Thresholdgate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
+Thresholdgate::Thresholdgate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID, shared_ptr<ParametersTable> _PT) :
+	AbstractGate(_PT) {
 
 	ID = gateID;
 
@@ -63,3 +64,16 @@ string Thresholdgate::description() {
 	return to_string(ID) + ": ThresholdgateGate: " + to_string(threshold) + "\n" + AbstractGate::description();;
 }
 
+
+shared_ptr<AbstractGate> Thresholdgate::makeCopy(shared_ptr<ParametersTable> _PT)
+{
+	if (_PT == nullptr) {
+		_PT = PT;
+	}
+	auto newGate = make_shared<Thresholdgate>(_PT);
+	newGate->ID = ID;
+	newGate->inputs = inputs;
+	newGate->outputs = outputs;
+	newGate->threshold = threshold; 
+	return newGate;
+}

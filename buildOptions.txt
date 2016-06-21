@@ -2,8 +2,8 @@
   + Berry
 
 % Genome
-  + Circular
-  * Multi
+  * Circular
+  + Multi
   
 % Brain
   + ConstantValues

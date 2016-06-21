@@ -9,7 +9,7 @@
 #include "MarkovBrain.h"
 
 shared_ptr<ParameterLink<bool>> MarkovBrain::randomizeUnconnectedOutputsPL = Parameters::register_parameter("BRAIN_MARKOV_ADVANCED-randomizeUnconnectedOutputs", false, "output nodes with no connections will be set randomly (default : false, behavior set to 0)");
-shared_ptr<ParameterLink<int>> MarkovBrain::randomizeUnconnectedOutputsTypePL = Parameters::register_parameter("BRAIN_MARKOV_ADVANCED-randomizeUnconnectedOutputsType", 0, "random values resulting from randomizeUnconnectedOutput will be of type [0 = int, 1 = double]");
+shared_ptr<ParameterLink<int>> MarkovBrain::randomizeUnconnectedOutputsTypePL = Parameters::register_parameter("BRAIN_MARKOV_ADVANCED-randomizeUnconnectedOutputsType", 0, "random values resulting from randomizeUnconnectedOutput will be of type \n[0 = int, 1 = double]");
 shared_ptr<ParameterLink<double>> MarkovBrain::randomizeUnconnectedOutputsMaxPL = Parameters::register_parameter("BRAIN_MARKOV_ADVANCED-randomizeUnconnectedOutputsMax", 1.0, "random values resulting from randomizeUnconnectedOutput will be in the range of 0 to randomizeUnconnectedOutputsMax");
 
 MarkovBrain::MarkovBrain(vector<shared_ptr<AbstractGate>> _gates, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT) :
@@ -57,7 +57,7 @@ MarkovBrain::MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, int _nrInNode
 MarkovBrain::MarkovBrain(shared_ptr<AbstractGateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrInNodes, int _nrOutNodes, int _nrHiddenNodes, shared_ptr<ParametersTable> _PT) :
 		MarkovBrain(_GLB, _nrInNodes, _nrOutNodes, _nrHiddenNodes, _PT) {
 	//cout << "in MarkovBrain::MarkovBrain(shared_ptr<Base_GateListBuilder> _GLB, shared_ptr<AbstractGenome> genome, int _nrOfBrainStates)\n\tabout to - gates = GLB->buildGateList(genome, nrOfBrainStates);" << endl;
-	gates = GLB->buildGateList(genome, nrOfBrainNodes);
+	gates = GLB->buildGateList(genome, nrOfBrainNodes, _PT);
 	inOutReMap();  // map ins and outs from genome values to brain states
 	fillInConnectionsLists();
 }
@@ -223,3 +223,16 @@ void MarkovBrain::initalizeGenome(shared_ptr<AbstractGenome> _genome) {
 	}
 }
 
+shared_ptr<AbstractBrain> MarkovBrain::makeCopy(shared_ptr<ParametersTable> _PT)
+{
+	if (_PT == nullptr) {
+		_PT = PT;
+	}
+	vector<shared_ptr<AbstractGate>> _gates; 
+	for (auto gate : gates) {
+		_gates.push_back(gate->makeCopy());
+	}
+	auto newBrain = make_shared<MarkovBrain>(_gates, nrInNodes, nrOutNodes, nrHiddenNodes,_PT);
+	
+	return newBrain;
+}

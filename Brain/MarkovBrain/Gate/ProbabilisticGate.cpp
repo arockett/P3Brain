@@ -8,7 +8,8 @@
 
 #include "ProbabilisticGate.h"
 
-ProbabilisticGate::ProbabilisticGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> rawTable, int _ID) {
+ProbabilisticGate::ProbabilisticGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> rawTable, int _ID, shared_ptr<ParametersTable> _PT) :
+	AbstractGate(_PT) {
 	ID = _ID;
 	int i, j;
 	inputs = addresses.first;
@@ -50,4 +51,17 @@ void ProbabilisticGate::update(vector<double> & nodes, vector<double> & nextNode
 	for (size_t i = 0; i < outputs.size(); i++)  //for each output...
 		nextNodes[outputs[i]] += 1.0 * ((outputColumn >> (outputs.size() - 1 - i)) & 1);  // convert output (the column number) to bits and pack into next states
 																						   // but always put the last bit in the first input (to maintain consistancy)
+}
+
+shared_ptr<AbstractGate> ProbabilisticGate::makeCopy(shared_ptr<ParametersTable> _PT)
+{
+	if (_PT == nullptr) {
+		_PT = PT;
+	}
+	auto newGate = make_shared<ProbabilisticGate>(_PT);
+	newGate->table = table;
+	newGate->ID = ID;
+	newGate->inputs = inputs;
+	newGate->outputs = outputs;
+	return newGate;
 }

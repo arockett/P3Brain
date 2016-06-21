@@ -10,7 +10,8 @@
 
 bool FeedbackGate::feedbackON = true;
 
-FeedbackGate::FeedbackGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
+FeedbackGate::FeedbackGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID, shared_ptr<ParametersTable> _PT) :
+	AbstractGate(_PT) {
 
 	ID = gateID;
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -194,4 +195,30 @@ vector<int> FeedbackGate::getIns() {
 	R.push_back(posFBNode);
 	R.push_back(negFBNode);
 	return R;
+}
+
+shared_ptr<AbstractGate> FeedbackGate::makeCopy(shared_ptr<ParametersTable> _PT)
+{
+	if (_PT == nullptr) {
+		_PT = PT;
+	}
+	auto newGate = make_shared<FeedbackGate>(_PT);
+	newGate->table = table;
+	newGate->ID = ID;
+	newGate->inputs = inputs;
+	newGate->outputs = outputs;
+	newGate->originalTable = originalTable; 
+	newGate->posFBNode = posFBNode; 
+	newGate->negFBNode = negFBNode; 
+	newGate->nrPos = nrPos;
+	newGate->nrNeg = nrNeg;
+	newGate->posLevelOfFB = posLevelOfFB;
+	newGate->negLevelOfFB = negLevelOfFB;
+	newGate->chosenInPos = chosenInPos;
+	newGate->chosenInNeg = chosenInNeg;
+	newGate->chosenOutPos = chosenOutPos;
+	newGate->chosenOutNeg = chosenOutNeg;
+	
+	return newGate;
+
 }
