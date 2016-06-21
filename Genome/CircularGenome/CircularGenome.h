@@ -45,6 +45,9 @@ template<class T>
 class CircularGenome: public AbstractGenome {
 
 public:
+
+	
+
 	shared_ptr<ParameterLink<int>> initialSizeLPL;
 	shared_ptr<ParameterLink<double>> mutationPointRateLPL;
 	shared_ptr<ParameterLink<double>> mutationCopyRateLPL;
@@ -122,6 +125,8 @@ public:
 
 	CircularGenome(double _alphabetSize = 256, int _size = 100, shared_ptr<ParametersTable> _PT = nullptr);
 
+	virtual shared_ptr<AbstractGenome> makeCopy(shared_ptr<ParametersTable> _PT = nullptr);
+	
 	virtual ~CircularGenome() = default;
 
 	virtual void setupCircularGenome(int _size, double _alphabetSize);

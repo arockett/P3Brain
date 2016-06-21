@@ -24,7 +24,8 @@
 #include "Utilities/Utilities.h"
 
 #include "modules.h"
-using namespace std;
+	using namespace std;
+
 
 
 int main(int argc, const char * argv[]) {
@@ -33,10 +34,12 @@ int main(int argc, const char * argv[]) {
 
 	cout << "\tfor help run MABE with the \"-h\" flag (i.e. ./MABE -h)." << endl << endl;
 	configureDefaultsAndDocumentation();
-	Parameters::initializeParameters(argc, argv);  // loads command line and configFile values into registered parameters
-												   // also writes out a config file if requested
+	int maxLineLength = Global::maxLineLengthPL->lookup();
+	int commentIndent = Global::commentIndentPL->lookup();
+	Parameters::initializeParameters(argc, argv, maxLineLength, commentIndent);  // loads command line and configFile values into registered parameters
+																				 // also writes out a config file if requested
 
-	// outputDirectory must exist. If outputDirectory does not exist, no error will occur, but no data will be writen.
+												   // outputDirectory must exist. If outputDirectory does not exist, no error will occur, but no data will be writen.
 	FileManager::outputDirectory = Global::outputDirectoryPL->lookup();
 
 	if (Global::randomSeedPL->lookup() == -1) {
@@ -44,7 +47,8 @@ int main(int argc, const char * argv[]) {
 		int temp = rd();
 		Random::getCommonGenerator().seed(temp);
 		cout << "Generating Random Seed\n  " << temp << endl;
-	} else {
+	}
+	else {
 		Random::getCommonGenerator().seed(Global::randomSeedPL->lookup());
 		cout << "Using Random Seed: " << Global::randomSeedPL->lookup() << endl;
 	}
@@ -61,7 +65,8 @@ int main(int argc, const char * argv[]) {
 		if (NS == "") {
 			PT = nullptr;  //Parameters::root;
 			NS = "default";
-		} else {
+		}
+		else {
 			PT = Parameters::root->getTable(NS);
 		}
 
@@ -72,13 +77,12 @@ int main(int argc, const char * argv[]) {
 		shared_ptr<Organism> progenitor = make_shared<Organism>(templateGenome, templateBrain);  // make a organism with a genome and brain - progenitor serves as an ancestor to all and a template organism
 
 		Global::update = 0;  // the beginning of time - now we construct the first population
-		int popSize = (PT == nullptr)?Global::popSizePL->lookup():PT->lookupInt("GLOBAL-popSize");
+		int popSize = (PT == nullptr) ? Global::popSizePL->lookup() : PT->lookupInt("GLOBAL-popSize");
 		vector<shared_ptr<Organism>> population;
 		for (int i = 0; i < popSize; i++) {
 			auto newGenome = templateGenome->makeLike();
 			templateBrain->initalizeGenome(newGenome);  // use progenitors brain to prepare genome (add start codons, change ratio of site values, etc)
 			auto newOrg = make_shared<Organism>(progenitor, newGenome);
-			newOrg->gender = Random::getInt(0, 1);  // assign a random gender to the new org
 			population.push_back(newOrg);  // add a new org to population using progenitors template and a new random genome
 		}
 		progenitor->kill();  // the progenitor has served it's purpose.
@@ -105,43 +109,6 @@ int main(int argc, const char * argv[]) {
 	}
 
 
-////////////////////
-//// find org with score loop
-////////////////////
-//bool done = false;
-//int tempRepeats = AbstractWorld::repeatsPL->lookup();
-//AbstractWorld::repeatsPL->set(1);
-//
-//while (!done){
-//	shared_ptr<AbstractGenome> templateGenome = makeTemplateGenome(PT);
-//	shared_ptr<AbstractBrain> templateBrain = makeTemplateBrain(world, PT);
-//	shared_ptr<Organism> progenitor = make_shared<Organism>(templateGenome, templateBrain);
-//
-//	vector<shared_ptr<Organism>> population;
-//
-//	auto newGenome = templateGenome->makeLike();
-//	templateBrain->initalizeGenome(newGenome);  // use progenitors brain to prepare genome (add start codons, change ratio of site values, etc)
-//	auto newOrg = make_shared<Organism>(progenitor, newGenome);
-//	population.push_back(newOrg);  // add a new org to population using progenitors template and a new random genome
-//
-//	auto group = make_shared<Group>(population, groups["default"]->optimizer, groups["default"]->archivist);
-//
-//	double targetScore = 1.6;
-//	int targetCount = 0;
-//	for (int i = 0; i < 3; i++){
-//		world->evaluate(group, AbstractWorld::groupEvaluationPL->lookup(), false, false, false);
-//		if (group->population[0]->score >= targetScore){
-//			targetCount++;
-//		}
-//		//cout << targetCount << " " << group->population[0]->score << endl;
-//		if (targetCount >= 3){
-//			done = true;
-//		}
-//	}
-//}
-//cout << "DONE" << endl;
-//
-//AbstractWorld::repeatsPL->set(tempRepeats);
 
 //////////////////
 // evolution loop
@@ -157,25 +124,26 @@ int main(int argc, const char * argv[]) {
 
 		while (!finished) {
 			world->evaluate(groups[defaultGroup], AbstractWorld::groupEvaluationPL->lookup(), false, false, AbstractWorld::debugPL->lookup());  // evaluate each organism in the population using a World
-			//cout << "  evaluation done\n";
+																																				//cout << "  evaluation done\n";
 			finished = groups[defaultGroup]->archive();  // save data, update memory and delete any unneeded data;
-			//cout << "  archive done\n";
+														 //cout << "  archive done\n";
 			Global::update++;
 			groups[defaultGroup]->optimize();  // update the population (reproduction and death)
-			//cout << "  optimize done\n";
+											   //cout << "  optimize done\n";
 			cout << "update: " << Global::update - 1 << "   maxFitness: " << groups[defaultGroup]->optimizer->maxFitness << "" << endl;
 		}
 
 		groups[defaultGroup]->archive(1);  // flush any data that has not been output yet
 
-	} else if (Global::modePL->lookup() == "test") {
+	}
+	else if (Global::modePL->lookup() == "test") {
 
 		vector<shared_ptr<AbstractGenome>> mg;
 		groups[defaultGroup]->population[0]->genome->loadGenomeFile(Global::visualizePopulationFilePL->lookup(), mg);
 		cout << "file loaded";
-		int num_genomes = (int) mg.size();
+		int num_genomes = (int)mg.size();
 		int counter = 0;
-		while ((int) mg.size() < Global::popSizePL->lookup()) {
+		while ((int)mg.size() < Global::popSizePL->lookup()) {
 			cout << ".";
 			mg.push_back(mg[counter]);
 			counter++;
@@ -192,12 +160,12 @@ int main(int argc, const char * argv[]) {
 		}
 		cout << "\npopulation created." << endl;
 
-//////////////////////////////////////////////
-// rebuild testGroup with one particular org.
+		//////////////////////////////////////////////
+		// rebuild testGroup with one particular org.
 		testPopulation.clear();
 		auto newOrg = make_shared<Organism>(groups[defaultGroup]->population[0], mg[0]);
 		testPopulation.push_back(newOrg);
-//////////////////////////////////////////////
+		//////////////////////////////////////////////
 
 		shared_ptr<Group> testGroup = make_shared<Group>(testPopulation, groups[defaultGroup]->optimizer, groups[defaultGroup]->archivist);
 		cout << "\ngroup created." << endl;
@@ -207,7 +175,8 @@ int main(int argc, const char * argv[]) {
 			cout << o->score << " " << o->genome->dataMap.Get("ID") << endl;
 		}
 
-	} else {
+	}
+	else {
 		cout << "\n\nERROR: Unrecognized mode set in configuration!\n  \"" << Global::modePL->lookup() << "\" is not defined.\n\nExiting.\n" << endl;
 		exit(1);
 	}

@@ -28,6 +28,8 @@ class AbstractGenome {
 
 public:
 
+	virtual shared_ptr<AbstractGenome> makeCopy(shared_ptr<ParametersTable> _PT = nullptr);
+
 	static shared_ptr<ParameterLink<string>> genomeTypeStrPL;
 	static shared_ptr<ParameterLink<double>> alphabetSizePL;
 	static shared_ptr<ParameterLink<string>> genomeSitesTypePL;

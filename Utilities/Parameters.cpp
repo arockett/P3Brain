@@ -344,7 +344,7 @@ unordered_map<string, string> Parameters::readParametersFile(string fileName) {
 	return config_file_list;
 }
 
-void Parameters::initializeParameters(int argc, const char * argv[]) {
+void Parameters::initializeParameters(int argc, const char * argv[], int _maxLineLength, int _commentIndent) {
 
 	if (root == nullptr) {
 		root = ParametersTable::makeTable();
@@ -433,13 +433,13 @@ void Parameters::initializeParameters(int argc, const char * argv[]) {
 	}
 	if (saveFiles) {
 
-		Parameters::saveSettingsFiles( { "*" }, { { "settings_organism.cfg", { "GATE*", "GENOME*", "BRAIN*" } }, { "settings_world.cfg", { "WORLD*" } }, { "settings.cfg", { "" } } });
+		Parameters::saveSettingsFiles(_maxLineLength, _commentIndent, { "*" }, { { "settings_organism.cfg", { "GATE*", "GENOME*", "BRAIN*" } }, { "settings_world.cfg", { "WORLD*" } }, { "settings.cfg", { "" } } });
 		cout << "Saving config Files and Exiting." << endl;
 		exit(0);
 	}
 }
 
-void Parameters::saveSettingsFile(const string& nameSpace, stringstream& FILE, vector<string> categoryList, bool alsoChildren, int nameSpaceLevel) {
+void Parameters::saveSettingsFile(const string& nameSpace, stringstream& FILE, vector<string> categoryList, int _maxLineLength, int _commentIndent, bool alsoChildren, int nameSpaceLevel) {
 	map<string, vector<string>> sortedParameters;
 	root->lookupTable(nameSpace)->parametersToSortedList(sortedParameters);
 	if (!root->lookupTable(nameSpace)->neverSave) {
@@ -462,7 +462,8 @@ void Parameters::saveSettingsFile(const string& nameSpace, stringstream& FILE, v
 			if (sortedParameters.find("GLOBAL") != sortedParameters.end() && !(find(categoryList.begin(), categoryList.end(), "GLOBAL") != categoryList.end())) {
 				FILE << currentIndent << "% GLOBAL" << "\n";
 				for (auto parameter : sortedParameters["GLOBAL"]) {
-					FILE << currentIndent << "  " << parameter << "\n";
+					printParameterWithWraparound(FILE, currentIndent, parameter, _maxLineLength, _commentIndent);
+//					FILE << currentIndent << "  " << parameter << "\n";
 				}
 				FILE << "\n";
 			}
@@ -470,7 +471,8 @@ void Parameters::saveSettingsFile(const string& nameSpace, stringstream& FILE, v
 			if (sortedParameters.find("GLOBAL") != sortedParameters.end() && find(categoryList.begin(), categoryList.end(), "GLOBAL") != categoryList.end()) {
 				FILE << currentIndent << "% GLOBAL" << "\n";
 				for (auto parameter : sortedParameters["GLOBAL"]) {
-					FILE << currentIndent << "  " << parameter << "\n";
+					printParameterWithWraparound(FILE, currentIndent, parameter, _maxLineLength, _commentIndent);
+//					FILE << currentIndent << "  " << parameter << "\n";
 				}
 				FILE << "\n";
 			}
@@ -514,7 +516,8 @@ void Parameters::saveSettingsFile(const string& nameSpace, stringstream& FILE, v
 			if (saveThis) {
 				FILE << currentIndent << "% " << group.first << "\n";
 				for (auto parameter : group.second) {
-					FILE << currentIndent << "  " << parameter << "\n";
+					printParameterWithWraparound(FILE, currentIndent, parameter, _maxLineLength, _commentIndent); 
+//					FILE << currentIndent << "  " << parameter << "\n";
 				}
 				FILE << "\n";
 			}
@@ -524,7 +527,7 @@ void Parameters::saveSettingsFile(const string& nameSpace, stringstream& FILE, v
 			vector<shared_ptr<ParametersTable>> checklist = root->lookupTable(nameSpace)->getChildren();
 			sort(checklist.begin(), checklist.end());
 			for (auto c : checklist) {
-				saveSettingsFile(c->getTableNameSpace(), FILE, categoryList, true, nameSpaceLevel);
+				saveSettingsFile(c->getTableNameSpace(), FILE, categoryList, _maxLineLength, _commentIndent, true, nameSpaceLevel);
 			}
 		}
 
@@ -537,7 +540,83 @@ void Parameters::saveSettingsFile(const string& nameSpace, stringstream& FILE, v
 	}
 }
 
-void Parameters::saveSettingsFiles(vector<string> nameSpaceList, vector<pair<string, vector<string>>> categoryLists) {
+void Parameters::printParameterWithWraparound(stringstream& FILE, string _currentIndent, string _parameter, int _maxLineLength, int _commentIndent) {
+	int currentLineLength = _currentIndent.size(); 
+	FILE << _currentIndent; 
+	int beforeIndentLength = currentLineLength + _parameter.find("@@@#"); 
+	string betweenString = "";
+	for (int i = beforeIndentLength; i < _commentIndent; i++) {
+		betweenString.append(" "); 
+	}
+	betweenString.append("#"); 
+	_parameter.replace(_parameter.find("@@@#"), 4, betweenString); 
+	if (currentLineLength + (int)_parameter.size() < _maxLineLength) {
+		FILE << _parameter << endl; 
+	}
+	else
+	{
+		string indent = ""; 
+		for (int i = 0; i < _commentIndent; i++) {
+			indent.append(" "); 
+		}
+		indent.append("#    "); 
+
+		string parameterName = _parameter.substr(0, _parameter.find("#")); 
+		string parameterRemainder = _parameter.substr(_parameter.find("#"));
+		FILE << parameterName;
+		currentLineLength += parameterName.size(); 
+		int remainderMaxLength = _maxLineLength - _commentIndent; 
+		while (parameterRemainder.size() > 0) {
+			int newLine = parameterRemainder.substr(0, remainderMaxLength).find("\n");
+			if (newLine == -1) {
+				int lastSpace = parameterRemainder.substr(0, remainderMaxLength).find_last_of(" ");
+				if (lastSpace == -1) {
+					if (currentLineLength == 0) {
+						FILE << indent;
+						currentLineLength += _commentIndent;
+					}
+					if ((int)parameterRemainder.size() > remainderMaxLength) {
+						string takenPart = parameterRemainder.substr(0, remainderMaxLength - 1);
+						parameterRemainder = parameterRemainder.substr(remainderMaxLength - 1);
+						takenPart.append("-");
+						FILE << takenPart << endl;
+					}
+					else {
+						FILE << parameterRemainder << endl;
+						parameterRemainder = "";
+					}
+				}
+				else {
+					if (currentLineLength == 0) {
+						FILE << indent;
+						currentLineLength += _commentIndent;
+					}
+					if ((int)parameterRemainder.size() > remainderMaxLength) {
+						string remainderBeforeSpace = parameterRemainder.substr(0, lastSpace);
+						parameterRemainder = parameterRemainder.substr(lastSpace+1);
+						FILE << remainderBeforeSpace << endl;
+					}
+					else {
+						FILE << parameterRemainder << endl;
+						parameterRemainder = "";
+					}
+				}
+			}
+			else {
+				if (currentLineLength == 0) {
+					FILE << indent;
+					currentLineLength += _commentIndent;
+				}
+				string remainderBeforeNewLine = parameterRemainder.substr(0, newLine);
+				parameterRemainder = parameterRemainder.substr(newLine+1);
+				FILE << remainderBeforeNewLine << endl;
+			}
+			currentLineLength = 0;
+		} 
+	}
+}
+
+void Parameters::saveSettingsFiles(int _maxLineLength, int _commentIndent, vector<string> nameSpaceList, vector<pair<string, vector<string>>> categoryLists) {
 	bool alsoChildren;
 	string fileName;
 	vector<string> otherCategoryList;
@@ -569,9 +648,9 @@ void Parameters::saveSettingsFiles(vector<string> nameSpaceList, vector<pair<str
 			stringstream ss;
 			if (cList.second.size() == 1 && cList.second[0]=="") {
 				otherCategoryList.insert(otherCategoryList.begin(),"-");
-				saveSettingsFile(nameSpace, ss, otherCategoryList, alsoChildren);
+				saveSettingsFile(nameSpace, ss, otherCategoryList, _maxLineLength, _commentIndent, alsoChildren);
 			} else {
-				saveSettingsFile(nameSpace, ss, cList.second, alsoChildren);
+				saveSettingsFile(nameSpace, ss, cList.second, _maxLineLength, _commentIndent, alsoChildren);
 			}
 			string workingString = ss.str();
 			workingString.erase (remove (workingString.begin(), workingString.end(), ' '), workingString.end());

@@ -8,7 +8,8 @@
 
 #include "DeterministicGate.h"
 
-DeterministicGate::DeterministicGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID) {
+DeterministicGate::DeterministicGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID, shared_ptr<ParametersTable> _PT) :
+	AbstractGate(_PT) {
 	ID = _ID;
 	inputs = addresses.first;
 	outputs = addresses.second;
@@ -33,5 +34,18 @@ void DeterministicGate::update(vector<double> & nodes, vector<double> & nextNode
 	for (size_t i = 0; i < outputs.size(); i++) {
 		nextNodes[outputs[i]] += table[input][i];
 	}
+}
+
+shared_ptr<AbstractGate> DeterministicGate::makeCopy(shared_ptr<ParametersTable> _PT)
+{
+	if (_PT == nullptr) {
+		_PT = PT; 
+	}
+	auto newGate = make_shared<DeterministicGate>(_PT); 
+	newGate->table = table; 
+	newGate->ID = ID;	
+	newGate->inputs = inputs;
+	newGate->outputs = outputs;
+	return newGate;
 }
 

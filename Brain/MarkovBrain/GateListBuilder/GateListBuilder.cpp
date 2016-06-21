@@ -8,7 +8,7 @@
 
 #include "GateListBuilder.h"
 
-vector<shared_ptr<AbstractGate>> ClassicGateListBuilder::buildGateListAndGetAllValues(shared_ptr<AbstractGenome> genome, int nrOfBrainStates, int maxValue, vector<int> &genomeHeadValues, int genomeHeadValuesCount, vector<vector<int>> &genomePerGateValues, int genomePerGateValuesCount) {
+vector<shared_ptr<AbstractGate>> ClassicGateListBuilder::buildGateListAndGetAllValues(shared_ptr<AbstractGenome> genome, int nrOfBrainStates, int maxValue, vector<int> &genomeHeadValues, int genomeHeadValuesCount, vector<vector<int>> &genomePerGateValues, int genomePerGateValuesCount, shared_ptr<ParametersTable> gatePT) {
 
 	vector<shared_ptr<AbstractGate>> gates;
 	int codonMax = (1 << Global::bitsPerCodonPL->lookup()) - 1;
@@ -53,7 +53,7 @@ vector<shared_ptr<AbstractGate>> ClassicGateListBuilder::buildGateListAndGetAllV
 					gateGenomeHandler->toggleReadDirection();  // reverse the read direction again
 					gateGenomeHandler->readInt(0, codonMax, AbstractGate::START_CODE, gateCount);  // mark start codon in genomes coding region
 					gateGenomeHandler->readInt(0, codonMax, AbstractGate::START_CODE, gateCount);
-					shared_ptr<AbstractGate> newGate = gateBuilder.makeGate[testSite1Value](gateGenomeHandler, gateCount);
+					shared_ptr<AbstractGate> newGate = gateBuilder.makeGate[testSite1Value](gateGenomeHandler, gateCount, gatePT);
 
 					if (newGate != nullptr) {
 						// now read perGate values from genome
