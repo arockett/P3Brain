@@ -15,8 +15,8 @@ using namespace std;
 class LODwAPArchivist: public DefaultArchivist {  // Line of Decent with Active Pruning
 public:
 
-	static shared_ptr<ParameterLink<int>> LODwAP_Arch_dataIntervalPL;  // how often to write out data
-	static shared_ptr<ParameterLink<int>> LODwAP_Arch_genomeIntervalPL;  // how often to write out genomes
+	static shared_ptr<ParameterLink<string>> LODwAP_Arch_dataSequencePL;  // how often to write out data
+	static shared_ptr<ParameterLink<string>> LODwAP_Arch_genomeSequencePL;  // how often to write out genomes
 	static shared_ptr<ParameterLink<int>> LODwAP_Arch_pruneIntervalPL;  // how often to attempt to prune the LOD
 	static shared_ptr<ParameterLink<int>> LODwAP_Arch_terminateAfterPL;  // how long to run after updates (to get better coalescence)
 	static shared_ptr<ParameterLink<string>> LODwAP_Arch_DataFileNamePL;  // name of the Data file
@@ -26,8 +26,8 @@ public:
 	static shared_ptr<ParameterLink<bool>> LODwAP_Arch_dataFileShowAllListsPL;
 	static shared_ptr<ParameterLink<bool>> LODwAP_Arch_dataFileConvertAllListsPL;
 
-	int dataInterval;  // how often to write out data
-	int genomeInterval;  // how often to write out genomes
+	vector<int> dataSequence;  // how often to write out data
+	vector<int> genomeSequence;  // how often to write out genomes
 	int pruneInterval;  // how often to attempt to prune the LOD
 	int terminateAfter;  // how long to run after updates (to get better coalescence)
 	string DataFileName;  // name of the Data file
@@ -42,8 +42,12 @@ public:
 	//// info about files under management
 	int nextDataWrite;  // next time data files will be written to disk
 	int nextGenomeWrite;  // next time a genome file will be written to genome.csv
-	int nextDataCheckPoint;  // next time data files contents need to be checkpointed (this is needed particularly to handle delay > interval)
-	int nextGenomeCheckPoint;  // next time a genome files contents need to be checkpointed (this is needed particularly to handle delay > interval)
+
+	int dataSeqIndex;
+	int genomeSeqIndex;
+
+	//int nextDataCheckPoint;  // next time data files contents need to be checkpointed (this is needed particularly to handle delay > interval)
+	//int nextGenomeCheckPoint;  // next time a genome files contents need to be checkpointed (this is needed particularly to handle delay > interval)
 
 	//unordered_map<int, vector<weak_ptr<Organism>>> checkpoints;  // used by SSwD only - this keeps lists of orgs that may be written (if they have living decendents)
 	//// key is Global::nextGenomeWrite or Global::nextDataWrite

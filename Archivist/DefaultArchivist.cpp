@@ -3,7 +3,10 @@ using namespace std;
 
 shared_ptr<ParameterLink<string>> DefaultArchivist::Arch_outputMethodStrPL = Parameters::register_parameter("ARCHIVIST-outputMethod", (string) "default", "output method, [default, LODwAP (Line of Decent with Aggressive Pruning), SSwD (SnapShot with Delay)]");  // string parameter for outputMethod;
 
-shared_ptr<ParameterLink<int>> DefaultArchivist::Arch_realtimeFilesIntervalPL = Parameters::register_parameter("ARCHIVIST_DEFAULT-realtimeFilesInterval", 10, "How often to write to realtime data files");
+shared_ptr<ParameterLink<string>> DefaultArchivist::Arch_realtimeSequencePL = Parameters::register_parameter("ARCHIVIST_DEFAULT-realtimeSequence", (string) ":10", "How often to write to realtime data files. (format: x = single value, x-y = x to y, x-y:z = x to y on x, :z = from 0 to updates on z, x:z = from x to 'updates' on z) e.g. '1-100:10, 200, 300:100'");
+shared_ptr<ParameterLink<string>> DefaultArchivist::SS_Arch_dataSequencePL = Parameters::register_parameter("ARCHIVIST_DEFAULT-snapshotDataSequence", (string) ":100", "How often to save a realtime snapshot data file. (format: x = single value, x-y = x to y, x-y:z = x to y on x, :z = from 0 to updates on z, x:z = from x to 'updates' on z) e.g. '1-100:10, 200, 300:100'");
+shared_ptr<ParameterLink<string>> DefaultArchivist::SS_Arch_genomeSequencePL = Parameters::register_parameter("ARCHIVIST_DEFAULT-snapshotGenomeSequence", (string) ":1000", "How often to save a realtime snapshot genome file. (format: x = single value, x-y = x to y, x-y:z = x to y on x, :z = from 0 to updates on z, x:z = from x to 'updates' on z) e.g. '1-100:10, 200, 300:100'");
+
 shared_ptr<ParameterLink<bool>> DefaultArchivist::Arch_writeAveFilePL = Parameters::register_parameter("ARCHIVIST_DEFAULT-writeAveFile", true, "Save data to average file?");
 shared_ptr<ParameterLink<bool>> DefaultArchivist::Arch_writeDominantFilePL = Parameters::register_parameter("ARCHIVIST_DEFAULT-writeDominantFile", true, "Save data to dominant file?");
 shared_ptr<ParameterLink<string>> DefaultArchivist::Arch_AveFileNamePL = Parameters::register_parameter("ARCHIVIST_DEFAULT-aveFileName", (string) "ave.csv", "name of average file (saves population averages)");
@@ -11,8 +14,6 @@ shared_ptr<ParameterLink<string>> DefaultArchivist::Arch_DominantFileNamePL = Pa
 shared_ptr<ParameterLink<string>> DefaultArchivist::Arch_DefaultAveFileColumnNamesPL = Parameters::register_parameter("ARCHIVIST_DEFAULT-aveFileColumns", (string) "[]", "data to be saved into average file (must be values that can generate an average). If empty, MABE will try to figure it out");
 shared_ptr<ParameterLink<bool>> DefaultArchivist::Arch_DominantFileShowAllListsPL = Parameters::register_parameter("ARCHIVIST_DEFAULT-dominantFileShowAllLists", true, "lists named 'all'* in data map will be averaged and added to file. if true, raw 'all'* lists will also be added to the file");
 
-shared_ptr<ParameterLink<int>> DefaultArchivist::SS_Arch_dataIntervalPL = Parameters::register_parameter("ARCHIVIST_DEFAULT-snapshotDataInterval", 100, "How often to save a snapshot data file");
-shared_ptr<ParameterLink<int>> DefaultArchivist::SS_Arch_genomeIntervalPL = Parameters::register_parameter("ARCHIVIST_DEFAULT-snapshotGenomeInterval", 1000, "How often to save a snapshot genome file");
 shared_ptr<ParameterLink<string>> DefaultArchivist::SS_Arch_DataFilePrefixPL = Parameters::register_parameter("ARCHIVIST_DEFAULT-snapshotDataFilePrefix", (string) "snapshotData", "prefix for name of snapshot genome file (stores genomes)");
 shared_ptr<ParameterLink<string>> DefaultArchivist::SS_Arch_GenomeFilePrefixPL = Parameters::register_parameter("ARCHIVIST_DEFAULT-snapshotGenomeFilePrefix", (string) "snapshotGenome", "prefix for name of snapshot data file (stores everything but genomes)");
 shared_ptr<ParameterLink<bool>> DefaultArchivist::SS_Arch_writeDataFilesPL = Parameters::register_parameter("ARCHIVIST_DEFAULT-writeSnapshotDataFiles", false, "if true, snapshot data files will be written (with all non genome data for entire population)");
@@ -20,7 +21,25 @@ shared_ptr<ParameterLink<bool>> DefaultArchivist::SS_Arch_writeGenomeFilesPL = P
 
 DefaultArchivist::DefaultArchivist(shared_ptr<ParametersTable> _PT) :
 		PT(_PT) {
-	realtimeFilesInterval = (PT == nullptr) ? Arch_realtimeFilesIntervalPL->lookup() : PT->lookupInt("ARCHIVIST_DEFAULT-realtimeFilesInterval");
+	string realtimeSequenceStr = (PT == nullptr) ? Arch_realtimeSequencePL->lookup() : PT->lookupString("ARCHIVIST_DEFAULT-realtimeSequence");
+	realtimeSequence = seq(realtimeSequenceStr, Global::updatesPL->lookup(), true);
+	if (realtimeSequence.size() == 0) {
+		cout << "unable to translate ARCHIVIST_DEFAULT-realtimeSequence \"" << realtimeSequenceStr << "\".\nExiting." << endl;
+		exit(1);
+	}
+	string dataSequenceStr = (PT == nullptr) ? SS_Arch_dataSequencePL->lookup() : PT->lookupString("ARCHIVIST_DEFAULT-snapshotDataSequence");
+	realtimeDataSequence = seq(dataSequenceStr, Global::updatesPL->lookup(), true);
+	if (realtimeDataSequence.size() == 0) {
+		cout << "unable to translate ARCHIVIST_DEFAULT-snapshotDataSequence \"" << dataSequenceStr << "\".\nExiting." << endl;
+		exit(1);
+	}
+	string genomeIntervalStr = (PT == nullptr) ? SS_Arch_genomeSequencePL->lookup() : PT->lookupString("ARCHIVIST_DEFAULT-snapshotGenomeSequence");
+	realtimeGenomeSequence = seq(genomeIntervalStr, Global::updatesPL->lookup(), true);
+	if (realtimeGenomeSequence.size() == 0) {
+		cout << "unable to translate ARCHIVIST_DEFAULT-snapshotGenomeSequence \"" << genomeIntervalStr << "\".\nExiting." << endl;
+		exit(1);
+	}
+
 	writeAveFile = (PT == nullptr) ? Arch_writeAveFilePL->lookup() : PT->lookupBool("ARCHIVIST_DEFAULT-writeAveFile");
 	writeDominantFile = (PT == nullptr) ? Arch_writeDominantFilePL->lookup() : PT->lookupBool("ARCHIVIST_DEFAULT-writeDominantFile");
 	AveFileName = (PT == nullptr) ? Arch_AveFileNamePL->lookup() : PT->lookupString("ARCHIVIST_DEFAULT-aveFileName");
@@ -28,12 +47,14 @@ DefaultArchivist::DefaultArchivist(shared_ptr<ParametersTable> _PT) :
 	AveFileColumnNames = (PT == nullptr) ? Arch_DefaultAveFileColumnNamesPL->lookup() : PT->lookupString("ARCHIVIST_DEFAULT-aveFileColumns");
 	DominantFileShowAllLists = (PT == nullptr) ? Arch_DominantFileShowAllListsPL->lookup() : PT->lookupBool("ARCHIVIST_DEFAULT-dominantFileShowAllLists");
 
-	dataInterval = (PT == nullptr) ? SS_Arch_dataIntervalPL->lookup() : PT->lookupInt("ARCHIVIST_DEFAULT-snapshotDataInterval");
-	genomeInterval = (PT == nullptr) ? SS_Arch_genomeIntervalPL->lookup() : PT->lookupInt("ARCHIVIST_DEFAULT-snapshotGenomeInterval");
 	DataFilePrefix = (PT == nullptr) ? SS_Arch_DataFilePrefixPL->lookup() : PT->lookupString("ARCHIVIST_DEFAULT-snapshotDataFilePrefix");
 	GenomeFilePrefix = (PT == nullptr) ? SS_Arch_GenomeFilePrefixPL->lookup() : PT->lookupString("ARCHIVIST_DEFAULT-snapshotGenomeFilePrefix");
 	writeSnapshotDataFiles = (PT == nullptr) ? SS_Arch_writeDataFilesPL->lookup() : PT->lookupBool("ARCHIVIST_DEFAULT-writeSnapshotDataFiles");
 	writeSnapshotGenomeFiles = (PT == nullptr) ? SS_Arch_writeGenomeFilesPL->lookup() : PT->lookupBool("ARCHIVIST_DEFAULT-writeSnapshotGenomeFiles");
+
+	realtimeSequenceIndex = 0;
+	realtimeDataSeqIndex = 0;
+	realtimeGenomeSeqIndex = 0;
 
 	finished = false;
 }
@@ -77,7 +98,7 @@ void DefaultArchivist::writeRealTimeFiles(vector<shared_ptr<Organism>> &populati
 						}
 						temp /= (double) values.size();
 					} else {
-						cout << "WARNING:  In Archivist::writeRealTimeFiles(vector<shared_ptr<Organism>> &population) key \"" << key << "\" could not be found in dataMap!" << endl;
+						cout << "WARNING:  In Archivist::writeRealTimeFiles(vector<shared_ptr<Organism>> &population). While \"writing ave.csv\" key \"" << key << "\" could not be found in dataMap!" << endl;
 					}
 				}
 				aveValue += temp;
@@ -165,15 +186,24 @@ void DefaultArchivist::saveSnapshotGenomes(vector<shared_ptr<Organism>> populati
 // return true if next save will be > updates + terminate after
 bool DefaultArchivist::archive(vector<shared_ptr<Organism>> population, int flush) {
 	if (flush != 1) {
-		if ((Global::update % realtimeFilesInterval == 0) && (flush == 0)) {  // do not write files on flush - these organisms have not been evaluated!
+		if ((Global::update == realtimeSequence[realtimeSequenceIndex]) && (flush == 0)) {  // do not write files on flush - these organisms have not been evaluated!
 			writeRealTimeFiles(population);  // write to dominant and average files
+			if (realtimeSequenceIndex + 1 < (int)realtimeSequence.size()){
+				realtimeSequenceIndex++;
+			}
 		}
 
-		if ((Global::update % dataInterval == 0) && (flush == 0) && writeSnapshotDataFiles) {  // do not write files on flush - these organisms have not been evaluated!
+		if ((Global::update == realtimeDataSequence[realtimeDataSeqIndex]) && (flush == 0) && writeSnapshotDataFiles) {  // do not write files on flush - these organisms have not been evaluated!
 			saveSnapshotData(population);
+			if (realtimeDataSeqIndex + 1 < (int)realtimeDataSequence.size()){
+				realtimeDataSeqIndex++;
+			}
 		}
-		if ((Global::update % genomeInterval == 0) && (flush == 0) && writeSnapshotGenomeFiles) {  // do not write files on flush - these organisms have not been evaluated!
+		if ((Global::update == realtimeGenomeSequence[realtimeGenomeSeqIndex]) && (flush == 0) && writeSnapshotGenomeFiles) {  // do not write files on flush - these organisms have not been evaluated!
 			saveSnapshotGenomes(population);
+			if (realtimeGenomeSeqIndex + 1 < (int)realtimeGenomeSequence.size()){
+				realtimeGenomeSeqIndex++;
+			}
 		}
 
 		for (auto org : population) {  // we don't need to worry about tracking parents or lineage, so we clear out this data every generation.

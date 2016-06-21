@@ -25,25 +25,25 @@ const double ParametersEntry<double>::getDouble() {
 	return get();
 }
 
-shared_ptr<ParameterLink<bool>> Parameters::getBoolLink(const string& name, shared_ptr<ParametersTable> table){
+shared_ptr<ParameterLink<bool>> Parameters::getBoolLink(const string& name, shared_ptr<ParametersTable> table) {
 	auto entry = table->lookupBoolEntry(name);
 	auto newLink = make_shared<ParameterLink<bool>>(name, entry, table);
 	return newLink;
 }
 
-shared_ptr<ParameterLink<string>> Parameters::getStringLink(const string& name, shared_ptr<ParametersTable> table){
+shared_ptr<ParameterLink<string>> Parameters::getStringLink(const string& name, shared_ptr<ParametersTable> table) {
 	auto entry = table->lookupStringEntry(name);
 	auto newLink = make_shared<ParameterLink<string>>(name, entry, table);
 	return newLink;
 }
 
-shared_ptr<ParameterLink<int>> Parameters::getIntLink(const string& name, shared_ptr<ParametersTable> table){
+shared_ptr<ParameterLink<int>> Parameters::getIntLink(const string& name, shared_ptr<ParametersTable> table) {
 	auto entry = table->lookupIntEntry(name);
 	auto newLink = make_shared<ParameterLink<int>>(name, entry, table);
 	return newLink;
 }
 
-shared_ptr<ParameterLink<double>> Parameters::getDoubleLink(const string& name, shared_ptr<ParametersTable> table){
+shared_ptr<ParameterLink<double>> Parameters::getDoubleLink(const string& name, shared_ptr<ParametersTable> table) {
 	auto entry = table->lookupDoubleEntry(name);
 	auto newLink = make_shared<ParameterLink<double>>(name, entry, table);
 	return newLink;
@@ -126,14 +126,7 @@ void Parameters::readCommandLine(int argc, const char** argv, unordered_map<stri
 			saveFiles = true;
 			argCount++;
 		} else if (argv[argCount][0] == '-' && argv[argCount][1] == 'h') {
-			cout << "Usage: " << argv[0] << " [-f <file1> <file2> ...] [-p <parameter name/value pairs>] [-s]\n\n" <<
-					"  -f, \"load files\" - list of settings files to be loaded.\n" <<
-					"         Parameters in later files overwrite parameters in earlier files.\n\n" <<
-					"  -p, \"set parameters\" - list of parameter/name pairs \n" <<
-					"         (i.e. \"-p GLOBAL-updates 100 GLOBAL-popSize 200\" would set MABE to run\n" <<
-					"         for 100 updates with a population size of 200. Parameters set on the\n" <<
-					"         command line overwrite parameters from files\n\n" <<
-					"  -s, \"save\" - save settings files.\n" << endl;
+			cout << "Usage: " << argv[0] << " [-f <file1> <file2> ...] [-p <parameter name/value pairs>] [-s]\n\n" << "  -f, \"load files\" - list of settings files to be loaded.\n" << "         Parameters in later files overwrite parameters in earlier files.\n\n" << "  -p, \"set parameters\" - list of parameter/name pairs \n" << "         (i.e. \"-p GLOBAL-updates 100 GLOBAL-popSize 200\" would set MABE to run\n" << "         for 100 updates with a population size of 200. Parameters set on the\n" << "         command line overwrite parameters from files\n\n" << "  -s, \"save\" - save settings files.\n" << endl;
 			exit(1);
 		} else {
 			cout << "  Error on command line. Unrecognized option. Exiting." << endl;
@@ -388,8 +381,18 @@ void Parameters::initializeParameters(int argc, const char * argv[]) {
 				stringToValue(i.second, value);
 				root->setParameter(workingCategory + "-" + workingParameterName, value, workingNameSpace, true);
 			} else {
-				cout << "  ERROR :: while reading file \"" << fileName << "\" found \"" << workingNameSpace + workingCategory + "-" + workingParameterName << ".\n  But \"" << workingCategory + "-" + workingParameterName << "\" is not a registered parameter!\n  Exiting." << endl;
-				exit(1);
+				if (saveFiles) {
+					cout << "   WARRNING";
+				} else {
+					cout << "  ERROR";
+				}
+				cout << " :: while reading file \"" << fileName << "\" found \"" << workingNameSpace + workingCategory + "-" + workingParameterName << ".\n      But \"" << workingCategory + "-" + workingParameterName << "\" is not a registered parameter!" << endl;
+				if (saveFiles) {
+					cout << "      This parameter will not be saved to new files." << endl;
+				} else {
+					cout << "  Exiting." << endl;
+					exit(1);
+				}
 			}
 		}
 	}
@@ -414,8 +417,18 @@ void Parameters::initializeParameters(int argc, const char * argv[]) {
 			stringToValue(i.second, value);
 			root->setParameter(workingCategory + "-" + workingParameterName, value, workingNameSpace, true);
 		} else {
-			cout << "  ERROR :: while reading command line found \"" << workingNameSpace + workingCategory + "-" + workingParameterName << ".\n  But \"" << workingCategory + "-" + workingParameterName << "\" is not a registered parameter!\n  Exiting." << endl;
-			exit(1);
+			if (saveFiles) {
+				cout << "   WARRNING";
+			} else {
+				cout << "  ERROR";
+			}
+			cout << " :: while reading command line found \"" << workingNameSpace + workingCategory + "-" + workingParameterName << ".\n      But \"" << workingCategory + "-" + workingParameterName << "\" is not a registered parameter!" << endl;
+			if (saveFiles) {
+				cout << "      This parameter will not be saved to new files." << endl;
+			} else {
+				cout << "  Exiting." << endl;
+				exit(1);
+			}
 		}
 	}
 	if (saveFiles) {

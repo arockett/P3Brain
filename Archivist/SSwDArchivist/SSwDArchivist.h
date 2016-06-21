@@ -14,20 +14,20 @@ using namespace std;
 
 class SSwDArchivist : public DefaultArchivist {  // SnapShot with Delay
  public:
-	static shared_ptr<ParameterLink<int>> SSwD_Arch_dataIntervalPL;  // how often to write out data
-	static shared_ptr<ParameterLink<int>> SSwD_Arch_genomeIntervalPL;  // how often to write out genomes
-	static shared_ptr<ParameterLink<int>> SSwD_Arch_dataIntervalDelayPL;  // when using SSwD, how long is the delay
-	static shared_ptr<ParameterLink<int>> SSwD_Arch_genomeIntervalDelayPL;  // when using SSwD, how long is the delay
+	static shared_ptr<ParameterLink<string>> SSwD_Arch_dataSequenceStrPL;  // how often to write out data
+	static shared_ptr<ParameterLink<string>> SSwD_Arch_genomeSequenceStrPL;  // how often to write out genomes
+	static shared_ptr<ParameterLink<int>> SSwD_Arch_dataDelayPL;  // when using SSwD, how long is the delay
+	static shared_ptr<ParameterLink<int>> SSwD_Arch_genomeDelayPL;  // when using SSwD, how long is the delay
 	static shared_ptr<ParameterLink<int>> SSwD_Arch_cleanupIntervalPL;  // how often to attempt to prune the LOD
 	static shared_ptr<ParameterLink<string>> SSwD_Arch_DataFilePrefixPL;  // name of the Data file
 	static shared_ptr<ParameterLink<string>> SSwD_Arch_GenomeFilePrefixPL;  // name of the Genome file (genomes on LOD)
 	static shared_ptr<ParameterLink<bool>> SSwD_Arch_writeDataFilesPL;  // if true, write data file
 	static shared_ptr<ParameterLink<bool>> SSwD_Arch_writeGenomeFilesPL;  // if true, write genome file
 
-	int dataInterval;  // how often to write out data
-	int genomeInterval;  // how often to write out genomes
-	int dataIntervalDelay;  // when using SSwD, how long is the delay
-	int genomeIntervalDelay;  // when using SSwD, how long is the delay
+	vector<int> dataSequence;  // how often to write out data
+	vector<int> genomeSequence;  // how often to write out data
+	int dataDelay;  // when using SSwD, how long is the delay
+	int genomeDelay;  // when using SSwD, how long is the delay
 	int cleanupInterval;  // how often to attempt to prune the LOD
 	string DataFilePrefix;  // name of the Data file
 	string GenomeFilePrefix;  // name of the Genome file (genomes on LOD)
@@ -35,6 +35,12 @@ class SSwDArchivist : public DefaultArchivist {  // SnapShot with Delay
 	bool writeGenomeFiles;  // if true, write genome file
 
 	//// info about files under management
+
+	int writeDataSeqIndex;
+	int checkPointDataSeqIndex;
+	int writeGenomeSeqIndex;
+	int checkPointGenomeSeqIndex;
+
 	int nextDataWrite;  // next time data files will be written to disk
 	int nextGenomeWrite;  // next time a genome file will be written to genome.csv
 	int nextDataCheckPoint;  // next time data files contents need to be checkpointed (this is needed particularly to handle delay > interval)
