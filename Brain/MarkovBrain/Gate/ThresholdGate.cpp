@@ -64,3 +64,16 @@ string Thresholdgate::description() {
 	return to_string(ID) + ": ThresholdgateGate: " + to_string(threshold) + "\n" + AbstractGate::description();;
 }
 
+
+shared_ptr<AbstractGate> Thresholdgate::makeCopy(shared_ptr<ParametersTable> _PT)
+{
+	if (_PT = nullptr) {
+		_PT = PT;
+	}
+	auto newGate = make_shared<Thresholdgate>(_PT);
+	newGate->ID = ID;
+	newGate->inputs = inputs;
+	newGate->outputs = outputs;
+	newGate->threshold = threshold; 
+	return newGate;
+}

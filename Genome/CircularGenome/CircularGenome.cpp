@@ -300,6 +300,20 @@ CircularGenome<unsigned char>::CircularGenome(double _alphabetSize, int _size, s
 }
 
 template<class T>
+shared_ptr<AbstractGenome> CircularGenome<T>::makeCopy(shared_ptr<ParametersTable> _PT) {
+	if (_PT = nullptr) {
+		_PT = PT;
+	}
+
+	auto newGenome = make_shared<CircularGenome>(alphabetSize, 1, _PT);
+	newGenome->sites = sites; 
+
+	return newGenome;
+}
+
+
+
+template<class T>
 shared_ptr<AbstractGenome::Handler> CircularGenome<T>::newHandler(shared_ptr<AbstractGenome> _genome, bool _readDirection) {
 	//cout << "In Genome::newHandler()" << endl;
 	return make_shared<Handler>(_genome, _readDirection);

@@ -24,6 +24,10 @@ class GPGate : public AbstractGate {
 	static shared_ptr<ParameterLink<double>> constValueMaxPL;
 
 	GPGate() = delete;
+	GPGate(shared_ptr<ParametersTable> _PT = nullptr) :
+		AbstractGate(_PT) {
+		operation = 0;
+	}
 	//GPGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID);
 	GPGate(pair<vector<int>, vector<int>> _addresses, int _operation, vector<double> _constValues, int gateID, shared_ptr<ParametersTable> _PT = nullptr);
 
@@ -33,6 +37,7 @@ class GPGate : public AbstractGate {
 	virtual string gateType() override{
 		return "GeneticPrograming";
 	}
+	virtual shared_ptr<AbstractGate> makeCopy(shared_ptr<ParametersTable> _PT = nullptr) override;
 
 };
 

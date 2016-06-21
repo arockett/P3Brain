@@ -19,6 +19,10 @@ public:
 	vector<int> defaultOutput;
 	double epsilon;
 	VoidGate() = delete;
+	VoidGate(shared_ptr<ParametersTable> _PT = nullptr) :
+		DeterministicGate(_PT) {
+		epsilon = 0; 
+	}
 	VoidGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID, double _epsilon, shared_ptr<ParametersTable> _PT = nullptr);
 	virtual ~VoidGate() = default;
 	virtual void update(vector<double> & states, vector<double> & nextStates) override;

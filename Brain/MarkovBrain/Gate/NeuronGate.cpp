@@ -25,3 +25,26 @@ shared_ptr<ParameterLink<double>> NeuronGate::defaultDeliveryErrorPL = Parameter
 
 shared_ptr<ParameterLink<bool>> NeuronGate::defaultThresholdFromNodePL = Parameters::register_parameter("BRAIN_MARKOV_GATES_NEURON-thresholdFromNode", false, "if true, gate will have additional input, which will be used as threshold");
 shared_ptr<ParameterLink<bool>> NeuronGate::defaultDeliveryChargeFromNodePL = Parameters::register_parameter("BRAIN_MARKOV_GATES_NEURON-deliveryChargeFromNode", false, "if true, gate will have additional input, which will be used as deliveryCharge");
+
+
+shared_ptr<AbstractGate> NeuronGate::makeCopy(shared_ptr<ParametersTable> _PT)
+{
+	if (_PT = nullptr) {
+		_PT = PT;
+	}
+	auto newGate = make_shared<NeuronGate>(_PT);
+	newGate->ID = ID;
+	newGate->inputs = inputs;
+	newGate->outputs = outputs;
+	newGate->dischargeBehavior = dischargeBehavior;
+	newGate->thresholdValue = thresholdValue;
+	newGate->thresholdActivates = thresholdActivates;
+	newGate->decayRate = decayRate;
+	newGate->deliveryCharge = deliveryCharge;
+	newGate->deliveryError = deliveryError;
+	newGate->currentCharge = currentCharge;
+	newGate->thresholdFromNode = thresholdFromNode;
+	newGate->deliveryChargeFromNode = deliveryChargeFromNode;
+
+	return newGate;
+}

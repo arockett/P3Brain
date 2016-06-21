@@ -18,12 +18,17 @@ class ProbabilisticGate: public AbstractGate {  //conventional probabilistic gat
 public:
 	vector<vector<double>> table;
 	ProbabilisticGate() = delete;
+	ProbabilisticGate(shared_ptr<ParametersTable> _PT = nullptr) :
+		AbstractGate(_PT) {
+		table = {};
+	}
 	ProbabilisticGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _rawTable, int _ID, shared_ptr<ParametersTable> _PT = nullptr);
 	virtual ~ProbabilisticGate() = default;
 	virtual void update(vector<double> & states, vector<double> & nextStates) override;
 	virtual string gateType() override{
 		return "Probabilistic";
 	}
+	virtual shared_ptr<AbstractGate> makeCopy(shared_ptr<ParametersTable> _PT = nullptr) override;
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__ProbabilisticGate__) */

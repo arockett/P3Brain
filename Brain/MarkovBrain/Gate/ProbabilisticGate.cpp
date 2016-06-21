@@ -52,3 +52,16 @@ void ProbabilisticGate::update(vector<double> & nodes, vector<double> & nextNode
 		nextNodes[outputs[i]] += 1.0 * ((outputColumn >> (outputs.size() - 1 - i)) & 1);  // convert output (the column number) to bits and pack into next states
 																						   // but always put the last bit in the first input (to maintain consistancy)
 }
+
+shared_ptr<AbstractGate> ProbabilisticGate::makeCopy(shared_ptr<ParametersTable> _PT)
+{
+	if (_PT = nullptr) {
+		_PT = PT;
+	}
+	auto newGate = make_shared<ProbabilisticGate>(_PT);
+	newGate->table = table;
+	newGate->ID = ID;
+	newGate->inputs = inputs;
+	newGate->outputs = outputs;
+	return newGate;
+}

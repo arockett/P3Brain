@@ -27,12 +27,12 @@ int Organism::organismIDCounter = -1;  // every organism will get a unique ID
  * create an empty organism - it must be filled somewhere else.
  * parents is left empty (this is organism has no parents!)
  */
-Organism::Organism() {
+Organism::Organism(shared_ptr<ParametersTable> _PT) {
+	PT = _PT; 
 	genome = nullptr;
 	brain = nullptr;
 	ID = registerOrganism();
 	alive = true;
-	gender = 0;  // by default all orgs are female.
 	offspringCount = 0;  // because it's alive;
 	//genomeAncestors.insert(ID);  // it is it's own Ancestor for genome tracking purposes
 	ancestors.insert(ID);  // it is it's own Ancestor for data tracking purposes
@@ -48,12 +48,12 @@ Organism::Organism() {
  * create a new organism given only a genome - since we do not know the type of brain we are using, we can not make the brain yet
  * parents is left empty (this is organism has no parents!)
  */
-Organism::Organism(shared_ptr<AbstractGenome> _genome) {
+Organism::Organism(shared_ptr<AbstractGenome> _genome, shared_ptr<ParametersTable> _PT) {
+	PT = _PT;
 	genome = _genome;
 	brain = nullptr;
 	ID = registerOrganism();
 	alive = true;
-	gender = 0;  // by default all orgs are female.
 	offspringCount = 0;  // because it's alive;
 	ancestors.insert(ID);  // it is it's own Ancestor for data tracking purposes
 	snapshotAncestors.insert(ID);
@@ -65,14 +65,14 @@ Organism::Organism(shared_ptr<AbstractGenome> _genome) {
 	dataMap.SetMany(genome->getStats());
 }
 
-Organism::Organism(shared_ptr<AbstractGenome> _genome, shared_ptr<AbstractBrain> _brain) {
+Organism::Organism(shared_ptr<AbstractGenome> _genome, shared_ptr<AbstractBrain> _brain, shared_ptr<ParametersTable> _PT) {
+	PT = _PT;
 	genome = _genome;
 	//cout << "in Organism::Organism(shared_ptr<AbstractGenome> _genome, shared_ptr<AbstractBrain> _brain)\n\tabout to make brain from genome"<<endl;
 	brain = _brain->makeBrainFromGenome(genome);
 	//cout << "\tmade brain from genome"<<endl;
 	ID = registerOrganism();
 	alive = true;
-	gender = 0;  // by default all orgs are female.
 	offspringCount = 0;  // because it's alive;
 	ancestors.insert(ID);  // it is it's own Ancestor for data tracking purposes
 	snapshotAncestors.insert(ID);
@@ -88,12 +88,12 @@ Organism::Organism(shared_ptr<AbstractGenome> _genome, shared_ptr<AbstractBrain>
  * create an organism with one parent
  * a brain is created with the assumption that the new brain should be of the same type as the parents brain
  */
-Organism::Organism(shared_ptr<Organism> from, shared_ptr<AbstractGenome> _genome) {
+Organism::Organism(shared_ptr<Organism> from, shared_ptr<AbstractGenome> _genome, shared_ptr<ParametersTable> _PT) {
+	PT = _PT;
 	genome = _genome;
 	brain = from->brain->makeBrainFromGenome(genome);
 	ID = registerOrganism();
 	alive = true;
-	gender = 0;  // by default all orgs are female.
 	offspringCount = 0;
 	parents.push_back(from);
 	from->offspringCount++;  // this parent has an(other) offspring
@@ -119,13 +119,13 @@ Organism::Organism(shared_ptr<Organism> from, shared_ptr<AbstractGenome> _genome
  * a) all organisms in from are the same
  * b) and the new brain should be of the same type as the parents brain
  */
-Organism::Organism(const vector<shared_ptr<Organism>> from, shared_ptr<AbstractGenome> _genome) {
+Organism::Organism(const vector<shared_ptr<Organism>> from, shared_ptr<AbstractGenome> _genome, shared_ptr<ParametersTable> _PT) {
+	PT = _PT;
 	genome = _genome;
 	brain = from[0]->brain->makeBrainFromGenome(genome);
 	ID = registerOrganism();
 	alive = true;
 	offspringCount = 0;  // because it's alive;
-	gender = 0;  // by default all orgs are female.
 	for (auto parent : from) {
 		parents.push_back(parent);  // add this parent to the parents set
 		parent->offspringCount++;  // this parent has an(other) offspring
@@ -176,7 +176,6 @@ shared_ptr<Organism> Organism::makeMutatedOffspringFromMany(vector<shared_ptr<Or
 	}
 	shared_ptr<Organism> newOrg = make_shared<Organism>(from, genome->makeMutatedGenomeFromMany(parentGenomes));
 
-	newOrg->gender = from[Random::getIndex(from.size())]->gender;  // assign a gender to the new org randomly from one of it's parents
 	//cout << "  leaving Organism::makeMutatedOffspringFromMany(vector<shared_ptr<Organism>> from)\n";
 	return newOrg;
 }
@@ -250,4 +249,27 @@ shared_ptr<Organism> Organism::getMostRecentCommonAncestor(vector<shared_ptr<Org
 // clear all historical data (used when only saving real time data)
 void Organism::clearHistory() {
 	parents.clear();
+}
+
+shared_ptr<Organism> Organism::makeCopy(shared_ptr<ParametersTable> _PT) {
+	if (_PT = nullptr) {
+		_PT = PT;
+	}
+	auto newOrg = make_shared<Organism>(_PT); 
+	newOrg->brain = brain->makeCopy(); 
+	newOrg->genome = genome->makeCopy(); 
+	newOrg->dataMap = dataMap; 
+	newOrg->snapShotDataMaps = snapShotDataMaps;
+	newOrg->score = score;
+	newOrg->offspringCount = offspringCount;
+	newOrg->parents = parents;
+	for (auto parent : parents) {
+		parent->offspringCount++; 
+	}
+	newOrg->ancestors = ancestors;
+	newOrg->timeOfBirth = timeOfBirth;
+	newOrg->timeOfDeath = timeOfDeath;
+	newOrg->alive = alive;
+	newOrg->ID = registerOrganism();
+	return newOrg; 
 }

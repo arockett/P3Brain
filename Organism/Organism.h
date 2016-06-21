@@ -30,10 +30,10 @@ class Organism {
 	DataMap dataMap;  // holds all data (genome size, score, world data, etc.)
 	map<int, DataMap> snapShotDataMaps;  // Used only with SnapShot with Delay (SSwD) stores contents of dataMap when an ouput interval is reached so that
 	// after the delay we have the correct data for the given time. key is 'update'. This possibly should be wrapped into Archivist.
-	int gender;  // generally 0=female, 1=male, *=?
 
 	shared_ptr<AbstractGenome> genome;
 	shared_ptr<AbstractBrain> brain;
+	shared_ptr<ParametersTable> PT; 
 
 	double score;
 
@@ -49,12 +49,12 @@ class Organism {
 	int timeOfDeath;  // the time this organism stopped being alive (this organism may be stored for archival reasons)
 
 	bool alive;  // is this organism alive (1) or dead (0)
-
-	Organism();  // make an empty organism
-	Organism(shared_ptr<AbstractGenome> _genome);  // make a parentless organism with a genome, and a nullptr to brain
-	Organism(shared_ptr<AbstractGenome> _genome, shared_ptr<AbstractBrain> _brain);  // make a parentless organism with a genome, and a brain
-	Organism(shared_ptr<Organism> from, shared_ptr<AbstractGenome> _genome);  // make an organism with one parent, a genome and a brain determined from the parents brain type.
-	Organism(const vector<shared_ptr<Organism>> from, shared_ptr<AbstractGenome> _genome);  // make a organism with many parents, a genome, and a brain determined from the parents brain type.
+	Organism() = delete; 
+	Organism(shared_ptr<ParametersTable> _PT = nullptr);  // make an empty organism
+	Organism(shared_ptr<AbstractGenome> _genome, shared_ptr<ParametersTable> _PT = nullptr);  // make a parentless organism with a genome, and a nullptr to brain
+	Organism(shared_ptr<AbstractGenome> _genome, shared_ptr<AbstractBrain> _brain, shared_ptr<ParametersTable> _PT = nullptr);  // make a parentless organism with a genome, and a brain
+	Organism(shared_ptr<Organism> from, shared_ptr<AbstractGenome> _genome, shared_ptr<ParametersTable> _PT = nullptr);  // make an organism with one parent, a genome and a brain determined from the parents brain type.
+	Organism(const vector<shared_ptr<Organism>> from, shared_ptr<AbstractGenome> _genome, shared_ptr<ParametersTable> _PT = nullptr);  // make a organism with many parents, a genome, and a brain determined from the parents brain type.
 
 	virtual ~Organism();
 
@@ -66,6 +66,7 @@ class Organism {
 	virtual shared_ptr<Organism> getMostRecentCommonAncestor(vector<shared_ptr<Organism>> LOD);
 	virtual shared_ptr<Organism> makeMutatedOffspringFrom(shared_ptr<Organism> parent);
 	virtual shared_ptr<Organism> makeMutatedOffspringFromMany(vector<shared_ptr<Organism>> from);
+	virtual shared_ptr<Organism> makeCopy(shared_ptr<ParametersTable> _PT = nullptr);
 	virtual void clearHistory();  // clear all historical data (used when only saving real time data)
 };
 

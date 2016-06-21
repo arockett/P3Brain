@@ -196,3 +196,29 @@ vector<int> FeedbackGate::getIns() {
 	R.push_back(negFBNode);
 	return R;
 }
+
+shared_ptr<AbstractGate> FeedbackGate::makeCopy(shared_ptr<ParametersTable> _PT)
+{
+	if (_PT = nullptr) {
+		_PT = PT;
+	}
+	auto newGate = make_shared<FeedbackGate>(_PT);
+	newGate->table = table;
+	newGate->ID = ID;
+	newGate->inputs = inputs;
+	newGate->outputs = outputs;
+	newGate->originalTable = originalTable; 
+	newGate->posFBNode = posFBNode; 
+	newGate->negFBNode = negFBNode; 
+	newGate->nrPos = nrPos;
+	newGate->nrNeg = nrNeg;
+	newGate->posLevelOfFB = posLevelOfFB;
+	newGate->negLevelOfFB = negLevelOfFB;
+	newGate->chosenInPos = chosenInPos;
+	newGate->chosenInNeg = chosenInNeg;
+	newGate->chosenOutPos = chosenOutPos;
+	newGate->chosenOutNeg = chosenOutNeg;
+	
+	return newGate;
+
+}

@@ -18,10 +18,15 @@ class Thresholdgate : public AbstractGate {
 	int threshold;
  public:
 	Thresholdgate() = delete;
+	Thresholdgate(shared_ptr<ParametersTable> _PT = nullptr) :
+		AbstractGate(_PT) {
+		threshold = 0; 
+	}
 	Thresholdgate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID, shared_ptr<ParametersTable> _PT = nullptr);
 	virtual ~Thresholdgate() = default;
 	virtual void update(vector<double> & states, vector<double> & nextStates) override;
 	virtual string description() override;
+	virtual shared_ptr<AbstractGate> makeCopy(shared_ptr<ParametersTable> _PT = nullptr) override;
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Threshold_Gate__) */

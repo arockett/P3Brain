@@ -26,6 +26,12 @@ class FeedbackGate : public AbstractGate {
 	static bool feedbackON;
 
 	FeedbackGate() = delete;
+	FeedbackGate(shared_ptr<ParametersTable> _PT = nullptr) :
+		AbstractGate(_PT) {
+		table = {};
+		originalTable = {};
+		exit(1); 
+	}
 	FeedbackGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID, shared_ptr<ParametersTable> _PT = nullptr);
 	virtual ~FeedbackGate() = default;
 	virtual void update(vector<double> & states, vector<double> & nextStates) override;
@@ -36,6 +42,7 @@ class FeedbackGate : public AbstractGate {
 	virtual string gateType() override{
 		return "Feedback";
 	}
+	virtual shared_ptr<AbstractGate> makeCopy(shared_ptr<ParametersTable> _PT = nullptr) override;
 
 };
 

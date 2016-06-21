@@ -223,3 +223,16 @@ void MarkovBrain::initalizeGenome(shared_ptr<AbstractGenome> _genome) {
 	}
 }
 
+shared_ptr<AbstractBrain> MarkovBrain::makeCopy(shared_ptr<ParametersTable> _PT)
+{
+	if (_PT = nullptr) {
+		_PT = PT;
+	}
+	vector<shared_ptr<AbstractGate>> _gates; 
+	for (auto gate : gates) {
+		_gates.push_back(gate->makeCopy());
+	}
+	auto newBrain = make_shared<MarkovBrain>(_gates, nrInNodes, nrOutNodes, nrHiddenNodes,_PT);
+	
+	return newBrain;
+}
