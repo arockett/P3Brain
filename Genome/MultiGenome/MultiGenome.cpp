@@ -307,6 +307,17 @@ MultiGenome::MultiGenome(shared_ptr<AbstractChromosome> _chromosome, int chromos
 	recordDataMap();
 }
 
+shared_ptr<AbstractGenome> MultiGenome::makeCopy(shared_ptr<ParametersTable> _PT) {
+	auto newGenome = make_shared<MultiGenome>(_PT);
+	newGenome->chromosomes.resize(0);
+	for (auto chromosome : chromosomes) {
+		newGenome->chromosomes.push_back(chromosome->makeCopy());
+	}
+	newGenome->ploidy = ploidy;
+	newGenome->dataMap = dataMap; 
+	return newGenome;
+}
+
 shared_ptr<AbstractGenome::Handler> MultiGenome::newHandler(shared_ptr<AbstractGenome> _genome, bool _readDirection) {
 	//cout << "In Genome::newHandler()" << endl;
 	for (auto chromosome : chromosomes) {

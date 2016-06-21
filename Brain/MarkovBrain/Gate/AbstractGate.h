@@ -28,6 +28,7 @@ using namespace std;
 class AbstractGate {
 public:
 	int ID;
+	const shared_ptr<ParametersTable> PT;
 
 	static const int START_CODE = 0;
 	static const int IN_COUNT_CODE = 10;
@@ -35,12 +36,13 @@ public:
 	static const int OUT_COUNT_CODE = 20;
 	static const int OUT_ADDRESS_CODE = 21;
 	static const int DATA_CODE = 30;
-
-	AbstractGate() {
+	AbstractGate() = delete;
+	AbstractGate(shared_ptr<ParametersTable> _PT = nullptr) : PT(_PT) {
 		ID = 0;
 	}
 	virtual ~AbstractGate() = default;
 
+	virtual shared_ptr<AbstractGate> makeCopy(shared_ptr<ParametersTable> _PT = nullptr);
 	vector<int> inputs;
 	vector<int> outputs;
 

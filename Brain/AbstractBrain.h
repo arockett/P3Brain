@@ -197,7 +197,7 @@ public:
 	vector<int> getInputNodesList() {
 		return inputNodesList;
 	}
-
+	virtual shared_ptr<AbstractBrain> makeCopy(shared_ptr<ParametersTable> _PT = nullptr);
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__Brain__) */

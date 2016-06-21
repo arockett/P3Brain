@@ -14,7 +14,8 @@ shared_ptr<ParameterLink<double>> GPGate::constValueMaxPL = Parameters::register
 /* *** GP Gate implementation *** */
 
 //GPGate::GPGate(shared_ptr<AbstractGenome> genome, shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {
-GPGate::GPGate(pair<vector<int>, vector<int>> _addresses, int _operation, vector<double> _constValues, int gateID) {
+GPGate::GPGate(pair<vector<int>, vector<int>> _addresses, int _operation, vector<double> _constValues, int gateID, shared_ptr<ParametersTable> _PT) :
+	AbstractGate(_PT) {
 
 	ID = gateID;
 
@@ -94,3 +95,17 @@ string GPGate::description() {
 	return "Gate " + to_string(ID) + " is a (" + gateTypeName[operation] + ") " + gateType() + "Gate\n" + AbstractGate::descriptionIO() + constString;
 }
 
+
+shared_ptr<AbstractGate> GPGate::makeCopy(shared_ptr<ParametersTable> _PT)
+{
+	if (_PT == nullptr) {
+		_PT = PT;
+	}
+	auto newGate = make_shared<GPGate>(_PT);
+	newGate->ID = ID;
+	newGate->inputs = inputs;
+	newGate->outputs = outputs;
+	newGate->constValues = constValues;
+	newGate->operation = operation;
+	return newGate;
+}

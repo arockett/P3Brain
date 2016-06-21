@@ -28,6 +28,9 @@ public:
 	static shared_ptr<ParameterLink<int>> popSizePL;  // number of genomes in the population
 	static shared_ptr<ParameterLink<string>> modePL;  // number of genomes in the population
 
+	static shared_ptr<ParameterLink<int>> maxLineLengthPL;  // max length of lines in the parameters files 
+	static shared_ptr<ParameterLink<int>> commentIndentPL;  // minimum number of characters before comments 
+
 	static shared_ptr<ParameterLink<string>> visualizePopulationFilePL;
 
 	static shared_ptr<ParameterLink<string>> outputDirectoryPL;  // where files will be written

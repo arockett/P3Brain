@@ -118,6 +118,7 @@ public:
 	MultiGenome(shared_ptr<ParametersTable> _PT = nullptr);
 	MultiGenome(shared_ptr<AbstractChromosome> _chromosome, shared_ptr<ParametersTable> _PT = nullptr);
 	MultiGenome(shared_ptr<AbstractChromosome> _chromosome, int chromosomeCount, int _plodiy, shared_ptr<ParametersTable> _PT = nullptr);
+	virtual shared_ptr<AbstractGenome> makeCopy(shared_ptr<ParametersTable> _PT = nullptr) override;
 	virtual ~MultiGenome() = default;
 
 	virtual shared_ptr<AbstractGenome> makeLike() override {

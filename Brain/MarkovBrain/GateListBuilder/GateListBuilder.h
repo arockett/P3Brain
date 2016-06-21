@@ -43,25 +43,25 @@ class AbstractGateListBuilder {
 	virtual set<string> getInUseGateNames(){
 		return gateBuilder.inUseGateNames;
 	}
-	virtual vector<shared_ptr<AbstractGate>> buildGateList(shared_ptr<AbstractGenome> genome, int nrOfBrainStates){
+	virtual vector<shared_ptr<AbstractGate>> buildGateList(shared_ptr<AbstractGenome> genome, int nrOfBrainStates, shared_ptr<ParametersTable> gatePT){
 		vector<int> temp1;
 		vector<vector<int>> temp2;
-		return buildGateListAndGetAllValues(genome, nrOfBrainStates, 0, temp1, 0, temp2, 0);
+		return buildGateListAndGetAllValues(genome, nrOfBrainStates, 0, temp1, 0, temp2, 0, gatePT);
 	}
 
-	virtual vector<shared_ptr<AbstractGate>> buildGateListAndGetHeadValues(shared_ptr<AbstractGenome> genome, int nrOfBrainStates, int maxValue, vector<int> &genomeHeadValues, int genomeHeadValuesCount){
+	virtual vector<shared_ptr<AbstractGate>> buildGateListAndGetHeadValues(shared_ptr<AbstractGenome> genome, int nrOfBrainStates, int maxValue, vector<int> &genomeHeadValues, int genomeHeadValuesCount, shared_ptr<ParametersTable> gatePT){
 		vector<vector<int>> temp;
-		return buildGateListAndGetAllValues(genome, nrOfBrainStates, maxValue, genomeHeadValues, genomeHeadValuesCount, temp, 0);
+		return buildGateListAndGetAllValues(genome, nrOfBrainStates, maxValue, genomeHeadValues, genomeHeadValuesCount, temp, 0, gatePT);
 	}
 
-	virtual vector<shared_ptr<AbstractGate>> buildGateListAndGetPerGateValues(shared_ptr<AbstractGenome> genome, int nrOfBrainStates, int maxValue, vector<vector<int>> &genomePerGateValues, int genomePerGateValuesCount){
+	virtual vector<shared_ptr<AbstractGate>> buildGateListAndGetPerGateValues(shared_ptr<AbstractGenome> genome, int nrOfBrainStates, int maxValue, vector<vector<int>> &genomePerGateValues, int genomePerGateValuesCount, shared_ptr<ParametersTable> gatePT){
 		vector<int> temp;
-		return buildGateListAndGetAllValues(genome, nrOfBrainStates, maxValue, temp, 0, genomePerGateValues, genomePerGateValuesCount);
+		return buildGateListAndGetAllValues(genome, nrOfBrainStates, maxValue, temp, 0, genomePerGateValues, genomePerGateValuesCount, gatePT);
 	}
 
 	virtual vector<shared_ptr<AbstractGate>> buildGateListAndGetAllValues(shared_ptr<AbstractGenome> genome, int nrOfBrainStates,
             int maxValue, vector<int> &genomeHeadValues, int genomeHeadValuesCount,
-            vector<vector<int>> &genomePerGateValues, int genomePerGateValuesCount) = 0;
+            vector<vector<int>> &genomePerGateValues, int genomePerGateValuesCount, shared_ptr<ParametersTable> gatePT) = 0;
 
 };
 
@@ -78,7 +78,7 @@ class ClassicGateListBuilder : public AbstractGateListBuilder {
 
 	virtual vector<shared_ptr<AbstractGate>> buildGateListAndGetAllValues(shared_ptr<AbstractGenome> genome, int nrOfBrainStates,
 	                                               int maxValue, vector<int> &genomeHeadValues, int genomeHeadValuesCount,
-	                                               vector<vector<int>> &genomePerGateValues, int genomePerGateValuesCount);
+	                                               vector<vector<int>> &genomePerGateValues, int genomePerGateValuesCount, shared_ptr<ParametersTable> gatePT);
 };
 
 #endif /* defined(__BasicMarkovBrainTemplate__GateListBuilder__) */

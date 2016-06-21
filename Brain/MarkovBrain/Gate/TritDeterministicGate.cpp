@@ -8,7 +8,8 @@
 
 #include "TritDeterministicGate.h"
 
-TritDeterministicGate::TritDeterministicGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID) {
+TritDeterministicGate::TritDeterministicGate(pair<vector<int>, vector<int>> addresses, vector<vector<int>> _table, int _ID, shared_ptr<ParametersTable> _PT) :
+	AbstractGate(_PT) {
 	ID = _ID;
 	inputs = addresses.first;
 	outputs = addresses.second;
@@ -20,4 +21,17 @@ void TritDeterministicGate::update(vector<double> & nodes, vector<double> & next
 	for (size_t i = 0; i < outputs.size(); i++) {
 		nextNodes[outputs[i]] += table[input][i];
 	}
+}
+
+shared_ptr<AbstractGate> TritDeterministicGate::makeCopy(shared_ptr<ParametersTable> _PT)
+{
+	if (_PT == nullptr) {
+		_PT = PT;
+	}
+	auto newGate = make_shared<TritDeterministicGate>(_PT);
+	newGate->table = table;
+	newGate->ID = ID;
+	newGate->inputs = inputs;
+	newGate->outputs = outputs;
+	return newGate;
 }
