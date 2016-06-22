@@ -372,7 +372,7 @@ inline vector<int> seq(const string seqStr, int defaultMax = -1, bool addZero = 
 					seqDefinitions[currentDef].push_back(defaultMax);
 					seqDefinitions[currentDef].push_back(n);
 					ss >> c;
-					if (c != ',' and !ss.fail()) {
+					if (c != ',' && !ss.fail()) {
 						error = true;
 					}
 				}
@@ -382,7 +382,7 @@ inline vector<int> seq(const string seqStr, int defaultMax = -1, bool addZero = 
 		} else {  // first element was an int
 			seqDefinitions[currentDef].push_back(n);  // push back first number read
 			ss >> c;
-			if (c == ',' or ss.fail()) {
+			if (c == ',' || ss.fail()) {
 				// if next char is a ',' or end of string, we have a single value or a ':x' definition
 				// do nothing...
 			} else if (c == '-') {
@@ -396,10 +396,10 @@ inline vector<int> seq(const string seqStr, int defaultMax = -1, bool addZero = 
 					ss >> n;
 					seqDefinitions[currentDef].push_back(n);
 					ss >> c;
-					if (c != ',' and !ss.fail()) {
+					if (c != ',' && !ss.fail()) {
 						error = true;
 					}
-				} else if (c == ',' or ss.fail()) {
+				} else if (c == ',' || ss.fail()) {
 					//we are at the end of this definition (either comma, get read to read more, or end of string)
 					seqDefinitions[currentDef].push_back(1); // no step was provided
 				} else {
@@ -417,7 +417,7 @@ inline vector<int> seq(const string seqStr, int defaultMax = -1, bool addZero = 
 					seqDefinitions[currentDef].push_back(defaultMax);  // first is alreay pushed
 					seqDefinitions[currentDef].push_back(n);
 					ss >> c;
-					if (c != ',' and !ss.fail()) {
+					if (c != ',' && !ss.fail()) {
 						error = true;
 					}
 				}
