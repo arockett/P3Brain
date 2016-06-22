@@ -1,6 +1,6 @@
 # BasicMarkovBrainTemplate
 
-[click here for the wiki](https://github.com/ahnt/BasicMarkovBrainTemplate/wiki)
+To learn more about MABE and see installation instrutions [click here for the wiki](https://github.com/ahnt/BasicMarkovBrainTemplate/wiki)
 
 ### please do not commit your 'work' and 'build' directory, and also do not commit your xcode project file, only the folders that contain .cpp and .h files.<br>
 <br>
