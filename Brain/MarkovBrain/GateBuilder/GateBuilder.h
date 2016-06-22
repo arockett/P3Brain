@@ -13,12 +13,12 @@
 
 #include "../../../Utilities/Parameters.h"
 #include "../Gate/DeterministicGate.h"
-#include "../Gate/FeedbackGate.h"
+//#include "../Gate/FeedbackGate.h"
 #include "../Gate/FixedEpsilonGate.h"
 #include "../Gate/GPGate.h"
 #include "../Gate/NeuronGate.h"
 #include "../Gate/ProbabilisticGate.h"
-#include "../Gate/ThresholdGate.h"
+//#include "../Gate/ThresholdGate.h"
 #include "../Gate/TritDeterministicGate.h"
 #include "../Gate/VoidGate.h"
 
