@@ -1,9 +1,12 @@
+//  MABE is a product of The Hintza Lab @ MSU
+//     for general research information:
+//         http://hintzelab.msu.edu/
+//     for MABE documentation:
+//         https://github.com/ahnt/BasicMarkovBrainTemplate/wiki - for
 //
-//  LODwAP_Archivist.h
-//  BasicMarkovBrainTemplate
-//
-//  Created by Cliff Bohm on 5/30/15.
-//
+//  Copyright (c) 2015 Michigan State University. All rights reserved.
+//     to view the full license, visit:
+//          https://github.com/ahnt/BasicMarkovBrainTemplate/wiki/license
 
 #ifndef __BasicMarkovBrainTemplate__LODwAP_Archivist__
 #define __BasicMarkovBrainTemplate__LODwAP_Archivist__

@@ -1,13 +1,13 @@
+//  MABE is a product of The Hintza Lab @ MSU
+//     for general research information:
+//         http://hintzelab.msu.edu/
+//     for MABE documentation:
+//         https://github.com/ahnt/BasicMarkovBrainTemplate/wiki - for
 //
-//  Gate.cpp
-//  BasicMarkovBrainTemplate
-//
-//  Created by Arend Hintze on 5/30/15.
-//  Copyright (c) 2015 Arend Hintze. All rights reserved.
-//
+//  Copyright (c) 2015 Michigan State University. All rights reserved.
+//     to view the full license, visit:
+//          https://github.com/ahnt/BasicMarkovBrainTemplate/wiki/license
 
-//#include <iostream>
-//
 #include "NeuronGate.h"
 
 shared_ptr<ParameterLink<int>> NeuronGate::defaultNumInputsMinPL = Parameters::register_parameter("BRAIN_MARKOV_GATES_NEURON-numInputsMin", 3, "min number of inputs to neuronGate");
