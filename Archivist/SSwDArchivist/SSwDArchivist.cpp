@@ -1,3 +1,14 @@
+//  MABE is a product of The Hintza Lab @ MSU
+//     for general research information:
+//         http://hintzelab.msu.edu/
+//     for MABE documentation:
+//         https://github.com/ahnt/BasicMarkovBrainTemplate/wiki - for
+//
+//  Copyright (c) 2015 Michigan State University. All rights reserved.
+//     to view the full license, visit:
+//          https://github.com/ahnt/BasicMarkovBrainTemplate/wiki/license
+
+
 #include "SSwDArchivist.h"
 
 shared_ptr<ParameterLink<string>> SSwDArchivist::SSwD_Arch_dataSequenceStrPL = Parameters::register_parameter("ARCHIVIST_SSWD-dataSequence", (string)":100", "when to save a data file (format: x = single value, x-y = x to y, x-y:z = x to y on x, :z = from 0 to updates on z, x:z = from x to 'updates' on z) e.g. '1-100:10, 200, 300:100'");

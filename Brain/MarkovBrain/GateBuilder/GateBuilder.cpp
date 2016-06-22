@@ -1,3 +1,15 @@
+//  MABE is a product of The Hintza Lab @ MSU
+//     for general research information:
+//         http://hintzelab.msu.edu/
+//     for MABE documentation:
+//         https://github.com/ahnt/BasicMarkovBrainTemplate/wiki - for
+//
+//  Copyright (c) 2015 Michigan State University. All rights reserved.
+//     to view the full license, visit:
+//          https://github.com/ahnt/BasicMarkovBrainTemplate/wiki/license
+
+
+
 #include "GateBuilder.h"
 #include <cmath>
 
@@ -10,12 +22,12 @@ shared_ptr<ParameterLink<int>> Gate_Builder::epsiGateInitialCountPL = Parameters
 shared_ptr<ParameterLink<bool>> Gate_Builder::usingVoidGatePL = Parameters::register_parameter("BRAIN_MARKOV_GATES-voidGate", false, "set to true to enable void gates");
 shared_ptr<ParameterLink<int>> Gate_Builder::voidGateInitialCountPL = Parameters::register_parameter("BRAIN_MARKOV_GATES-voidGate_InitialCount", 3, "seed genome with this many start codons");
 
-shared_ptr<ParameterLink<bool>> Gate_Builder::usingFBGatePL = Parameters::register_parameter("BRAIN_MARKOV_GATES-feedBackGate", false, "set to true to enable feedback gates");
-shared_ptr<ParameterLink<int>> Gate_Builder::fBGateInitialCountPL = Parameters::register_parameter("BRAIN_MARKOV_GATES-feedBackGate_InitialCount", 3, "seed genome with this many start codons");
+//shared_ptr<ParameterLink<bool>> Gate_Builder::usingFBGatePL = Parameters::register_parameter("BRAIN_MARKOV_GATES-feedBackGate", false, "set to true to enable feedback gates");
+//shared_ptr<ParameterLink<int>> Gate_Builder::fBGateInitialCountPL = Parameters::register_parameter("BRAIN_MARKOV_GATES-feedBackGate_InitialCount", 3, "seed genome with this many start codons");
 shared_ptr<ParameterLink<bool>> Gate_Builder::usingGPGatePL = Parameters::register_parameter("BRAIN_MARKOV_GATES-geneticProgramingGate", false, "set to true to enable GP (what?) gates");
 shared_ptr<ParameterLink<int>> Gate_Builder::gPGateInitialCountPL = Parameters::register_parameter("BRAIN_MARKOV_GATES-geneticProgramingGate_InitialCount", 3, "seed genome with this many start codons");
-shared_ptr<ParameterLink<bool>> Gate_Builder::usingThGatePL = Parameters::register_parameter("BRAIN_MARKOV_GATES-thresholdGate", false, "set to true to enable threshold gates");
-shared_ptr<ParameterLink<int>> Gate_Builder::thGateInitialCountPL = Parameters::register_parameter("BRAIN_MARKOV_GATES-thresholdGate_InitialCount", 3, "seed genome with this many start codons");
+//shared_ptr<ParameterLink<bool>> Gate_Builder::usingThGatePL = Parameters::register_parameter("BRAIN_MARKOV_GATES-thresholdGate", false, "set to true to enable threshold gates");
+//shared_ptr<ParameterLink<int>> Gate_Builder::thGateInitialCountPL = Parameters::register_parameter("BRAIN_MARKOV_GATES-thresholdGate_InitialCount", 3, "seed genome with this many start codons");
 
 shared_ptr<ParameterLink<bool>> Gate_Builder::usingTritDeterministicGatePL = Parameters::register_parameter("BRAIN_MARKOV_GATES-tritGate", false, "set to true to enable tritDeterministic gates");
 shared_ptr<ParameterLink<int>> Gate_Builder::tritDeterministicGateInitialCountPL = Parameters::register_parameter("BRAIN_MARKOV_GATES-tritGate_InitialCount", 3, "seed genome with this many start codons");
@@ -77,8 +89,8 @@ void Gate_Builder::setupGates() {
 	int GPCode = 46;
 	int TritDeterministicCode = 47;
 	int NeuronCode = 48;
-	int FeedbackCode = 49;
-	int ThresholdCode = 50;
+//	int FeedbackCode = 49;
+//	int ThresholdCode = 50;
 
 	int bitsPerCodon = Global::bitsPerCodonPL->lookup();
 	makeGate.resize(1 << bitsPerCodon);
@@ -219,19 +231,19 @@ void Gate_Builder::setupGates() {
 			return make_shared<VoidGate>(addresses,table,gateID, epsilon, _PT);
 		});
 	}
-	if ((PT == nullptr) ? usingFBGatePL->lookup() : PT->lookupBool("BRAIN_MARKOV_GATES-feedBackGate")) {
-		inUseGateNames.insert("FeedBack");
-		int codonOne = FeedbackCode;
-		inUseGateTypes.insert(codonOne);
-		{
-			gateStartCodes[codonOne].push_back(codonOne);
-			gateStartCodes[codonOne].push_back(((1 << bitsPerCodon) - 1) - codonOne);
-		}
-		intialGateCounts[codonOne] = (PT == nullptr) ? fBGateInitialCountPL->lookup() : PT->lookupInt("BRAIN_MARKOV_GATES-feedBackGate_InitialCount");
-
-		cout << "in Gate_Builder::setupGates() : GATES-feedBackGate = true, but there is no current implementation! Exiting." << endl;
-		exit(1);
-	}
+//	if ((PT == nullptr) ? usingFBGatePL->lookup() : PT->lookupBool("BRAIN_MARKOV_GATES-feedBackGate")) {
+//		inUseGateNames.insert("FeedBack");
+//		int codonOne = FeedbackCode;
+//		inUseGateTypes.insert(codonOne);
+//		{
+//			gateStartCodes[codonOne].push_back(codonOne);
+//			gateStartCodes[codonOne].push_back(((1 << bitsPerCodon) - 1) - codonOne);
+//		}
+//		intialGateCounts[codonOne] = (PT == nullptr) ? fBGateInitialCountPL->lookup() : PT->lookupInt("BRAIN_MARKOV_GATES-feedBackGate_InitialCount");
+//
+//		cout << "in Gate_Builder::setupGates() : GATES-feedBackGate = true, but there is no current implementation! Exiting." << endl;
+//		exit(1);
+//	}
 //		AddGate(FeedbackCode, [](shared_ptr<AbstractGenome> genome,shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {return make_shared<FeedbackGate>(genome,genomeHandler,gateID);});
 //		Global::inUseGateTypes.insert(44);
 //	}
@@ -264,20 +276,20 @@ void Gate_Builder::setupGates() {
 		//GPGate(pair<vector<int>, vector<int>> _addresses, int _operation, vector<double> _constValues, int gateID);
 
 	}
-	if ((PT == nullptr) ? usingThGatePL->lookup() : PT->lookupBool("BRAIN_MARKOV_GATES-thresholdGate")) {
-		inUseGateNames.insert("Threshold");
-		int codonOne = ThresholdCode;
-		inUseGateTypes.insert(codonOne);
-		{
-			gateStartCodes[codonOne].push_back(codonOne);
-			gateStartCodes[codonOne].push_back(((1 << bitsPerCodon) - 1) - codonOne);
-		}
-		intialGateCounts[codonOne] = (PT == nullptr) ? thGateInitialCountPL->lookup() : PT->lookupInt("BRAIN_MARKOV_GATES-thresholdGate_InitialCount");
-
-		cout << "in Gate_Builder::setupGates() : GATES-thresholdGate = true, but there is no current implementation! Exiting." << endl;
-		exit(1);
-	}
-
+//	if ((PT == nullptr) ? usingThGatePL->lookup() : PT->lookupBool("BRAIN_MARKOV_GATES-thresholdGate")) {
+//		inUseGateNames.insert("Threshold");
+//		int codonOne = ThresholdCode;
+//		inUseGateTypes.insert(codonOne);
+//		{
+//			gateStartCodes[codonOne].push_back(codonOne);
+//			gateStartCodes[codonOne].push_back(((1 << bitsPerCodon) - 1) - codonOne);
+//		}
+//		intialGateCounts[codonOne] = (PT == nullptr) ? thGateInitialCountPL->lookup() : PT->lookupInt("BRAIN_MARKOV_GATES-thresholdGate_InitialCount");
+//
+//		cout << "in Gate_Builder::setupGates() : GATES-thresholdGate = true, but there is no current implementation! Exiting." << endl;
+//		exit(1);
+//	}
+//
 //		AddGate(ThresholdCode, [](shared_ptr<AbstractGenome> genome,shared_ptr<AbstractGenome::Handler> genomeHandler, int gateID) {return make_shared<Thresholdgate>(genome,genomeHandler,gateID);});
 //		Global::inUseGateTypes.insert(46);
 //	}

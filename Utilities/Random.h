@@ -1,3 +1,13 @@
+//  MABE is a product of The Hintza Lab @ MSU
+//     for general research information:
+//         http://hintzelab.msu.edu/
+//     for MABE documentation:
+//         https://github.com/ahnt/BasicMarkovBrainTemplate/wiki - for
+//
+//  Copyright (c) 2015 Michigan State University. All rights reserved.
+//     to view the full license, visit:
+//          https://github.com/ahnt/BasicMarkovBrainTemplate/wiki/license
+
 // This file provides a wrapper around C++11's style of generating random
 // numbers. We provide a "common" number generator so the entire code
 // base can work with a global seed if they want, as well as some
