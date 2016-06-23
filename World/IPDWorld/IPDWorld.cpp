@@ -17,6 +17,8 @@ shared_ptr<ParameterLink<double>> IPDWorld::S_payOffPL = Parameters::register_pa
 shared_ptr<ParameterLink<double>> IPDWorld::T_payOffPL = Parameters::register_parameter("WORLD_IPD-T_payOff", 5.0, "Temptation Payoff - received when an organism defects, and their opponent cooperates");
 shared_ptr<ParameterLink<double>> IPDWorld::P_payOffPL = Parameters::register_parameter("WORLD_IPD-P_payOff", 1.0, "Punishment Payoff - received when both organisms defect");
 
+shared_ptr<ParameterLink<int>> IPDWorld::numCompetitorsPL = Parameters::register_parameter("WORLD_IPD-numCompetitors", -1, "number of each organism will challenge (and also be challenged by).\nTotal matches played will be 2 times this number * population size.\nIf -1, then every organism will play every other organism once.");
+
 shared_ptr<ParameterLink<bool>> IPDWorld::CPL = Parameters::register_parameter("WORLD_IPD-C", true, "How will Cooperate be represented internally (Defect will = 1 - Cooperate)");
 
 //shared_ptr<ParameterLink<double>> BerryWorld::TSKPL = Parameters::register_parameter("WORLD_BERRY-taskSwitchingCost", 1.4, "cost to change food sources");
@@ -29,10 +31,12 @@ IPDWorld::IPDWorld(shared_ptr<ParametersTable> _PT) :
 	roundsMax = (PT == nullptr) ? roundsMaxPL->lookup() : PT->lookupInt("WORLD_IPD-roundsMax");
 	roundsMin = (PT == nullptr) ? roundsMinPL->lookup() : PT->lookupInt("WORLD_IPD-roundsMin");
 
-	R_payOff = (PT == nullptr) ? R_payOffPL->lookup() : PT->lookupInt("WORLD_IPD-R_payOff");
-	S_payOff = (PT == nullptr) ? S_payOffPL->lookup() : PT->lookupInt("WORLD_IPD-S_payOff");
-	T_payOff = (PT == nullptr) ? T_payOffPL->lookup() : PT->lookupInt("WORLD_IPD-T_payOff");
-	P_payOff = (PT == nullptr) ? P_payOffPL->lookup() : PT->lookupInt("WORLD_IPD-T_payOff");
+	R_payOff = (PT == nullptr) ? R_payOffPL->lookup() : PT->lookupDouble("WORLD_IPD-R_payOff");
+	S_payOff = (PT == nullptr) ? S_payOffPL->lookup() : PT->lookupDouble("WORLD_IPD-S_payOff");
+	T_payOff = (PT == nullptr) ? T_payOffPL->lookup() : PT->lookupDouble("WORLD_IPD-T_payOff");
+	P_payOff = (PT == nullptr) ? P_payOffPL->lookup() : PT->lookupDouble("WORLD_IPD-P_payOff");
+
+	numCompetitors = (PT == nullptr) ? numCompetitorsPL->lookup() : PT->lookupInt("WORLD_IPD-numCompetitors");
 
 	C = (PT == nullptr) ? CPL->lookup() : PT->lookupBool("WORLD_IPD-C");
 	D = 1 - C;
@@ -43,10 +47,10 @@ IPDWorld::IPDWorld(shared_ptr<ParametersTable> _PT) :
 	// columns to be added to ave file
 	aveFileColumns.clear();
 	aveFileColumns.push_back("score");
-//	aveFileColumns.push_back("wins");
-//	aveFileColumns.push_back("loses");
-//	aveFileColumns.push_back("tie");
-//	aveFileColumns.push_back("draw");
+	aveFileColumns.push_back("CC");
+	aveFileColumns.push_back("DD");
+	aveFileColumns.push_back("CD");
+	aveFileColumns.push_back("CD");
 }
 
 void IPDWorld::runWorldDuel(shared_ptr<Organism> p1, shared_ptr<Organism> p2, bool analyse, bool visualize, bool debug) {
@@ -56,15 +60,14 @@ void IPDWorld::runWorldDuel(shared_ptr<Organism> p1, shared_ptr<Organism> p2, bo
 	double P1score = 0;
 	double P2score = 0;
 
-//	int P1wins = 0;
-//	int P2wins = 0;
-//
-//	int P1loses = 0;
-//	int P2loses = 0;
-//	int P1tie = 0;
-//	int P2tie = 0;
-//	int P1draw = 0;
-//	int P2draw = 0;
+	int P1CC = 0;
+	int P2CC = 0;
+	int P1CD = 0;
+	int P2CD = 0;
+	int P1DC = 0;
+	int P2DC = 0;
+	int P1DD = 0;
+	int P2DD = 0;
 
 	p1->dataMap.Append("moves", "X");
 	p2->dataMap.Append("moves", "X");
@@ -101,42 +104,91 @@ void IPDWorld::runWorldDuel(shared_ptr<Organism> p1, shared_ptr<Organism> p2, bo
 			//cout << "CC" << endl;
 			P1score += R_payOff;
 			P2score += R_payOff;
+			P1CC++;
+			P2CC++;
 		}
 		if (p1Move == C && p2Move == D) {
 			//cout << "CD" << endl;
 			P1score += S_payOff;
 			P2score += T_payOff;
+			P1CD++;
+			P2DC++;
 		}
 		if (p1Move == D && p2Move == C) {
 			//cout << "DC" << endl;
 			P1score += T_payOff;
 			P2score += S_payOff;
+			P1DC++;
+			P2CD++;
 		}
 		if (p1Move == D && p2Move == D) {
 			//cout << "DD" << endl;
 			P1score += P_payOff;
 			P2score += P_payOff;
+			P1DD++;
+			P2DD++;
 		}
 //		cout << "P1 score: " << P1score << endl;
 //		cout << "P2 score: " << P2score << endl;
 
 	}
-	p1->score = P1score / gL;
-	p2->score = P2score / gL;
+	p1->score = P1score / (double) gL;
+	p2->score = P2score / (double) gL;
+
+	p1->dataMap.Append("allCC", (double) P1CC / (double) gL);
+	p2->dataMap.Append("allCC", (double) P2CC / (double) gL);
+	p1->dataMap.Append("allCD", (double) P1CD / (double) gL);
+	p2->dataMap.Append("allCD", (double) P2CD / (double) gL);
+	p1->dataMap.Append("allDC", (double) P1DC / (double) gL);
+	p2->dataMap.Append("allDC", (double) P2DC / (double) gL);
+	p1->dataMap.Append("allDD", (double) P1DD / (double) gL);
+	p2->dataMap.Append("allDD", (double) P2DD / (double) gL);
+
 }
 
 void IPDWorld::runWorld(shared_ptr<Group> group, bool analyse, bool visualize, bool debug) {
+	if (group->population.size() < 2) {
+		cout << "  IPDWorld must be run with WORLD::groupEvaluation = true (1) and must be passed a group who's population size > 1.\n  Please update your parameters and rerun." << endl;
+		exit(1);
+	}
 	vector<double> scores(group->population.size(), 0);
-	for (int i = 0; i < (int) group->population.size(); i++) {
-		for (int j = i; j < (int) group->population.size(); j++) {
-			if (i != j) {
+
+	int n = numCompetitors;
+	if (n == -1) {
+		for (int i = 0; i < (int) group->population.size(); i++) {
+			for (int j = i + 1; j < (int) group->population.size(); j++) {
+				//if (i != j) {
 				IPDWorld::runWorldDuel(group->population[i], group->population[j], analyse, visualize, debug);
 				scores[i] += group->population[i]->score;
+				scores[j] += group->population[j]->score;
+				//}
+			}
+		}
+	} else {
+		if (n >= (int)group->population.size()){
+			cout << "In IPDWorld, WORLD_IPD-numCompetitors is to large. must be > 0 and < population size.\nExiting."<<endl;
+			exit(1);
+		} else if (n == 0){
+			cout << "In IPDWorld, WORLD_IPD-numCompetitors is 0. must be > 0 and < population size.\nExiting."<<endl;
+			exit(1);
+		} else {
+			for (int i = 0; i < (int) group->population.size(); i++) {
+				for (int j = i + 1; j < i + n; j++) {
+					int competitorIndex = j % (int) group->population.size();
+					IPDWorld::runWorldDuel(group->population[i], group->population[competitorIndex], analyse, visualize, debug);
+					scores[i] += group->population[i]->score;
+					scores[competitorIndex] += group->population[competitorIndex]->score;
+				}
 			}
 		}
 	}
+	if (n == -1){
+		n = (int) group->population.size() - 1; // if n == -1 the each org plays every other org
+	} else {
+		n = n * 2; // else each org plays the n orgs "before" and "after" them (in the population vector)
+	}
 	for (int i = 0; i < (int) group->population.size(); i++) {
-		group->population[i]->score = scores[i] / ((int) group->population.size()-1);
+		group->population[i]->score = scores[i] / (double)n;
 		group->population[i]->dataMap.Append("allscore", group->population[i]->score);
 
 	}
