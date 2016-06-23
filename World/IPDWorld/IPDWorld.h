@@ -37,12 +37,15 @@ public:
 
 	static shared_ptr<ParameterLink<bool>> CPL;
 
+	static shared_ptr<ParameterLink<int>> numCompetitorsPL;
+
 	int roundsMin;
 	int roundsMax;
 	double R_payOff; // Reward
 	double S_payOff; // sucker
 	double T_payOff; // Temptation
 	double P_payOff; // Punishment
+	int numCompetitors;
 
 	bool C;
 	bool D;

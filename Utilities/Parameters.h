@@ -153,17 +153,17 @@ public:
 		return (0);
 	}
 
-	virtual const void get(bool& value) {
-		ASSERT(false, "using abstract class method for get(bool) - suggests a type mismatch in parameter types.");
+	virtual const void get(bool& value, string name = "") {
+		ASSERT(false, "using abstract class method for get(bool) \"" + name + "\" - suggests a type mismatch in parameter types.");
 	}
-	virtual const void get(string& value) {
-		ASSERT(false, "using abstract class method for get(string) - suggests a type mismatch in parameter types.");
+	virtual const void get(string& value, string name = "") {
+		ASSERT(false, "using abstract class method for get(string) \"" + name + "\" - suggests a type mismatch in parameter types.");
 	}
-	virtual const void get(int& value) {
-		ASSERT(false, "using abstract class method for get(int) - suggests a type mismatch in parameter types.");
+	virtual const void get(int& value, string name = "") {
+		ASSERT(false, "using abstract class method for get(int) \"" + name + "\" - suggests a type mismatch in parameter types.");
 	}
-	virtual const void get(double& value) {
-		ASSERT(false, "using abstract class method for get(double) - suggests a type mismatch in parameter types.");
+	virtual const void get(double& value, string name = "") {
+		ASSERT(false, "using abstract class method for get(double) \"" + name + "\" - suggests a type mismatch in parameter types.");
 	}
 
 	virtual void set(const bool & val, bool _local = true) {
@@ -226,7 +226,7 @@ public:
 		return *valuePtr;
 	}
 
-	const void get(T& value) override {
+	const void get(T& value, string name) override {
 		value = *valuePtr;
 	}
 
@@ -504,7 +504,7 @@ public:
 	void lookup(const string& name, T& value) {
 		// check for the name in this table
 		if (table.find(name) != table.end()) {  // if this table has entry called name
-			table[name]->get(value);
+			table[name]->get(value,name);
 
 		} else {
 			//value = 10.0;
@@ -516,7 +516,7 @@ public:
 			}
 			searchTable = findTableWithNamedParameter(name, searchTable);  // find the name in the closest ancestor table with named parameter
 			ASSERT (searchTable != nullptr,"  ERROR! :: in ParametersTable::lookup(const string& name, bool& value) - could not find \"" << tableNameSpace << name << "\" in parameters tables! Exiting!");
-			searchTable->table[name]->get(value);// assign value
+			searchTable->table[name]->get(value,name);// assign value
 			////table[name] = make_shared<ParametersEntry<T>>(value,false);// create new entry with value and local = false
 			table[name] = make_shared<ParametersEntry<T>>();
 			table[name]->follow(searchTable->table[name]);
@@ -848,7 +848,7 @@ public:
 	}
 	static void readCommandLine(int argc, const char** argv, unordered_map<string, string>& comand_line_list, vector<string>& fileList, bool& saveFiles);
 	static unordered_map<string, string> readParametersFile(string fileName);
-	static void initializeParameters(int argc, const char * argv[], int _maxLineLength, int _commentIndent);
+	static bool initializeParameters(int argc, const char * argv[]);
 	static void saveSettingsFile(const string& nameSpace, stringstream& FILE, vector<string> categoryList, int _maxLineLength, int _commentIndent, bool alsoChildren = false, int nameSpaceLevel = 0);
 	static void saveSettingsFiles(int _maxLineLength, int _commentIndent, vector<string> nameSpaceList = { "*" }, vector<pair<string, vector<string>>> categoryLists = { {"settings.cfg", {""}}});
 	static void printParameterWithWraparound(stringstream& FILE, string _currentIndent, string _parameter, int _maxLineLength, int _commentIndent);

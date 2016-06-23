@@ -26,22 +26,30 @@
 #include "Utilities/Utilities.h"
 
 #include "modules.h"
-	using namespace std;
+
+using namespace std;
 
 
 
 int main(int argc, const char * argv[]) {
-
+																		 // also writes out a config file if requested
 	cout << "\n\n" << "\tMM   MM      A       BBBBBB    EEEEEE\n" << "\tMMM MMM     AAA      BB   BB   EE\n" << "\tMMMMMMM    AA AA     BBBBBB    EEEEEE\n" << "\tMM M MM   AAAAAAA    BB   BB   EE\n" << "\tMM   MM  AA     AA   BBBBBB    EEEEEE\n" << "\n" << "\tModular    Agent      Based    Evolver\n\n\n\thttp://hintzelab.msu.edu/MABE\n\n" << endl;
 
 	cout << "\tfor help run MABE with the \"-h\" flag (i.e. ./MABE -h)." << endl << endl;
 	configureDefaultsAndDocumentation();
-	int maxLineLength = Global::maxLineLengthPL->lookup();
-	int commentIndent = Global::commentIndentPL->lookup();
-	Parameters::initializeParameters(argc, argv, maxLineLength, commentIndent);  // loads command line and configFile values into registered parameters
-																				 // also writes out a config file if requested
+	bool saveFiles = Parameters::initializeParameters(argc, argv);  // loads command line and configFile values into registered parameters
+	// also writes out a config file if requested
 
-												   // outputDirectory must exist. If outputDirectory does not exist, no error will occur, but no data will be writen.
+	if (saveFiles) {
+		int maxLineLength = Global::maxLineLengthPL->lookup();
+		int commentIndent = Global::commentIndentPL->lookup();
+
+		Parameters::saveSettingsFiles(maxLineLength, commentIndent, { "*" }, { { "settings_organism.cfg", { "GATE*", "GENOME*", "BRAIN*" } }, { "settings_world.cfg", { "WORLD*" } }, { "settings.cfg", { "" } } });
+		cout << "Saving config Files and Exiting." << endl;
+		exit(0);
+	}
+
+	// outputDirectory must exist. If outputDirectory does not exist, no error will occur, but no data will be writen.
 	FileManager::outputDirectory = Global::outputDirectoryPL->lookup();
 
 	if (Global::randomSeedPL->lookup() == -1) {
@@ -111,7 +119,6 @@ int main(int argc, const char * argv[]) {
 	}
 
 
-
 //////////////////
 // evolution loop
 //////////////////
@@ -126,7 +133,7 @@ int main(int argc, const char * argv[]) {
 
 		while (!finished) {
 			world->evaluate(groups[defaultGroup], AbstractWorld::groupEvaluationPL->lookup(), false, false, AbstractWorld::debugPL->lookup());  // evaluate each organism in the population using a World
-																																				//cout << "  evaluation done\n";
+																														//cout << "  evaluation done\n";
 			finished = groups[defaultGroup]->archive();  // save data, update memory and delete any unneeded data;
 														 //cout << "  archive done\n";
 			Global::update++;
