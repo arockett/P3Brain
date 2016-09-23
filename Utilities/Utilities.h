@@ -1,9 +1,12 @@
-/*
- * Utilities.h
- *
- *  Created on: Oct 6, 2015
- *      Author: cliff
- */
+//  MABE is a product of The Hintza Lab @ MSU
+//     for general research information:
+//         http://hintzelab.msu.edu/
+//     for MABE documentation:
+//         https://github.com/ahnt/BasicMarkovBrainTemplate/wiki - for
+//
+//  Copyright (c) 2015 Michigan State University. All rights reserved.
+//     to view the full license, visit:
+//          https://github.com/ahnt/BasicMarkovBrainTemplate/wiki/license
 
 #ifndef __BasicMarkovBrainTemplate__Utilities__
 #define __BasicMarkovBrainTemplate__Utilities__
@@ -13,8 +16,63 @@
 #include <iostream>
 #include <map>
 #include <sstream>
+#include <set>
+#include <vector>
 
 using namespace std;
+
+
+template<typename T1, typename T2>
+bool HaveSameType(T1, T2) {
+	return is_same<T1, T2>();
+}
+
+inline string get_var_typename(const bool&) {
+	return "bool";
+}
+inline string get_var_typename(const string&) {
+	return "string";
+}
+inline string get_var_typename(const int&) {
+	return "int";
+}
+inline string get_var_typename(const double&) {
+	return "double";
+}
+
+inline vector<string> nameSpaceToNameParts(const string& nameSpace) {
+	string localNameSpace = nameSpace;
+	vector<string> nameParts;
+	bool done = (nameSpace.size() == 0);
+	bool nameSpaceValid = true;
+	while (!done) {
+		if (localNameSpace.size() > 2) {  // name space name must end with :: so must have more then 2 characters
+			int i = 0;
+			while ((localNameSpace[i] != ':' || localNameSpace[i + 1] != ':') && (i < (int) localNameSpace.size() - 2)) {
+				i++;
+			}
+			if (!(localNameSpace[i] == ':' && localNameSpace[i + 1] == ':')) {  // if there is not "::" at the end of the name space part
+				nameSpaceValid = false;
+				done = true;
+			} else {  // found "::"
+				nameParts.push_back(localNameSpace.substr(0, i + 2));
+				localNameSpace = localNameSpace.substr(i + 2, localNameSpace.size());
+				if (localNameSpace.size() == 0) {  // if after cutting of part there is nothing left
+					done = true;
+				}
+			}
+		} else {  // if the name space name part is less then 3 characters... ie, must be at least "*::"
+			nameSpaceValid = false;
+			done = true;
+		}
+	}
+	if (!nameSpaceValid) {
+		cout << "  Error::in nameSpaceToNameParts(const string& nameSpace). name space is invalid.\n  Can't parse \"" << localNameSpace << "\"\n   Parameter name space must end in ::\nExiting." << endl;
+		exit(1);
+	}
+	return nameParts;
+}
+
 
 /*
  * return x % y were (-1 % y) = (y - 1)
@@ -70,7 +128,7 @@ inline vector<string> parseCSVLine(string rawLine, const char separator = ',') {
 				// read non " non whitespace stuff (i.e. look for separators and entries);
 
 			} else {  // it is whitespace. there should be no whitespace in this file. Error.
-				cout << "In FileManager::parseCSVLine(string rawLine)\nWhile attempting to read csv file, encountered whitespace. This file should have no whitespace. Exiting.\n";
+				cout << "In parseCSVLine(string rawLine)\nWhile attempting to read csv file, encountered whitespace. This file should have no whitespace. Exiting.\n";
 				exit(1);
 			}
 		}
@@ -151,6 +209,21 @@ inline string CSVLookUp(map<string, vector<string>> CSV_Table, const string& loo
 template<class T>
 static bool load_value(const string& value, T& target) {
 	std::stringstream ss(value);
+	ss >> target;
+	if (ss.fail()) {
+		return false;
+	} else {
+		string remaining;
+		ss >> remaining;
+		// stream failure means nothing left in stream, which is what we want
+		return ss.fail();
+	}
+}
+
+// Put an arbitrary value to the target variable, return false on conversion failure (COPIES FUNCTION OF load_value()!)
+template<class T>
+static bool stringToValue(const string& source, T& target) {
+	std::stringstream ss(source);
 	ss >> target;
 	if (ss.fail()) {
 		return false;
@@ -243,6 +316,152 @@ inline int vectorToTritToInt(const vector<Type> &nodes, const vector<int> &nodeA
 		}
 	}
 	return result;
+}
+
+
+// converts a ',' separated formatted string to sequence with duplicates removed
+// single number -> just add that number
+// x-y -> add from x to y
+// x-y:z -> add from x to y on z
+// x:z -> from x to defaultMax on z (if defaultMax is not defined, error... see below)
+// :z -? from 0 to defaultMax on z (if defaultMax is not defined, error... see below)
+//
+// on error (see x:z and :z or if the str is not formatted correctly), return an empty vector (size 0)
+//
+// addZero true will insure that 0 is in the sequence
+//
+// function works by first parsing seqStr into a vector where each element if a vector with {start,end,step}
+// next, each list is added to a new vector. This vector is convered to a set and back to a vector (which both
+// remove duplicates, and sorts)
+//
+// example input   /   output
+// 4                                      /   4
+// 10-20                                  /   10,11,12,13,14,15,16,17,18,19,20
+// 10-20:3                                /   10,13,16,19
+// 5:5 (with defaultMax = 20)             /   5,10,15,20
+// :3 (with defaultMax = 20)              /   0,3,6,9,12,15,18
+// 4,10-15,30:2 ((with defaultMax = 40)   /   4,10,11,12,13,14,15,30,32,34,36,38,40
+
+
+inline vector<int> seq(const string seqStr, int defaultMax = -1, bool addZero = false) {
+	stringstream ss(seqStr);
+	int n;
+	char c;
+	bool error = (seqStr.size() == 0) ? true : false;  // detect empty string
+
+	vector<vector<int>> seqDefinitions;
+
+	int currentDef = 0;
+
+	while (!ss.fail() && !error) {  // while not at end of string and no error has been detected
+		seqDefinitions.resize(seqDefinitions.size() + 1);
+		ss >> n;
+		if (ss.fail()) {  // if first element read was not an int
+			ss.clear();
+			ss >> c;
+			if (c == ':') {  // this may be a definition of format ':x', that is a range from 0
+				ss >> n;
+				if (ss.fail()) {  // we were expecting an int!
+					error = true;
+				} else {  // set up seq definition 0 > defaultMax : n
+					if (defaultMax == -1) {
+						cout << "Error in seq(const string seqStr, int defaultMax = -1)\n  attempt to use simple range (':x'), but defaultMax was not set\n  will return empty sequence."<<endl;
+						error = true;
+					}
+					seqDefinitions[currentDef].push_back(0);
+					seqDefinitions[currentDef].push_back(defaultMax);
+					seqDefinitions[currentDef].push_back(n);
+					ss >> c;
+					if (c != ',' && !ss.fail()) {
+						error = true;
+					}
+				}
+			} else {  // first element was neither an int or ':'
+				error = true;
+			}
+		} else {  // first element was an int
+			seqDefinitions[currentDef].push_back(n);  // push back first number read
+			ss >> c;
+			if (c == ',' || ss.fail()) {
+				// if next char is a ',' or end of string, we have a single value or a ':x' definition
+				// do nothing...
+			} else if (c == '-') {
+				ss >> n;
+				seqDefinitions[currentDef].push_back(n);
+				if (ss.fail()) {
+					error = true;
+				}
+				ss >> c;
+				if (c == ':') {
+					ss >> n;
+					seqDefinitions[currentDef].push_back(n);
+					ss >> c;
+					if (c != ',' && !ss.fail()) {
+						error = true;
+					}
+				} else if (c == ',' || ss.fail()) {
+					//we are at the end of this definition (either comma, get read to read more, or end of string)
+					seqDefinitions[currentDef].push_back(1); // no step was provided
+				} else {
+					error = true;  // we did not find a comma or end of string at the end of a definition
+				}
+			} else if (c == ':') {  // this maybe a definition of format x : y
+				ss >> n;
+				if (ss.fail()) {  // we were expecting an int!
+					error = true;
+				} else {  // set up seq definition 0 > defaultMax : n
+					if (defaultMax == -1) {
+						cout << "ERROR :: in seq(const string seqStr, int defaultMax = -1)\n  attempt to define unbound range ('x:y'), but defaultMax was not set\n  will return empty sequence."<<endl;
+						error = true;
+					}
+					seqDefinitions[currentDef].push_back(defaultMax);  // first is alreay pushed
+					seqDefinitions[currentDef].push_back(n);
+					ss >> c;
+					if (c != ',' && !ss.fail()) {
+						error = true;
+					}
+				}
+			} else {
+				error = true;  // we needed to find either '>' or ',' and did not!
+			}
+		}
+		currentDef++;
+	}
+
+	vector<int> seq;
+
+	if (error) {
+		seq.resize(0);
+		return seq;
+	}
+
+	for (auto seqDef : seqDefinitions) {
+		if (seqDef.size() == 1) {
+			seq.push_back(seqDef[0]);
+		} else {
+			int current = seqDef[0];
+			int end = seqDef[1];
+			int step = seqDef[2];
+
+			if (current < end) {
+				for (; current <= end; current += step) {
+					seq.push_back(current);
+				}
+			} else {
+				for (; current >= end; current -= step) {
+					seq.push_back(current);
+				}
+			}
+		}
+	}
+
+	if (addZero){
+		seq.push_back(0); // may result in duplicate which will be corrected in the next step
+	}
+	set<int> converterSet(seq.begin(), seq.end());
+	seq.assign(converterSet.begin(), converterSet.end());
+
+	return seq;
 }
 
 #endif // __BasicMarkovBrainTemplate__Utilities__

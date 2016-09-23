@@ -1,25 +1,29 @@
+//  MABE is a product of The Hintza Lab @ MSU
+//     for general research information:
+//         http://hintzelab.msu.edu/
+//     for MABE documentation:
+//         https://github.com/ahnt/BasicMarkovBrainTemplate/wiki - for
 //
-//  BerryWorld.cpp
-//  BasicMarkovBrainTemplate
-//
-//  Created by Arend Hintze on 6/15/15.
-//  Copyright (c) 2015 Arend Hintze. All rights reserved.
-//
+//  Copyright (c) 2015 Michigan State University. All rights reserved.
+//     to view the full license, visit:
+//          https://github.com/ahnt/BasicMarkovBrainTemplate/wiki/license
 
 #include "../../Utilities/Utilities.h"
 #include "NumeralClassifierWorld.h"
 
-const int& NumeralClassifierWorld::defaulttestsPreWorldEval = Parameters::register_parameter("NumeralClassifier_testsPreWorldEval", 5, "number of values each brain attempts to evaluate in a world evaluation", "WORLD - NUMERALCLASSIFIER");
-const int& NumeralClassifierWorld::defaultWorldUpdates = Parameters::register_parameter("NumeralClassifier_WorldUpdates", 100, "amount of time an brain is tested", "WORLD - NUMERALCLASSIFIER");
-const int& NumeralClassifierWorld::defaultRetinaType = Parameters::register_parameter("retinaType", 3, "//1 = center only, 2 = 3 across, 3 = 3x3, 4 = 5x5, 5 = 7x7", "WORLD - NUMERALCLASSIFIER");
-const string& NumeralClassifierWorld::numeralDataFileName = Parameters::register_parameter("numeralDataFileName", (string) "World/NumeralClassifierWorld/mnist.train.discrete.28x28-only100", "name of file with numeral data", "WORLD - NUMERALCLASSIFIER");
+shared_ptr<ParameterLink<int>> NumeralClassifierWorld::defaulttestsPreWorldEvalPL = Parameters::register_parameter("WORLD_NUMERALCLASSIFIER-testsPreWorldEval", 5, "number of values each brain attempts to evaluate in a world evaluation");
+shared_ptr<ParameterLink<int>> NumeralClassifierWorld::defaultWorldUpdatesPL = Parameters::register_parameter("WORLD_NUMERALCLASSIFIER-WorldUpdates", 100, "number of world updates brain has to evaluate each value");
+shared_ptr<ParameterLink<int>> NumeralClassifierWorld::defaultRetinaTypePL = Parameters::register_parameter("WORLD_NUMERALCLASSIFIER-retinaType", 3, "1 = center only, 2 = 3 across, 3 = 3x3, 4 = 5x5, 5 = 7x7");
+shared_ptr<ParameterLink<string>> NumeralClassifierWorld::numeralDataFileNamePL = Parameters::register_parameter("WORLD_NUMERALCLASSIFIER-dataFileName", (string) "World/NumeralClassifierWorld/mnist.train.discrete.28x28-only100", "name of file with numeral data");
 
-NumeralClassifierWorld::NumeralClassifierWorld() {
-	worldUpdates = defaultWorldUpdates;
-	testsPreWorldEval = defaulttestsPreWorldEval;
+NumeralClassifierWorld::NumeralClassifierWorld(shared_ptr<ParametersTable> _PT) :
+		AbstractWorld(_PT) {
+	worldUpdates = (PT == nullptr) ? defaultWorldUpdatesPL->lookup() : PT->lookupInt("WORLD_NUMERALCLASSIFIER-WorldUpdates");
+	testsPreWorldEval = (PT == nullptr) ? defaulttestsPreWorldEvalPL->lookup() : PT->lookupInt("WORLD_NUMERALCLASSIFIER-testsPreWorldEval");
+	retinaType = (PT == nullptr) ? defaultRetinaTypePL->lookup() : PT->lookupInt("WORLD_NUMERALCLASSIFIER-retinaType");  //1 = center only, 2 = 3 across, 3 = 3x3, 4 = 5x5, 5 = 7x7
+	numeralDataFileName = (PT == nullptr) ? numeralDataFileNamePL->lookup() : PT->lookupString("WORLD_NUMERALCLASSIFIER-dataFileName");
 
 	outputNodesCount = 13;  // moveX(1), moveY(1), 0->9(10), done(1)
-	retinaType = defaultRetinaType;  //1 = center only, 2 = 3 across, 3 = 3x3, 4 = 5x5, 5 = 7x7
 	switch (retinaType) {
 	case 1:
 		retinaSensors = 1;
@@ -112,8 +116,8 @@ NumeralClassifierWorld::NumeralClassifierWorld() {
 	aveFileColumns.push_back("totalIncorrect");
 }
 
-double NumeralClassifierWorld::testIndividual(shared_ptr<Organism> org, bool analyse, bool show) {
-
+void NumeralClassifierWorld::runWorldSolo(shared_ptr<Organism> org, bool analyse, bool visualize, bool debug) {
+	// numeralClassifierWorld assumes there will only ever be one agent being tested at a time. It uses org by default.
 	double score = 0.0;
 	int currentX, currentY;  // = { Random::getIndex(28), Random::getIndex(28) };  // place organism somewhere in the world
 
@@ -133,7 +137,6 @@ double NumeralClassifierWorld::testIndividual(shared_ptr<Organism> org, bool ana
 	int nodesAssignmentCounter;  // this world can has number of brainState inputs set by parameter. This counter is used while assigning inputs
 	// make sure the brain does not have values from last run
 	org->brain->resetBrain();
-
 	for (int test = 0; test < testsPreWorldEval; test++) {  //run agent for "worldUpdates" brain updates
 		numeralPick = Random::getIndex(10);  // pick a number
 		counts[numeralPick]++;
@@ -233,7 +236,7 @@ double NumeralClassifierWorld::testIndividual(shared_ptr<Organism> org, bool ana
 //			org->brain->resetOutputs();
 //		}
 
-			if (show) {
+			if (debug) {
 				cout << "\n----------------------------\n";
 				cout << "\ngeneration update: " << Global::update << "  world update: " << worldUpdate << "\n";
 				cout << "currentLocation: " << currentX << "," << currentY << "\n";
@@ -255,7 +258,7 @@ double NumeralClassifierWorld::testIndividual(shared_ptr<Organism> org, bool ana
 			currentX += Trit(org->brain->readOutput(0)) * stepSize;  // left and right
 			currentY += Trit(org->brain->readOutput(1)) * stepSize;  // up and down
 
-			if (show) {
+			if (debug) {
 				cout << "outNodes: ";
 				for (int i = 0; i < outputNodesCount; i++) {
 					cout << org->brain->readOutput(i) << " ";
@@ -336,5 +339,9 @@ double NumeralClassifierWorld::testIndividual(shared_ptr<Organism> org, bool ana
 	org->dataMap.Append("alltotalCorrect", total_correct);  // total food eaten (regardless of type)
 	org->dataMap.Append("alltotalIncorrect", total_incorrect);  // total food eaten (regardless of type)
 
-	return score;
+	if (score < 0.0) {
+		score = 0.0;
+	}
+	org->score = score;
+	org->dataMap.Append("allscore", score);
 }

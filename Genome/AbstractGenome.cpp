@@ -1,19 +1,24 @@
+//  MABE is a product of The Hintza Lab @ MSU
+//     for general research information:
+//         http://hintzelab.msu.edu/
+//     for MABE documentation:
+//         https://github.com/ahnt/BasicMarkovBrainTemplate/wiki - for
 //
-//  sites.cpp
-//  BasicMarkovBrainTemplate
-//
-//  Created by Arend Hintze on 5/29/15.
-//  Copyright (c) 2015 Arend Hintze. All rights reserved.
-//
+//  Copyright (c) 2015 Michigan State University. All rights reserved.
+//     to view the full license, visit:
+//          https://github.com/ahnt/BasicMarkovBrainTemplate/wiki/license
 
 #include "AbstractGenome.h"
 
-const string& AbstractGenome::genomeTypeStr = Parameters::register_parameter("genomeType", (string) "Multi", "genome to be used in evolution loop, [Multi, Circular]", "GENOME");  // string parameter for outputMethod;
-const int& AbstractGenome::alphabetSize = Parameters::register_parameter("genomeAlphabetSize", 256, "alphabet size for genome", "GENOME");  // string parameter for outputMethod;
-const string& AbstractGenome::genomeSitesType = Parameters::register_parameter("genomeSitesType", (string) "char", "type for sites in genome [char, int, double, bool]", "GENOME");  // string parameter for outputMethod;
+shared_ptr<ParameterLink<string>> AbstractGenome::genomeTypeStrPL = Parameters::register_parameter("GENOME-genomeType", (string) "Circular", "genome to be used in evolution loop, [Multi, Circular]");  // string parameter for outputMethod;
+shared_ptr<ParameterLink<double>> AbstractGenome::alphabetSizePL = Parameters::register_parameter("GENOME-alphabetSize", 256.0, "alphabet size for genome");  // string parameter for outputMethod;
+shared_ptr<ParameterLink<string>> AbstractGenome::genomeSitesTypePL = Parameters::register_parameter("GENOME-sitesType", (string) "char", "type for sites in genome [char, int, double, bool]");  // string parameter for outputMethod;
 
 
-
+shared_ptr<AbstractGenome> AbstractGenome::makeCopy(shared_ptr<ParametersTable> _PT) {
+	cout << "ERROR IN AbstractGenome::makeCopy() - You are using the abstract copy constructor for genomes. You must define your own" << endl;
+	exit(1);
+}
 
 
 
