@@ -29,7 +29,7 @@ void Decoder::mapToBeginning( vector<int>& map, int length, int start )
     }
 }
 
-void Decoder::mapToEnd( vector<int>& map, int length, int end = 0 )
+void Decoder::mapToEnd( vector<int>& map, int length, int end )
 {
     map.resize( length );
     for( int i = 0; i < length; i++ )
@@ -145,7 +145,7 @@ vector<shared_ptr<AbstractGate>> FixedInputDecoder::decode( const vector<bool>& 
     {
         /* Create a gate: */
 
-        // Hard code the input indices to x previous nodes where x is 
+        // Hard code the input indices to x previous nodes where x is
         // the number of gate inputs
         vector<int> inNodes;
         for( int j = gateIns; j > 0; j-- )

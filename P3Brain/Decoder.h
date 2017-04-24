@@ -22,7 +22,7 @@ public:
 
 protected:
     void mapToBeginning( vector<int>& map, int length, int start = 0 );
-    void mapToEnd( vector<int>& map, int length, int end );
+    void mapToEnd( vector<int>& map, int length, int end = 0 );
 
     bool validated = false;
     int inputEncodingSize;
