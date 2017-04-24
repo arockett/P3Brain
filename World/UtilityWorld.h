@@ -12,21 +12,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "AbstractWorld.h"
+#include "../AbstractWorld.h"
 
 using namespace std;
 
 class UtilityWorld: public AbstractWorld {
-	static const int& thinkTime;
-	static const double& pNoise;
-	static const double& piNoise;
-	static const double& alpha;
-	static const string& DATAFileName;
-	static const int& nrOfTests;
-	
-public:
-	UtilityWorld();
-    virtual double testIndividual( shared_ptr<Organism> org, bool analyse, bool show = 0 ) override;
+
+	// Parameters
+    static shared_ptr<ParameterLink<int>> thinkTimePL;
+    static shared_ptr<ParameterLink<double>> pNoisePL;
+    static shared_ptr<ParameterLink<double>> piNoisePL;
+    static shared_ptr<ParameterLink<double>> alphaPL;
+    static shared_ptr<ParameterLink<string>> DATAFileNamePL;
+    static shared_ptr<ParameterLink<int>> nrOfTestsPL;
+	// End parameters
+
+    int thinkTime;
+    double pNoise;
+    double piNoise;
+    double alpha;
+    string DATAFileName;
+    int nrOfTests;
+
+  public:
+    UtilityWorld(shared_ptr<ParametersTable> _PT = nullptr);
+
+    virtual void runWorldSolo( shared_ptr<Organism> org, bool analyse, bool visualize, bool debug ) override;
+
 	double getPi(double p,double theAlpha);
 	//extra methods added:
 	double GetUtilityForAnsweringQuestion( shared_ptr<Organism> org, double P[2], double Pay[2]);
@@ -40,7 +52,16 @@ public:
     {
         return 4;
     }
-	
+
+    virtual int maxOrgsAllowed() override
+    {
+		return 1;
+    }
+
+    virtual int minOrgsAllowed() override
+    {
+		return 1;
+    }
 };
 
 #endif /* UtilityWorld_hpp */

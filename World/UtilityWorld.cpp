@@ -8,28 +8,32 @@
 
 #include "UtilityWorld.h"
 
-const double& UtilityWorld::pNoise = Parameters::register_parameter( "UTILITY_pNoise", 0.25, "delta noise on p", "WORLD - UTILITY" );
-const double& UtilityWorld::piNoise = Parameters::register_parameter( "UTILITY_piNoise", 0.25, "delta noise on pi", "WORLD - UTILITY" );
-const double& UtilityWorld::alpha = Parameters::register_parameter( "UTILITY_alpha", 0.0, "alpha parameter", "WORLD - UTILITY" );
-const int& UtilityWorld::thinkTime = Parameters::register_parameter( "UTILITY_thinkTime", 100, "think time allowed", "WORLD - UTILITY" );
-const string& UtilityWorld::DATAFileName = Parameters::register_parameter( "UTILITY_DATAFileName", ( string )"defaultDataFile.csv", "file to save the extra data into", "WORLD - UTILITY" );
-const int& UtilityWorld::nrOfTests = Parameters::register_parameter( "UTILITY_nrOfTests", 100, "how many times is a brain asked to do teh decision task", "WORLD - UTILITY" );
+shared_ptr<ParameterLink<double>> UtilityWorld::pNoisePL = Parameters::register_parameter("WORLD_UTILITY-pNoise", 0.25, "delta noise on p");
+shared_ptr<ParameterLink<double>> UtilityWorld::piNoisePL = Parameters::register_parameter("WORLD_UTILITY-piNoise", 0.25, "delta noise on pi");
+shared_ptr<ParameterLink<double>> UtilityWorld::alphaPL = Parameters::register_parameter("WORLD_UTILITY-alpha", 0.0, "alpha parameter");
+shared_ptr<ParameterLink<int>> UtilityWorld::thinkTimePL = Parameters::register_parameter("WORLD_UTILITY-thinkTime", 100, "think time allowed");
+shared_ptr<ParameterLink<string>> UtilityWorld::DATAFileNamePL = Parameters::register_parameter("WORLD_UTILITY-DATAFileName", (string) "defaultDataFile.csv", "file to save the extra data into");
+shared_ptr<ParameterLink<int>> UtilityWorld::nrOfTestsPL = Parameters::register_parameter("WORLD_UTILITY-nrOfTests", 100, "how many times is a brain asked to do teh decision task");
 
-//int DecisionMakerWorld::thinkTime=1;
-//double DecisionMakerWorld::pNoise=0.25;
-//double DecisionMakerWorld::piNoise=0.25;
-//double DecisionMakerWorld::alpha=0.0;
-//string DecisionMakerWorld::DATAFileName="";
+UtilityWorld::UtilityWorld(shared_ptr<ParametersTable> _PT) :
+        AbstractWorld(_PT)
+{
+    pNoise = (PT == nullptr) ? pNoisePL->lookup() : PT->lookupDouble("WORLD_UTILITY-pNoise");
+    piNoise = (PT == nullptr) ? piNoisePL->lookup() : PT->lookupDouble("WORLD_UTILITY-piNoise");
+    alpha = (PT == nullptr) ? alphaPL->lookup() : PT->lookupDouble("WORLD_UTILITY-alpha");
+    thinkTime = (PT == nullptr) ? thinkTimePL->lookup() : PT->lookupInt("WORLD_UTILITY-thinkTime");
+    DATAFileName = (PT == nullptr) ? DATAFileNamePL->lookup() : PT->lookupString("WORLD_UTILITY-DATAFileName");
+    nrOfTests = (PT == nullptr) ? nrOfTestsPL->lookup() : PT->lookupInt("WORLD_UTILITY-nrOfTests");
+}
 
-double UtilityWorld::getPi( double p, double theAlpha ) {
+double UtilityWorld::getPi( double p, double theAlpha )
+{
     return ( -0.5*theAlpha + 0.5 ) + ( p*theAlpha );
 }
 
-UtilityWorld::UtilityWorld() {
-}
 
-
-double UtilityWorld::GetUtilityForAnsweringQuestion( shared_ptr<Organism> org, double P[2], double Pay[2] ) {
+double UtilityWorld::GetUtilityForAnsweringQuestion( shared_ptr<Organism> org, double P[2], double Pay[2] )
+{
     double U[2];
     U[0] = P[0] * Pay[0];
     U[1] = P[1] * Pay[1];
@@ -67,7 +71,8 @@ double UtilityWorld::GetUtilityForAnsweringQuestion( shared_ptr<Organism> org, d
     return 0.0;
 }
 
-double UtilityWorld::testIndividual( shared_ptr<Organism> org, bool analyse, bool show ) {
+void UtilityWorld::runWorldSolo( shared_ptr<Organism> org, bool analyse, bool visualize, bool debug )
+{
     auto& agent = org->brain;
     double fitness = 1.0;
     int correct = 0;
@@ -150,5 +155,6 @@ double UtilityWorld::testIndividual( shared_ptr<Organism> org, bool analyse, boo
         org->dataMap.Set( "incorrect", incorrect );
         org->dataMap.Set( "score", fitness );
     }
-    return fitness;
+
+    org->score = fitness;
 }

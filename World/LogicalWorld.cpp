@@ -26,81 +26,85 @@ LogicalWorld::~LogicalWorld()
 {
 }
 
-double LogicalWorld::testIndividual(shared_ptr<Organism> organism, bool analyse, bool show) {
-    auto& agent = organism->brain;
+void LogicalWorld::runWorldSolo(shared_ptr<Organism> org, bool analyse, bool visualize, bool debug)
+{
+    org->score = 0.0;
+    auto &brain = org->brain;
     // If there aren't enough non-input nodes to check then return 0 fitness
     // because the bit string is not long enough
-    if( (int)logic.size() > agent->nrOfBrainNodes - 2 )
-        return 0.0;
+    if( (int)logic.size() > brain->nrOfBrainNodes - 2 )
+    {
+        return;
+    }
 
     double fitness = 0.0;
 
     /*
-     * Test the agent with each combination of two bit binary inputs
+     * Test the brain with each combination of two bit binary inputs
      */
     // 0 0
-    agent->resetBrain();
-    agent->nodes[0] = 0.0;
-    agent->nodes[1] = 0.0;
-    for( int i = 0; i < agent->nrOfBrainNodes - 2; i++ )
+    brain->resetBrain();
+    brain->nodes[0] = 0.0;
+    brain->nodes[1] = 0.0;
+    for( int i = 0; i < brain->nrOfBrainNodes - 2; i++ )
     {
-        agent->nodes[0] = 0.0;
-        agent->nodes[1] = 0.0;
-        agent->update();
+        brain->nodes[0] = 0.0;
+        brain->nodes[1] = 0.0;
+        brain->update();
     }
     for( unsigned i = 0; i < logic.size(); i++ )
     {
-        if( agent->nodes[agent->nrOfBrainNodes - ( logic.size() - i )] == (double)getBit( logic[i], 3 ) )
+        if( brain->nodes[brain->nrOfBrainNodes - ( logic.size() - i )] == (double)getBit( logic[i], 3 ) )
             fitness += fitnessIncrement;
     }
 
     // 0 1
-    agent->resetBrain();
-    agent->nodes[0] = 0.0;
-    agent->nodes[1] = 1.0;
-    for( int i = 0; i < agent->nrOfBrainNodes - 2; i++ )
+    brain->resetBrain();
+    brain->nodes[0] = 0.0;
+    brain->nodes[1] = 1.0;
+    for( int i = 0; i < brain->nrOfBrainNodes - 2; i++ )
     {
-        agent->nodes[0] = 0.0;
-        agent->nodes[1] = 1.0;
-        agent->update();
+        brain->nodes[0] = 0.0;
+        brain->nodes[1] = 1.0;
+        brain->update();
     }
     for( unsigned i = 0; i < logic.size(); i++ )
     {
-        if( agent->nodes[agent->nrOfBrainNodes - ( logic.size() - i )] == (double)getBit( logic[i], 2 ) )
+        if( brain->nodes[brain->nrOfBrainNodes - ( logic.size() - i )] == (double)getBit( logic[i], 2 ) )
             fitness += fitnessIncrement;
     }
-    
+
     // 1 0
-    agent->resetBrain();
-    agent->nodes[0] = 1.0;
-    agent->nodes[1] = 0.0;
-    for( int i = 0; i < agent->nrOfBrainNodes - 2; i++ )
+    brain->resetBrain();
+    brain->nodes[0] = 1.0;
+    brain->nodes[1] = 0.0;
+    for( int i = 0; i < brain->nrOfBrainNodes - 2; i++ )
     {
-        agent->nodes[0] = 1.0;
-        agent->nodes[1] = 0.0;
-        agent->update();
+        brain->nodes[0] = 1.0;
+        brain->nodes[1] = 0.0;
+        brain->update();
     }
     for( unsigned i = 0; i < logic.size(); i++ )
     {
-        if( agent->nodes[agent->nrOfBrainNodes - ( logic.size() - i )] == (double)getBit( logic[i], 1 ) )
+        if( brain->nodes[brain->nrOfBrainNodes - ( logic.size() - i )] == (double)getBit( logic[i], 1 ) )
             fitness += fitnessIncrement;
     }
 
     // 1 1
-    agent->resetBrain();
-    agent->nodes[0] = 1.0;
-    agent->nodes[1] = 1.0;
-    for( int i = 0; i < agent->nrOfBrainNodes - 2; i++ )
+    brain->resetBrain();
+    brain->nodes[0] = 1.0;
+    brain->nodes[1] = 1.0;
+    for( int i = 0; i < brain->nrOfBrainNodes - 2; i++ )
     {
-        agent->nodes[0] = 1.0;
-        agent->nodes[1] = 1.0;
-        agent->update();
+        brain->nodes[0] = 1.0;
+        brain->nodes[1] = 1.0;
+        brain->update();
     }
     for( unsigned i = 0; i < logic.size(); i++ )
     {
-        if( agent->nodes[agent->nrOfBrainNodes - ( logic.size() - i )] == (double)getBit( logic[i], 0 ) )
+        if( brain->nodes[brain->nrOfBrainNodes - ( logic.size() - i )] == (double)getBit( logic[i], 0 ) )
             fitness += fitnessIncrement;
     }
 
-    return fitness;
+    org->score = fitness;
 }

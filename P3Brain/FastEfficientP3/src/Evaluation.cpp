@@ -18,7 +18,7 @@ evaluation::pointer Configuration::get(const string key) {
 
 /*
 * For this integration of P3 with Markov Brains, a MarkovWorld is the only
-* evaluator that is possible and the specific world to test in is a 
+* evaluator that is possible and the specific world to test in is a
 * configurable option.
 */
 MarkovWorld::MarkovWorld( Configuration& config, int run_number )
@@ -55,7 +55,8 @@ float MarkovWorld::evaluate(const vector<bool>& solution)
     float sum = 0.0;
     for( int i = 0; i < trials; i++ )
     {
-        sum += (float)trainingGround->testIndividual( gladiator, false );
+        trainingGround->runWorldSolo(gladiator, false, false, false);
+        sum += (float)gladiator->score;
     }
     return sum / trials;
 }

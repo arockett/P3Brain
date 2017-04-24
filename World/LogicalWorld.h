@@ -9,7 +9,8 @@
 #ifndef LOGICALWORLD_H_
 #define LOGICALWORLD_H_
 
-#include "AbstractWorld.h"
+#include "../AbstractWorld.h"
+
 
 class LogicalWorld : public AbstractWorld
 {
@@ -36,7 +37,7 @@ public:
     LogicalWorld();
     virtual ~LogicalWorld();
 
-    virtual double testIndividual(shared_ptr<Organism> org, bool analyse, bool show = 0) override;
+    virtual void runWorldSolo(shared_ptr<Organism> org, bool analyse, bool visualize, bool debug) override;
 
     virtual int requiredInputs() override
     {
@@ -48,7 +49,17 @@ public:
         return logic.size();
     }
 
-private:
+    virtual int maxOrgsAllowed() override
+    {
+        return 1;
+    }
+
+    virtual int minOrgsAllowed() override
+    {
+        return 1;
+    }
+
+  private:
     vector<Logic> logic;
     double fitnessIncrement;
 };
