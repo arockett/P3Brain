@@ -43,15 +43,20 @@ void Decoder::mapToEnd( vector<int>& map, int length, int end )
 
 void UnstructuredDecoder::validateParameters( int genomeLength, int numInputNodes, int numOutputNodes, int numHiddenNodes, int gateIns, vector<int>& iMap, vector<int>& oMap )
 {
-    /********************************************************
-    * Calculate encoding sizes to ensure the genome is long enough
-    ********************************************************/
     numNodes = numInputNodes + numOutputNodes + numHiddenNodes;
     int numGates = numOutputNodes + numHiddenNodes;
 
+    /*
+     * Calculate encoding sizes
+     */
     logicEncodingSize = 1 << gateIns;
     inputEncodingSize = (int)ceil( log2( numNodes ) );
     int gateEncodingSize = gateIns * inputEncodingSize + logicEncodingSize;
+
+    /*
+     * Make sure the genome is long enough given the number of gates it needs
+     * to encode and the number of bits needed to encode one gate (gateEncodingSize)
+     */
     ASSERT( genomeLength / gateEncodingSize == numGates,
         "Invalid genome length, should be " << numGates * gateEncodingSize << "." );
 
@@ -112,11 +117,17 @@ void FixedInputDecoder::validateParameters( int genomeLength, int numInputNodes,
 {
     // Calculate the number of bits needed to represent a gate with the given # of ins
     logicEncodingSize = 1 << gateIns;
+    inputEncodingSize = 0;
 
     // How many gates does this genome size encode for? Assert that it is
     // a multiple of the number of bits needed to store one gate logic table
     int numGates = numOutputNodes + numHiddenNodes;
     float encodedGates = (float)genomeLength / (float)logicEncodingSize;
+
+    /*
+     * Make sure the genome is long enough given the number of gates it needs
+     * to encode and the number of bits needed to encode one gate (gateEncodingSize)
+     */
     ASSERT( encodedGates == (float)numGates,
         "Invalid P3 bit string length. With " << gateIns << " gate inputs, and "
         << numGates << " gates, the bit string length must be " << logicEncodingSize * numGates << "." );
@@ -179,13 +190,78 @@ vector<shared_ptr<AbstractGate>> FixedInputDecoder::decode( const vector<bool>& 
 
 void FixedLogicDecoder::validateParameters( int genomeLength, int numInputNodes, int numOutputNodes, int numHiddenNodes, int gateIns, vector<int>& iMap, vector<int>& oMap )
 {
+    numNodes = numInputNodes + numOutputNodes + numHiddenNodes;
+    int numGates = numOutputNodes + numHiddenNodes;
 
+    /*
+     * Since the fixed logic should be a "universal gate" like NOR, there can only be 2 inputs per gate.
+     * Make sure there are only 2 inputs per gate.
+     */
+    ASSERT( gateIns == 2,
+        "Invalid number of inputs per gate. For FixedLogicDecoder must always be 2.");
+
+    /*
+     * Calculate encoding sizes
+     */
+    logicEncodingSize = 0;
+    inputEncodingSize = (int)ceil( log2( numNodes ) );
+    int gateEncodingSize = gateIns * inputEncodingSize;
+
+    /*
+     * Make sure the genome is long enough given the number of gates it needs
+     * to encode and the number of bits needed to encode one gate (gateEncodingSize)
+     */
+    ASSERT( genomeLength / gateEncodingSize == numGates,
+        "Invalid genome length, should be " << numGates * gateEncodingSize << "." );
+
+    /*
+     * Set the input and output mappings
+     */
+    mapToBeginning( iMap, numInputNodes );
+    mapToBeginning( oMap, numOutputNodes, numInputNodes );
+
+    validated = true;
 }
 
 vector<shared_ptr<AbstractGate>> FixedLogicDecoder::decode( const vector<bool>& genome, int numInputNodes, int numOutputNodes, int numHiddenNodes, int gateIns )
 {
-    // TODO
-    return vector<shared_ptr<AbstractGate>>();
+    /********************************************************
+    * Decode the genome bit string
+    ********************************************************/
+    vector<shared_ptr<AbstractGate>> gates;
+    auto start = genome.begin();
+    int nodeId = numInputNodes;
+    while( start != genome.end() )
+    {
+        /* Create a gate: */
+
+        // Get inputs
+        vector<int> inNodes;
+        for( int i = 0; i < gateIns; i++ )
+        {
+            auto end = start + inputEncodingSize;
+            vector<bool> inNumber( start, end );
+            inNodes.push_back( boolStringToInt( inNumber ) % numNodes );
+            start = end;
+        }
+
+        // Set output
+        vector<int> outNode = { nodeId };
+
+        // Set logic to be NOR
+        vector<vector<int>> logic;
+        logic.push_back( vector<int>(1, 1) );   // output if input is 00
+        logic.push_back( vector<int>(1, 0) );   // output is input is 01
+        logic.push_back( vector<int>(1, 0) );   // output is input is 10
+        logic.push_back( vector<int>(1, 0) );   // output is input is 11
+
+        // Create and add gate
+        gates.push_back( make_shared<DeterministicGate>( pair<vector<int>, vector<int>>( inNodes, outNode ), logic, nodeId - numInputNodes ) );
+
+        nodeId++;
+    }
+
+    return gates;
 }
 
 

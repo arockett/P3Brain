@@ -30,6 +30,9 @@ protected:
 };
 
 
+/**
+ * Gates can connect to any node and have any internal logic.
+ */
 class UnstructuredDecoder : public Decoder
 {
 public:
@@ -41,6 +44,10 @@ private:
 };
 
 
+/**
+ * Gates can only connect to the previous N gates where N is the fixed number of inputs for a gate.
+ * Gates can have any internal logic.
+ */
 class FixedInputDecoder : public Decoder
 {
 public:
@@ -49,14 +56,25 @@ public:
 };
 
 
+/**
+ * Gates can connect to any node but all have a fixed internal logic.
+ */
 class FixedLogicDecoder : public Decoder
 {
 public:
     virtual void validateParameters( int, int, int, int, int, vector<int>&, vector<int>& ) override;
     virtual vector<shared_ptr<AbstractGate>> decode( const vector<bool>&, int, int, int, int ) override;
+
+private:
+    int numNodes;
 };
 
 
+/**
+ * Gates are connected like a hypercube where each vertex is a gate and each edge is a possible connection.
+ * Gates may only connect to one of their neighbors in the hypercube.
+ * Gate may have any internal logic.
+ */
 class HypercubeDecoder : public Decoder
 {
 public:
