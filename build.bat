@@ -3,11 +3,12 @@ call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
 
 if not exist ".\build\" mkdir build
 
-set compilerflags=/Ox /Zi /EHsc /W2 /Fo".\build\\"
+set compilerflags=/Od /Zi /EHsc /W2 /Fo".\build\\"
 
 set linkerflags=/OUT:p3brain.exe
 
-set sourcefiles=.\P3Brain\*.cpp^
+set sourcefiles=.\*.cpp^
+ .\P3Brain\*.cpp^
  .\P3Brain\FastEfficientP3\src\*.cpp^
  .\Analyze\*.cpp^
  .\Archivist\*.cpp^
@@ -37,7 +38,8 @@ set sourcefiles=.\P3Brain\*.cpp^
  .\World\BerryWorld\*.cpp^
  .\World\UtilityWorld\*.cpp
 
-set includedirs=/I .\P3Brain^
+set includedirs=/I .\^
+ /I .\P3Brain^
  /I .\P3Brain\FastEfficientP3\src^
  /I .\Analyze^
  /I .\Archivist^

@@ -56,7 +56,7 @@ public:
 
 private:
     shared_ptr<AbstractWorld> trainingGround = nullptr;
-    shared_ptr<Organism> gladiator = make_shared<Organism>();
+    shared_ptr<Organism> gladiator = make_shared<Organism>( make_shared<ParametersTable>("", nullptr) );
     shared_ptr<Decoder> decoder = nullptr;
     int numInputNodes;
     int numOutputNodes;
