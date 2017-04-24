@@ -183,6 +183,12 @@ void BerryWorld::printGrid(vector<int> grid, pair<int, int> loc, int facing) {
 	cout << "\n";
 }
 
+void BerryWorld::runWorldSolo(shared_ptr<Organism> org, bool analyse, bool visualize, bool debug) {
+    shared_ptr<Group> groupOfOne = make_shared<Group>();
+    groupOfOne->population.push_back(org);
+    runWorld(groupOfOne, analyse, visualize, debug);
+}
+
 void BerryWorld::runWorld(shared_ptr<Group> group, bool analyse, bool visualize, bool debug) {
 	vector<double> scores(group->population.size(), 0);
 
