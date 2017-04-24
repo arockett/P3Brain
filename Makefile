@@ -10,15 +10,31 @@ VPATH = P3Brain \
 		P3Brain/FastEfficientP3/src \
 		Analyze \
 		Archivist \
+		Archivist/LODwAPArchivist \
+		Archivist/SSwDArchivist \
 		Brain \
-		Gate \
-		GateListBuilder \
+		Brain/ConstantValuesBrain \
+		Brain/HumanBrain \
+		Brain/MarkovBrain \
+		Brain/MarkovBrain/Gate \
+		Brain/MarkovBrain/GateBuilder \
+		Brain/MarkovBrain/GateListBuilder \
+		Brain/WireBrain \
 		Genome \
+		Genome/CircularGenome \
+		Genome/MultiGenome \
+		Genome/MultiGenome/Chromosome \
 		Group \
 		Optimizer \
+		Optimizer/GAOptimizer \
+		Optimizer/Tournament2Optimizer \
+		Optimizer/TournamentOptimizer \
 		Organism \
 		Utilities \
-		World
+		World \
+		World/BerryWorld \
+		World/LogicalWorld \
+		World/UtilityWorld
 
 # List all files to ignore (best for excluding unwanted 'main' files
 IGNORES = main.cpp \

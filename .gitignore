@@ -9,6 +9,9 @@ gmon.out
 
 *.o
 *.d
+*.exe
+*.ilk
+*.pdb
 
 __pycache__
 *.pyc
@@ -17,9 +20,12 @@ __pycache__
 *.csv
 *.cfg
 
-P3Brain/output.dat
+.vscode
+
 P3Brain/P3Brain.sln
 P3Brain/P3Brain.vcxproj
 P3Brain/P3Brain.vcxproj.filters
 
-P3Brain/solutions.dat
+*output.dat
+*output.meta
+*solutions.dat
