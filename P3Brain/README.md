@@ -1,12 +1,13 @@
-========================================================================
+
 # P3Brain Project Overview
-========================================================================
 
 The P3Brain Project enables optimization of Markov Brains using
 the Parameterless Population Pyramid (P3) algorithm.
 
 P3 optimizes bit strings that represent problem solutions using hill climbing,
 dynamic population sizes, and LTGA crossover.
+
+---
 
 ## Compiling the project
 
@@ -27,6 +28,8 @@ README located in the P3Brain/FastEfficientP3 folder for more info.
 $ p3brain.exe P3Brain/FastEfficientP3/config/default.cfg P3Brain/world.cfg
 ```
 
+---
+
 ## How does this work and where is the code?
 
 The P3Brain code is in the P3Brain folder. The P3 code is also located in the P3Brain
@@ -42,10 +45,11 @@ the command line.
 ### All about Decoders
 
 Currently 4 types of Decoders exist:
-    1. Unstructured
-    2. Fixed Input
-    3. Fixed Logic
-    4. Hypercube
+
+  * Unstructured
+  * Fixed Input
+  * Fixed Logic
+  * Hypercube
 
 The names reflect how they allow gates to connect to each other if at all and
 whether or not the gates can have unique internal logic.
@@ -111,17 +115,23 @@ also equal neighbor one.
 
 ### Where is the code?
 
-Relevant files:
-    - Evaluation.h
+  - Evaluation.h
+
         Declares MarkovWorld Evaluator and creates string mappings that allow
         the 'world' config parameter to specify a test world at run time. Go
         here to add support for more worlds.
-    - Evaluation.cpp
+
+  - Evaluation.cpp
+
         This is where the MarkovWorld Evaluator is defined. Go here to see where
         bit string candidates suggested by P3 are turned into Markov Brains and
         given a fitness score by a world.
-    - Decoder.h
+
+  - Decoder.h
+
         This is where all the Decoder types are declared and where the config parameter
         strings specifying which Decoder to use at runtime are declared.
-    - Decoder.cpp
+
+  - Decoder.cpp
+
         Go here to see how each Decoder type creates gates for a Markov Brain from bit strings.
