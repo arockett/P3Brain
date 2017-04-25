@@ -78,9 +78,9 @@ void UtilityWorld::runWorldSolo( shared_ptr<Organism> org, bool analyse, bool vi
     int correct = 0;
     int incorrect = 0;
     double fixedP[10] = { 0.05,0.15,0.25,0.35,0.45,0.55,0.65,0.75,0.85,0.95 };
-    if( analyse ) {
-        FILE *F = fopen( DATAFileName.c_str(), "w+t" );
-        fprintf( F, "p1,pay1,p2,pay2,U1,U2,C1,C2,undec\n" );
+    if( true ) {
+        //FILE *F = fopen( DATAFileName.c_str(), "w+t" );
+        //fprintf( F, "p1,pay1,p2,pay2,U1,U2,C1,C2,undec\n" );
         for( int t1 = 0; t1 < 100; t1++ ) {
             for( int t2 = 0; t2 < 100; t2++ ) {
                 agent->resetBrain();
@@ -93,41 +93,41 @@ void UtilityWorld::runWorldSolo( shared_ptr<Organism> org, bool analyse, bool vi
                 U[1] = P[1] * Pay[1];
                 double answer = GetUtilityForAnsweringQuestion( org, P, Pay );
                 fitness *= 1.0 + answer;
-                if( answer == 0.0 ) {
-                    if( U[0] < U[1] ) {
-                        fprintf( F, "%f,%f,%f,%f,%f,%f,1,0,1\n", P[0], Pay[0], P[1], Pay[1], U[0], U[1] );
-                    }
-                    else {
-                        fprintf( F, "%f,%f,%f,%f,%f,%f,0,1,1\n", P[0], Pay[0], P[1], Pay[1], U[0], U[1] );
-                    }
-                }
-                else {
-                    if( U[0] == answer ) {
-                        fprintf( F, "%f,%f,%f,%f,%f,%f,1,0,0\n", P[0], Pay[0], P[1], Pay[1], U[0], U[1] );
-                    }
-                    else {
-                        fprintf( F, "%f,%f,%f,%f,%f,%f,0,1,0\n", P[0], Pay[0], P[1], Pay[1], U[0], U[1] );
-                    }
-                }
+                // if( answer == 0.0 ) {
+                //     if( U[0] < U[1] ) {
+                //         fprintf( F, "%f,%f,%f,%f,%f,%f,1,0,1\n", P[0], Pay[0], P[1], Pay[1], U[0], U[1] );
+                //     }
+                //     else {
+                //         fprintf( F, "%f,%f,%f,%f,%f,%f,0,1,1\n", P[0], Pay[0], P[1], Pay[1], U[0], U[1] );
+                //     }
+                // }
+                // else {
+                //     if( U[0] == answer ) {
+                //         fprintf( F, "%f,%f,%f,%f,%f,%f,1,0,0\n", P[0], Pay[0], P[1], Pay[1], U[0], U[1] );
+                //     }
+                //     else {
+                //         fprintf( F, "%f,%f,%f,%f,%f,%f,0,1,0\n", P[0], Pay[0], P[1], Pay[1], U[0], U[1] );
+                //     }
+                // }
             }
         }
-        fclose( F );
+        //fclose( F );
     }
     else {
         // normal evolution
         for( int i = 0; i < nrOfTests; i++ ) {
             agent->resetBrain();
             double P[2], Pay[2], U[2];
-            for( int l = 0; l < 2; l++ ) {
+            for( int k = 0; k < 2; k++ ) {
                 double nx, ny;
                 //this creates random variables from the defined distribution
                 //this needs to become the predefined question matrix
                 do {
                     nx = ( Random::getDouble( 1.0 )*pNoise ) - ( pNoise / 2.0 );
                     ny = ( Random::getDouble( 1.0 )*piNoise ) - ( piNoise / 2.0 );
-                    P[l] = Random::getDouble( 1.0 ) + nx;
-                    Pay[l] = getPi( P[l], alpha ) + ny;
-                } while( ( P[l]<0.0 ) || ( P[l]>1.0 ) || ( Pay[l]<0.0 ) || ( Pay[l]>1.0 ) );
+                    P[k] = Random::getDouble( 1.0 ) + nx;
+                    Pay[k] = getPi( P[k], alpha ) + ny;
+                } while( ( P[k]<0.0 ) || ( P[k]>1.0 ) || ( Pay[k]<0.0 ) || ( Pay[k]>1.0 ) );
             }
             U[0] = P[0] * Pay[0];
             U[1] = P[1] * Pay[1];
